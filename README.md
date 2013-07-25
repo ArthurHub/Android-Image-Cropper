@@ -4,6 +4,8 @@ The Cropper is an image cropping tool. It provides a way to set an image in XML 
 
 For more information, see the linked Github Wiki page. 
 
+https://github.com/edmodo/cropper/wiki
+
 License
 =======
 Copyright 2013, Edmodo, Inc. 
