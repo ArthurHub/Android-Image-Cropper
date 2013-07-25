@@ -6,6 +6,8 @@ For more information, see the linked Github Wiki page.
 
 https://github.com/edmodo/cropper/wiki
 
+![ScreenShot](http://i.imgur.com/3FhsTgfl.jpg)
+
 License
 =======
 Copyright 2013, Edmodo, Inc. 
