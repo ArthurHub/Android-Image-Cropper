@@ -2,7 +2,7 @@ Cropper
 =======
 The Cropper is an image cropping tool. It provides a way to set an image in XML and programmatically, and displays a resizable crop window on top of the image. Calling the method getCroppedImage() will then return the Bitmap marked by the crop window.
 
-For more information, see the linked Github wiki page. 
+For more information, see the linked Github Wiki page. 
 
 License
 =======
