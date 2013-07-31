@@ -9,12 +9,11 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" 
  * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
  * governing permissions and limitations under the License. 
-*/
+ */
 
 package com.edmodo.cropper.cropwindow;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -147,19 +146,15 @@ public class CropOverlayView extends View {
 
         if (showGuidelines()) {
             // Determines whether guidelines should be drawn or not
-            if (mGuidelines == GUIDELINES_ON)
+            if (mGuidelines == GUIDELINES_ON) {
                 drawRuleOfThirdsGuidelines(canvas);
-
-            if (mGuidelines == GUIDELINES_ON_TOUCH)
-            {
+            } else if (mGuidelines == GUIDELINES_ON_TOUCH) {
                 // Draw only when resizing
                 if (mPressedHandle != null)
                     drawRuleOfThirdsGuidelines(canvas);
-            }
-
-            if (mGuidelines == GUIDELINES_OFF)
+            } else if (mGuidelines == GUIDELINES_OFF) {
                 // Do nothing
-                ;
+            }
         }
 
         // Draws the main crop window border.
@@ -170,7 +165,6 @@ public class CropOverlayView extends View {
                         mBorderPaint);
 
         drawCorners(canvas);
-
     }
 
     @Override
@@ -189,13 +183,13 @@ public class CropOverlayView extends View {
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                this.getParent().requestDisallowInterceptTouchEvent(false);
+                getParent().requestDisallowInterceptTouchEvent(false);
                 onActionUp();
                 return true;
 
             case MotionEvent.ACTION_MOVE:
                 onActionMove(event.getX(), event.getY());
-                this.getParent().requestDisallowInterceptTouchEvent(true);
+                getParent().requestDisallowInterceptTouchEvent(true);
                 return true;
 
             default:
@@ -217,7 +211,7 @@ public class CropOverlayView extends View {
     }
 
     /**
-     * Resets the crop overlay view. 
+     * Resets the crop overlay view.
      * 
      * @param bitmap the Bitmap to set
      */

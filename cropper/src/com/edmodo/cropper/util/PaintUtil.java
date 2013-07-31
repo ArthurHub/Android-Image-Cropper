@@ -9,7 +9,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" 
  * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
  * governing permissions and limitations under the License. 
-*/
+ */
 
 package com.edmodo.cropper.util;
 
@@ -17,8 +17,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.TypedValue;
-
-import com.edmodo.cropper.R;
 
 /**
  * Utility class for handling all of the Paint used to draw the CropOverlayView.
@@ -106,7 +104,7 @@ public class PaintUtil {
 
         return cornerPaint;
     }
-    
+
     /**
      * Returns the value of the corner thickness
      * 
@@ -115,8 +113,7 @@ public class PaintUtil {
     public static float getCornerThickness() {
         return DEFAULT_CORNER_THICKNESS_DP;
     }
-    
-    
+
     /**
      * Returns the value of the line thickness of the border
      * 

@@ -14,7 +14,6 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Switch;
@@ -25,9 +24,9 @@ import com.edmodo.cropper.CropImageView;
 public class MainActivity extends Activity {
 
     Bitmap croppedImage;
-    
+
     private final static int DEFAULT_ASPECT_RATIO_VALUES = 10;
-    
+
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -51,11 +50,11 @@ public class MainActivity extends Activity {
             }
 
         });
-        
-        //Sets initial aspect ratio to 10/10, for demonstration purposes
+
+        // Sets initial aspect ratio to 10/10, for demonstration purposes
         cropImageView.setAspectRatioX(DEFAULT_ASPECT_RATIO_VALUES);
         cropImageView.setAspectRatioY(DEFAULT_ASPECT_RATIO_VALUES);
-        
+
         // Sets aspectRatioX
         final TextView aspectRatioX = (TextView) findViewById(R.id.aspectRatioX);
         SeekBar aspectRatioXSeek = (SeekBar) findViewById(R.id.aspectRatioXSeek);
@@ -99,7 +98,7 @@ public class MainActivity extends Activity {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-        
+
         // Sets showGuidelines
         final TextView showGuidelines = (TextView) findViewById(R.id.showGuidelines);
         SeekBar showGuidelinesSeek = (SeekBar) findViewById(R.id.showGuidelinesSeek);
@@ -114,7 +113,7 @@ public class MainActivity extends Activity {
                         showGuidelines.setText("showGuidelines = onTouch");
                     else if (progress == 2)
                         showGuidelines.setText("showGuidelines = on");
-                    
+
                 } catch (IllegalArgumentException e) {
                 }
             }
@@ -127,10 +126,10 @@ public class MainActivity extends Activity {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-        
+
         final Button cropButton = (Button) findViewById(R.id.Button_crop);
         cropButton.setOnClickListener(new View.OnClickListener() {
-            
+
             @Override
             public void onClick(View v) {
                 croppedImage = cropImageView.getCroppedImage();

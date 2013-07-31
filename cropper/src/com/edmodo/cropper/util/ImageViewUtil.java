@@ -9,7 +9,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" 
  * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
  * governing permissions and limitations under the License. 
-*/
+ */
 
 package com.edmodo.cropper.util;
 
@@ -78,19 +78,20 @@ public class ImageViewUtil {
         double resultHeight;
         int resultX;
         int resultY;
-        
+
         double viewToBitmapWidthRatio = Double.POSITIVE_INFINITY;
         double viewToBitmapHeightRatio = Double.POSITIVE_INFINITY;
 
-        //Checks if either width or height needs to be fixed
+        // Checks if either width or height needs to be fixed
         if (viewWidth < bitmapWidth) {
             viewToBitmapWidthRatio = (double) viewWidth / (double) bitmapWidth;
         }
         if (viewHeight < bitmapHeight) {
             viewToBitmapHeightRatio = (double) viewHeight / (double) bitmapHeight;
         }
-        
-        //If either needs to be fixed, choose smallest ratio and calculate from there
+
+        // If either needs to be fixed, choose smallest ratio and calculate from
+        // there
         if (viewToBitmapWidthRatio != Double.POSITIVE_INFINITY || viewToBitmapHeightRatio != Double.POSITIVE_INFINITY)
         {
             if (viewToBitmapWidthRatio <= viewToBitmapHeightRatio) {
@@ -102,7 +103,8 @@ public class ImageViewUtil {
                 resultWidth = (bitmapWidth * resultHeight / bitmapHeight);
             }
         }
-        //Otherwise, the picture is within frame layout bounds. Desired width is simply picture size
+        // Otherwise, the picture is within frame layout bounds. Desired width
+        // is simply picture size
         else {
             resultHeight = bitmapHeight;
             resultWidth = bitmapWidth;
@@ -121,7 +123,10 @@ public class ImageViewUtil {
             resultY = (int) Math.round((viewHeight - resultHeight) / 2);
         }
 
-        final Rect result = new Rect(resultX, resultY, resultX + (int) Math.ceil(resultWidth), resultY + (int) Math.ceil(resultHeight));
+        final Rect result = new Rect(resultX,
+                                     resultY,
+                                     resultX + (int) Math.ceil(resultWidth),
+                                     resultY + (int) Math.ceil(resultHeight));
 
         return result;
     }
