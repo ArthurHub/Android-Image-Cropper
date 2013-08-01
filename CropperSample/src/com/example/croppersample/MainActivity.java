@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -27,13 +29,14 @@ public class MainActivity extends Activity {
     private final static int DEFAULT_ASPECT_RATIO_VALUES = 10;
     private static final String ASPECT_RATIO_X = "ASPECT_RATIO_X";
     private static final String ASPECT_RATIO_Y = "ASPECT_RATIO_Y";
-    
+    private static final int ON_TOUCH = 1;
+
     // Instance variables
     private int mAspectRatioX = DEFAULT_ASPECT_RATIO_VALUES;
     private int mAspectRatioY = DEFAULT_ASPECT_RATIO_VALUES;
 
     Bitmap croppedImage;
-    
+
     // Saves the state upon rotating the screen/restarting the activity
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
@@ -49,7 +52,7 @@ public class MainActivity extends Activity {
         mAspectRatioX = bundle.getInt(ASPECT_RATIO_X);
         mAspectRatioY = bundle.getInt(ASPECT_RATIO_Y);
     }
-    
+
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -61,17 +64,35 @@ public class MainActivity extends Activity {
         ViewGroup root = (ViewGroup) findViewById(R.id.mylayout);
         setFont(root, mFont);
 
+        // Initialize components of the app
         final CropImageView cropImageView = (CropImageView) findViewById(R.id.CropImageView);
+        final SeekBar aspectRatioXSeek = (SeekBar) findViewById(R.id.aspectRatioXSeek);
+        final SeekBar aspectRatioYSeek = (SeekBar) findViewById(R.id.aspectRatioYSeek);
+        final ToggleButton fixedAspectRatioToggle = (ToggleButton) findViewById(R.id.fixedAspectRatioToggle);
+        Spinner showGuidelinesSpin = (Spinner) findViewById(R.id.showGuidelinesSpin);
+        
+        // Sets sliders to be disabled until fixedAspectRatio is set
+        aspectRatioXSeek.setEnabled(false);
+        aspectRatioYSeek.setEnabled(false);
+
+        // Set initial spinner value
+        showGuidelinesSpin.setSelection(ON_TOUCH);
 
         // Sets fixedAspectRatio
-        ToggleButton fixedAspectRatioToggle = (ToggleButton) findViewById(R.id.fixedAspectRatioToggle);
         fixedAspectRatioToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 cropImageView.setFixedAspectRatio(isChecked);
+                if (isChecked) {
+                    aspectRatioXSeek.setEnabled(true);
+                    aspectRatioYSeek.setEnabled(true);
+                }
+                else {
+                    aspectRatioXSeek.setEnabled(false);
+                    aspectRatioYSeek.setEnabled(false);
+                }
             }
-
         });
 
         // Sets initial aspect ratio to 10/10, for demonstration purposes
@@ -79,7 +100,7 @@ public class MainActivity extends Activity {
 
         // Sets aspectRatioX
         final TextView aspectRatioX = (TextView) findViewById(R.id.aspectRatioX);
-        SeekBar aspectRatioXSeek = (SeekBar) findViewById(R.id.aspectRatioXSeek);
+
         aspectRatioXSeek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar aspectRatioXSeek, int progress, boolean fromUser) {
@@ -102,7 +123,7 @@ public class MainActivity extends Activity {
 
         // Sets aspectRatioY
         final TextView aspectRatioY = (TextView) findViewById(R.id.aspectRatioY);
-        SeekBar aspectRatioYSeek = (SeekBar) findViewById(R.id.aspectRatioYSeek);
+
         aspectRatioYSeek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar aspectRatioYSeek, int progress, boolean fromUser) {
@@ -123,31 +144,15 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Sets showGuidelines
-        final TextView showGuidelines = (TextView) findViewById(R.id.showGuidelines);
-        SeekBar showGuidelinesSeek = (SeekBar) findViewById(R.id.showGuidelinesSeek);
-        showGuidelinesSeek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar showGuidelinesSeek, int progress, boolean fromUser) {
-                try {
-                    cropImageView.setGuidelines(progress);
-                    if (progress == 0)
-                        showGuidelines.setText("showGuidelines = off");
-                    else if (progress == 1)
-                        showGuidelines.setText("showGuidelines = onTouch");
-                    else if (progress == 2)
-                        showGuidelines.setText("showGuidelines = on");
 
-                } catch (IllegalArgumentException e) {
-                }
+        // Sets up the Spinner
+        showGuidelinesSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                cropImageView.setGuidelines(i);
             }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                return;
             }
         });
 
