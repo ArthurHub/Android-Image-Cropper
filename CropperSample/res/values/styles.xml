@@ -13,7 +13,18 @@
     </style>
 
     <!-- Application theme. -->
-<style name="AppTheme" parent="android:Theme.Holo" />
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    <style name="AppTheme" parent="android:Theme.Holo" />
+    <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+
+
+    <!-- Robo Theme. -->
+    <style name="RoboTheme" parent="@android:style/TextAppearance.DeviceDefault.Medium">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">@dimen/textSize</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginTop">10dp</item>
+    </style>
 
 </resources>

@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
                 try {
                     mAspectRatioX = progress;
                     cropImageView.setAspectRatio(progress, mAspectRatioY);
-                    aspectRatioX.setText("aspectRatioX = " + progress);
+                    aspectRatioX.setText(" " + progress);
                 } catch (IllegalArgumentException e) {
                 }
             }
@@ -130,7 +130,7 @@ public class MainActivity extends Activity {
                 try {
                     mAspectRatioY = progress;
                     cropImageView.setAspectRatio(mAspectRatioX, progress);
-                    aspectRatioY.setText("aspectRatioY = " + progress);
+                    aspectRatioY.setText(" " + progress);
                 } catch (IllegalArgumentException e) {
                 }
             }
