@@ -41,19 +41,32 @@
             android:paddingLeft="40dp"
             android:paddingRight="40dp" >
 
-            <TextView
-                android:id="@+id/fixedAspectRatio"
-                style="@style/RoboTheme"
-                android:paddingBottom="8dp"
-                android:paddingTop="20dp"
-                android:text="@string/fixedAspectRatio" />
-
-            <ToggleButton
-                android:id="@+id/fixedAspectRatioToggle"
-                style="@style/RoboTheme"
+            <RelativeLayout
+                android:id="@+id/fixedAspectRatioLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="15dp"
+                android:focusableInTouchMode="true" >
+
+                <TextView
+                    android:id="@+id/fixedAspectRatio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/fixedAspectRatio"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp" />
+
+                <ToggleButton
+                    android:id="@+id/fixedAspectRatioToggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/fixedAspectRatio"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp" />
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/aspectRatioX"
@@ -81,27 +94,45 @@
                 android:max="100"
                 android:progress="10" />
 
-            <TextView
-                android:id="@+id/showGuidelines"
-                style="@style/RoboTheme"
-                android:paddingBottom="8dp"
-                android:text="@string/showGuidelines" />
-
-            <Spinner
-                android:id="@+id/showGuidelinesSpin"
-                style="@style/RoboTheme"
+            <RelativeLayout
+                android:id="@+id/showGuidelinesLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:entries="@array/showGuidelinesArray" />
+                android:layout_marginBottom="10dp"
+                android:focusableInTouchMode="true" >
+
+                <TextView
+                    android:id="@+id/showGuidelines"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/showGuidelines"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp" />
+
+                <Spinner
+                    android:id="@+id/showGuidelinesSpin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/showGuidelines"
+                    android:entries="@array/showGuidelinesArray"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp" />
+            </RelativeLayout>
+
 
             <Button
                 android:id="@+id/Button_crop"
                 style="@style/RoboTheme"
-                android:background="@android:color/transparent"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:background="#474747"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="@string/crop"
                 android:textColor="#33B5E5"
-                android:textSize="35sp" />
+                android:textSize="30sp"/>
 
             <ImageView
                 android:id="@+id/croppedImageView"
