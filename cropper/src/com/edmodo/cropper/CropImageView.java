@@ -38,7 +38,7 @@ public class CropImageView extends FrameLayout {
 
     // Sets the default image guidelines to show when resizing
     public static final int DEFAULT_GUIDELINES = 1;
-    public static final boolean DEFAULT_FIXED_ASPECT_RATIO = true;
+    public static final boolean DEFAULT_FIXED_ASPECT_RATIO = false;
     public static final int DEFAULT_ASPECT_RATIO_X = 1;
     public static final int DEFAULT_ASPECT_RATIO_Y = 1;
 
@@ -301,30 +301,6 @@ public class CropImageView extends FrameLayout {
         mAspectRatioX = aspectRatioX;
         mCropOverlayView.setAspectRatioX(mAspectRatioX);
 
-        mAspectRatioY = aspectRatioY;
-        mCropOverlayView.setAspectRatioY(mAspectRatioY);
-    }
-
-    /**
-     * Sets the X value of the aspect ratio; is defaulted to 1.
-     * 
-     * @param aspectRatioX int that specifies the new X value of the aspect
-     *            ratio
-     */
-    public void setAspectRatioX(int aspectRatioX)
-    {
-        mAspectRatioX = aspectRatioX;
-        mCropOverlayView.setAspectRatioX(mAspectRatioX);
-    }
-
-    /**
-     * Sets the Y value of the aspect ratio; is defaulted to 1.
-     * 
-     * @param aspectRatioY int that specifies the new Y value of the aspect
-     *            ratio
-     */
-    public void setAspectRatioY(int aspectRatioY)
-    {
         mAspectRatioY = aspectRatioY;
         mCropOverlayView.setAspectRatioY(mAspectRatioY);
     }

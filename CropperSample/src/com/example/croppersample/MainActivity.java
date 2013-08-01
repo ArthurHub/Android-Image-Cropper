@@ -23,10 +23,33 @@ import com.edmodo.cropper.CropImageView;
 
 public class MainActivity extends Activity {
 
-    Bitmap croppedImage;
-
+    // Static final constants
     private final static int DEFAULT_ASPECT_RATIO_VALUES = 10;
+    private static final String ASPECT_RATIO_X = "ASPECT_RATIO_X";
+    private static final String ASPECT_RATIO_Y = "ASPECT_RATIO_Y";
+    
+    // Instance variables
+    private int mAspectRatioX = DEFAULT_ASPECT_RATIO_VALUES;
+    private int mAspectRatioY = DEFAULT_ASPECT_RATIO_VALUES;
 
+    Bitmap croppedImage;
+    
+    // Saves the state upon rotating the screen/restarting the activity
+    @Override
+    protected void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        bundle.putInt(ASPECT_RATIO_X, mAspectRatioX);
+        bundle.putInt(ASPECT_RATIO_Y, mAspectRatioY);
+    }
+
+    // Restores the state upon rotating the screen/restarting the activity
+    @Override
+    protected void onRestoreInstanceState(Bundle bundle) {
+        super.onRestoreInstanceState(bundle);
+        mAspectRatioX = bundle.getInt(ASPECT_RATIO_X);
+        mAspectRatioY = bundle.getInt(ASPECT_RATIO_Y);
+    }
+    
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -52,8 +75,7 @@ public class MainActivity extends Activity {
         });
 
         // Sets initial aspect ratio to 10/10, for demonstration purposes
-        cropImageView.setAspectRatioX(DEFAULT_ASPECT_RATIO_VALUES);
-        cropImageView.setAspectRatioY(DEFAULT_ASPECT_RATIO_VALUES);
+        cropImageView.setAspectRatio(DEFAULT_ASPECT_RATIO_VALUES, DEFAULT_ASPECT_RATIO_VALUES);
 
         // Sets aspectRatioX
         final TextView aspectRatioX = (TextView) findViewById(R.id.aspectRatioX);
@@ -62,7 +84,8 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(SeekBar aspectRatioXSeek, int progress, boolean fromUser) {
                 try {
-                    cropImageView.setAspectRatioX(progress);
+                    mAspectRatioX = progress;
+                    cropImageView.setAspectRatio(progress, mAspectRatioY);
                     aspectRatioX.setText("aspectRatioX = " + progress);
                 } catch (IllegalArgumentException e) {
                 }
@@ -84,7 +107,8 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(SeekBar aspectRatioYSeek, int progress, boolean fromUser) {
                 try {
-                    cropImageView.setAspectRatioY(progress);
+                    mAspectRatioY = progress;
+                    cropImageView.setAspectRatio(mAspectRatioX, progress);
                     aspectRatioY.setText("aspectRatioY = " + progress);
                 } catch (IllegalArgumentException e) {
                 }
