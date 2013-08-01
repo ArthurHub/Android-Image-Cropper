@@ -16,8 +16,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.edmodo.cropper.CropImageView;
 
@@ -64,8 +64,8 @@ public class MainActivity extends Activity {
         final CropImageView cropImageView = (CropImageView) findViewById(R.id.CropImageView);
 
         // Sets fixedAspectRatio
-        Switch fixedAspectRatioSwitch = (Switch) findViewById(R.id.fixedAspectRatioSwitch);
-        fixedAspectRatioSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        ToggleButton fixedAspectRatioToggle = (ToggleButton) findViewById(R.id.fixedAspectRatioToggle);
+        fixedAspectRatioToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

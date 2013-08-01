@@ -44,15 +44,16 @@
             <TextView
                 android:id="@+id/fixedAspectRatio"
                 style="@style/RoboTheme"
+                android:paddingBottom="8dp"
                 android:paddingTop="20dp"
                 android:text="@string/fixedAspectRatio" />
 
-            <Switch
-                android:id="@+id/fixedAspectRatioSwitch"
+            <ToggleButton
+                android:id="@+id/fixedAspectRatioToggle"
                 style="@style/RoboTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center" />
 
             <TextView
                 android:id="@+id/aspectRatioX"
