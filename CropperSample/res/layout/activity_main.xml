@@ -19,6 +19,7 @@
 
         <TextView
             android:id="@+id/title"
+            style="@style/RoboTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -41,24 +42,59 @@
             android:paddingLeft="40dp"
             android:paddingRight="40dp" >
 
-            <TextView
-                android:id="@+id/fixedAspectRatio"
-                style="@style/RoboTheme"
-                android:paddingBottom="8dp"
-                android:paddingTop="20dp"
-                android:text="@string/fixedAspectRatio" />
-
-            <ToggleButton
-                android:id="@+id/fixedAspectRatioToggle"
-                style="@style/RoboTheme"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/showGuidelinesLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="15dp"
+                android:focusableInTouchMode="true"
+                android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/aspectRatioX"
-                style="@style/RoboTheme"
-                android:text="@string/aspectRatioX" />
+                <TextView
+                    android:id="@+id/fixedAspectRatio"
+                    style="@style/RoboTheme"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|right"
+                    android:text="@string/fixedAspectRatio" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal" >
+
+                    <ToggleButton
+                        android:id="@+id/fixedAspectRatioToggle"
+                        style="@style/RoboTheme"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/aspectRatioXHeader"
+                    style="@style/RoboTheme"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/aspectRatioXHeader" />
+
+                <TextView
+                    android:id="@+id/aspectRatioX"
+                    style="@style/RoboTheme"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:text="@string/aspectRatioX" />
+            </LinearLayout>
 
             <SeekBar
                 android:id="@+id/aspectRatioXSeek"
@@ -68,10 +104,27 @@
                 android:max="100"
                 android:progress="10" />
 
-            <TextView
-                android:id="@+id/aspectRatioY"
-                style="@style/RoboTheme"
-                android:text="@string/aspectRatioY" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/aspectRatioYHeader"
+                    style="@style/RoboTheme"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/aspectRatioYHeader" />
+
+                <TextView
+                    android:id="@+id/aspectRatioY"
+                    style="@style/RoboTheme"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:text="@string/aspectRatioY" />
+            </LinearLayout>
 
             <SeekBar
                 android:id="@+id/aspectRatioYSeek"
@@ -81,34 +134,59 @@
                 android:max="100"
                 android:progress="10" />
 
-            <TextView
-                android:id="@+id/showGuidelines"
-                style="@style/RoboTheme"
-                android:paddingBottom="8dp"
-                android:text="@string/showGuidelines" />
-
-            <Spinner
-                android:id="@+id/showGuidelinesSpin"
-                style="@style/RoboTheme"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/showGuidelinesLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:entries="@array/showGuidelinesArray" />
+                android:layout_marginBottom="10dp"
+                android:focusableInTouchMode="true"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/showGuidelines"
+                    style="@style/RoboTheme"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/showGuidelines" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal" >
+
+                    <Spinner
+                        android:id="@+id/showGuidelinesSpin"
+                        style="@style/RoboTheme"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/showGuidelinesArray"
+                        android:gravity="left" />
+                </LinearLayout>
+            </LinearLayout>
 
             <Button
                 android:id="@+id/Button_crop"
                 style="@style/RoboTheme"
-                android:background="@android:color/transparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
                 android:text="@string/crop"
                 android:textColor="#33B5E5"
-                android:textSize="35sp" />
+                android:textSize="30sp" />
 
             <ImageView
                 android:id="@+id/croppedImageView"
                 style="@style/RoboTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="center|top"
                 android:contentDescription="@string/croppedImageDesc"
                 android:src="@drawable/butterfly" />
         </LinearLayout>

@@ -5,9 +5,11 @@
     <string name="title">Cropper</string>
     <string name="action_settings">Settings</string>
     <string name="title">Cropper</string>
-    <string name="fixedAspectRatio">fixedAspectRatio = </string>
-    <string name="aspectRatioX">aspectRatioX = 10</string>
-    <string name="aspectRatioY">aspectRatioY = 10</string>
+    <string name="fixedAspectRatio">fixedAspectRatio =</string>
+    <string name="aspectRatioX">\u002010</string>
+    <string name="aspectRatioXHeader">aspectRatioX =</string>
+    <string name="aspectRatioY">\u002010</string>
+    <string name="aspectRatioYHeader">aspectRatioY =</string>
     <string name="showGuidelines">showGuidelines = </string>
     <string name="crop">Crop</string>
     <string name="croppedImageDesc">The cropped image.</string>
