@@ -84,15 +84,16 @@
             <TextView
                 android:id="@+id/showGuidelines"
                 style="@style/RoboTheme"
+                android:paddingBottom="8dp"
                 android:text="@string/showGuidelines" />
 
-            <SeekBar
-                android:id="@+id/showGuidelinesSeek"
+            <Spinner
+                android:id="@+id/showGuidelinesSpin"
                 style="@style/RoboTheme"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:max="2"
-                android:progress="1" />
+                android:layout_gravity="center"
+                android:entries="@array/showGuidelinesArray" />
 
             <Button
                 android:id="@+id/Button_crop"

@@ -8,8 +8,14 @@
     <string name="fixedAspectRatio">fixedAspectRatio = </string>
     <string name="aspectRatioX">aspectRatioX = 10</string>
     <string name="aspectRatioY">aspectRatioY = 10</string>
-    <string name="showGuidelines">showGuidelines = onTouch</string>
+    <string name="showGuidelines">showGuidelines = </string>
     <string name="crop">Crop</string>
     <string name="croppedImageDesc">The cropped image.</string>
+
+    <string-array name="showGuidelinesArray">
+        <item>Off</item>
+        <item>On Touch</item>
+        <item>On</item>
+    </string-array>
 
 </resources>
