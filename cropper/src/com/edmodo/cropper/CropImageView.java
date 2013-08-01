@@ -151,8 +151,8 @@ public class CropImageView extends FrameLayout {
                 desiredHeight = mBitmap.getHeight();
             }
 
-            int width = setOnMeasureSpec(widthMode, widthSize, desiredWidth);
-            int height = setOnMeasureSpec(heightMode, heightSize, desiredHeight);
+            int width = getOnMeasureSpec(widthMode, widthSize, desiredWidth);
+            int height = getOnMeasureSpec(heightMode, heightSize, desiredHeight);
 
             mLayoutWidth = width;
             mLayoutHeight = height;
@@ -329,7 +329,7 @@ public class CropImageView extends FrameLayout {
      * @param desiredSize The desired size of the measured width or height.
      * @return The final size of the width or height.
      */
-    private static int setOnMeasureSpec(int measureSpecMode, int measureSpecSize, int desiredSize)
+    private static int getOnMeasureSpec(int measureSpecMode, int measureSpecSize, int desiredSize)
     {
         // Measure Width
         int spec;
