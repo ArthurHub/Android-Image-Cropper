@@ -2,6 +2,15 @@ Cropper
 =======
 The Cropper is an image cropping tool. It provides a way to set an image in XML and programmatically, and displays a resizable crop window on top of the image. Calling the method getCroppedImage() will then return the Bitmap marked by the crop window.
 
+Furthermore, developers are able to customize the following attributes (both via XML and programmatically):
+
+- appearance of guidelines in the crop window
+- whether the aspect ratio is fixed or not
+- aspect ratio (if the aspect ratio is fixed)
+- image resource
+
+A public method to rotate the image by a specified number of degrees is also included, by calling rotateImage(). This can be used to provide the user with an option to fix the image orientation should Android miscalculate the intended orientation.
+
 For more information, see the linked Github Wiki page. 
 
 https://github.com/edmodo/cropper/wiki
