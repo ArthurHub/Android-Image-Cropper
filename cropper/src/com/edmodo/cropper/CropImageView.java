@@ -17,7 +17,10 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,11 +46,14 @@ public class CropImageView extends FrameLayout {
     public static final int DEFAULT_ASPECT_RATIO_Y = 1;
 
     private static final int DEFAULT_IMAGE_RESOURCE = 0;
+    
+    private static final String DEGREES_ROTATED = "DEGREES_ROTATED";
 
     private ImageView mImageView;
     private CropOverlayView mCropOverlayView;
 
     private Bitmap mBitmap;
+    private int mDegreesRotated = 0;
 
     private int mLayoutWidth;
     private int mLayoutHeight;
@@ -86,8 +92,42 @@ public class CropImageView extends FrameLayout {
         init(context);
     }
 
+    
     // View Methods ////////////////////////////////////////////////////////////
 
+    @Override
+    public Parcelable onSaveInstanceState() {
+
+        final Bundle bundle = new Bundle();
+
+        bundle.putParcelable("instanceState", super.onSaveInstanceState());
+        bundle.putInt(DEGREES_ROTATED, mDegreesRotated);
+        
+        return bundle;
+        
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+
+        if (state instanceof Bundle) {
+
+            final Bundle bundle = (Bundle) state;
+
+            //Fixes the rotation of the image when orientation changes.
+            mDegreesRotated = bundle.getInt(DEGREES_ROTATED);
+            int tempDegrees = mDegreesRotated;
+            rotateImage(mDegreesRotated);
+            mDegreesRotated = tempDegrees;
+            
+            super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
+
+        } else {
+            super.onRestoreInstanceState(state);
+        }
+    }
+    
+    
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 
@@ -304,6 +344,23 @@ public class CropImageView extends FrameLayout {
         mAspectRatioY = aspectRatioY;
         mCropOverlayView.setAspectRatioY(mAspectRatioY);
     }
+    
+    /**
+     * Rotates image by the specified number of degrees clockwise. Cycles from 0 to 360 degrees.
+     * 
+     * @param degrees Integer specifying the number of degrees to rotate.
+     */
+    public void rotateImage(int degrees) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        mBitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
+        setImageBitmap(mBitmap);
+        
+        mDegreesRotated += degrees;
+        mDegreesRotated = mDegreesRotated % 360;
+    }
+    
+    
 
     // Private Methods /////////////////////////////////////////////////////////
 

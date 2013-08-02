@@ -42,8 +42,21 @@
             android:paddingLeft="40dp"
             android:paddingRight="40dp" >
 
+            <Button
+                android:id="@+id/Button_rotate"
+                style="@style/RoboTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:text="@string/rotate"
+                android:textColor="#33B5E5" />
+
             <LinearLayout
-                android:id="@+id/showGuidelinesLayout"
+                android:id="@+id/fixedAspectRatioLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -187,8 +200,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|top"
-                android:contentDescription="@string/croppedImageDesc"
-                android:src="@drawable/butterfly" />
+                android:contentDescription="@string/croppedImageDesc"/>
         </LinearLayout>
     </LinearLayout>
 
