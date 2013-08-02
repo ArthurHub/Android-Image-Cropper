@@ -9,7 +9,7 @@ Furthermore, developers are able to customize the following attributes (both via
 - aspect ratio (if the aspect ratio is fixed)
 - image resource
 
-A public method to rotate the image by a specified number of degrees is also included, by calling rotateImage(). This can be used to provide the user with an option to fix the image orientation should Android miscalculate the intended orientation.
+A public method to rotate the image by a specified number of degrees is also included. This can be used to provide the user with an option to fix the image orientation should Android miscalculate the intended orientation.
 
 For more information, see the linked Github Wiki page. 
 
