@@ -12,6 +12,7 @@
     <string name="aspectRatioYHeader">aspectRatioY =</string>
     <string name="showGuidelines">showGuidelines = </string>
     <string name="crop">Crop</string>
+    <string name="rotate">Rotate</string>
     <string name="croppedImageDesc">The cropped image.</string>
 
     <string-array name="showGuidelinesArray">
