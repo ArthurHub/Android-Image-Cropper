@@ -26,7 +26,8 @@ import com.edmodo.cropper.CropImageView;
 public class MainActivity extends Activity {
 
     // Static final constants
-    private final static int DEFAULT_ASPECT_RATIO_VALUES = 10;
+    private static final int DEFAULT_ASPECT_RATIO_VALUES = 10;
+    private static final int ROTATE_NINETY_DEGREES = 90;
     private static final String ASPECT_RATIO_X = "ASPECT_RATIO_X";
     private static final String ASPECT_RATIO_Y = "ASPECT_RATIO_Y";
     private static final int ON_TOUCH = 1;
@@ -77,7 +78,17 @@ public class MainActivity extends Activity {
 
         // Set initial spinner value
         showGuidelinesSpin.setSelection(ON_TOUCH);
+        
+        //Sets the rotate button
+        final Button rotateButton = (Button) findViewById(R.id.Button_rotate);
+        rotateButton.setOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                cropImageView.rotateImage(ROTATE_NINETY_DEGREES);
+            }
+        });
+        
         // Sets fixedAspectRatio
         fixedAspectRatioToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
