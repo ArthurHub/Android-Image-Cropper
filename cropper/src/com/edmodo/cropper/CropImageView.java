@@ -216,12 +216,13 @@ public class CropImageView extends FrameLayout {
         
         super.onLayout(changed, l, t, r, b);
 
-        // Gets original parameters, and creates the new parameters
-        ViewGroup.LayoutParams origparams = (ViewGroup.LayoutParams) this.getLayoutParams();
-        origparams.width = mLayoutWidth;
-        origparams.height = mLayoutHeight;
-
-        setLayoutParams(origparams);
+        if (mLayoutWidth > 0 && mLayoutHeight > 0) {
+            // Gets original parameters, and creates the new parameters
+            ViewGroup.LayoutParams origparams = this.getLayoutParams();
+            origparams.width = mLayoutWidth;
+            origparams.height = mLayoutHeight;
+            setLayoutParams(origparams);
+        }
     }
 
     // Public Methods //////////////////////////////////////////////////////////
