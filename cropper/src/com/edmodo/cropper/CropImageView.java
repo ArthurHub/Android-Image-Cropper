@@ -134,6 +134,8 @@ public class CropImageView extends FrameLayout {
         if (mBitmap != null) {
             final Rect bitmapRect = ImageViewUtil.getBitmapRectCenterInside(mBitmap, this);
             mCropOverlayView.setBitmapRect(bitmapRect);
+        } else {
+            mCropOverlayView.setBitmapRect(new Rect());
         }
     }
 
@@ -208,6 +210,7 @@ public class CropImageView extends FrameLayout {
 
         } else {
 
+            mCropOverlayView.setBitmapRect(new Rect());
             setMeasuredDimension(widthSize, heightSize);
         }
     }
