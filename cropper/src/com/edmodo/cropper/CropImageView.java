@@ -138,7 +138,7 @@ public class CropImageView extends FrameLayout {
             final Rect bitmapRect = ImageViewUtil.getBitmapRectCenterInside(mBitmap, this);
             mCropOverlayView.setBitmapRect(bitmapRect);
         } else {
-            mCropOverlayView.setBitmapRect(new Rect());
+            mCropOverlayView.setBitmapRect(EMPTY_RECT);
         }
     }
 
@@ -173,9 +173,7 @@ public class CropImageView extends FrameLayout {
                 viewToBitmapHeightRatio = (double) heightSize / (double) mBitmap.getHeight();
             }
 
-            // If either needs to be fixed, choose smallest ratio and calculate
-            // from
-            // there
+            // If either needs to be fixed, choose smallest ratio and calculate from there
             if (viewToBitmapWidthRatio != Double.POSITIVE_INFINITY || viewToBitmapHeightRatio != Double.POSITIVE_INFINITY)
             {
                 if (viewToBitmapWidthRatio <= viewToBitmapHeightRatio) {
@@ -188,9 +186,8 @@ public class CropImageView extends FrameLayout {
                 }
             }
 
-            // Otherwise, the picture is within frame layout bounds. Desired
-            // width
-            // is simply picture size
+            // Otherwise, the picture is within frame layout bounds. Desired width is
+            // simply picture size
             else {
                 desiredWidth = mBitmap.getWidth();
                 desiredHeight = mBitmap.getHeight();
@@ -224,7 +221,7 @@ public class CropImageView extends FrameLayout {
 
         if (mLayoutWidth > 0 && mLayoutHeight > 0) {
             // Gets original parameters, and creates the new parameters
-            ViewGroup.LayoutParams origparams = this.getLayoutParams();
+            final ViewGroup.LayoutParams origparams = this.getLayoutParams();
             origparams.width = mLayoutWidth;
             origparams.height = mLayoutHeight;
             setLayoutParams(origparams);
