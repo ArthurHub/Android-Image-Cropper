@@ -38,6 +38,10 @@ import com.edmodo.cropper.util.PointContainer;
  */
 public class CropImageView extends FrameLayout {
 
+    // Private Constants ///////////////////////////////////////////////////////
+
+    private static final Rect EMPTY_RECT = new Rect();
+
     // Member Variables ////////////////////////////////////////////////////////
 
     // Sets the default image guidelines to show when resizing
@@ -47,7 +51,7 @@ public class CropImageView extends FrameLayout {
     public static final int DEFAULT_ASPECT_RATIO_Y = 1;
 
     private static final int DEFAULT_IMAGE_RESOURCE = 0;
-    
+
     private static final String DEGREES_ROTATED = "DEGREES_ROTATED";
 
     private ImageView mImageView;
@@ -93,7 +97,6 @@ public class CropImageView extends FrameLayout {
         init(context);
     }
 
-    
     // View Methods ////////////////////////////////////////////////////////////
 
     @Override
@@ -103,9 +106,9 @@ public class CropImageView extends FrameLayout {
 
         bundle.putParcelable("instanceState", super.onSaveInstanceState());
         bundle.putInt(DEGREES_ROTATED, mDegreesRotated);
-        
+
         return bundle;
-        
+
     }
 
     @Override
@@ -115,20 +118,19 @@ public class CropImageView extends FrameLayout {
 
             final Bundle bundle = (Bundle) state;
 
-            //Fixes the rotation of the image when orientation changes.
+            // Fixes the rotation of the image when orientation changes.
             mDegreesRotated = bundle.getInt(DEGREES_ROTATED);
             int tempDegrees = mDegreesRotated;
             rotateImage(mDegreesRotated);
             mDegreesRotated = tempDegrees;
-            
+
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
 
         } else {
             super.onRestoreInstanceState(state);
         }
     }
-    
-    
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 
@@ -211,13 +213,13 @@ public class CropImageView extends FrameLayout {
 
         } else {
 
-            mCropOverlayView.setBitmapRect(new Rect());
+            mCropOverlayView.setBitmapRect(EMPTY_RECT);
             setMeasuredDimension(widthSize, heightSize);
         }
     }
 
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        
+
         super.onLayout(changed, l, t, r, b);
 
         if (mLayoutWidth > 0 && mLayoutHeight > 0) {
@@ -340,11 +342,11 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Sets whether the aspect ratio is fixed or not; true fixes the aspect
-     * ratio, while false allows it to be changed.
+     * Sets whether the aspect ratio is fixed or not; true fixes the aspect ratio, while
+     * false allows it to be changed.
      * 
-     * @param fixAspectRatio Boolean that signals whether the aspect ratio
-     *            should be maintained.
+     * @param fixAspectRatio Boolean that signals whether the aspect ratio should be
+     *            maintained.
      */
     public void setFixedAspectRatio(boolean fixAspectRatio)
     {
@@ -352,11 +354,11 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Sets the guidelines for the CropOverlayView to be either on, off, or to
-     * show when resizing the application.
+     * Sets the guidelines for the CropOverlayView to be either on, off, or to show when
+     * resizing the application.
      * 
-     * @param guidelines Integer that signals whether the guidelines should be
-     *            on, off, or only showing when resizing.
+     * @param guidelines Integer that signals whether the guidelines should be on, off, or
+     *            only showing when resizing.
      */
     public void setGuidelines(int guidelines)
     {
@@ -366,10 +368,8 @@ public class CropImageView extends FrameLayout {
     /**
      * Sets the both the X and Y values of the aspectRatio.
      * 
-     * @param aspectRatioX int that specifies the new X value of the aspect
-     *            ratio
-     * @param aspectRatioX int that specifies the new Y value of the aspect
-     *            ratio
+     * @param aspectRatioX int that specifies the new X value of the aspect ratio
+     * @param aspectRatioX int that specifies the new Y value of the aspect ratio
      */
     public void setAspectRatio(int aspectRatioX, int aspectRatioY)
     {
@@ -379,9 +379,10 @@ public class CropImageView extends FrameLayout {
         mAspectRatioY = aspectRatioY;
         mCropOverlayView.setAspectRatioY(mAspectRatioY);
     }
-    
+
     /**
-     * Rotates image by the specified number of degrees clockwise. Cycles from 0 to 360 degrees.
+     * Rotates image by the specified number of degrees clockwise. Cycles from 0 to 360
+     * degrees.
      * 
      * @param degrees Integer specifying the number of degrees to rotate.
      */
@@ -390,12 +391,10 @@ public class CropImageView extends FrameLayout {
         matrix.postRotate(degrees);
         mBitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
         setImageBitmap(mBitmap);
-        
+
         mDegreesRotated += degrees;
         mDegreesRotated = mDegreesRotated % 360;
     }
-    
-    
 
     // Private Methods /////////////////////////////////////////////////////////
 
@@ -413,8 +412,8 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Determines the specs for the onMeasure function. Calculates the width or
-     * height depending on the mode.
+     * Determines the specs for the onMeasure function. Calculates the width or height
+     * depending on the mode.
      * 
      * @param measureSpecMode The mode of the measured width or height.
      * @param measureSpecSize The size of the measured width or height.

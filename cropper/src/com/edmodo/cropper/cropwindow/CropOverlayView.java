@@ -40,8 +40,8 @@ public class CropOverlayView extends View {
     // Private Constants ///////////////////////////////////////////////////////
 
     private static final int SNAP_RADIUS_DP = 6;
-    public static final float DEFAULT_SHOW_GUIDELINES_LIMIT = 100;
-
+    private static final float DEFAULT_SHOW_GUIDELINES_LIMIT = 100;
+    
     // Gets default values from PaintUtil, sets a bunch of values such that the
     // corners will draw correctly
     private static final float DEFAULT_CORNER_THICKNESS_DP = PaintUtil.getCornerThickness();
