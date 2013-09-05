@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import com.edmodo.cropper.cropwindow.CropOverlayView;
 import com.edmodo.cropper.cropwindow.edge.Edge;
 import com.edmodo.cropper.util.ImageViewUtil;
+import com.edmodo.cropper.util.PointContainer;
 
 /**
  * Custom view that provides cropping capabilities to an image.
@@ -134,6 +135,8 @@ public class CropImageView extends FrameLayout {
         if (mBitmap != null) {
             final Rect bitmapRect = ImageViewUtil.getBitmapRectCenterInside(mBitmap, this);
             mCropOverlayView.setBitmapRect(bitmapRect);
+        } else {
+            mCropOverlayView.setBitmapRect(new Rect());
         }
     }
 
@@ -208,6 +211,7 @@ public class CropImageView extends FrameLayout {
 
         } else {
 
+            mCropOverlayView.setBitmapRect(new Rect());
             setMeasuredDimension(widthSize, heightSize);
         }
     }
@@ -216,12 +220,13 @@ public class CropImageView extends FrameLayout {
         
         super.onLayout(changed, l, t, r, b);
 
-        // Gets original parameters, and creates the new parameters
-        ViewGroup.LayoutParams origparams = (ViewGroup.LayoutParams) this.getLayoutParams();
-        origparams.width = mLayoutWidth;
-        origparams.height = mLayoutHeight;
-
-        setLayoutParams(origparams);
+        if (mLayoutWidth > 0 && mLayoutHeight > 0) {
+            // Gets original parameters, and creates the new parameters
+            ViewGroup.LayoutParams origparams = this.getLayoutParams();
+            origparams.width = mLayoutWidth;
+            origparams.height = mLayoutHeight;
+            setLayoutParams(origparams);
+        }
     }
 
     // Public Methods //////////////////////////////////////////////////////////
@@ -302,6 +307,36 @@ public class CropImageView extends FrameLayout {
                                                          (int) actualCropHeight);
 
         return croppedBitmap;
+    }
+
+    public PointContainer getPointContainer() {
+        final Rect displayedImageRect = ImageViewUtil.getBitmapRectCenterInside(mBitmap, mImageView);
+
+        // Get the scale factor between the actual Bitmap dimensions and the
+        // displayed dimensions for width.
+        final float actualImageWidth = mBitmap.getWidth();
+        final float displayedImageWidth = displayedImageRect.width();
+        final float scaleFactorWidth = actualImageWidth / displayedImageWidth;
+
+        // Get the scale factor between the actual Bitmap dimensions and the
+        // displayed dimensions for height.
+        final float actualImageHeight = mBitmap.getHeight();
+        final float displayedImageHeight = displayedImageRect.height();
+        final float scaleFactorHeight = actualImageHeight / displayedImageHeight;
+
+        // Get crop window position relative to the displayed image.
+        final float cropWindowX = Edge.LEFT.getCoordinate() - displayedImageRect.left;
+        final float cropWindowY = Edge.TOP.getCoordinate() - displayedImageRect.top;
+        final float cropWindowWidth = Edge.getWidth();
+        final float cropWindowHeight = Edge.getHeight();
+
+        // Scale the crop window position to the actual size of the Bitmap.
+        final float actualCropX = cropWindowX * scaleFactorWidth;
+        final float actualCropY = cropWindowY * scaleFactorHeight;
+        final float actualCropWidth = cropWindowWidth * scaleFactorWidth;
+        final float actualCropHeight = cropWindowHeight * scaleFactorHeight;
+
+        return new PointContainer(actualCropX, actualCropY, actualCropWidth, actualCropHeight);
     }
 
     /**
