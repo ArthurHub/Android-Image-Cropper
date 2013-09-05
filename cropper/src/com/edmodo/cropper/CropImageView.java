@@ -38,6 +38,10 @@ import com.edmodo.cropper.util.ImageViewUtil;
  */
 public class CropImageView extends FrameLayout {
 
+    // Private Constants ///////////////////////////////////////////////////////
+
+    private static final Rect EMPTY_RECT = new Rect();
+
     // Member Variables ////////////////////////////////////////////////////////
 
     // Sets the default image guidelines to show when resizing
@@ -209,7 +213,7 @@ public class CropImageView extends FrameLayout {
 
         } else {
 
-            mCropOverlayView.setBitmapRect(new Rect());
+            mCropOverlayView.setBitmapRect(EMPTY_RECT);
             setMeasuredDimension(widthSize, heightSize);
         }
     }
