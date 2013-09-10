@@ -11,6 +11,8 @@ Developers can customize the following attributes (both via XML and programmatic
 
 A public method to rotate the image by a specified number of degrees is also included. This can be used to provide the user with an option to fix the image orientation should Android miscalculate the intended orientation.
 
+Supported on API Level 7 and above.
+
 For more information, see the linked Github Wiki page. 
 
 https://github.com/edmodo/cropper/wiki
