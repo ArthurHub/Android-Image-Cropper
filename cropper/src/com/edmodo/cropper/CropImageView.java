@@ -20,6 +20,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.media.ExifInterface;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -252,6 +253,52 @@ public class CropImageView extends FrameLayout {
             mCropOverlayView.resetCropOverlayView();
         }
     }
+    
+    /**
+     * Set a Bitmap with a EXIF information. Then if there is orientation info
+     * we can rotate the bitmap manually
+     * <br><br>
+     * The EXIF can be get from following codes:
+     * <br><br>
+     * ExifInterface exif = new ExifInterface(path);
+     * <br><br>
+     * @param bitmap the original bitmap need to be set
+     * @param exif the EXIF information about this bitmap
+     */
+    public void setImageBitmap(Bitmap bitmap, ExifInterface exif) {
+		if (bitmap == null) {
+			return;
+		}
+
+		if (exif == null) {
+			setImageBitmap(bitmap);
+			return;
+		}
+		Matrix matrix = new Matrix();
+		int orientation = exif
+				.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+		int rotate = -1;
+		switch (orientation) {
+		case ExifInterface.ORIENTATION_ROTATE_270:
+			rotate = 270;
+			break;
+		case ExifInterface.ORIENTATION_ROTATE_180:
+			rotate = 180;
+			break;
+		case ExifInterface.ORIENTATION_ROTATE_90:
+			rotate = 90;
+			break;
+		}
+		if (rotate == -1) {
+			setImageBitmap(bitmap);
+		} else {
+			matrix.postRotate(rotate);
+			Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
+					bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+			setImageBitmap(rotatedBitmap);
+			bitmap.recycle();
+		}
+	}
 
     /**
      * Sets a Drawable as the content of the CropImageView.
