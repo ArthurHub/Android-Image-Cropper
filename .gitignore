@@ -23,3 +23,15 @@ local.properties
 # Eclipse generated files/folders
 .metadata/
 .settings/
+
+#IntelliJ IDEA
+.idea
+*.iml
+*.ipr
+*.iws
+out
+
+# Gradle folder
+.gradle/
+build/
+
