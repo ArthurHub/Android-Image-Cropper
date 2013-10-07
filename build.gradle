@@ -1,0 +1,12 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.5.+'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.7'
+}

@@ -4,7 +4,6 @@
     <string name="app_name">Cropper Sample</string>
     <string name="title">Cropper</string>
     <string name="action_settings">Settings</string>
-    <string name="title">Cropper</string>
     <string name="fixedAspectRatio">fixedAspectRatio =</string>
     <string name="aspectRatioX">\u002010</string>
     <string name="aspectRatioXHeader">aspectRatioX =</string>

@@ -23,3 +23,8 @@ local.properties
 # Eclipse generated files/folders
 .metadata/
 .settings/
+
+# Gradle folder
+.gradle/
+build/
+
