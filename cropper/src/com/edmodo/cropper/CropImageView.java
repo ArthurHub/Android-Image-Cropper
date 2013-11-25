@@ -114,7 +114,7 @@ public class CropImageView extends FrameLayout {
     @Override
     public void onRestoreInstanceState(Parcelable state) {
 
-        if (state instanceof Bundle) {
+        if (state instanceof Bundle && mBitmap != null) {
 
             final Bundle bundle = (Bundle) state;
 
