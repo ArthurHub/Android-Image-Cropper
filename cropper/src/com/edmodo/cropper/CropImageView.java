@@ -118,11 +118,13 @@ public class CropImageView extends FrameLayout {
 
             final Bundle bundle = (Bundle) state;
 
-            // Fixes the rotation of the image when orientation changes.
-            mDegreesRotated = bundle.getInt(DEGREES_ROTATED);
-            int tempDegrees = mDegreesRotated;
-            rotateImage(mDegreesRotated);
-            mDegreesRotated = tempDegrees;
+            if (mBitmap != null) {
+                // Fixes the rotation of the image when orientation changes.
+                mDegreesRotated = bundle.getInt(DEGREES_ROTATED);
+                int tempDegrees = mDegreesRotated;
+                rotateImage(mDegreesRotated);
+                mDegreesRotated = tempDegrees;
+            }
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
 
