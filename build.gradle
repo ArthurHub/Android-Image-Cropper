@@ -1,12 +1,15 @@
 buildscript {
+
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.6.+'
+        // Plug-in release notes: http://tools.android.com/tech-docs/new-build-system
+        classpath 'com.android.tools.build:gradle:0.8.+'
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.8'
+    // See latest Gradle version: http://www.gradle.org/downloads
+    gradleVersion = '1.10'
 }

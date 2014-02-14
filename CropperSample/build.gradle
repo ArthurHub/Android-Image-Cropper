@@ -5,8 +5,9 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 17
-    buildToolsVersion = 17
+    
+    compileSdkVersion 19
+    buildToolsVersion = "19.0.1"
 
     sourceSets {
         main {
