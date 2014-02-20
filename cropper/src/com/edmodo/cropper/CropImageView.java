@@ -359,6 +359,7 @@ public class CropImageView extends FrameLayout {
                                                          (int) actualCropY,
                                                          (int) actualCropWidth,
                                                          (int) actualCropHeight);
+        mBitmap.recycle();
 
         return croppedBitmap;
     }
@@ -458,8 +459,9 @@ public class CropImageView extends FrameLayout {
 
         Matrix matrix = new Matrix();
         matrix.postRotate(degrees);
-        mBitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
-        setImageBitmap(mBitmap);
+        final Bitmap rotatedBitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
+        mBitmap.recycle();
+        setImageBitmap(rotatedBitmap);
 
         mDegreesRotated += degrees;
         mDegreesRotated = mDegreesRotated % 360;
