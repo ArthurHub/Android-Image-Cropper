@@ -1,4 +1,9 @@
 apply plugin: 'android-library'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+version = "1.0.0"
+group = "com.edmodo"
 
 android {
 
@@ -15,6 +20,74 @@ android {
             manifest.srcFile 'AndroidManifest.xml'
             java.srcDirs = ['src']
             res.srcDirs = ['res']
+        }
+    }
+}
+
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+signing {
+    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+task publishLocal(type: Upload) {
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        repository(url: "file://$buildDir/repo")
+    }
+}
+
+uploadArchives {
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+        repository(url: sonatypeRepo) {
+            authentication(userName: sonatypeUsername,
+                    password: sonatypePassword)
+        }
+
+        pom.project {
+            name 'Cropper'
+            packaging 'aar'
+            description 'Image cropper library for Android applications'
+            url 'https://github.com/edmodo/cropper'
+
+            scm {
+                url 'scm:git@github.com:edmodo/cropper.git'
+                connection 'scm:git@github.com:edmodo/cropper.git'
+                developerConnection 'scm:git@github.com:edmodo/cropper.git'
+            }
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+
+            developers {
+                developer {
+                    id 'ahuang13'
+                    name 'Angus Huang'
+                    email 'angus@edmodo.com'
+                }
+                developer {
+                    id 'TT1943'
+                    name 'Xiahong Lin'
+                    email 'xiahong@edmodo.com'
+                }
+            }
         }
     }
 }
