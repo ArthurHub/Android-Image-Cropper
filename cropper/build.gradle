@@ -24,12 +24,6 @@ android {
     }
 }
 
-configurations {
-    archives {
-        extendsFrom configurations.default
-    }
-}
-
 repositories {
     mavenCentral()
 }
@@ -47,7 +41,6 @@ task publishLocal(type: Upload) {
 }
 
 uploadArchives {
-    configuration = configurations.archives
     repositories.mavenDeployer {
         beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
