@@ -19,6 +19,19 @@ https://github.com/edmodo/cropper/wiki
 
 ![ScreenShot](http://i.imgur.com/3FhsTgfl.jpg)
 
+Installation
+=======
+
+**build.gradle**
+
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+	  compile 'com.edmodo:cropper:1.0.1'
+	}
+
 License
 =======
 Copyright 2013, Edmodo, Inc. 
