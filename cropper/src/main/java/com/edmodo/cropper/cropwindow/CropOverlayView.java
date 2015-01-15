@@ -408,6 +408,9 @@ public class CropOverlayView extends View {
 
                 final float centerX = getWidth() / 2f;
 
+                //dirty fix for wrong crop overlay aspect ratio when using fixed aspect ratio
+                mTargetAspectRatio = (float) mAspectRatioX / mAspectRatioY;
+
                 // Limits the aspect ratio to no less than 40 wide or 40 tall
                 final float cropWidth = Math.max(Edge.MIN_CROP_LENGTH_PX,
                         AspectRatioUtil.calculateWidth(Edge.TOP.getCoordinate(),
