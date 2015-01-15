@@ -389,6 +389,9 @@ public class CropOverlayView extends View {
      */
     private void initCropWindow(Rect bitmapRect) {
 
+        if (bitmapRect.width() == 0 || bitmapRect.height() == 0)
+            return;
+
         // Tells the attribute functions the crop window has already been
         // initialized
         if (!initializedCropWindow)
