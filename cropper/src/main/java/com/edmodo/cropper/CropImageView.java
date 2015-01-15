@@ -342,40 +342,14 @@ public class CropImageView extends FrameLayout {
      */
     public Bitmap getCroppedImage() {
 
-        final Rect displayedImageRect = ImageViewUtil.getBitmapRect(mBitmap, mImageView, mScaleType);
-
-        // Get the scale factor between the actual Bitmap dimensions and the
-        // displayed dimensions for width.
-        final float actualImageWidth = mBitmap.getWidth();
-        final float displayedImageWidth = displayedImageRect.width();
-        final float scaleFactorWidth = actualImageWidth / displayedImageWidth;
-
-        // Get the scale factor between the actual Bitmap dimensions and the
-        // displayed dimensions for height.
-        final float actualImageHeight = mBitmap.getHeight();
-        final float displayedImageHeight = displayedImageRect.height();
-        final float scaleFactorHeight = actualImageHeight / displayedImageHeight;
-
-        // Get crop window position relative to the displayed image.
-        final float cropWindowX = Edge.LEFT.getCoordinate() - displayedImageRect.left;
-        final float cropWindowY = Edge.TOP.getCoordinate() - displayedImageRect.top;
-        final float cropWindowWidth = Edge.getWidth();
-        final float cropWindowHeight = Edge.getHeight();
-
-        // Scale the crop window position to the actual size of the Bitmap.
-        final float actualCropX = cropWindowX * scaleFactorWidth;
-        final float actualCropY = cropWindowY * scaleFactorHeight;
-        final float actualCropWidth = cropWindowWidth * scaleFactorWidth;
-        final float actualCropHeight = cropWindowHeight * scaleFactorHeight;
+        RectF actualCropRect = getActualCropRect();
+        float actualCropX = Math.max(0f, actualCropRect.left);
+        float actualCropY = Math.max(0f, actualCropRect.top);
+        float actualCropWidth = Math.min(mBitmap.getWidth(), actualCropRect.right - actualCropRect.left);
+        float actualCropHeight = Math.min(mBitmap.getHeight(), actualCropRect.bottom - actualCropRect.top);
 
         // Crop the subset from the original Bitmap.
-        final Bitmap croppedBitmap = Bitmap.createBitmap(mBitmap,
-                (int) actualCropX,
-                (int) actualCropY,
-                (int) actualCropWidth,
-                (int) actualCropHeight);
-
-        return croppedBitmap;
+        return Bitmap.createBitmap(mBitmap, (int) actualCropX, (int) actualCropY, (int) actualCropWidth, (int) actualCropHeight);
     }
 
     /**
