@@ -4,7 +4,6 @@ package com.example.croppersample;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -23,7 +22,7 @@ import com.edmodo.cropper.CropImageView;
 public class MainActivity extends Activity {
 
     // Static final constants
-    private static final int DEFAULT_ASPECT_RATIO_VALUES = 10;
+    private static final int DEFAULT_ASPECT_RATIO_VALUES = 20;
 
     private static final int ROTATE_NINETY_DEGREES = 90;
 
@@ -42,7 +41,7 @@ public class MainActivity extends Activity {
 
     // Saves the state upon rotating the screen/restarting the activity
     @Override
-    protected void onSaveInstanceState(Bundle bundle) {
+    protected void onSaveInstanceState(@SuppressWarnings("NullableProblems") Bundle bundle) {
         super.onSaveInstanceState(bundle);
         bundle.putInt(ASPECT_RATIO_X, mAspectRatioX);
         bundle.putInt(ASPECT_RATIO_Y, mAspectRatioY);
@@ -50,7 +49,7 @@ public class MainActivity extends Activity {
 
     // Restores the state upon rotating the screen/restarting the activity
     @Override
-    protected void onRestoreInstanceState(Bundle bundle) {
+    protected void onRestoreInstanceState(@SuppressWarnings("NullableProblems") Bundle bundle) {
         super.onRestoreInstanceState(bundle);
         mAspectRatioX = bundle.getInt(ASPECT_RATIO_X);
         mAspectRatioY = bundle.getInt(ASPECT_RATIO_Y);
@@ -66,8 +65,8 @@ public class MainActivity extends Activity {
         final CropImageView cropImageView = (CropImageView) findViewById(R.id.CropImageView);
         final SeekBar aspectRatioXSeek = (SeekBar) findViewById(R.id.aspectRatioXSeek);
         final SeekBar aspectRatioYSeek = (SeekBar) findViewById(R.id.aspectRatioYSeek);
-        final ToggleButton fixedAspectRatioToggle = (ToggleButton) findViewById(R.id.fixedAspectRatioToggle);
         Spinner showGuidelinesSpin = (Spinner) findViewById(R.id.showGuidelinesSpin);
+        final TextView aspectRatioNum = (TextView) findViewById(R.id.aspectRatioNum);
 
         // Sets sliders to be disabled until fixedAspectRatio is set
         aspectRatioXSeek.setEnabled(false);
@@ -87,7 +86,7 @@ public class MainActivity extends Activity {
         });
 
         // Sets fixedAspectRatio
-        fixedAspectRatioToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        ((ToggleButton) findViewById(R.id.fixedAspectRatioToggle)).setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -102,21 +101,24 @@ public class MainActivity extends Activity {
             }
         });
 
+        // Sets crop shape
+        ((ToggleButton) findViewById(R.id.cropShapeToggle)).setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                cropImageView.setCropShape(isChecked ? CropImageView.CropShape.OVAL : CropImageView.CropShape.RECTANGLE);
+            }
+        });
+
         // Sets initial aspect ratio to 10/10, for demonstration purposes
         cropImageView.setAspectRatio(DEFAULT_ASPECT_RATIO_VALUES, DEFAULT_ASPECT_RATIO_VALUES);
-
-        // Sets aspectRatioX
-        final TextView aspectRatioX = (TextView) findViewById(R.id.aspectRatioX);
 
         aspectRatioXSeek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar aspectRatioXSeek, int progress, boolean fromUser) {
-                try {
-                    mAspectRatioX = progress;
-                    cropImageView.setAspectRatio(progress, mAspectRatioY);
-                    aspectRatioX.setText(" " + progress);
-                } catch (IllegalArgumentException e) {
-                }
+                mAspectRatioX = progress;
+                cropImageView.setAspectRatio(progress, mAspectRatioY);
+                aspectRatioNum.setText("(" + mAspectRatioX + ", " + mAspectRatioY + ")");
             }
 
             @Override
@@ -128,18 +130,12 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Sets aspectRatioY
-        final TextView aspectRatioY = (TextView) findViewById(R.id.aspectRatioY);
-
         aspectRatioYSeek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar aspectRatioYSeek, int progress, boolean fromUser) {
-                try {
-                    mAspectRatioY = progress;
-                    cropImageView.setAspectRatio(mAspectRatioX, progress);
-                    aspectRatioY.setText(" " + progress);
-                } catch (IllegalArgumentException e) {
-                }
+                mAspectRatioY = progress;
+                cropImageView.setAspectRatio(mAspectRatioX, progress);
+                aspectRatioNum.setText("(" + mAspectRatioX + ", " + mAspectRatioY + ")");
             }
 
             @Override
@@ -162,8 +158,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        final Button cropButton = (Button) findViewById(R.id.Button_crop);
-        cropButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.Button_crop).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -172,14 +167,5 @@ public class MainActivity extends Activity {
                 croppedImageView.setImageBitmap(croppedImage);
             }
         });
-
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
 }
