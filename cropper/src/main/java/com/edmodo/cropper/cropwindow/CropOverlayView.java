@@ -35,8 +35,7 @@ import com.edmodo.cropper.util.HandleUtil;
 import com.edmodo.cropper.util.PaintUtil;
 
 /**
- * A custom View representing the crop window and the shaded background outside
- * the crop window.
+ * A custom View representing the crop window and the shaded background outside the crop window.
  */
 public class CropOverlayView extends View {
 
