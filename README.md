@@ -1,4 +1,4 @@
-Android-Image-Cropper
+Android Image Cropper
 =======
 An image cropping tool, displays a resizable crop window on top of the image. 
 Calling the method getCroppedImage() will then return the Bitmap marked by the crop window.
