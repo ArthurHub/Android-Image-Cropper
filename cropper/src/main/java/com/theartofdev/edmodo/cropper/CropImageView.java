@@ -376,10 +376,22 @@ public class CropImageView extends FrameLayout {
      * @return a new Bitmap representing the cropped image
      */
     public Bitmap getCroppedImage() {
+        return getCroppedImage(0, 0);
+    }
+
+    /**
+     * Gets the cropped image based on the current crop window.<br/>
+     * If image loaded from URI will use sample size to fir the requested width and height.
+     *
+     * @return a new Bitmap representing the cropped image
+     */
+    public Bitmap getCroppedImage(int reqWidth, int reqHeight) {
         if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
             Rect rect = getActualCropRectNoRotation();
+            reqWidth = reqWidth > 0 ? reqWidth : rect.width();
+            reqHeight = reqHeight > 0 ? reqHeight : rect.height();
             ImageViewUtil.DecodeBitmapResult result =
-                    ImageViewUtil.decodeSampledBitmapRegion(getContext(), mLoadedImageUri, rect, rect.width(), rect.height());
+                    ImageViewUtil.decodeSampledBitmapRegion(getContext(), mLoadedImageUri, rect, reqWidth, reqHeight);
 
             Bitmap bitmap = result.bitmap;
             if (mDegreesRotated > 0) {
