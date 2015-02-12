@@ -13,10 +13,23 @@
 
 package com.edmodo.cropper.util;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Utility class that deals with operations with an ImageView.
@@ -26,8 +39,8 @@ public class ImageViewUtil {
     /**
      * Gets the rectangular position of a Bitmap if it were placed inside a View.
      *
-     * @param bitmap    the Bitmap
-     * @param view      the parent View of the Bitmap
+     * @param bitmap the Bitmap
+     * @param view the parent View of the Bitmap
      * @param scaleType the desired scale type
      * @return the rectangular position of the Bitmap
      */
@@ -50,11 +63,11 @@ public class ImageViewUtil {
     /**
      * Gets the rectangular position of a Bitmap if it were placed inside a View.
      *
-     * @param bitmapWidth  the Bitmap's width
+     * @param bitmapWidth the Bitmap's width
      * @param bitmapHeight the Bitmap's height
-     * @param viewWidth    the parent View's width
-     * @param viewHeight   the parent View's height
-     * @param scaleType    the desired scale type
+     * @param viewWidth the parent View's width
+     * @param viewHeight the parent View's height
+     * @param scaleType the desired scale type
      * @return the rectangular position of the Bitmap
      */
     public static Rect getBitmapRect(int bitmapWidth,
@@ -67,6 +80,149 @@ public class ImageViewUtil {
                 return getBitmapRectCenterInsideHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
             case FIT_CENTER:
                 return getBitmapRectFitCenterHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
+        }
+    }
+
+    /**
+     * Rotate the given image by reading the Exif value of the image (uri).<br/>
+     * If no rotation is required the image will not be rotated.<br/>
+     * New bitmap is created and the old one is recycled.
+     */
+    public static Bitmap rotateBitmapByExif(Context context, Bitmap bitmap, Uri uri) {
+        try {
+            File file = getFileFromUri(context, uri);
+            if (file.exists()) {
+                ExifInterface ei = new ExifInterface(file.getAbsolutePath());
+                bitmap = rotateBitmapByExif(bitmap, ei);
+            }
+        } catch (Exception ignored) {
+        }
+        return bitmap;
+    }
+
+    /**
+     * Rotate the given image by given Exif value.<br/>
+     * If no rotation is required the image will not be rotated.<br/>
+     * New bitmap is created and the old one is recycled.
+     */
+    public static Bitmap rotateBitmapByExif(Bitmap bitmap, ExifInterface exif) {
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                bitmap = rotateBitmap(bitmap, 90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                bitmap = rotateBitmap(bitmap, 180);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                bitmap = rotateBitmap(bitmap, 270);
+                break;
+        }
+        return bitmap;
+    }
+
+    /**
+     * Decode bitmap from stream using sampling to get bitmap with the requested limit.
+     */
+    public static DecodeBitmapResult decodeSampledBitmap(Context context, Uri uri, int reqWidth, int reqHeight) {
+
+        InputStream stream = null;
+        try {
+            ContentResolver resolver = context.getContentResolver();
+            stream = resolver.openInputStream(uri);
+
+            // First decode with inJustDecodeBounds=true to check dimensions
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(stream, new Rect(0, 0, 0, 0), options);
+            options.inJustDecodeBounds = false;
+
+            // Calculate inSampleSize
+            options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, reqWidth, reqHeight);
+
+            // Decode bitmap with inSampleSize set
+            closeSafe(stream);
+            stream = resolver.openInputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeStream(stream, new Rect(0, 0, 0, 0), options);
+
+            return new DecodeBitmapResult(bitmap, options.inSampleSize);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load sampled bitmap", e);
+        } finally {
+            closeSafe(stream);
+        }
+    }
+
+    /**
+     * Calculate the largest inSampleSize value that is a power of 2 and keeps both
+     * height and width larger than the requested height and width.
+     */
+    public static int calculateInSampleSize(int width, int height, int reqWidth, int reqHeight) {
+        int inSampleSize = 1;
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+            while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
+    }
+
+    /**
+     * Get {@link java.io.File} object for the given Android URI.<br/>
+     * Use content resolver to get real path if direct path doesn't return valid file.
+     */
+    public static File getFileFromUri(Context context, Uri uri) {
+
+        // first try by direct path
+        File file = new File(uri.getPath());
+        if (file.exists()) {
+            return file;
+        }
+
+        // try reading real path from content resolver (gallery images)
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(uri, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            String realPath = cursor.getString(column_index);
+            file = new File(realPath);
+        } catch (Exception ignored) {
+        } finally {
+            closeSafe(cursor);
+        }
+
+        return file;
+    }
+
+    /**
+     * Rotate the given bitmap by the given degrees.<br/>
+     * New bitmap is created and the old one is recycled.
+     */
+    public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
+        Matrix matrix = new Matrix();
+        matrix.setRotate(degrees);
+        Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+        bitmap.recycle();
+        return newBitmap;
+    }
+
+    /**
+     * Close the given closeable object (Stream) in a safe way: check if it is null and catch-log
+     * exception thrown.
+     *
+     * @param closeable the closable object to close
+     */
+    public static void closeSafe(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException ignored) {
+            }
         }
     }
 
@@ -188,4 +344,28 @@ public class ImageViewUtil {
 
         return result;
     }
+
+    //region: Inner class: DecodeBitmapResult
+
+    /**
+     * The result of {@link #decodeSampledBitmap(android.content.Context, android.net.Uri, int, int)}.
+     */
+    static final class DecodeBitmapResult {
+
+        /**
+         * The loaded bitmap
+         */
+        public final Bitmap bitmap;
+
+        /**
+         * The sample size used to load the given bitmap
+         */
+        public final int sampleSize;
+
+        DecodeBitmapResult(Bitmap bitmap, int sampleSize) {
+            this.sampleSize = sampleSize;
+            this.bitmap = bitmap;
+        }
+    }
+    //endregion
 }

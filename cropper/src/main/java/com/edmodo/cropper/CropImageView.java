@@ -137,10 +137,8 @@ public class CropImageView extends FrameLayout {
      * @param bitmap the Bitmap to set
      */
     public void setImageBitmap(Bitmap bitmap) {
-
         mBitmap = bitmap;
         mImageView.setImageBitmap(mBitmap);
-
         if (mCropOverlayView != null) {
             mCropOverlayView.resetCropOverlayView();
         }
@@ -156,46 +154,10 @@ public class CropImageView extends FrameLayout {
      * @param exif the EXIF information about this bitmap; may be null
      */
     public void setImageBitmap(Bitmap bitmap, ExifInterface exif) {
-
-        if (bitmap == null) {
-            return;
+        if (bitmap != null && exif != null) {
+            bitmap = ImageViewUtil.rotateBitmapByExif(bitmap, exif);
         }
-
-        if (exif == null) {
-            setImageBitmap(bitmap);
-            return;
-        }
-
-        final Matrix matrix = new Matrix();
-        final int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-        int rotate = -1;
-
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                rotate = 270;
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                rotate = 180;
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                rotate = 90;
-                break;
-        }
-
-        if (rotate == -1) {
-            setImageBitmap(bitmap);
-        } else {
-            matrix.postRotate(rotate);
-            final Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap,
-                    0,
-                    0,
-                    bitmap.getWidth(),
-                    bitmap.getHeight(),
-                    matrix,
-                    true);
-            setImageBitmap(rotatedBitmap);
-            bitmap.recycle();
-        }
+        setImageBitmap(bitmap);
     }
 
     /**
