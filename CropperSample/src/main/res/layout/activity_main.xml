@@ -19,30 +19,36 @@
             xmlns:custom="http://schemas.android.com/apk/res-auto"
             android:id="@+id/CropImageView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="280dp"
             android:layout_gravity="center"
             custom:imageResource="@drawable/butterfly"/>
 
-        <Button
-            android:id="@+id/Button_crop"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Crop"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
 
-        <Button
-            android:id="@+id/Button_load"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Load"/>
+            <Button
+                android:id="@+id/Button_load"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Load"/>
 
-        <Button
-            android:id="@+id/Button_rotate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Rotate"/>
+            <Button
+                android:id="@+id/Button_rotate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rotate"/>
+
+            <Button
+                android:id="@+id/Button_crop"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Crop"/>
+
+        </LinearLayout>
+
 
         <ToggleButton
             android:id="@+id/cropShapeToggle"
