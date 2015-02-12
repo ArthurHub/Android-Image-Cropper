@@ -31,6 +31,13 @@
             android:text="Crop"/>
 
         <Button
+            android:id="@+id/Button_load"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Load"/>
+
+        <Button
             android:id="@+id/Button_rotate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

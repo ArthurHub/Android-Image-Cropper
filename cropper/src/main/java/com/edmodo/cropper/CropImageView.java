@@ -24,9 +24,11 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,6 +171,24 @@ public class CropImageView extends FrameLayout {
         if (resId != 0) {
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
             setImageBitmap(bitmap);
+        }
+    }
+
+    /**
+     * Sets a bitmap loaded from the given Android URI as the content of the CropImageView.
+     *
+     * @param uri the URI to load the image from
+     */
+    public void setImageUri(Uri uri) {
+        if (uri != null) {
+
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            double densityAdj = metrics.density > 1 ? 1 / metrics.density : 1;
+
+            int width = (int) (metrics.widthPixels * densityAdj);
+            int height = (int) (metrics.heightPixels * densityAdj);
+            ImageViewUtil.DecodeBitmapResult result = ImageViewUtil.decodeSampledBitmap(getContext(), uri, width, height);
+            setImageBitmap(result.bitmap);
         }
     }
 

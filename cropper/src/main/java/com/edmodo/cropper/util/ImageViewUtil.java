@@ -350,7 +350,7 @@ public class ImageViewUtil {
     /**
      * The result of {@link #decodeSampledBitmap(android.content.Context, android.net.Uri, int, int)}.
      */
-    static final class DecodeBitmapResult {
+    public static final class DecodeBitmapResult {
 
         /**
          * The loaded bitmap
