@@ -18,6 +18,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.media.ExifInterface;
@@ -88,16 +89,16 @@ public class ImageViewUtil {
      * If no rotation is required the image will not be rotated.<br/>
      * New bitmap is created and the old one is recycled.
      */
-    public static Bitmap rotateBitmapByExif(Context context, Bitmap bitmap, Uri uri) {
+    public static RotateBitmapResult rotateBitmapByExif(Context context, Bitmap bitmap, Uri uri) {
         try {
             File file = getFileFromUri(context, uri);
             if (file.exists()) {
                 ExifInterface ei = new ExifInterface(file.getAbsolutePath());
-                bitmap = rotateBitmapByExif(bitmap, ei);
+                return rotateBitmapByExif(bitmap, ei);
             }
         } catch (Exception ignored) {
         }
-        return bitmap;
+        return new RotateBitmapResult(bitmap, 0);
     }
 
     /**
@@ -105,20 +106,24 @@ public class ImageViewUtil {
      * If no rotation is required the image will not be rotated.<br/>
      * New bitmap is created and the old one is recycled.
      */
-    public static Bitmap rotateBitmapByExif(Bitmap bitmap, ExifInterface exif) {
+    public static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, ExifInterface exif) {
+        int degrees = 0;
         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
         switch (orientation) {
             case ExifInterface.ORIENTATION_ROTATE_90:
-                bitmap = rotateBitmap(bitmap, 90);
+                degrees = 90;
                 break;
             case ExifInterface.ORIENTATION_ROTATE_180:
-                bitmap = rotateBitmap(bitmap, 180);
+                degrees = 180;
                 break;
             case ExifInterface.ORIENTATION_ROTATE_270:
-                bitmap = rotateBitmap(bitmap, 270);
+                degrees = 270;
                 break;
         }
-        return bitmap;
+        if (degrees > 0) {
+            bitmap = rotateBitmap(bitmap, degrees);
+        }
+        return new RotateBitmapResult(bitmap, degrees);
     }
 
     /**
@@ -144,6 +149,30 @@ public class ImageViewUtil {
             closeSafe(stream);
             stream = resolver.openInputStream(uri);
             Bitmap bitmap = BitmapFactory.decodeStream(stream, new Rect(0, 0, 0, 0), options);
+
+            return new DecodeBitmapResult(bitmap, options.inSampleSize);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load sampled bitmap", e);
+        } finally {
+            closeSafe(stream);
+        }
+    }
+
+    /**
+     * Decode specific rectangle bitmap from stream using sampling to get bitmap with the requested limit.
+     */
+    public static DecodeBitmapResult decodeSampledBitmapRegion(Context context, Uri uri, Rect rect, int reqWidth, int reqHeight) {
+        InputStream stream = null;
+        try {
+            ContentResolver resolver = context.getContentResolver();
+            stream = resolver.openInputStream(uri);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = calculateInSampleSize(rect.width(), rect.height(), reqWidth, reqHeight);
+
+            BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(stream, false);
+            Bitmap bitmap = decoder.decodeRegion(rect, options);
 
             return new DecodeBitmapResult(bitmap, options.inSampleSize);
 
@@ -229,7 +258,7 @@ public class ImageViewUtil {
     /**
      * Helper that does the work of the above functions. Gets the rectangular
      * position of a Bitmap if it were placed inside a View with scale type set
-     * to {@link ImageView#ScaleType #CENTER_INSIDE}.
+     * to {@link android.widget.ImageView.ScaleType #CENTER_INSIDE}.
      *
      * @param bitmapWidth the Bitmap's width
      * @param bitmapHeight the Bitmap's height
@@ -365,6 +394,30 @@ public class ImageViewUtil {
         DecodeBitmapResult(Bitmap bitmap, int sampleSize) {
             this.sampleSize = sampleSize;
             this.bitmap = bitmap;
+        }
+    }
+    //endregion
+
+    //region: Inner class: RotateBitmapResult
+
+    /**
+     * The result of {@link #rotateBitmapByExif(android.graphics.Bitmap, android.media.ExifInterface)}.
+     */
+    public static final class RotateBitmapResult {
+
+        /**
+         * The loaded bitmap
+         */
+        public final Bitmap bitmap;
+
+        /**
+         * The degrees the image was rotated
+         */
+        public final int degrees;
+
+        RotateBitmapResult(Bitmap bitmap, int degrees) {
+            this.bitmap = bitmap;
+            this.degrees = degrees;
         }
     }
     //endregion
