@@ -1,8 +1,10 @@
 Android Image Cropper
 =======
 Forked from [edmodo/cropper](https://github.com/edmodo/cropper) fixing some bugs and adding some features.
+
 An image cropping tool, displays a resizable crop window on top of the image. 
-Calling the method getCroppedImage() will then return the Bitmap marked by the crop window.
+
+Calling the method getCroppedImage() will return the Bitmap marked by the crop window.
 
 ### Setting image:
  - Bitmap: setImageBitmap(Bitmap bitmap), setImageBitmap(Bitmap bitmap, ExifInterface exif)
