@@ -175,7 +175,9 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Sets a bitmap loaded from the given Android URI as the content of the CropImageView.
+     * Sets a bitmap loaded from the given Android URI as the content of the CropImageView.<br/>
+     * Can be used with URI from gallery or camera source.<br/>
+     * Will rotate the image by exif data.<br/>
      *
      * @param uri the URI to load the image from
      */
@@ -188,7 +190,10 @@ public class CropImageView extends FrameLayout {
             int width = (int) (metrics.widthPixels * densityAdj);
             int height = (int) (metrics.heightPixels * densityAdj);
             ImageViewUtil.DecodeBitmapResult result = ImageViewUtil.decodeSampledBitmap(getContext(), uri, width, height);
-            setImageBitmap(result.bitmap);
+
+            Bitmap rotatedBitmap = ImageViewUtil.rotateBitmapByExif(getContext(), result.bitmap, uri);
+
+            setImageBitmap(rotatedBitmap);
         }
     }
 
