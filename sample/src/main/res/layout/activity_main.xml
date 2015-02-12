@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:background="#EEE"
+        tools:context=".MainActivity">
+
+        <com.theartofdev.edmodo.cropper.CropImageView
+            xmlns:custom="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/CropImageView"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:layout_gravity="center"
+            custom:imageResource="@drawable/butterfly"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <Button
+                android:id="@+id/Button_load"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Load"/>
+
+            <Button
+                android:id="@+id/Button_rotate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rotate"/>
+
+            <Button
+                android:id="@+id/Button_crop"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Crop"/>
+
+        </LinearLayout>
+
+
+        <ToggleButton
+            android:id="@+id/cropShapeToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textOn="Crop shape: Oval"
+            android:textOff="Crop shape: Rectangle"/>
+
+        <LinearLayout
+            android:id="@+id/fixedAspectRatioLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ToggleButton
+                android:id="@+id/fixedAspectRatioToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="Fixed AspectRatio: ON"
+                android:textOff="Fixed AspectRatio: OFF"/>
+
+            <TextView
+                android:id="@+id/aspectRatioNum"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:text="(20, 20)"/>
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/aspectRatioXSeek"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="20"/>
+
+        <SeekBar
+            android:id="@+id/aspectRatioYSeek"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="20"/>
+
+        <Spinner
+            android:id="@+id/showGuidelinesSpin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/showGuidelinesArray"/>
+
+        <ImageView
+            android:id="@+id/croppedImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+
+</ScrollView>
