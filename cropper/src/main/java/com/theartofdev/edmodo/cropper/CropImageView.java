@@ -228,8 +228,8 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Sets a Bitmap and initializes the image rotation according to the EXIT data.
-     * <p/>
+     * Sets a Bitmap and initializes the image rotation according to the EXIT data.<br>
+     * <br>
      * The EXIF can be retrieved by doing the following:
      * <code>ExifInterface exif = new ExifInterface(path);</code>
      *
@@ -263,9 +263,9 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Sets a bitmap loaded from the given Android URI as the content of the CropImageView.<br/>
-     * Can be used with URI from gallery or camera source.<br/>
-     * Will rotate the image by exif data.<br/>
+     * Sets a bitmap loaded from the given Android URI as the content of the CropImageView.<br>
+     * Can be used with URI from gallery or camera source.<br>
+     * Will rotate the image by exif data.<br>
      *
      * @param uri the URI to load the image from
      */
@@ -380,7 +380,7 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Gets the cropped image based on the current crop window.<br/>
+     * Gets the cropped image based on the current crop window.<br>
      * If image loaded from URI will use sample size to fir the requested width and height.
      *
      * @return a new Bitmap representing the cropped image

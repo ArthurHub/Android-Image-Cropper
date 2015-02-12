@@ -1,5 +1,12 @@
 apply plugin: 'com.android.library'
 
+ext {
+    PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
+    PUBLISH_ARTIFACT_ID = 'Android-Image-Cropper'
+    PUBLISH_VERSION = '1.0'
+    // gradlew clean build generateRelease
+}
+
 android {
 
     compileSdkVersion 21
@@ -15,3 +22,5 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 }
+
+apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'

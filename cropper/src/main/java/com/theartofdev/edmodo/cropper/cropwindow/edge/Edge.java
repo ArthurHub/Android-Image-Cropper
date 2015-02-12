@@ -133,9 +133,9 @@ public enum Edge {
      * Returns whether or not you can re-scale the image based on whether any edge would be out of bounds.
      * Checks all the edges for a possibility of jumping out of bounds.
      *
-     * @param Edge the Edge that is about to be expanded
+     * @param edge the Edge that is about to be expanded
      * @param imageRect the rectangle of the picture
-     * @param aspectratio the desired aspectRatio of the picture.
+     * @param aspectRatio the desired aspectRatio of the picture.
      * @return whether or not the new image would be out of bounds.
      */
     public boolean isNewRectangleOutOfBounds(Edge edge, Rect imageRect, float aspectRatio) {

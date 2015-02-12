@@ -85,8 +85,8 @@ public class ImageViewUtil {
     }
 
     /**
-     * Rotate the given image by reading the Exif value of the image (uri).<br/>
-     * If no rotation is required the image will not be rotated.<br/>
+     * Rotate the given image by reading the Exif value of the image (uri).<br>
+     * If no rotation is required the image will not be rotated.<br>
      * New bitmap is created and the old one is recycled.
      */
     public static RotateBitmapResult rotateBitmapByExif(Context context, Bitmap bitmap, Uri uri) {
@@ -102,8 +102,8 @@ public class ImageViewUtil {
     }
 
     /**
-     * Rotate the given image by given Exif value.<br/>
-     * If no rotation is required the image will not be rotated.<br/>
+     * Rotate the given image by given Exif value.<br>
+     * If no rotation is required the image will not be rotated.<br>
      * New bitmap is created and the old one is recycled.
      */
     public static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, ExifInterface exif) {
@@ -200,7 +200,7 @@ public class ImageViewUtil {
     }
 
     /**
-     * Get {@link java.io.File} object for the given Android URI.<br/>
+     * Get {@link java.io.File} object for the given Android URI.<br>
      * Use content resolver to get real path if direct path doesn't return valid file.
      */
     public static File getFileFromUri(Context context, Uri uri) {
@@ -229,7 +229,7 @@ public class ImageViewUtil {
     }
 
     /**
-     * Rotate the given bitmap by the given degrees.<br/>
+     * Rotate the given bitmap by the given degrees.<br>
      * New bitmap is created and the old one is recycled.
      */
     public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
