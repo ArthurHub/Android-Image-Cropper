@@ -4,7 +4,7 @@ Forked from [edmodo/cropper](https://github.com/edmodo/cropper) fixing some bugs
 
 Image cropping tool, displays a resizable, rectengular/oval crop window on top of image. 
 
-Optimized for cropping image picked from Camera or Gallery
+Optimized for cropping image picked from Camera or Gallery (see blog)
 - Support setting cropping image by Android URI loaded by ContentResolver.
 - Auto image roatete by reading Exif data to handle rotation by camera.
 - Using sampling to reduce memory usage and prevent out-of-memory.
@@ -25,13 +25,10 @@ For more information, see the [linked Github Wiki page](https://github.com/edmod
 
 ![ScreenShot](https://github.com/ArthurHub/Android-Image-Cropper/blob/master/demo.jpg?raw=true)
 
-## Installation
-
-**build.gradle**
-
-	dependencies {
-	  compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
-	}
+## Gradle
+```
+compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
+```
 
 ## License
 
