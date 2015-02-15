@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Android Image Cropper : Android widget for cropping image, optimized for picked image from Camera or Gallery.">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Android Image Cropper</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ArthurHub/Android-Image-Cropper">View on GitHub</a>
+
+          <h1 id="project_title">Android Image Cropper</h1>
+          <h2 id="project_tagline">Android widget for cropping image, optimized for picked image from Camera or Gallery.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ArthurHub/Android-Image-Cropper/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ArthurHub/Android-Image-Cropper/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="android-image-cropper" class="anchor" href="#android-image-cropper" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android Image Cropper</h1>
+
+<p>Forked from <a href="https://github.com/edmodo/cropper">edmodo/cropper</a> fixing some bugs and adding some features.</p>
+
+<p>Image cropping tool, displays a resizable, rectengular/oval crop window on top of image. </p>
+
+<p>Optimized for cropping image picked from Camera or Gallery</p>
+
+<ul>
+<li>Support setting cropping image by Android URI loaded by ContentResolver.</li>
+<li>Auto image roatete by reading Exif data to handle rotation by camera.</li>
+<li>Using sampling to reduce memory usage and prevent out-of-memory.</li>
+<li>Support required size and sampling on getting cropped image for memory optimization.</li>
+</ul>
+
+<h3>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features:</h3>
+
+<ul>
+<li>Set cropping image as Bitmap, Resource or Android URI.</li>
+<li>Set cropping window shape to Rectengular or Oval (circle by setting fixed aspect ration).</li>
+<li>Set image Scale type in the cropping image view: center or fit.</li>
+<li>Control the appearance of guidelines in the crop window.</li>
+<li>Control cropping window aspect ratio, ability to fix it (squared).</li>
+<li>Auto rotate bitmap by provided Exif data or loading from Android URI.</li>
+<li>Rotate image API to allow the user to rotate the image during cropping.</li>
+<li>Get cropping rectangle or the cropped bitmap.</li>
+<li>Supported on API Level 10 and above.</li>
+</ul>
+
+<p>For more information, see the <a href="https://github.com/edmodo/cropper/wiki">linked Github Wiki page</a>. </p>
+
+<p><img src="https://github.com/ArthurHub/Android-Image-Cropper/blob/master/demo.jpg?raw=true" alt="ScreenShot"></p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p><strong>build.gradle</strong></p>
+
+<pre><code>dependencies {
+  compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
+}
+</code></pre>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Copyright 2013, Edmodo, Inc. </p>
+
+<p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the License.
+You may obtain a copy of the License in the LICENSE file, or at:</p>
+
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+
+<p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Android Image Cropper maintained by <a href="https://github.com/ArthurHub">ArthurHub</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
