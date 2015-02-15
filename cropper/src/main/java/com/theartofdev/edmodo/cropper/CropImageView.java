@@ -220,6 +220,18 @@ public class CropImageView extends FrameLayout {
      * @param bitmap the Bitmap to set
      */
     public void setImageBitmap(Bitmap bitmap) {
+
+        // if we allocated the bitmap, release it as fast as possible
+        if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
+            mBitmap.recycle();
+        }
+
+        // clean the loaded image flags for new image
+        mImageResource = 0;
+        mLoadedImageUri = null;
+        mLoadedSampleSize = 1;
+        mDegreesRotated = 0;
+
         mBitmap = bitmap;
         mImageView.setImageBitmap(mBitmap);
         if (mCropOverlayView != null) {
@@ -242,9 +254,6 @@ public class CropImageView extends FrameLayout {
             bitmap = result.bitmap;
             mDegreesRotated = result.degrees;
         }
-        mImageResource = 0;
-        mLoadedImageUri = null;
-        mLoadedSampleSize = 1;
         setImageBitmap(bitmap);
     }
 
