@@ -2,32 +2,25 @@ Android Image Cropper
 =======
 Forked from [edmodo/cropper](https://github.com/edmodo/cropper) fixing some bugs and adding some features.
 
-An image cropping tool, displays a resizable crop window on top of the image. 
+Image cropping tool, displays a resizable, rectengular/oval crop window on top of image. 
 
-Calling the method getCroppedImage() will return the Bitmap marked by the crop window.
+Optimized for cropping image picked from Camera or Gallery
+- Support setting cropping image by Android URI loaded by ContentResolver.
+- Auto image roatete by reading Exif data to handle rotation by camera.
+- Using sampling to reduce memory usage and prevent out-of-memory.
+- Support required size and sampling on getting cropped image for memory optimization.
 
-### Setting image:
- - Bitmap: setImageBitmap(Bitmap bitmap), setImageBitmap(Bitmap bitmap, ExifInterface exif)
- - Resource: setImageResource(int resId)
- - URI: setImageUri(Uri uri)  
+### Features:
+- Set cropping image as Bitmap, Resource or Android URI.
+- Set cropping window shape to Rectengular or Oval (circle by setting fixed aspect ration).
+- Set image Scale type in the cropping image view: center or fit.
+- Control the appearance of guidelines in the crop window.
+- Control cropping window aspect ratio, ability to fix it (squared).
+- Auto rotate bitmap by provided Exif data or loading from Android URI.
+- Rotate image API to allow the user to rotate the image during cropping.
+- Get cropping rectangle or the cropped bitmap.
+- Supported on API Level 10 and above.
 
-### Customizable:
-- Rectengular or Oval cropping shape.
-- Scale type of the image in the control.
-- appearance of guidelines in the crop window.
-- whether the aspect ratio is fixed or not and the ratio if fixed.
-
-### Image rotation:
-- Ability to provide ExifInterface for bitmap to fix rotation on load.
-- Will automatically load ExifInterface data if loaded from URI to fix rotation on load.
-- API to rotate loaded image.
-
-### Loading from URI:
-- Easy to use to crop image picked from Gallery or Camera.
-- Loaded using samplaning to lower memory usage.
-- Cropped rectange and cropped image will be on the original image, with option to adjust required size.
-
-Supported on API Level 10 and above.
 For more information, see the [linked Github Wiki page](https://github.com/edmodo/cropper/wiki). 
 
 ![ScreenShot](https://github.com/ArthurHub/Android-Image-Cropper/blob/master/demo.jpg?raw=true)
@@ -36,12 +29,8 @@ For more information, see the [linked Github Wiki page](https://github.com/edmod
 
 **build.gradle**
 
-	repositories {
-	  maven { url 'http://dl.bintray.com/arthurhub/maven' }
-	}
-
 	dependencies {
-	  compile 'com.theartofdev.edmodo:Android-Image-Cropper:1.0@aar'
+	  compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
 	}
 
 ## License
