@@ -1,39 +1,40 @@
-Cropper
+Android Image Cropper
 =======
-The Cropper is an image cropping tool. It provides a way to set an image in XML and programmatically, and displays a resizable crop window on top of the image. Calling the method getCroppedImage() will then return the Bitmap marked by the crop window.
+Forked from [edmodo/cropper](https://github.com/edmodo/cropper) fixing some bugs and adding some features.
 
-Developers can customize the following attributes (both via XML and programmatically):
+Image cropping tool, displays a resizable, rectengular/oval crop window on top of image. 
 
-- appearance of guidelines in the crop window
-- whether the aspect ratio is fixed or not
-- aspect ratio (if the aspect ratio is fixed)
-- image resource
+Optimized for cropping image picked from Camera or Gallery
+- Support setting cropping image by Android URI loaded by ContentResolver.
+- Auto image roatete by reading Exif data to handle rotation by camera.
+- Using sampling to reduce memory usage and prevent out-of-memory.
+- Support required size and sampling on getting cropped image for memory optimization.
 
-A public method to rotate the image by a specified number of degrees is also included. This can be used to provide the user with an option to fix the image orientation should Android miscalculate the intended orientation.
+### Features:
+- Set cropping image as Bitmap, Resource or Android URI.
+- Set cropping window shape to Rectengular or Oval (circle by setting fixed aspect ration).
+- Set image Scale type in the cropping image view: center or fit.
+- Control the appearance of guidelines in the crop window.
+- Control cropping window aspect ratio, ability to fix it (squared).
+- Auto rotate bitmap by provided Exif data or loading from Android URI.
+- Rotate image API to allow the user to rotate the image during cropping.
+- Get cropping rectangle or the cropped bitmap.
+- Supported on API Level 10 and above.
 
-Supported on API Level 7 and above.
+For more information, see the [linked Github Wiki page](https://github.com/edmodo/cropper/wiki). 
 
-For more information, see the linked Github Wiki page. 
+![ScreenShot](https://github.com/ArthurHub/Android-Image-Cropper/blob/master/demo.jpg?raw=true)
 
-https://github.com/edmodo/cropper/wiki
-
-![ScreenShot](http://i.imgur.com/3FhsTgfl.jpg)
-
-Installation
-=======
+## Installation
 
 **build.gradle**
 
-	repositories {
-		mavenCentral()
-	}
-
 	dependencies {
-	  compile 'com.edmodo:cropper:1.0.1'
+	  compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
 	}
 
-License
-=======
+## License
+
 Copyright 2013, Edmodo, Inc. 
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the License.
@@ -42,10 +43,3 @@ You may obtain a copy of the License in the LICENSE file, or at:
 http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-
-Contributions
-=======
-
-We'd love for you to participate in the development of our project. Before we can accept your pull request, please sign our Individual Contributor License Agreement. It's a short form that covers our bases and makes sure you're eligible to contribute. Thank you!
-
-http://goo.gl/gfj6Mb
