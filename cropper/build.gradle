@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 
 ext {
     PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
-    PUBLISH_ARTIFACT_ID = 'Android-Image-Cropper'
-    PUBLISH_VERSION = '1.0'
+    PUBLISH_ARTIFACT_ID = 'android-image-cropper'
+    PUBLISH_VERSION = '1.0.1'
     // gradlew clean build generateRelease
 }
 
