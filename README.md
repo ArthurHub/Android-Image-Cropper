@@ -31,14 +31,32 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
 ```
 compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
 ```
+or with using [AARLinkSources Plugin](https://github.com/xujiaao/AARLinkSources) to get the [sources in the IDE](https://groups.google.com/forum/#!msg/adt-dev/yVPo71O_ZKM/BcYP-hLai2wJ).
+```
+buildscript {
+    repositories {
+        maven { url 'https://raw.github.com/xujiaao/mvn-repository/master/releases' }
+    }
+
+    dependencies {
+        classpath 'com.github.xujiaao:aarLinkSources:1.0.0'
+    }
+}
+
+apply plugin: 'aar-link-sources'
+
+dependencies {
+  compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
+  aarLinkSources 'com.theartofdev.edmodo:android-image-cropper:1.0.+:sources@jar'
+}
+```
 
 ## License
-
 Copyright 2013, Edmodo, Inc. 
 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the License.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the   License.
 You may obtain a copy of the License in the LICENSE file, or at:
 
-http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS   IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
