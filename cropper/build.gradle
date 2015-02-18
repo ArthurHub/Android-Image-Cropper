@@ -15,7 +15,7 @@ android {
         minSdkVersion 10
         targetSdkVersion 21
         versionCode 1
-        versionName '1.0'
+        versionName PUBLISH_VERSION
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -23,4 +23,4 @@ android {
     }
 }
 
-apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
+apply from: 'https://raw.githubusercontent.com/ArthurHub/release-android-library/master/android-release-aar.gradle'
