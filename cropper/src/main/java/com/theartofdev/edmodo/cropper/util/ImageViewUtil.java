@@ -222,7 +222,8 @@ public class ImageViewUtil {
             file = new File(realPath);
         } catch (Exception ignored) {
         } finally {
-            closeSafe(cursor);
+            if (cursor != null)
+                cursor.close();
         }
 
         return file;
