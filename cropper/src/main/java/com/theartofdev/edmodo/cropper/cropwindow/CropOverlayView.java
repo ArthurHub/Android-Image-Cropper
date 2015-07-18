@@ -28,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.theartofdev.edmodo.cropper.CropImageView;
+import com.theartofdev.edmodo.cropper.CropShape;
 import com.theartofdev.edmodo.cropper.cropwindow.edge.Edge;
 import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
 import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
@@ -128,7 +129,7 @@ public class CropOverlayView extends View {
     /**
      * The shape of the cropping area - rectangle/circular.
      */
-    private CropImageView.CropShape mCropShape;
+    private CropShape mCropShape;
 
     // Whether the Crop View has been initialized for the first time
     private boolean initializedCropWindow = false;
@@ -176,7 +177,7 @@ public class CropOverlayView extends View {
     /**
      * The shape of the cropping area - rectangle/circular.
      */
-    public void setCropShape(CropImageView.CropShape cropShape) {
+    public void setCropShape(CropShape cropShape) {
         mCropShape = cropShape;
         invalidate();
     }
@@ -327,7 +328,7 @@ public class CropOverlayView extends View {
         float t = Edge.TOP.getCoordinate() + w;
         float r = Edge.RIGHT.getCoordinate() - w;
         float b = Edge.BOTTOM.getCoordinate() - w;
-        if (mCropShape == CropImageView.CropShape.RECTANGLE) {
+        if (mCropShape == CropShape.RECTANGLE) {
             // Draw rectangle crop window border.
             canvas.drawRect(l, t, r, b, mBorderPaint);
             drawCorners(canvas);
@@ -510,7 +511,7 @@ public class CropOverlayView extends View {
         float r = Edge.RIGHT.getCoordinate() - w;
         float b = Edge.BOTTOM.getCoordinate() - w;
 
-        if (mCropShape == CropImageView.CropShape.OVAL) {
+        if (mCropShape == CropShape.OVAL) {
             l += 15 * mGuidelinePaint.getStrokeWidth();
             t += 15 * mGuidelinePaint.getStrokeWidth();
             r -= 15 * mGuidelinePaint.getStrokeWidth();
@@ -541,7 +542,7 @@ public class CropOverlayView extends View {
         final float r = Edge.RIGHT.getCoordinate();
         final float b = Edge.BOTTOM.getCoordinate();
 
-        if (mCropShape == CropImageView.CropShape.RECTANGLE) {
+        if (mCropShape == CropShape.RECTANGLE) {
             canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, t, mBackgroundPaint);
             canvas.drawRect(bitmapRect.left, b, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
             canvas.drawRect(bitmapRect.left, t, l, b, mBackgroundPaint);
@@ -594,7 +595,7 @@ public class CropOverlayView extends View {
         final float right = Edge.RIGHT.getCoordinate();
         final float bottom = Edge.BOTTOM.getCoordinate();
 
-        mPressedHandle = HandleUtil.getPressedHandle(x, y, left, top, right, bottom, mHandleRadius);
+        mPressedHandle = HandleUtil.getPressedHandle(x, y, left, top, right, bottom, mHandleRadius, mCropShape);
 
         if (mPressedHandle == null) {
             return;

@@ -17,6 +17,7 @@ import android.content.Context;
 import android.util.Pair;
 import android.util.TypedValue;
 
+import com.theartofdev.edmodo.cropper.CropShape;
 import com.theartofdev.edmodo.cropper.cropwindow.CropOverlayView;
 import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
 
@@ -68,12 +69,43 @@ public class HandleUtil {
                                           float top,
                                           float right,
                                           float bottom,
-                                          float targetRadius) {
+                                          float targetRadius,
+                                          CropShape cropShape) {
 
         Handle pressedHandle = null;
 
-        // Note: corner-handles take precedence, then side-handles, then center.
+        if (cropShape == CropShape.RECTANGLE) {
+            pressedHandle = getRectanglePressedHandle(x, y, left, top, right, bottom, targetRadius);
+        } else if (cropShape == CropShape.OVAL) {
+            pressedHandle = getOvalPressedHandle(x, y, left, top, right, bottom);
+        }
 
+        return pressedHandle;
+    }
+
+    /**
+     * Determines which, if any, of the handles are pressed given the touch
+     * coordinates, the bounding box, and the touch radius.
+     *
+     * @param x the x-coordinate of the touch point
+     * @param y the y-coordinate of the touch point
+     * @param left the x-coordinate of the left bound
+     * @param top the y-coordinate of the top bound
+     * @param right the x-coordinate of the right bound
+     * @param bottom the y-coordinate of the bottom bound
+     * @param targetRadius the target radius in pixels
+     * @return the Handle that was pressed; null if no Handle was pressed
+     */
+    private static Handle getRectanglePressedHandle(float x,
+                                                    float y,
+                                                    float left,
+                                                    float top,
+                                                    float right,
+                                                    float bottom,
+                                                    float targetRadius) {
+        Handle pressedHandle = null;
+
+        // Note: corner-handles take precedence, then side-handles, then center.
         if (HandleUtil.isInCornerTargetZone(x, y, left, top, targetRadius)) {
             pressedHandle = Handle.TOP_LEFT;
         } else if (HandleUtil.isInCornerTargetZone(x, y, right, top, targetRadius)) {
@@ -94,7 +126,74 @@ public class HandleUtil {
             pressedHandle = Handle.RIGHT;
         } else if (HandleUtil.isInCenterTargetZone(x, y, left, top, right, bottom) && !focusCenter()) {
             pressedHandle = Handle.CENTER;
+        }
 
+        return pressedHandle;
+    }
+
+    /**
+     * Determines which, if any, of the handles are pressed given the touch
+     * coordinates, the bounding box/oval, and the touch radius.
+     *
+     * @param x the x-coordinate of the touch point
+     * @param y the y-coordinate of the touch point
+     * @param left the x-coordinate of the left bound
+     * @param top the y-coordinate of the top bound
+     * @param right the x-coordinate of the right bound
+     * @param bottom the y-coordinate of the bottom bound
+     * @return the Handle that was pressed; null if no Handle was pressed
+     */
+    private static Handle getOvalPressedHandle(float x,
+                                               float y,
+                                               float left,
+                                               float top,
+                                               float right,
+                                               float bottom) {
+
+        /*
+           Use a 6x6 grid system divided into 9 "handles", with the center the biggest region. While
+           this is not perfect, it's a good quick-to-ship approach.
+
+           TL T T T T TR
+            L C C C C R
+            L C C C C R
+            L C C C C R
+            L C C C C R
+           BL B B B B BR
+        */
+        final float cellLength = (right - left) / 6;
+        final float leftCenter = left + cellLength;
+        final float rightCenter = left + (5 * cellLength);
+
+        final float cellHeight = (bottom - top) / 6;
+        final float topCenter = top + cellHeight;
+        final float bottomCenter = top + 5 * cellHeight;
+
+        final Handle pressedHandle;
+        if (x < leftCenter) {
+            if (y < topCenter) {
+                pressedHandle = Handle.TOP_LEFT;
+            } else if(y < bottomCenter) {
+                pressedHandle = Handle.LEFT;
+            } else {
+                pressedHandle = Handle.BOTTOM_LEFT;
+            }
+        } else if (x < rightCenter) {
+            if (y < topCenter) {
+                pressedHandle = Handle.TOP;
+            } else if(y < bottomCenter) {
+                pressedHandle = Handle.CENTER;
+            } else {
+                pressedHandle = Handle.BOTTOM;
+            }
+        } else {
+            if (y < topCenter) {
+                pressedHandle = Handle.TOP_RIGHT;
+            } else if(y < bottomCenter) {
+                pressedHandle = Handle.RIGHT;
+            } else {
+                pressedHandle = Handle.BOTTOM_RIGHT;
+            }
         }
 
         return pressedHandle;
