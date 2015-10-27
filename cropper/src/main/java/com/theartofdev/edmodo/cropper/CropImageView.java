@@ -101,7 +101,7 @@ public class CropImageView extends FrameLayout {
     /**
      * The shape of the cropping area - rectangle/circular.
      */
-    private CropImageView.CropShape mCropShape;
+    private CropShape mCropShape;
 
     /**
      * The URI that the image was loaded from (if loaded from URI)
@@ -157,14 +157,14 @@ public class CropImageView extends FrameLayout {
     /**
      * The shape of the cropping area - rectangle/circular.
      */
-    public CropImageView.CropShape getCropShape() {
+    public CropShape getCropShape() {
         return mCropShape;
     }
 
     /**
      * The shape of the cropping area - rectangle/circular.
      */
-    public void setCropShape(CropImageView.CropShape cropShape) {
+    public void setCropShape(CropShape cropShape) {
         if (cropShape != mCropShape) {
             mCropShape = cropShape;
             mCropOverlayView.setCropShape(cropShape);
@@ -640,14 +640,4 @@ public class CropImageView extends FrameLayout {
     }
     //endregion
 
-    //region: Inner class: CropShape
-
-    /**
-     * The possible cropping area shape
-     */
-    public static enum CropShape {
-        RECTANGLE,
-        OVAL
-    }
-    //endregion
 }
