@@ -129,8 +129,8 @@ public class MainActivity extends Activity {
         aspectRatioXSeek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar aspectRatioXSeek, int progress, boolean fromUser) {
-                mAspectRatioX = progress;
-                cropImageView.setAspectRatio(progress, mAspectRatioY);
+                mAspectRatioX = Math.max(1, progress);
+                cropImageView.setAspectRatio(mAspectRatioX, mAspectRatioY);
                 aspectRatioNum.setText("(" + mAspectRatioX + ", " + mAspectRatioY + ")");
             }
 
@@ -146,8 +146,8 @@ public class MainActivity extends Activity {
         aspectRatioYSeek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar aspectRatioYSeek, int progress, boolean fromUser) {
-                mAspectRatioY = progress;
-                cropImageView.setAspectRatio(mAspectRatioX, progress);
+                mAspectRatioY = Math.max(1, progress);
+                cropImageView.setAspectRatio(mAspectRatioX, mAspectRatioY);
                 aspectRatioNum.setText("(" + mAspectRatioX + ", " + mAspectRatioY + ")");
             }
 
