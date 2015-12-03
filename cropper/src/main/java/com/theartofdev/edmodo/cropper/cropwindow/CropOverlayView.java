@@ -551,6 +551,7 @@ public class CropOverlayView extends View {
             Path circleSelectionPath = new Path();
             mRectF.set(l, t, r, b);
             circleSelectionPath.addOval(mRectF, Path.Direction.CW);
+            canvas.save();
             canvas.clipPath(circleSelectionPath, Region.Op.XOR);
             canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
             canvas.restore();
