@@ -220,25 +220,24 @@ public class CropImageView extends FrameLayout {
      * @param bitmap the Bitmap to set
      */
     public void setImageBitmap(Bitmap bitmap) {
-        if(mBitmap == bitmap) {
-            return;
-        }
+        if (mBitmap != bitmap) {
 
-        // if we allocated the bitmap, release it as fast as possible
-        if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
-            mBitmap.recycle();
-        }
+            // if we allocated the bitmap, release it as fast as possible
+            if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
+                mBitmap.recycle();
+            }
 
-        // clean the loaded image flags for new image
-        mImageResource = 0;
-        mLoadedImageUri = null;
-        mLoadedSampleSize = 1;
-        mDegreesRotated = 0;
+            // clean the loaded image flags for new image
+            mImageResource = 0;
+            mLoadedImageUri = null;
+            mLoadedSampleSize = 1;
+            mDegreesRotated = 0;
 
-        mBitmap = bitmap;
-        mImageView.setImageBitmap(mBitmap);
-        if (mCropOverlayView != null) {
-            mCropOverlayView.resetCropOverlayView();
+            mBitmap = bitmap;
+            mImageView.setImageBitmap(mBitmap);
+            if (mCropOverlayView != null) {
+                mCropOverlayView.resetCropOverlayView();
+            }
         }
     }
 

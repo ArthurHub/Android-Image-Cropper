@@ -31,11 +31,11 @@ public final class PaintUtil {
 
     private static final String DEFAULT_BACKGROUND_COLOR_ID = "#77000000";
 
-    private static final float DEFAULT_LINE_THICKNESS_DP = 2;
+    private static final float DEFAULT_LINE_THICKNESS_DP = 3;
 
     private static final float DEFAULT_CORNER_THICKNESS_DP = 3;
 
-    private static final float DEFAULT_GUIDELINE_THICKNESS_PX = 1;
+    private static final float DEFAULT_GUIDELINE_THICKNESS_PX = 2;
     //endregion
 
     /**
@@ -78,14 +78,11 @@ public final class PaintUtil {
      * Creates the Paint object for drawing the translucent overlay outside the
      * crop window.
      *
-     * @param context the Context
      * @return the new Paint object
      */
-    public static Paint newBackgroundPaint(Context context) {
-
-        final Paint paint = new Paint();
+    public static Paint newBackgroundPaint() {
+        Paint paint = new Paint();
         paint.setColor(Color.parseColor(DEFAULT_BACKGROUND_COLOR_ID));
-
         return paint;
     }
 

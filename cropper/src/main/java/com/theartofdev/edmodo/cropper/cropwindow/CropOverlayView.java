@@ -324,10 +324,10 @@ public class CropOverlayView extends View {
         }
 
         float w = mBorderPaint.getStrokeWidth();
-        float l = Edge.LEFT.getCoordinate() + w;
-        float t = Edge.TOP.getCoordinate() + w;
-        float r = Edge.RIGHT.getCoordinate() - w;
-        float b = Edge.BOTTOM.getCoordinate() - w;
+        float l = Edge.LEFT.getCoordinate() + w / 2;
+        float t = Edge.TOP.getCoordinate() + w / 2;
+        float r = Edge.RIGHT.getCoordinate() - w / 2;
+        float b = Edge.BOTTOM.getCoordinate() - w / 2;
         if (mCropShape == CropShape.RECTANGLE) {
             // Draw rectangle crop window border.
             canvas.drawRect(l, t, r, b, mBorderPaint);
@@ -381,7 +381,7 @@ public class CropOverlayView extends View {
 
         mBorderPaint = PaintUtil.newBorderPaint(context);
         mGuidelinePaint = PaintUtil.newGuidelinePaint();
-        mBackgroundPaint = PaintUtil.newBackgroundPaint(context);
+        mBackgroundPaint = PaintUtil.newBackgroundPaint();
         mCornerPaint = PaintUtil.newCornerPaint(context);
 
         // Sets the values for the corner sizes
@@ -429,13 +429,13 @@ public class CropOverlayView extends View {
                 Edge.TOP.setCoordinate(bitmapRect.top);
                 Edge.BOTTOM.setCoordinate(bitmapRect.bottom);
 
-                final float centerX = getWidth() / 2f;
+                float centerX = getWidth() / 2f;
 
                 //dirty fix for wrong crop overlay aspect ratio when using fixed aspect ratio
                 mTargetAspectRatio = (float) mAspectRatioX / mAspectRatioY;
 
                 // Limits the aspect ratio to no less than 40 wide or 40 tall
-                final float cropWidth = Math.max(Edge.MIN_CROP_LENGTH_PX,
+                float cropWidth = Math.max(Edge.MIN_CROP_LENGTH_PX,
                         AspectRatioUtil.calculateWidth(Edge.TOP.getCoordinate(),
                                 Edge.BOTTOM.getCoordinate(),
                                 mTargetAspectRatio));
@@ -446,7 +446,7 @@ public class CropOverlayView extends View {
                     mTargetAspectRatio = (Edge.MIN_CROP_LENGTH_PX) / (Edge.BOTTOM.getCoordinate() - Edge.TOP.getCoordinate());
                 }
 
-                final float halfCropWidth = cropWidth / 2f;
+                float halfCropWidth = cropWidth / 2f;
                 Edge.LEFT.setCoordinate(centerX - halfCropWidth);
                 Edge.RIGHT.setCoordinate(centerX + halfCropWidth);
 
@@ -455,10 +455,10 @@ public class CropOverlayView extends View {
                 Edge.LEFT.setCoordinate(bitmapRect.left);
                 Edge.RIGHT.setCoordinate(bitmapRect.right);
 
-                final float centerY = getHeight() / 2f;
+                float centerY = getHeight() / 2f;
 
                 // Limits the aspect ratio to no less than 40 wide or 40 tall
-                final float cropHeight = Math.max(Edge.MIN_CROP_LENGTH_PX,
+                float cropHeight = Math.max(Edge.MIN_CROP_LENGTH_PX,
                         AspectRatioUtil.calculateHeight(Edge.LEFT.getCoordinate(),
                                 Edge.RIGHT.getCoordinate(),
                                 mTargetAspectRatio));
@@ -469,7 +469,7 @@ public class CropOverlayView extends View {
                     mTargetAspectRatio = (Edge.RIGHT.getCoordinate() - Edge.LEFT.getCoordinate()) / Edge.MIN_CROP_LENGTH_PX;
                 }
 
-                final float halfCropHeight = cropHeight / 2f;
+                float halfCropHeight = cropHeight / 2f;
                 Edge.TOP.setCoordinate(centerY - halfCropHeight);
                 Edge.BOTTOM.setCoordinate(centerY + halfCropHeight);
             }
@@ -477,8 +477,8 @@ public class CropOverlayView extends View {
         } else { // ... do not fix aspect ratio...
 
             // Initialize crop window to have 10% padding w/ respect to image.
-            final float horizontalPadding = 0.1f * bitmapRect.width();
-            final float verticalPadding = 0.1f * bitmapRect.height();
+            float horizontalPadding = 0.1f * bitmapRect.width();
+            float verticalPadding = 0.1f * bitmapRect.height();
 
             Edge.LEFT.setCoordinate(bitmapRect.left + horizontalPadding);
             Edge.TOP.setCoordinate(bitmapRect.top + verticalPadding);
@@ -505,42 +505,55 @@ public class CropOverlayView extends View {
 
     private void drawRuleOfThirdsGuidelines(Canvas canvas) {
 
-        float w = mBorderPaint.getStrokeWidth();
-        float l = Edge.LEFT.getCoordinate() + w;
-        float t = Edge.TOP.getCoordinate() + w;
-        float r = Edge.RIGHT.getCoordinate() - w;
-        float b = Edge.BOTTOM.getCoordinate() - w;
+        float sw = mBorderPaint.getStrokeWidth();
+        float l = Edge.LEFT.getCoordinate() + sw;
+        float t = Edge.TOP.getCoordinate() + sw;
+        float r = Edge.RIGHT.getCoordinate() - sw;
+        float b = Edge.BOTTOM.getCoordinate() - sw;
+
+        float oneThirdCropWidth = Edge.getWidth() / 3;
+        float oneThirdCropHeight = Edge.getHeight() / 3;
 
         if (mCropShape == CropShape.OVAL) {
-            l += 15 * mGuidelinePaint.getStrokeWidth();
-            t += 15 * mGuidelinePaint.getStrokeWidth();
-            r -= 15 * mGuidelinePaint.getStrokeWidth();
-            b -= 15 * mGuidelinePaint.getStrokeWidth();
+
+            float w = Edge.getWidth() / 2 - sw;
+            float h = Edge.getHeight() / 2 - sw;
+
+            // Draw vertical guidelines.
+            float x1 = l + oneThirdCropWidth;
+            float x2 = r - oneThirdCropWidth;
+            float yv = (float) (h * Math.sin(Math.acos((w - oneThirdCropWidth) / w)));
+            canvas.drawLine(x1, t + h - yv, x1, b - h + yv, mGuidelinePaint);
+            canvas.drawLine(x2, t + h - yv, x2, b - h + yv, mGuidelinePaint);
+
+            // Draw horizontal guidelines.
+            float y1 = t + oneThirdCropHeight;
+            float y2 = b - oneThirdCropHeight;
+            float xv = (float) (w * Math.cos(Math.asin((h - oneThirdCropHeight) / h)));
+            canvas.drawLine(l + w - xv, y1, r - w + xv, y1, mGuidelinePaint);
+            canvas.drawLine(l + w - xv, y2, r - w + xv, y2, mGuidelinePaint);
+        } else {
+
+            // Draw vertical guidelines.
+            float x1 = l + oneThirdCropWidth;
+            float x2 = r - oneThirdCropWidth;
+            canvas.drawLine(x1, t, x1, b, mGuidelinePaint);
+            canvas.drawLine(x2, t, x2, b, mGuidelinePaint);
+
+            // Draw horizontal guidelines.
+            float y1 = t + oneThirdCropHeight;
+            float y2 = b - oneThirdCropHeight;
+            canvas.drawLine(l, y1, r, y1, mGuidelinePaint);
+            canvas.drawLine(l, y2, r, y2, mGuidelinePaint);
         }
-
-        // Draw vertical guidelines.
-        final float oneThirdCropWidth = Edge.getWidth() / 3;
-
-        final float x1 = l + oneThirdCropWidth;
-        canvas.drawLine(x1, t, x1, b, mGuidelinePaint);
-        final float x2 = r - oneThirdCropWidth;
-        canvas.drawLine(x2, t, x2, b, mGuidelinePaint);
-
-        // Draw horizontal guidelines.
-        final float oneThirdCropHeight = Edge.getHeight() / 3;
-
-        final float y1 = t + oneThirdCropHeight;
-        canvas.drawLine(l, y1, r, y1, mGuidelinePaint);
-        final float y2 = b - oneThirdCropHeight;
-        canvas.drawLine(l, y2, r, y2, mGuidelinePaint);
     }
 
     private void drawBackground(Canvas canvas, Rect bitmapRect) {
 
-        final float l = Edge.LEFT.getCoordinate();
-        final float t = Edge.TOP.getCoordinate();
-        final float r = Edge.RIGHT.getCoordinate();
-        final float b = Edge.BOTTOM.getCoordinate();
+        float l = Edge.LEFT.getCoordinate();
+        float t = Edge.TOP.getCoordinate();
+        float r = Edge.RIGHT.getCoordinate();
+        float b = Edge.BOTTOM.getCoordinate();
 
         if (mCropShape == CropShape.RECTANGLE) {
             canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, t, mBackgroundPaint);
@@ -560,11 +573,11 @@ public class CropOverlayView extends View {
 
     private void drawCorners(Canvas canvas) {
 
-        float w = mBorderPaint.getStrokeWidth();
-        final float l = Edge.LEFT.getCoordinate() + w;
-        final float t = Edge.TOP.getCoordinate() + w;
-        final float r = Edge.RIGHT.getCoordinate() - w;
-        final float b = Edge.BOTTOM.getCoordinate() - w;
+        float w = mBorderPaint.getStrokeWidth() / 2;
+        float l = Edge.LEFT.getCoordinate() + w;
+        float t = Edge.TOP.getCoordinate() + w;
+        float r = Edge.RIGHT.getCoordinate() - w;
+        float b = Edge.BOTTOM.getCoordinate() - w;
 
         // Top left
         canvas.drawLine(l - mCornerOffset, t - mCornerExtension, l - mCornerOffset, t + mCornerLength, mCornerPaint);
@@ -591,10 +604,10 @@ public class CropOverlayView extends View {
      */
     private void onActionDown(float x, float y) {
 
-        final float left = Edge.LEFT.getCoordinate();
-        final float top = Edge.TOP.getCoordinate();
-        final float right = Edge.RIGHT.getCoordinate();
-        final float bottom = Edge.BOTTOM.getCoordinate();
+        float left = Edge.LEFT.getCoordinate();
+        float top = Edge.TOP.getCoordinate();
+        float right = Edge.RIGHT.getCoordinate();
+        float bottom = Edge.BOTTOM.getCoordinate();
 
         mPressedHandle = HandleUtil.getPressedHandle(x, y, left, top, right, bottom, mHandleRadius, mCropShape);
 
