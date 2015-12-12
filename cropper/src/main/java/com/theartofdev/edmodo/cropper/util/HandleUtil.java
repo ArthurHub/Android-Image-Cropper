@@ -17,7 +17,7 @@ import android.content.Context;
 import android.util.Pair;
 import android.util.TypedValue;
 
-import com.theartofdev.edmodo.cropper.CropShape;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import com.theartofdev.edmodo.cropper.cropwindow.CropOverlayView;
 import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
 
@@ -70,13 +70,13 @@ public class HandleUtil {
                                           float right,
                                           float bottom,
                                           float targetRadius,
-                                          CropShape cropShape) {
+                                          CropImageView.CropShape cropShape) {
 
         Handle pressedHandle = null;
 
-        if (cropShape == CropShape.RECTANGLE) {
+        if (cropShape == CropImageView.CropShape.RECTANGLE) {
             pressedHandle = getRectanglePressedHandle(x, y, left, top, right, bottom, targetRadius);
-        } else if (cropShape == CropShape.OVAL) {
+        } else if (cropShape == CropImageView.CropShape.OVAL) {
             pressedHandle = getOvalPressedHandle(x, y, left, top, right, bottom);
         }
 

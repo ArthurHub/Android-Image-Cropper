@@ -639,4 +639,11 @@ public class CropImageView extends FrameLayout {
     }
     //endregion
 
+    /**
+     * The possible cropping area shape.
+     */
+    public enum CropShape {
+        RECTANGLE,
+        OVAL
+    }
 }

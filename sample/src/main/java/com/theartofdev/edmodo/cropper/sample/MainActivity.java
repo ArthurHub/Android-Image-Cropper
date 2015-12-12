@@ -26,7 +26,6 @@ import android.widget.ToggleButton;
 
 import com.example.croppersample.R;
 import com.theartofdev.edmodo.cropper.CropImageView;
-import com.theartofdev.edmodo.cropper.CropShape;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -119,7 +118,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                cropImageView.setCropShape(isChecked ? CropShape.OVAL : CropShape.RECTANGLE);
+                cropImageView.setCropShape(isChecked ? CropImageView.CropShape.OVAL : CropImageView.CropShape.RECTANGLE);
             }
         });
 

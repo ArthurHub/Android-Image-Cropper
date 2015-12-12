@@ -28,7 +28,6 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.theartofdev.edmodo.cropper.CropImageView;
-import com.theartofdev.edmodo.cropper.CropShape;
 import com.theartofdev.edmodo.cropper.cropwindow.edge.Edge;
 import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
 import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
@@ -129,7 +128,7 @@ public class CropOverlayView extends View {
     /**
      * The shape of the cropping area - rectangle/circular.
      */
-    private CropShape mCropShape;
+    private CropImageView.CropShape mCropShape;
 
     // Whether the Crop View has been initialized for the first time
     private boolean initializedCropWindow = false;
@@ -177,7 +176,7 @@ public class CropOverlayView extends View {
     /**
      * The shape of the cropping area - rectangle/circular.
      */
-    public void setCropShape(CropShape cropShape) {
+    public void setCropShape(CropImageView.CropShape cropShape) {
         mCropShape = cropShape;
         invalidate();
     }
@@ -328,7 +327,7 @@ public class CropOverlayView extends View {
         float t = Edge.TOP.getCoordinate() + w / 2;
         float r = Edge.RIGHT.getCoordinate() - w / 2;
         float b = Edge.BOTTOM.getCoordinate() - w / 2;
-        if (mCropShape == CropShape.RECTANGLE) {
+        if (mCropShape == CropImageView.CropShape.RECTANGLE) {
             // Draw rectangle crop window border.
             canvas.drawRect(l, t, r, b, mBorderPaint);
             drawCorners(canvas);
@@ -514,7 +513,7 @@ public class CropOverlayView extends View {
         float oneThirdCropWidth = Edge.getWidth() / 3;
         float oneThirdCropHeight = Edge.getHeight() / 3;
 
-        if (mCropShape == CropShape.OVAL) {
+        if (mCropShape == CropImageView.CropShape.OVAL) {
 
             float w = Edge.getWidth() / 2 - sw;
             float h = Edge.getHeight() / 2 - sw;
@@ -555,7 +554,7 @@ public class CropOverlayView extends View {
         float r = Edge.RIGHT.getCoordinate();
         float b = Edge.BOTTOM.getCoordinate();
 
-        if (mCropShape == CropShape.RECTANGLE) {
+        if (mCropShape == CropImageView.CropShape.RECTANGLE) {
             canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, t, mBackgroundPaint);
             canvas.drawRect(bitmapRect.left, b, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
             canvas.drawRect(bitmapRect.left, t, l, b, mBackgroundPaint);
