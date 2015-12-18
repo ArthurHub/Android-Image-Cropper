@@ -185,7 +185,7 @@ public class CropOverlayView extends View {
     public void setCropShape(CropImageView.CropShape cropShape) {
         if (mCropShape != cropShape) {
             mCropShape = cropShape;
-            if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 19) {
+            if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17) {
                 if (mCropShape == CropImageView.CropShape.OVAL) {
                     mOriginalLayerType = getLayerType();
                     if (mOriginalLayerType != View.LAYER_TYPE_SOFTWARE) {
@@ -591,7 +591,7 @@ public class CropOverlayView extends View {
             canvas.drawRect(r, t, bitmapRect.right, b, mBackgroundPaint);
         } else {
             Path circleSelectionPath = new Path();
-            if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 19 && mCropShape == CropImageView.CropShape.OVAL) {
+            if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17 && mCropShape == CropImageView.CropShape.OVAL) {
                 mRectF.set(l + 2, t + 2, r - 2, b - 2);
             } else {
                 mRectF.set(l, t, r, b);
