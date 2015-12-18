@@ -170,6 +170,25 @@ public class MainActivity extends Activity {
             }
         });
 
+        final TextView snapRadiusNum = (TextView) findViewById(R.id.snapRadiusNum);
+        ((SeekBar) findViewById(R.id.snapRadiusSeek)).setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                cropImageView.setSnapRadius(progress);
+                snapRadiusNum.setText(Integer.toString(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         findViewById(R.id.Button_crop).setOnClickListener(new View.OnClickListener() {
 
             @Override

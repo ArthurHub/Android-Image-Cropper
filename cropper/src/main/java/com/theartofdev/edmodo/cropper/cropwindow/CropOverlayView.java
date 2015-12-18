@@ -42,7 +42,7 @@ public class CropOverlayView extends View {
 
     //region: Fields and Consts
 
-    private static final int SNAP_RADIUS_DP = 6;
+    private static final int SNAP_RADIUS_DP = 3;
 
     private static final float DEFAULT_SHOW_GUIDELINES_LIMIT = 100;
 
@@ -281,6 +281,15 @@ public class CropOverlayView extends View {
     }
 
     /**
+     * An edge of the crop window will snap to the corresponding edge of a
+     * specified bounding box when the crop window edge is less than or equal to
+     * this distance (in pixels) away from the bounding box edge. (default: 3)
+     */
+    public void setSnapRadius(float snapRadius) {
+        mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, snapRadius, getResources().getDisplayMetrics());
+    }
+
+    /**
      * Sets all initial values, but does not call initCropWindow to reset the
      * views. Used once at the very start to initialize the attributes.
      *
@@ -397,9 +406,7 @@ public class CropOverlayView extends View {
 
         mHandleRadius = HandleUtil.getTargetRadius(context);
 
-        mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                SNAP_RADIUS_DP,
-                displayMetrics);
+        mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PT, SNAP_RADIUS_DP, displayMetrics);
 
         mBorderPaint = PaintUtil.newBorderPaint(context);
         mGuidelinePaint = PaintUtil.newGuidelinePaint();

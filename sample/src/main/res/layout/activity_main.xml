@@ -96,6 +96,33 @@
             android:max="100"
             android:progress="20"/>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Snap Radius:"/>
+
+            <TextView
+                android:id="@+id/snapRadiusNum"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:text="3"/>
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/snapRadiusSeek"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="25"
+            android:progress="3"/>
+
         <Spinner
             android:id="@+id/showGuidelinesSpin"
             android:layout_width="wrap_content"
