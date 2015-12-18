@@ -57,7 +57,7 @@ public class CropOverlayView extends View {
     private static final float DEFAULT_CORNER_EXTENSION_DP = DEFAULT_CORNER_THICKNESS_DP / 2
             + DEFAULT_CORNER_OFFSET_DP;
 
-    private static final float DEFAULT_CORNER_LENGTH_DP = 20;
+    private static final float DEFAULT_CORNER_LENGTH_DP = 15;
 
     private static final int GUIDELINES_ON_TOUCH = 1;
 
@@ -606,7 +606,7 @@ public class CropOverlayView extends View {
 
     private void drawCorners(Canvas canvas) {
 
-        float w = mBorderPaint.getStrokeWidth() / 2;
+        float w = mBorderPaint.getStrokeWidth() * 1.5f + 1;
         float l = Edge.LEFT.getCoordinate() + w;
         float t = Edge.TOP.getCoordinate() + w;
         float r = Edge.RIGHT.getCoordinate() - w;

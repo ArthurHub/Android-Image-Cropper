@@ -33,7 +33,7 @@ public final class PaintUtil {
 
     private static final float DEFAULT_LINE_THICKNESS_DP = 3;
 
-    private static final float DEFAULT_CORNER_THICKNESS_DP = 3;
+    private static final float DEFAULT_CORNER_THICKNESS_DP = 2;
 
     private static final float DEFAULT_GUIDELINE_THICKNESS_PX = 2;
     //endregion
