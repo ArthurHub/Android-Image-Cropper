@@ -20,6 +20,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Pair;
@@ -139,6 +140,11 @@ public class CropOverlayView extends View {
     private float mCornerOffset;
 
     private float mCornerLength;
+
+    /**
+     * Used to set back LayerType after changing to software.
+     */
+    private Integer mOriginalLayerType;
     //endregion
 
     public CropOverlayView(Context context) {
@@ -177,8 +183,25 @@ public class CropOverlayView extends View {
      * The shape of the cropping area - rectangle/circular.
      */
     public void setCropShape(CropImageView.CropShape cropShape) {
-        mCropShape = cropShape;
-        invalidate();
+        if (mCropShape != cropShape) {
+            mCropShape = cropShape;
+            if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 19) {
+                if (mCropShape == CropImageView.CropShape.OVAL) {
+                    mOriginalLayerType = getLayerType();
+                    if (mOriginalLayerType != View.LAYER_TYPE_SOFTWARE) {
+                        // TURN off hardware acceleration
+                        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                    } else {
+                        mOriginalLayerType = null;
+                    }
+                } else if (mOriginalLayerType != null) {
+                    // return hardware acceleration back
+                    setLayerType(mOriginalLayerType, null);
+                    mOriginalLayerType = null;
+                }
+            }
+            invalidate();
+        }
     }
 
     /**
@@ -561,7 +584,11 @@ public class CropOverlayView extends View {
             canvas.drawRect(r, t, bitmapRect.right, b, mBackgroundPaint);
         } else {
             Path circleSelectionPath = new Path();
-            mRectF.set(l, t, r, b);
+            if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 19 && mCropShape == CropImageView.CropShape.OVAL) {
+                mRectF.set(l + 2, t + 2, r - 2, b - 2);
+            } else {
+                mRectF.set(l, t, r, b);
+            }
             circleSelectionPath.addOval(mRectF, Path.Direction.CW);
             canvas.save();
             canvas.clipPath(circleSelectionPath, Region.Op.XOR);
