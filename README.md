@@ -31,25 +31,6 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
 ```
 compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
 ```
-or with using [AARLinkSources Plugin](https://github.com/xujiaao/AARLinkSources) to get the [sources in the IDE](https://groups.google.com/forum/#!msg/adt-dev/yVPo71O_ZKM/BcYP-hLai2wJ).
-```
-buildscript {
-    repositories {
-        maven { url 'https://raw.github.com/xujiaao/mvn-repository/master/releases' }
-    }
-
-    dependencies {
-        classpath 'com.github.xujiaao:aarLinkSources:1.0.0'
-    }
-}
-
-apply plugin: 'aar-link-sources'
-
-dependencies {
-  compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
-  aarLinkSources 'com.theartofdev.edmodo:android-image-cropper:1.0.+:sources@jar'
-}
-```
 
 ## License
 Copyright 2013, Edmodo, Inc. 
