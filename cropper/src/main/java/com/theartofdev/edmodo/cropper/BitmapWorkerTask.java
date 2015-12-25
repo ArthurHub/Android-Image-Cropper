@@ -17,7 +17,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 import com.theartofdev.edmodo.cropper.util.ImageViewUtil;
 
@@ -90,13 +89,6 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
     @Override
     protected BitmapWorkerTask.BitmapWorkerTaskResult doInBackground(Void... params) {
         try {
-            Log.w("CIW", "doInBackground...");
-
-            try {
-                Thread.sleep(5000, 0);
-            } catch (InterruptedException ignored) {
-            }
-
             if (!isCancelled()) {
 
                 ImageViewUtil.DecodeBitmapResult decodeResult =
@@ -124,11 +116,18 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
      */
     @Override
     protected void onPostExecute(BitmapWorkerTask.BitmapWorkerTaskResult result) {
-        Log.w("CIW", "Post execute...");
-        if (!isCancelled() && result != null) {
-            CropImageView cropImageView = mCropImageViewReference.get();
-            if (cropImageView != null) {
-                cropImageView.onSetImageUriAsyncComplete(result);
+        if (result != null) {
+            boolean completeCalled = false;
+            if (!isCancelled()) {
+                CropImageView cropImageView = mCropImageViewReference.get();
+                if (cropImageView != null) {
+                    completeCalled = true;
+                    cropImageView.onSetImageUriAsyncComplete(result);
+                }
+            }
+            if (!completeCalled && result.bitmap != null) {
+                // fast release of unused bitmap
+                result.bitmap.recycle();
             }
         }
     }

@@ -607,6 +607,12 @@ public class CropImageView extends FrameLayout {
         if (mLoadedImageUri == null && mImageResource < 1) {
             bundle.putParcelable("SET_BITMAP", mBitmap);
         }
+        if (mBitmapWorkerTask != null) {
+            BitmapWorkerTask task = mBitmapWorkerTask.get();
+            if (task != null) {
+                bundle.putParcelable("LOADING_IMAGE_URI", task.getUri());
+            }
+        }
         bundle.putInt("DEGREES_ROTATED", mDegreesRotated);
         return bundle;
     }
@@ -615,19 +621,26 @@ public class CropImageView extends FrameLayout {
     public void onRestoreInstanceState(Parcelable state) {
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
+
+            Bitmap bitmap = null;
             Uri uri = bundle.getParcelable("LOADED_IMAGE_URI");
             if (uri != null) {
                 setImageUriAsync(uri, bundle.getInt("DEGREES_ROTATED"));
-            }
-
-            int resId = bundle.getInt("LOADED_IMAGE_RESOURCE");
-            if (resId > 0) {
-                setImageResource(resId);
-            }
-
-            Bitmap bitmap = bundle.getParcelable("SET_BITMAP");
-            if (bitmap != null) {
-                setBitmap(bitmap, true);
+            } else {
+                int resId = bundle.getInt("LOADED_IMAGE_RESOURCE");
+                if (resId > 0) {
+                    setImageResource(resId);
+                } else {
+                    bitmap = bundle.getParcelable("SET_BITMAP");
+                    if (bitmap != null) {
+                        setBitmap(bitmap, true);
+                    } else {
+                        uri = bundle.getParcelable("LOADING_IMAGE_URI");
+                        if (uri != null) {
+                            setImageUriAsync(uri);
+                        }
+                    }
+                }
             }
 
             mDegreesRotated = bundle.getInt("DEGREES_ROTATED");
