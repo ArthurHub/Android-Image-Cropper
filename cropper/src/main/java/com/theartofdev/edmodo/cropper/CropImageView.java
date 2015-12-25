@@ -482,26 +482,19 @@ public class CropImageView extends FrameLayout {
      */
     public void setImageUriAsync(Uri uri) {
         if (uri != null) {
-            if (mLoadedImageUri == null || !mLoadedImageUri.equals(uri)) {
-                BitmapWorkerTask currentTask = mBitmapWorkerTask != null ? mBitmapWorkerTask.get() : null;
-                if (currentTask != null) {
-                    if (currentTask.getUri().equals(uri)) {
-                        // this URI is already loading, ignore set
-                        return;
-                    } else {
-                        // cancel previous loading
-                        Log.w("CIW", "Cancel...");
-                        currentTask.cancel(true);
-                    }
-                }
-
-                Log.w("CIW", "Start...");
-                // either no existing task is working or we canceled it, need to load new URI
-                clearImage();
-                mProgressBar.setVisibility(VISIBLE);
-                mBitmapWorkerTask = new WeakReference<>(new BitmapWorkerTask(this, uri));
-                mBitmapWorkerTask.get().execute();
+            BitmapWorkerTask currentTask = mBitmapWorkerTask != null ? mBitmapWorkerTask.get() : null;
+            if (currentTask != null) {
+                // cancel previous loading (no check if the same URI because camera URI can be the same for different images)
+                Log.w("CIW", "Cancel...");
+                currentTask.cancel(true);
             }
+
+            Log.w("CIW", "Start...");
+            // either no existing task is working or we canceled it, need to load new URI
+            clearImage();
+            mProgressBar.setVisibility(VISIBLE);
+            mBitmapWorkerTask = new WeakReference<>(new BitmapWorkerTask(this, uri));
+            mBitmapWorkerTask.get().execute();
         }
     }
 
@@ -590,7 +583,7 @@ public class CropImageView extends FrameLayout {
 
         if (state instanceof Bundle) {
 
-            final Bundle bundle = (Bundle) state;
+            Bundle bundle = (Bundle) state;
 
             if (mBitmap != null) {
                 // Fixes the rotation of the image when orientation changes.
