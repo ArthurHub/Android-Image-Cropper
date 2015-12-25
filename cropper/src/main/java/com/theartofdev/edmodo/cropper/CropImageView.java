@@ -110,6 +110,11 @@ public class CropImageView extends FrameLayout {
     private CropShape mCropShape;
 
     /**
+     * callback to be invoked when image async loading is complete
+     */
+    private OnSetImageCompleteListener mOnSetImageCompleteListener;
+
+    /**
      * The URI that the image was loaded from (if loaded from URI)
      */
     private Uri mLoadedImageUri;
@@ -381,6 +386,13 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * Set the callback to be invoked when image async loading is complete (successful or failed).
+     */
+    public void setOnSetImageCompleteListener(OnSetImageCompleteListener onSetImageCompleteListener) {
+        mOnSetImageCompleteListener = onSetImageCompleteListener;
+    }
+
+    /**
      * Sets a Bitmap as the content of the CropImageView.
      *
      * @param bitmap the Bitmap to set
@@ -553,6 +565,11 @@ public class CropImageView extends FrameLayout {
             mLoadedImageUri = result.uri;
             mLoadedSampleSize = result.loadSampleSize;
             mDegreesRotated = result.degreesRotated;
+        }
+
+        OnSetImageCompleteListener onSetImageCompleteListener = mOnSetImageCompleteListener;
+        if (onSetImageCompleteListener != null) {
+            onSetImageCompleteListener.onComplete(this, result.uri, result.error);
         }
     }
 
@@ -738,6 +755,25 @@ public class CropImageView extends FrameLayout {
     public enum CropShape {
         RECTANGLE,
         OVAL
+    }
+    //endregion
+
+    //region: Inner class: OnSetImageCompleteListener
+
+    /**
+     * Interface definition for a callback to be invoked when image async loading is complete.
+     */
+    public interface OnSetImageCompleteListener {
+
+        /**
+         * Called when a crop image view has completed loading image for cropping.<br>
+         * If loading failed error parameter will contain the error.
+         *
+         * @param v The crop image view that loading of image was complete.
+         * @param uri the URI of the image that was loading
+         * @param error if error occurred during loading will contain the error, otherwise null.
+         */
+        void onComplete(CropImageView v, Uri uri, Exception error);
     }
     //endregion
 }

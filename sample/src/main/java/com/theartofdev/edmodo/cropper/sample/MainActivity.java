@@ -22,6 +22,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.croppersample.R;
@@ -79,6 +80,17 @@ public class MainActivity extends Activity {
         final SeekBar aspectRatioYSeek = (SeekBar) findViewById(R.id.aspectRatioYSeek);
         Spinner showGuidelinesSpin = (Spinner) findViewById(R.id.showGuidelinesSpin);
         final TextView aspectRatioNum = (TextView) findViewById(R.id.aspectRatioNum);
+
+        cropImageView.setOnSetImageCompleteListener(new CropImageView.OnSetImageCompleteListener() {
+            @Override
+            public void onComplete(CropImageView v, Uri uri, Exception error) {
+                if (error == null) {
+                    Toast.makeText(cropImageView.getContext(), "Image load successful", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(cropImageView.getContext(), "Image load failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         // Sets sliders to be disabled until fixedAspectRatio is set
         aspectRatioXSeek.setEnabled(false);
