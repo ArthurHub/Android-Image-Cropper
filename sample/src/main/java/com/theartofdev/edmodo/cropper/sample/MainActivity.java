@@ -81,6 +81,10 @@ public class MainActivity extends Activity {
         Spinner showGuidelinesSpin = (Spinner) findViewById(R.id.showGuidelinesSpin);
         final TextView aspectRatioNum = (TextView) findViewById(R.id.aspectRatioNum);
 
+        if (savedInstanceState == null) {
+            cropImageView.setImageResource(R.drawable.butterfly);
+        }
+
         cropImageView.setOnSetImageCompleteListener(new CropImageView.OnSetImageCompleteListener() {
             @Override
             public void onComplete(CropImageView v, Uri uri, Exception error) {

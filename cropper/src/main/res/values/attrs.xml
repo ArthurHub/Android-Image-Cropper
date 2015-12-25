@@ -9,7 +9,6 @@
         <attr name="fixAspectRatio" format="boolean"/>
         <attr name="aspectRatioX" format="integer"/>
         <attr name="aspectRatioY" format="integer"/>
-        <attr name="imageResource" format="reference"/>
         <attr name="scaleType">
             <enum name="centerInside" value="0"/>
             <enum name="fitCenter" value="1"/>

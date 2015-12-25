@@ -41,6 +41,11 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
     private final Uri mUri;
 
     /**
+     * Optional: if given use this rotation and not by exif
+     */
+    private final Integer mPreSetRotation;
+
+    /**
      * The context of the crop image view widget used for loading of bitmap by Android URI
      */
     private final Context context;
@@ -56,8 +61,9 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
     private final int mHeight;
     //endregion
 
-    public BitmapWorkerTask(CropImageView cropImageView, Uri uri) {
+    public BitmapWorkerTask(CropImageView cropImageView, Uri uri, Integer preSetRotation) {
         mUri = uri;
+        mPreSetRotation = preSetRotation;
         mCropImageViewReference = new WeakReference<>(cropImageView);
 
         context = cropImageView.getContext();
@@ -87,7 +93,7 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
             Log.w("CIW", "doInBackground...");
 
             try {
-                Thread.sleep(10000, 0);
+                Thread.sleep(5000, 0);
             } catch (InterruptedException ignored) {
             }
 
@@ -98,8 +104,9 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
 
                 if (!isCancelled()) {
 
-                    ImageViewUtil.RotateBitmapResult rotateResult =
-                            ImageViewUtil.rotateBitmapByExif(context, decodeResult.bitmap, mUri);
+                    ImageViewUtil.RotateBitmapResult rotateResult = mPreSetRotation != null
+                            ? ImageViewUtil.rotateBitmapResult(decodeResult.bitmap, mPreSetRotation)
+                            : ImageViewUtil.rotateBitmapByExif(context, decodeResult.bitmap, mUri);
 
                     return new BitmapWorkerTaskResult(mUri, rotateResult.bitmap, decodeResult.sampleSize, rotateResult.degrees);
                 }

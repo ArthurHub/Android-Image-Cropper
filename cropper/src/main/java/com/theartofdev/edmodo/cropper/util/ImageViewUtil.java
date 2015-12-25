@@ -233,12 +233,24 @@ public class ImageViewUtil {
      * Rotate the given bitmap by the given degrees.<br>
      * New bitmap is created and the old one is recycled.
      */
+    public static RotateBitmapResult rotateBitmapResult(Bitmap bitmap, int degrees) {
+        return new RotateBitmapResult(rotateBitmap(bitmap, degrees), degrees);
+    }
+
+    /**
+     * Rotate the given bitmap by the given degrees.<br>
+     * New bitmap is created and the old one is recycled.
+     */
     public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
-        Matrix matrix = new Matrix();
-        matrix.setRotate(degrees);
-        Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
-        bitmap.recycle();
-        return newBitmap;
+        if (degrees > 0) {
+            Matrix matrix = new Matrix();
+            matrix.setRotate(degrees);
+            Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+            bitmap.recycle();
+            return newBitmap;
+        } else {
+            return bitmap;
+        }
     }
 
     /**

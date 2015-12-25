@@ -30,7 +30,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,19 +66,15 @@ public class CropImageView extends FrameLayout {
 
     public static final int DEFAULT_CROP_SHAPE_INDEX = 0;
 
-    private static final int DEFAULT_IMAGE_RESOURCE = 0;
-
     private static final ImageView.ScaleType[] VALID_SCALE_TYPES = new ImageView.ScaleType[]{ImageView.ScaleType.CENTER_INSIDE, ImageView.ScaleType.FIT_CENTER};
 
     private static final CropShape[] VALID_CROP_SHAPES = new CropShape[]{CropShape.RECTANGLE, CropShape.OVAL};
 
-    private static final String DEGREES_ROTATED = "DEGREES_ROTATED";
+    private final ImageView mImageView;
 
-    private ImageView mImageView;
+    private final CropOverlayView mCropOverlayView;
 
-    private CropOverlayView mCropOverlayView;
-
-    private ProgressBar mProgressBar;
+    private final ProgressBar mProgressBar;
 
     private Bitmap mBitmap;
 
@@ -100,7 +95,7 @@ public class CropImageView extends FrameLayout {
 
     private int mAspectRatioY = DEFAULT_ASPECT_RATIO_Y;
 
-    private int mImageResource = DEFAULT_IMAGE_RESOURCE;
+    private int mImageResource = 0;
 
     private ImageView.ScaleType mScaleType = VALID_SCALE_TYPES[DEFAULT_SCALE_TYPE_INDEX];
 
@@ -131,27 +126,39 @@ public class CropImageView extends FrameLayout {
     //endregion
 
     public CropImageView(Context context) {
-        super(context);
-        init(context);
+        this(context, null);
     }
 
     public CropImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
-        try {
-            mGuidelines = ta.getInteger(R.styleable.CropImageView_guidelines, DEFAULT_GUIDELINES);
-            mFixAspectRatio = ta.getBoolean(R.styleable.CropImageView_fixAspectRatio, DEFAULT_FIXED_ASPECT_RATIO);
-            mAspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, DEFAULT_ASPECT_RATIO_X);
-            mAspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, DEFAULT_ASPECT_RATIO_Y);
-            mImageResource = ta.getResourceId(R.styleable.CropImageView_imageResource, DEFAULT_IMAGE_RESOURCE);
-            mScaleType = VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, DEFAULT_SCALE_TYPE_INDEX)];
-            mCropShape = VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, DEFAULT_CROP_SHAPE_INDEX)];
-        } finally {
-            ta.recycle();
+        if (attrs != null) {
+            TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
+            try {
+                mGuidelines = ta.getInteger(R.styleable.CropImageView_guidelines, DEFAULT_GUIDELINES);
+                mFixAspectRatio = ta.getBoolean(R.styleable.CropImageView_fixAspectRatio, DEFAULT_FIXED_ASPECT_RATIO);
+                mAspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, DEFAULT_ASPECT_RATIO_X);
+                mAspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, DEFAULT_ASPECT_RATIO_Y);
+                mScaleType = VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, DEFAULT_SCALE_TYPE_INDEX)];
+                mCropShape = VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, DEFAULT_CROP_SHAPE_INDEX)];
+            } finally {
+                ta.recycle();
+            }
         }
 
-        init(context);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View v = inflater.inflate(R.layout.crop_image_view, this, true);
+
+        mImageView = (ImageView) v.findViewById(R.id.ImageView_image);
+        mImageView.setScaleType(mScaleType);
+
+        mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
+        mCropOverlayView.setInitialAttributeValues(mGuidelines, mFixAspectRatio, mAspectRatioX, mAspectRatioY);
+        mCropOverlayView.setCropShape(mCropShape);
+        mCropOverlayView.setVisibility(mBitmap != null ? VISIBLE : INVISIBLE);
+
+        mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
+        mProgressBar.setVisibility(mBitmap == null && mBitmapWorkerTask != null ? VISIBLE : INVISIBLE);
     }
 
     /**
@@ -398,16 +405,7 @@ public class CropImageView extends FrameLayout {
      * @param bitmap the Bitmap to set
      */
     public void setImageBitmap(Bitmap bitmap) {
-        if (mBitmap != bitmap) {
-            clearImage();
-
-            mBitmap = bitmap;
-            mImageView.setImageBitmap(mBitmap);
-            if (mCropOverlayView != null) {
-                mCropOverlayView.resetCropOverlayView();
-                mCropOverlayView.setVisibility(VISIBLE);
-            }
-        }
+        setBitmap(bitmap, true);
     }
 
     /**
@@ -425,7 +423,7 @@ public class CropImageView extends FrameLayout {
             bitmap = result.bitmap;
             mDegreesRotated = result.degrees;
         }
-        setImageBitmap(bitmap);
+        setBitmap(bitmap, true);
     }
 
     /**
@@ -436,8 +434,7 @@ public class CropImageView extends FrameLayout {
     public void setImageResource(int resId) {
         if (resId != 0) {
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
-            setImageBitmap(bitmap);
-
+            setBitmap(bitmap, true);
             mImageResource = resId;
         }
     }
@@ -465,7 +462,7 @@ public class CropImageView extends FrameLayout {
             ImageViewUtil.RotateBitmapResult rotateResult =
                     ImageViewUtil.rotateBitmapByExif(getContext(), decodeResult.bitmap, uri);
 
-            setImageBitmap(rotateResult.bitmap);
+            setBitmap(rotateResult.bitmap, true);
 
             mLoadedImageUri = uri;
             mLoadedSampleSize = decodeResult.sampleSize;
@@ -481,44 +478,14 @@ public class CropImageView extends FrameLayout {
      * @param uri the URI to load the image from
      */
     public void setImageUriAsync(Uri uri) {
-        if (uri != null) {
-            BitmapWorkerTask currentTask = mBitmapWorkerTask != null ? mBitmapWorkerTask.get() : null;
-            if (currentTask != null) {
-                // cancel previous loading (no check if the same URI because camera URI can be the same for different images)
-                Log.w("CIW", "Cancel...");
-                currentTask.cancel(true);
-            }
-
-            Log.w("CIW", "Start...");
-            // either no existing task is working or we canceled it, need to load new URI
-            clearImage();
-            mProgressBar.setVisibility(VISIBLE);
-            mBitmapWorkerTask = new WeakReference<>(new BitmapWorkerTask(this, uri));
-            mBitmapWorkerTask.get().execute();
-        }
+        setImageUriAsync(uri, null);
     }
 
     /**
      * Clear the current image set for cropping.
      */
     public void clearImage() {
-
-        // if we allocated the bitmap, release it as fast as possible
-        if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
-            mBitmap.recycle();
-        }
-
-        // clean the loaded image flags for new image
-        mImageResource = 0;
-        mLoadedImageUri = null;
-        mLoadedSampleSize = 1;
-        mDegreesRotated = 0;
-
-        mImageView.setImageBitmap(null);
-
-        if (mCropOverlayView != null) {
-            mCropOverlayView.setVisibility(INVISIBLE);
-        }
+        clearImage(true);
     }
 
     /**
@@ -532,7 +499,7 @@ public class CropImageView extends FrameLayout {
             Matrix matrix = new Matrix();
             matrix.postRotate(degrees);
             Bitmap bitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
-            setImageBitmap(bitmap);
+            setBitmap(bitmap, false);
 
             mDegreesRotated += degrees;
             mDegreesRotated = mDegreesRotated % 360;
@@ -540,6 +507,26 @@ public class CropImageView extends FrameLayout {
     }
 
     //region: Private methods
+
+    /**
+     * Load image from given URI async using {@link BitmapWorkerTask}<br>
+     * optionally rotate the loaded image given degrees, used for restore state.
+     */
+    private void setImageUriAsync(Uri uri, Integer preSetRotation) {
+        if (uri != null) {
+            BitmapWorkerTask currentTask = mBitmapWorkerTask != null ? mBitmapWorkerTask.get() : null;
+            if (currentTask != null) {
+                // cancel previous loading (no check if the same URI because camera URI can be the same for different images)
+                currentTask.cancel(true);
+            }
+
+            // either no existing task is working or we canceled it, need to load new URI
+            clearImage(true);
+            mProgressBar.setVisibility(VISIBLE);
+            mBitmapWorkerTask = new WeakReference<>(new BitmapWorkerTask(this, uri, preSetRotation));
+            mBitmapWorkerTask.get().execute();
+        }
+    }
 
     /**
      * On complete of the async bitmap loading by {@link #setImageUriAsync(Uri)} set the result
@@ -552,9 +539,8 @@ public class CropImageView extends FrameLayout {
         mBitmapWorkerTask = null;
         mProgressBar.setVisibility(INVISIBLE);
 
-        Log.w("CIW", "Complete...");
         if (result.error == null) {
-            setImageBitmap(result.bitmap);
+            setBitmap(result.bitmap, true);
             mLoadedImageUri = result.uri;
             mLoadedSampleSize = result.loadSampleSize;
             mDegreesRotated = result.degreesRotated;
@@ -566,35 +552,93 @@ public class CropImageView extends FrameLayout {
         }
     }
 
+    /**
+     * Set the given bitmap to be used in for cropping<br>
+     * Optionally clear full if the bitmap is new, or partial clear if the bitmap has been manipulated.
+     */
+    private void setBitmap(Bitmap bitmap, boolean clearFull) {
+        if (mBitmap != bitmap) {
+
+            clearImage(clearFull);
+
+            mBitmap = bitmap;
+            mImageView.setImageBitmap(mBitmap);
+            if (mCropOverlayView != null) {
+                mCropOverlayView.resetCropOverlayView();
+                mCropOverlayView.setVisibility(VISIBLE);
+            }
+        }
+    }
+
+    /**
+     * Clear the current image set for cropping.<br>
+     * Full clear will also clear the data of the set image like Uri or Resource id while partial clear
+     * will only clear the bitmap and recycle if required.
+     */
+    public void clearImage(boolean full) {
+
+        // if we allocated the bitmap, release it as fast as possible
+        if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
+            mBitmap.recycle();
+            mBitmap = null;
+        }
+
+        if (full) {
+            // clean the loaded image flags for new image
+            mImageResource = 0;
+            mLoadedImageUri = null;
+            mLoadedSampleSize = 1;
+            mDegreesRotated = 0;
+
+            mImageView.setImageBitmap(null);
+
+            if (mCropOverlayView != null) {
+                mCropOverlayView.setVisibility(INVISIBLE);
+            }
+        }
+    }
+
     @Override
     public Parcelable onSaveInstanceState() {
-
-        final Bundle bundle = new Bundle();
-
+        Bundle bundle = new Bundle();
         bundle.putParcelable("instanceState", super.onSaveInstanceState());
-        bundle.putInt(DEGREES_ROTATED, mDegreesRotated);
-
+        bundle.putParcelable("LOADED_IMAGE_URI", mLoadedImageUri);
+        bundle.putInt("LOADED_IMAGE_RESOURCE", mImageResource);
+        if (mLoadedImageUri == null && mImageResource < 1) {
+            bundle.putParcelable("SET_BITMAP", mBitmap);
+        }
+        bundle.putInt("DEGREES_ROTATED", mDegreesRotated);
         return bundle;
-
     }
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-
         if (state instanceof Bundle) {
-
             Bundle bundle = (Bundle) state;
+            Uri uri = bundle.getParcelable("LOADED_IMAGE_URI");
+            if (uri != null) {
+                setImageUriAsync(uri, bundle.getInt("DEGREES_ROTATED"));
+            }
 
-            if (mBitmap != null) {
-                // Fixes the rotation of the image when orientation changes.
-                mDegreesRotated = bundle.getInt(DEGREES_ROTATED);
-                int tempDegrees = mDegreesRotated;
+            int resId = bundle.getInt("LOADED_IMAGE_RESOURCE");
+            if (resId > 0) {
+                setImageResource(resId);
+            }
+
+            Bitmap bitmap = bundle.getParcelable("SET_BITMAP");
+            if (bitmap != null) {
+                setBitmap(bitmap, true);
+            }
+
+            mDegreesRotated = bundle.getInt("DEGREES_ROTATED");
+            if (mBitmap != null && bitmap == null) {
+                // Fixes the rotation of the image when we reloaded it.
+                int tmpRotated = mDegreesRotated;
                 rotateImage(mDegreesRotated);
-                mDegreesRotated = tempDegrees;
+                mDegreesRotated = tmpRotated;
             }
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
-
         } else {
             super.onRestoreInstanceState(state);
         }
@@ -691,25 +735,6 @@ public class CropImageView extends FrameLayout {
             origParams.height = mLayoutHeight;
             setLayoutParams(origParams);
         }
-    }
-
-    private void init(Context context) {
-
-        final LayoutInflater inflater = LayoutInflater.from(context);
-        final View v = inflater.inflate(R.layout.crop_image_view, this, true);
-
-        mImageView = (ImageView) v.findViewById(R.id.ImageView_image);
-        mImageView.setScaleType(mScaleType);
-
-        setImageResource(mImageResource);
-
-        mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
-        mCropOverlayView.setInitialAttributeValues(mGuidelines, mFixAspectRatio, mAspectRatioX, mAspectRatioY);
-        mCropOverlayView.setCropShape(mCropShape);
-        mCropOverlayView.setVisibility(mBitmap != null ? VISIBLE : INVISIBLE);
-
-        mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
-        mProgressBar.setVisibility(mBitmap == null && mBitmapWorkerTask != null ? VISIBLE : INVISIBLE);
     }
 
     /**
