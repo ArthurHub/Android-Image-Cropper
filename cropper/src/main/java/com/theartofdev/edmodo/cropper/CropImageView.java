@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,8 @@ import com.edmodo.cropper.R;
 import com.theartofdev.edmodo.cropper.cropwindow.CropOverlayView;
 import com.theartofdev.edmodo.cropper.cropwindow.edge.Edge;
 import com.theartofdev.edmodo.cropper.util.ImageViewUtil;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Custom view that provides cropping capabilities to an image.
@@ -112,6 +115,11 @@ public class CropImageView extends FrameLayout {
      * The sample size the image was loaded by if was loaded by URI
      */
     private int mLoadedSampleSize = 1;
+
+    /**
+     * Task used to load bitmap async from UI thread
+     */
+    private WeakReference<BitmapWorkerTask> mBitmapWorkerTask;
     //endregion
 
     public CropImageView(Context context) {
@@ -226,94 +234,6 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Sets a Bitmap as the content of the CropImageView.
-     *
-     * @param bitmap the Bitmap to set
-     */
-    public void setImageBitmap(Bitmap bitmap) {
-        if (mBitmap != bitmap) {
-
-            // if we allocated the bitmap, release it as fast as possible
-            if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
-                mBitmap.recycle();
-            }
-
-            // clean the loaded image flags for new image
-            mImageResource = 0;
-            mLoadedImageUri = null;
-            mLoadedSampleSize = 1;
-            mDegreesRotated = 0;
-
-            mBitmap = bitmap;
-            mImageView.setImageBitmap(mBitmap);
-            if (mCropOverlayView != null) {
-                mCropOverlayView.resetCropOverlayView();
-            }
-        }
-    }
-
-    /**
-     * Sets a Bitmap and initializes the image rotation according to the EXIT data.<br>
-     * <br>
-     * The EXIF can be retrieved by doing the following:
-     * <code>ExifInterface exif = new ExifInterface(path);</code>
-     *
-     * @param bitmap the original bitmap to set; if null, this
-     * @param exif the EXIF information about this bitmap; may be null
-     */
-    public void setImageBitmap(Bitmap bitmap, ExifInterface exif) {
-        if (bitmap != null && exif != null) {
-            ImageViewUtil.RotateBitmapResult result = ImageViewUtil.rotateBitmapByExif(bitmap, exif);
-            bitmap = result.bitmap;
-            mDegreesRotated = result.degrees;
-        }
-        setImageBitmap(bitmap);
-    }
-
-    /**
-     * Sets a Drawable as the content of the CropImageView.
-     *
-     * @param resId the drawable resource ID to set
-     */
-    public void setImageResource(int resId) {
-        if (resId != 0) {
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
-            setImageBitmap(bitmap);
-
-            mImageResource = resId;
-        }
-    }
-
-    /**
-     * Sets a bitmap loaded from the given Android URI as the content of the CropImageView.<br>
-     * Can be used with URI from gallery or camera source.<br>
-     * Will rotate the image by exif data.<br>
-     *
-     * @param uri the URI to load the image from
-     */
-    public void setImageUri(Uri uri) {
-        if (uri != null) {
-
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            double densityAdj = metrics.density > 1 ? 1 / metrics.density : 1;
-
-            int width = (int) (metrics.widthPixels * densityAdj);
-            int height = (int) (metrics.heightPixels * densityAdj);
-            ImageViewUtil.DecodeBitmapResult decodeResult =
-                    ImageViewUtil.decodeSampledBitmap(getContext(), uri, width, height);
-
-            ImageViewUtil.RotateBitmapResult rotateResult =
-                    ImageViewUtil.rotateBitmapByExif(getContext(), decodeResult.bitmap, uri);
-
-            setImageBitmap(rotateResult.bitmap);
-
-            mLoadedImageUri = uri;
-            mLoadedSampleSize = decodeResult.sampleSize;
-            mDegreesRotated = rotateResult.degrees;
-        }
-    }
-
-    /**
      * Gets the crop window's position relative to the source Bitmap (not the image
      * displayed in the CropImageView).
      *
@@ -383,24 +303,6 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Rotates image by the specified number of degrees clockwise. Cycles from 0 to 360
-     * degrees.
-     *
-     * @param degrees Integer specifying the number of degrees to rotate.
-     */
-    public void rotateImage(int degrees) {
-        if (mBitmap != null) {
-            Matrix matrix = new Matrix();
-            matrix.postRotate(degrees);
-            Bitmap bitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
-            setImageBitmap(bitmap);
-
-            mDegreesRotated += degrees;
-            mDegreesRotated = mDegreesRotated % 360;
-        }
-    }
-
-    /**
      * Gets the cropped image based on the current crop window.
      *
      * @return a new Bitmap representing the cropped image
@@ -411,7 +313,8 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Gets the cropped image based on the current crop window.<br>
-     * If image loaded from URI will use sample size to fir the requested width and height.
+     * If image loaded from URI will use sample size to fit in the requested width and height downsampling
+     * if required - optimization to get best size to quality.
      *
      * @return a new Bitmap representing the cropped image
      */
@@ -440,7 +343,9 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Gets the cropped circle image based on the current crop selection.
+     * Gets the cropped circle image based on the current crop selection.<br>
+     * Same as {@link #getCroppedImage()} (as the bitmap is rectangular by nature) but the pixels beyond the
+     * oval crop will be transparent.
      *
      * @return a new Circular Bitmap representing the cropped image
      */
@@ -472,7 +377,161 @@ public class CropImageView extends FrameLayout {
         }
     }
 
+    /**
+     * Sets a Bitmap as the content of the CropImageView.
+     *
+     * @param bitmap the Bitmap to set
+     */
+    public void setImageBitmap(Bitmap bitmap) {
+        if (mBitmap != bitmap) {
+
+            // if we allocated the bitmap, release it as fast as possible
+            if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
+                mBitmap.recycle();
+            }
+
+            // clean the loaded image flags for new image
+            mImageResource = 0;
+            mLoadedImageUri = null;
+            mLoadedSampleSize = 1;
+            mDegreesRotated = 0;
+
+            mBitmap = bitmap;
+            mImageView.setImageBitmap(mBitmap);
+            if (mCropOverlayView != null) {
+                mCropOverlayView.resetCropOverlayView();
+            }
+        }
+    }
+
+    /**
+     * Sets a Bitmap and initializes the image rotation according to the EXIT data.<br>
+     * <br>
+     * The EXIF can be retrieved by doing the following:
+     * <code>ExifInterface exif = new ExifInterface(path);</code>
+     *
+     * @param bitmap the original bitmap to set; if null, this
+     * @param exif the EXIF information about this bitmap; may be null
+     */
+    public void setImageBitmap(Bitmap bitmap, ExifInterface exif) {
+        if (bitmap != null && exif != null) {
+            ImageViewUtil.RotateBitmapResult result = ImageViewUtil.rotateBitmapByExif(bitmap, exif);
+            bitmap = result.bitmap;
+            mDegreesRotated = result.degrees;
+        }
+        setImageBitmap(bitmap);
+    }
+
+    /**
+     * Sets a Drawable as the content of the CropImageView.
+     *
+     * @param resId the drawable resource ID to set
+     */
+    public void setImageResource(int resId) {
+        if (resId != 0) {
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
+            setImageBitmap(bitmap);
+
+            mImageResource = resId;
+        }
+    }
+
+    /**
+     * Sets a bitmap loaded from the given Android URI as the content of the CropImageView.<br>
+     * Can be used with URI from gallery or camera source.<br>
+     * Will rotate the image by exif data.<br>
+     *
+     * @param uri the URI to load the image from
+     * @deprecated Use {@link #setImageUriAsync(Uri)} for better async handling
+     */
+    @Deprecated
+    public void setImageUri(Uri uri) {
+        if (uri != null) {
+
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            double densityAdj = metrics.density > 1 ? 1 / metrics.density : 1;
+
+            int width = (int) (metrics.widthPixels * densityAdj);
+            int height = (int) (metrics.heightPixels * densityAdj);
+            ImageViewUtil.DecodeBitmapResult decodeResult =
+                    ImageViewUtil.decodeSampledBitmap(getContext(), uri, width, height);
+
+            ImageViewUtil.RotateBitmapResult rotateResult =
+                    ImageViewUtil.rotateBitmapByExif(getContext(), decodeResult.bitmap, uri);
+
+            setImageBitmap(rotateResult.bitmap);
+
+            mLoadedImageUri = uri;
+            mLoadedSampleSize = decodeResult.sampleSize;
+            mDegreesRotated = rotateResult.degrees;
+        }
+    }
+
+    /**
+     * Sets a bitmap loaded from the given Android URI as the content of the CropImageView.<br>
+     * Can be used with URI from gallery or camera source.<br>
+     * Will rotate the image by exif data.<br>
+     *
+     * @param uri the URI to load the image from
+     */
+    public void setImageUriAsync(Uri uri) {
+        if (uri != null) {
+            if (mLoadedImageUri == null || !mLoadedImageUri.equals(uri)) {
+                BitmapWorkerTask currentTask = mBitmapWorkerTask != null ? mBitmapWorkerTask.get() : null;
+                if (currentTask != null) {
+                    if (currentTask.getUri().equals(uri)) {
+                        // this URI is already loading, ignore set
+                        return;
+                    } else {
+                        // cancel previous loading
+                        Log.w("CIW", "Cancel...");
+                        currentTask.cancel(true);
+                    }
+                }
+
+                Log.w("CIW", "Start...");
+                // either no existing task is working or we canceled it, need to load new URI
+                mBitmapWorkerTask = new WeakReference<>(new BitmapWorkerTask(this, uri));
+                mBitmapWorkerTask.get().execute();
+            }
+        }
+    }
+
+    /**
+     * Rotates image by the specified number of degrees clockwise. Cycles from 0 to 360
+     * degrees.
+     *
+     * @param degrees Integer specifying the number of degrees to rotate.
+     */
+    public void rotateImage(int degrees) {
+        if (mBitmap != null) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(degrees);
+            Bitmap bitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
+            setImageBitmap(bitmap);
+
+            mDegreesRotated += degrees;
+            mDegreesRotated = mDegreesRotated % 360;
+        }
+    }
+
     //region: Private methods
+
+    /**
+     * On complete of the async bitmap loading by {@link #setImageUriAsync(Uri)} set the result
+     * to the widget is still relevant.
+     *
+     * @param result the result of bitmap loading
+     */
+    void onSetImageUriAsyncComplete(BitmapWorkerTask.BitmapWorkerTaskResult result) {
+
+        Log.w("CIW", "Complete...");
+        setImageBitmap(result.bitmap);
+
+        mLoadedImageUri = result.uri;
+        mLoadedSampleSize = result.loadSampleSize;
+        mDegreesRotated = result.degreesRotated;
+    }
 
     @Override
     public Parcelable onSaveInstanceState() {
@@ -650,6 +709,8 @@ public class CropImageView extends FrameLayout {
     }
     //endregion
 
+    //region: Inner class: CropShape
+
     /**
      * The possible cropping area shape.
      */
@@ -657,4 +718,5 @@ public class CropImageView extends FrameLayout {
         RECTANGLE,
         OVAL
     }
+    //endregion
 }

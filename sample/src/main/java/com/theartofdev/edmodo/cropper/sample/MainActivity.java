@@ -193,7 +193,9 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                croppedImage = cropImageView.getCroppedImage();
+                croppedImage = cropImageView.getCropShape() == CropImageView.CropShape.OVAL
+                        ? cropImageView.getCroppedOvalImage()
+                        : cropImageView.getCroppedImage();
                 ImageView croppedImageView = (ImageView) findViewById(R.id.croppedImageView);
                 croppedImageView.setImageBitmap(croppedImage);
             }
@@ -212,7 +214,7 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             Uri imageUri = getPickImageResultUri(data);
-            ((CropImageView) findViewById(R.id.CropImageView)).setImageUri(imageUri);
+            ((CropImageView) findViewById(R.id.CropImageView)).setImageUriAsync(imageUri);
         }
     }
 
