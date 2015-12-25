@@ -548,11 +548,12 @@ public class CropImageView extends FrameLayout {
         mProgressBar.setVisibility(INVISIBLE);
 
         Log.w("CIW", "Complete...");
-        setImageBitmap(result.bitmap);
-
-        mLoadedImageUri = result.uri;
-        mLoadedSampleSize = result.loadSampleSize;
-        mDegreesRotated = result.degreesRotated;
+        if (result.error == null) {
+            setImageBitmap(result.bitmap);
+            mLoadedImageUri = result.uri;
+            mLoadedSampleSize = result.loadSampleSize;
+            mDegreesRotated = result.degreesRotated;
+        }
     }
 
     @Override

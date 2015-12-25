@@ -83,21 +83,27 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
      */
     @Override
     protected BitmapWorkerTask.BitmapWorkerTaskResult doInBackground(Void... params) {
-
-        Log.w("CIW", "doInBackground...");
-
         try {
-            Thread.sleep(6000, 0);
-        } catch (InterruptedException ignored) {
+            Log.w("CIW", "doInBackground...");
+
+            try {
+                Thread.sleep(6000, 0);
+            } catch (InterruptedException ignored) {
+            }
+
+            if (true)
+                throw new RuntimeException("test");
+
+            ImageViewUtil.DecodeBitmapResult decodeResult =
+                    ImageViewUtil.decodeSampledBitmap(context, mUri, mWidth, mHeight);
+
+            ImageViewUtil.RotateBitmapResult rotateResult =
+                    ImageViewUtil.rotateBitmapByExif(context, decodeResult.bitmap, mUri);
+
+            return new BitmapWorkerTaskResult(mUri, rotateResult.bitmap, decodeResult.sampleSize, rotateResult.degrees);
+        } catch (Exception e) {
+            return new BitmapWorkerTaskResult(mUri, e);
         }
-
-        ImageViewUtil.DecodeBitmapResult decodeResult =
-                ImageViewUtil.decodeSampledBitmap(context, mUri, mWidth, mHeight);
-
-        ImageViewUtil.RotateBitmapResult rotateResult =
-                ImageViewUtil.rotateBitmapByExif(context, decodeResult.bitmap, mUri);
-
-        return new BitmapWorkerTaskResult(mUri, rotateResult.bitmap, decodeResult.sampleSize, rotateResult.degrees);
     }
 
     /**
@@ -143,11 +149,25 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
          */
         public final int degreesRotated;
 
+        /**
+         * The error that occurred during async bitmap loading.
+         */
+        public final Exception error;
+
         BitmapWorkerTaskResult(Uri uri, Bitmap bitmap, int loadSampleSize, int degreesRotated) {
             this.uri = uri;
             this.bitmap = bitmap;
             this.loadSampleSize = loadSampleSize;
             this.degreesRotated = degreesRotated;
+            this.error = null;
+        }
+
+        public BitmapWorkerTaskResult(Uri uri, Exception error) {
+            this.uri = uri;
+            this.bitmap = null;
+            this.loadSampleSize = 0;
+            this.degreesRotated = 0;
+            this.error = error;
         }
     }
     //endregion
