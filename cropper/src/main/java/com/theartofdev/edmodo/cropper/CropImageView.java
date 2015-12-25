@@ -36,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.edmodo.cropper.R;
 import com.theartofdev.edmodo.cropper.cropwindow.CropOverlayView;
@@ -77,6 +78,8 @@ public class CropImageView extends FrameLayout {
     private ImageView mImageView;
 
     private CropOverlayView mCropOverlayView;
+
+    private ProgressBar mProgressBar;
 
     private Bitmap mBitmap;
 
@@ -384,22 +387,13 @@ public class CropImageView extends FrameLayout {
      */
     public void setImageBitmap(Bitmap bitmap) {
         if (mBitmap != bitmap) {
-
-            // if we allocated the bitmap, release it as fast as possible
-            if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
-                mBitmap.recycle();
-            }
-
-            // clean the loaded image flags for new image
-            mImageResource = 0;
-            mLoadedImageUri = null;
-            mLoadedSampleSize = 1;
-            mDegreesRotated = 0;
+            clearImage();
 
             mBitmap = bitmap;
             mImageView.setImageBitmap(mBitmap);
             if (mCropOverlayView != null) {
                 mCropOverlayView.resetCropOverlayView();
+                mCropOverlayView.setVisibility(VISIBLE);
             }
         }
     }
@@ -491,9 +485,34 @@ public class CropImageView extends FrameLayout {
 
                 Log.w("CIW", "Start...");
                 // either no existing task is working or we canceled it, need to load new URI
+                clearImage();
+                mProgressBar.setVisibility(VISIBLE);
                 mBitmapWorkerTask = new WeakReference<>(new BitmapWorkerTask(this, uri));
                 mBitmapWorkerTask.get().execute();
             }
+        }
+    }
+
+    /**
+     * Clear the current image set for cropping.
+     */
+    public void clearImage() {
+
+        // if we allocated the bitmap, release it as fast as possible
+        if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
+            mBitmap.recycle();
+        }
+
+        // clean the loaded image flags for new image
+        mImageResource = 0;
+        mLoadedImageUri = null;
+        mLoadedSampleSize = 1;
+        mDegreesRotated = 0;
+
+        mImageView.setImageBitmap(null);
+
+        if (mCropOverlayView != null) {
+            mCropOverlayView.setVisibility(INVISIBLE);
         }
     }
 
@@ -524,6 +543,9 @@ public class CropImageView extends FrameLayout {
      * @param result the result of bitmap loading
      */
     void onSetImageUriAsyncComplete(BitmapWorkerTask.BitmapWorkerTaskResult result) {
+
+        mBitmapWorkerTask = null;
+        mProgressBar.setVisibility(INVISIBLE);
 
         Log.w("CIW", "Complete...");
         setImageBitmap(result.bitmap);
@@ -590,8 +612,7 @@ public class CropImageView extends FrameLayout {
 
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-            // Bypasses a baffling bug when used within a ScrollView, where
-            // heightSize is set to 0.
+            // Bypasses a baffling bug when used within a ScrollView, where heightSize is set to 0.
             if (heightSize == 0) {
                 heightSize = mBitmap.getHeight();
             }
@@ -610,8 +631,7 @@ public class CropImageView extends FrameLayout {
                 viewToBitmapHeightRatio = (double) heightSize / (double) mBitmap.getHeight();
             }
 
-            // If either needs to be fixed, choose smallest ratio and calculate
-            // from there
+            // If either needs to be fixed, choose smallest ratio and calculate from there
             if (viewToBitmapWidthRatio != Double.POSITIVE_INFINITY || viewToBitmapHeightRatio != Double.POSITIVE_INFINITY) {
                 if (viewToBitmapWidthRatio <= viewToBitmapHeightRatio) {
                     desiredWidth = widthSize;
@@ -620,12 +640,8 @@ public class CropImageView extends FrameLayout {
                     desiredHeight = heightSize;
                     desiredWidth = (int) (mBitmap.getWidth() * viewToBitmapHeightRatio);
                 }
-            }
-
-            // Otherwise, the picture is within frame layout bounds. Desired
-            // width is
-            // simply picture size
-            else {
+            } else {
+                // Otherwise, the picture is within frame layout bounds. Desired width is simply picture size
                 desiredWidth = mBitmap.getWidth();
                 desiredHeight = mBitmap.getHeight();
             }
@@ -636,7 +652,7 @@ public class CropImageView extends FrameLayout {
             mLayoutWidth = width;
             mLayoutHeight = height;
 
-            final Rect bitmapRect = ImageViewUtil.getBitmapRect(mBitmap.getWidth(),
+            Rect bitmapRect = ImageViewUtil.getBitmapRect(mBitmap.getWidth(),
                     mBitmap.getHeight(),
                     mLayoutWidth,
                     mLayoutHeight,
@@ -659,10 +675,10 @@ public class CropImageView extends FrameLayout {
 
         if (mLayoutWidth > 0 && mLayoutHeight > 0) {
             // Gets original parameters, and creates the new parameters
-            final ViewGroup.LayoutParams origparams = this.getLayoutParams();
-            origparams.width = mLayoutWidth;
-            origparams.height = mLayoutHeight;
-            setLayoutParams(origparams);
+            ViewGroup.LayoutParams origParams = this.getLayoutParams();
+            origParams.width = mLayoutWidth;
+            origParams.height = mLayoutHeight;
+            setLayoutParams(origParams);
         }
     }
 
@@ -679,6 +695,10 @@ public class CropImageView extends FrameLayout {
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
         mCropOverlayView.setInitialAttributeValues(mGuidelines, mFixAspectRatio, mAspectRatioX, mAspectRatioY);
         mCropOverlayView.setCropShape(mCropShape);
+        mCropOverlayView.setVisibility(mBitmap != null ? VISIBLE : INVISIBLE);
+
+        mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
+        mProgressBar.setVisibility(mBitmap == null && mBitmapWorkerTask != null ? VISIBLE : INVISIBLE);
     }
 
     /**

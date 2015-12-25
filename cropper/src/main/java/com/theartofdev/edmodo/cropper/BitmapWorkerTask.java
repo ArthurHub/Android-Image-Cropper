@@ -85,6 +85,12 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
     protected BitmapWorkerTask.BitmapWorkerTaskResult doInBackground(Void... params) {
 
         Log.w("CIW", "doInBackground...");
+
+        try {
+            Thread.sleep(6000, 0);
+        } catch (InterruptedException ignored) {
+        }
+
         ImageViewUtil.DecodeBitmapResult decodeResult =
                 ImageViewUtil.decodeSampledBitmap(context, mUri, mWidth, mHeight);
 
