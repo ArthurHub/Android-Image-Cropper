@@ -120,6 +120,7 @@ public class CropImageView extends FrameLayout {
         int aspectRatioY = Defaults.DEFAULT_ASPECT_RATIO_Y;
         ImageView.ScaleType scaleType = Defaults.VALID_SCALE_TYPES[Defaults.DEFAULT_SCALE_TYPE_INDEX];
         CropShape cropShape = CropShape.RECTANGLE;
+        float snapRadius = Defaults.SNAP_RADIUS_DP;
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
@@ -129,6 +130,8 @@ public class CropImageView extends FrameLayout {
                 aspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, Defaults.DEFAULT_ASPECT_RATIO_Y);
                 scaleType = Defaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, Defaults.DEFAULT_SCALE_TYPE_INDEX)];
                 cropShape = Defaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, Defaults.DEFAULT_CROP_SHAPE_INDEX)];
+                snapRadius = ta.getFloat(R.styleable.CropImageView_snapRadius, snapRadius);
+                mShowProgressBar = ta.getBoolean(R.styleable.CropImageView_showProgressBar, mShowProgressBar);
             } finally {
                 ta.recycle();
             }
@@ -143,6 +146,7 @@ public class CropImageView extends FrameLayout {
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
         mCropOverlayView.setInitialAttributeValues(guidelines, fixAspectRatio, aspectRatioX, aspectRatioY);
         mCropOverlayView.setCropShape(cropShape);
+        mCropOverlayView.setSnapRadius(snapRadius);
         mCropOverlayView.setVisibility(mBitmap != null ? VISIBLE : INVISIBLE);
 
         mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);

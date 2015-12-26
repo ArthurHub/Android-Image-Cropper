@@ -40,7 +40,7 @@ class Defaults {
 
     public static final int DEFAULT_CROP_SHAPE_INDEX = 0;
 
-    public static final int SNAP_RADIUS_DP = 3;
+    public static final float SNAP_RADIUS_DP = 3;
 
     public static final float DEFAULT_SHOW_GUIDELINES_LIMIT = 100;
 
