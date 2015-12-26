@@ -671,6 +671,7 @@ public class CropImageView extends FrameLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
@@ -678,8 +679,6 @@ public class CropImageView extends FrameLayout {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         if (mBitmap != null) {
-
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
             // Bypasses a baffling bug when used within a ScrollView, where heightSize is set to 0.
             if (heightSize == 0) {
@@ -732,7 +731,6 @@ public class CropImageView extends FrameLayout {
             setMeasuredDimension(mLayoutWidth, mLayoutHeight);
 
         } else {
-
             mCropOverlayView.setBitmapRect(EMPTY_RECT);
             setMeasuredDimension(widthSize, heightSize);
         }
