@@ -17,13 +17,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -84,13 +79,6 @@ public class CropImageView extends FrameLayout {
 
     private int mLayoutHeight;
 
-    /**
-     * Instance variables for customizable attributes
-     */
-    private int mGuidelines = DEFAULT_GUIDELINES;
-
-    private boolean mFixAspectRatio = DEFAULT_FIXED_ASPECT_RATIO;
-
     private int mAspectRatioX = DEFAULT_ASPECT_RATIO_X;
 
     private int mAspectRatioY = DEFAULT_ASPECT_RATIO_Y;
@@ -107,7 +95,12 @@ public class CropImageView extends FrameLayout {
     /**
      * callback to be invoked when image async loading is complete
      */
-    private OnSetImageUriCompleteListener mOnSetImageUriCompleteListener;
+    private WeakReference<OnSetImageUriCompleteListener> mOnSetImageUriCompleteListener;
+
+    /**
+     * callback to be invoked when image async cropping is complete
+     */
+    private WeakReference<OnGetCroppedImageCompleteListener> mOnGetCroppedImageCompleteListener;
 
     /**
      * The URI that the image was loaded from (if loaded from URI)
@@ -122,7 +115,12 @@ public class CropImageView extends FrameLayout {
     /**
      * Task used to load bitmap async from UI thread
      */
-    private WeakReference<BitmapWorkerTask> mBitmapWorkerTask;
+    private WeakReference<BitmapLoadingWorkerTask> mBitmapLoadingWorkerTask;
+
+    /**
+     * Task used to crop bitmap async from UI thread
+     */
+    private WeakReference<BitmapCroppingWorkerTask> mBitmapCroppingWorkerTask;
     //endregion
 
     public CropImageView(Context context) {
@@ -132,11 +130,13 @@ public class CropImageView extends FrameLayout {
     public CropImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        int guidelines = DEFAULT_GUIDELINES;
+        boolean fixAspectRatio = DEFAULT_FIXED_ASPECT_RATIO;
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
-                mGuidelines = ta.getInteger(R.styleable.CropImageView_guidelines, DEFAULT_GUIDELINES);
-                mFixAspectRatio = ta.getBoolean(R.styleable.CropImageView_fixAspectRatio, DEFAULT_FIXED_ASPECT_RATIO);
+                guidelines = ta.getInteger(R.styleable.CropImageView_guidelines, guidelines);
+                fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_fixAspectRatio, DEFAULT_FIXED_ASPECT_RATIO);
                 mAspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, DEFAULT_ASPECT_RATIO_X);
                 mAspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, DEFAULT_ASPECT_RATIO_Y);
                 mScaleType = VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, DEFAULT_SCALE_TYPE_INDEX)];
@@ -153,12 +153,12 @@ public class CropImageView extends FrameLayout {
         mImageView.setScaleType(mScaleType);
 
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
-        mCropOverlayView.setInitialAttributeValues(mGuidelines, mFixAspectRatio, mAspectRatioX, mAspectRatioY);
+        mCropOverlayView.setInitialAttributeValues(guidelines, fixAspectRatio, mAspectRatioX, mAspectRatioY);
         mCropOverlayView.setCropShape(mCropShape);
         mCropOverlayView.setVisibility(mBitmap != null ? VISIBLE : INVISIBLE);
 
         mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
-        mProgressBar.setVisibility(mBitmap == null && mBitmapWorkerTask != null ? VISIBLE : INVISIBLE);
+        mProgressBar.setVisibility(mBitmap == null && mBitmapLoadingWorkerTask != null ? VISIBLE : INVISIBLE);
     }
 
     /**
@@ -249,6 +249,13 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * Get the URI of an image that was set by URI, null otherwise.
+     */
+    public Uri getImageUri() {
+        return mLoadedImageUri;
+    }
+
+    /**
      * Gets the crop window's position relative to the source Bitmap (not the image
      * displayed in the CropImageView).
      *
@@ -328,7 +335,7 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Gets the cropped image based on the current crop window.<br>
-     * If image loaded from URI will use sample size to fit in the requested width and height downsampling
+     * If image loaded from URI will use sample size to fit in the requested width and height down-sampling
      * if required - optimization to get best size to quality.
      *
      * @return a new Bitmap representing the cropped image
@@ -336,21 +343,15 @@ public class CropImageView extends FrameLayout {
     public Bitmap getCroppedImage(int reqWidth, int reqHeight) {
         if (mBitmap != null) {
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
-                Rect rect = getActualCropRectNoRotation();
-                reqWidth = reqWidth > 0 ? reqWidth : rect.width();
-                reqHeight = reqHeight > 0 ? reqHeight : rect.height();
-                ImageViewUtil.DecodeBitmapResult result =
-                        ImageViewUtil.decodeSampledBitmapRegion(getContext(), mLoadedImageUri, rect, reqWidth, reqHeight);
-
-                Bitmap bitmap = result.bitmap;
-                if (mDegreesRotated > 0) {
-                    bitmap = ImageViewUtil.rotateBitmap(bitmap, mDegreesRotated);
-                }
-
-                return bitmap;
+                return ImageViewUtil.cropBitmap(
+                        getContext(),
+                        mLoadedImageUri,
+                        getActualCropRectNoRotation(),
+                        mDegreesRotated,
+                        reqWidth,
+                        reqHeight);
             } else {
-                Rect rect = getActualCropRect();
-                return Bitmap.createBitmap(mBitmap, rect.left, rect.top, rect.width(), rect.height());
+                return ImageViewUtil.cropBitmap(mBitmap, getActualCropRect());
             }
         } else {
             return null;
@@ -367,37 +368,59 @@ public class CropImageView extends FrameLayout {
     public Bitmap getCroppedOvalImage() {
         if (mBitmap != null) {
             Bitmap cropped = getCroppedImage();
-
-            int width = cropped.getWidth();
-            int height = cropped.getHeight();
-            Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-            Canvas canvas = new Canvas(output);
-
-            final int color = 0xff424242;
-            final Paint paint = new Paint();
-
-            paint.setAntiAlias(true);
-            canvas.drawARGB(0, 0, 0, 0);
-            paint.setColor(color);
-
-            RectF rect = new RectF(0, 0, width, height);
-            canvas.drawOval(rect, paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(cropped, 0, 0, paint);
-
-            return output;
+            return ImageViewUtil.toOvalBitmap(cropped);
         } else {
             return null;
         }
     }
 
     /**
-     * Set the callback to be invoked when image async loading (of {@link #setImageUriAsync(Uri)})
+     * Gets the cropped image based on the current crop window.<br>
+     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     */
+    public void getCroppedImageAsync() {
+        getCroppedImageAsync(CropShape.RECTANGLE, 0, 0);
+    }
+
+    /**
+     * Gets the cropped image based on the current crop window.<br>
+     * If image loaded from URI will use sample size to fit in the requested width and height down-sampling
+     * if required - optimization to get best size to quality.<br>
+     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     *
+     * @param cropShape the shape to crop the image
+     */
+    public void getCroppedImageAsync(CropShape cropShape, int reqWidth, int reqHeight) {
+        if (mOnGetCroppedImageCompleteListener == null) {
+            throw new IllegalArgumentException("OnGetCroppedImageCompleteListener is not set");
+        }
+        BitmapCroppingWorkerTask currentTask = mBitmapCroppingWorkerTask != null ? mBitmapCroppingWorkerTask.get() : null;
+        if (currentTask != null) {
+            // cancel previous cropping
+            currentTask.cancel(true);
+        }
+
+        mProgressBar.setVisibility(VISIBLE);
+        mBitmapCroppingWorkerTask = mLoadedImageUri != null && mLoadedSampleSize > 1
+                ? new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getActualCropRectNoRotation(), cropShape, mDegreesRotated, reqWidth, reqHeight))
+                : new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getActualCropRect(), cropShape));
+        mBitmapCroppingWorkerTask.get().execute();
+    }
+
+    /**
+     * Set the callback to be invoked when image async loading ({@link #setImageUriAsync(Uri)})
      * is complete (successful or failed).
      */
-    public void setOnSetImageUriCompleteListener(OnSetImageUriCompleteListener onSetImageUriCompleteListener) {
-        mOnSetImageUriCompleteListener = onSetImageUriCompleteListener;
+    public void setOnSetImageUriCompleteListener(OnSetImageUriCompleteListener listener) {
+        mOnSetImageUriCompleteListener = listener != null ? new WeakReference<>(listener) : null;
+    }
+
+    /**
+     * Set the callback to be invoked when image async cropping ({@link #getCroppedImageAsync()})
+     * is complete (successful or failed).
+     */
+    public void setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener listener) {
+        mOnGetCroppedImageCompleteListener = listener != null ? new WeakReference<>(listener) : null;
     }
 
     /**
@@ -510,12 +533,12 @@ public class CropImageView extends FrameLayout {
     //region: Private methods
 
     /**
-     * Load image from given URI async using {@link BitmapWorkerTask}<br>
+     * Load image from given URI async using {@link BitmapLoadingWorkerTask}<br>
      * optionally rotate the loaded image given degrees, used for restore state.
      */
     private void setImageUriAsync(Uri uri, Integer preSetRotation) {
         if (uri != null) {
-            BitmapWorkerTask currentTask = mBitmapWorkerTask != null ? mBitmapWorkerTask.get() : null;
+            BitmapLoadingWorkerTask currentTask = mBitmapLoadingWorkerTask != null ? mBitmapLoadingWorkerTask.get() : null;
             if (currentTask != null) {
                 // cancel previous loading (no check if the same URI because camera URI can be the same for different images)
                 currentTask.cancel(true);
@@ -524,20 +547,20 @@ public class CropImageView extends FrameLayout {
             // either no existing task is working or we canceled it, need to load new URI
             clearImage(true);
             mProgressBar.setVisibility(VISIBLE);
-            mBitmapWorkerTask = new WeakReference<>(new BitmapWorkerTask(this, uri, preSetRotation));
-            mBitmapWorkerTask.get().execute();
+            mBitmapLoadingWorkerTask = new WeakReference<>(new BitmapLoadingWorkerTask(this, uri, preSetRotation));
+            mBitmapLoadingWorkerTask.get().execute();
         }
     }
 
     /**
      * On complete of the async bitmap loading by {@link #setImageUriAsync(Uri)} set the result
-     * to the widget is still relevant.
+     * to the widget if still relevant and call listener if set.
      *
      * @param result the result of bitmap loading
      */
-    void onSetImageUriAsyncComplete(BitmapWorkerTask.BitmapWorkerTaskResult result) {
+    void onSetImageUriAsyncComplete(BitmapLoadingWorkerTask.Result result) {
 
-        mBitmapWorkerTask = null;
+        mBitmapLoadingWorkerTask = null;
         mProgressBar.setVisibility(INVISIBLE);
 
         if (result.error == null) {
@@ -547,9 +570,27 @@ public class CropImageView extends FrameLayout {
             mDegreesRotated = result.degreesRotated;
         }
 
-        OnSetImageUriCompleteListener onSetImageUriCompleteListener = mOnSetImageUriCompleteListener;
-        if (onSetImageUriCompleteListener != null) {
-            onSetImageUriCompleteListener.onSetImageUriComplete(this, result.uri, result.error);
+        OnSetImageUriCompleteListener listener = mOnSetImageUriCompleteListener != null
+                ? mOnSetImageUriCompleteListener.get() : null;
+        if (listener != null) {
+            listener.onSetImageUriComplete(this, result.uri, result.error);
+        }
+    }
+
+    /**
+     * On complete of the async bitmap cropping by {@link #getCroppedImageAsync()} call listener if set.
+     *
+     * @param result the result of bitmap cropping
+     */
+    void onGetImageCroppingAsyncComplete(BitmapCroppingWorkerTask.Result result) {
+
+        mBitmapCroppingWorkerTask = null;
+        mProgressBar.setVisibility(INVISIBLE);
+
+        OnGetCroppedImageCompleteListener listener = mOnGetCroppedImageCompleteListener != null
+                ? mOnGetCroppedImageCompleteListener.get() : null;
+        if (listener != null) {
+            listener.onGetCroppedImageComplete(this, result.bitmap, result.error);
         }
     }
 
@@ -608,8 +649,8 @@ public class CropImageView extends FrameLayout {
         if (mLoadedImageUri == null && mImageResource < 1) {
             bundle.putParcelable("SET_BITMAP", mBitmap);
         }
-        if (mBitmapWorkerTask != null) {
-            BitmapWorkerTask task = mBitmapWorkerTask.get();
+        if (mBitmapLoadingWorkerTask != null) {
+            BitmapLoadingWorkerTask task = mBitmapLoadingWorkerTask.get();
             if (task != null) {
                 bundle.putParcelable("LOADING_IMAGE_URI", task.getUri());
             }
@@ -804,6 +845,25 @@ public class CropImageView extends FrameLayout {
          * @param error if error occurred during loading will contain the error, otherwise null.
          */
         void onSetImageUriComplete(CropImageView view, Uri uri, Exception error);
+    }
+    //endregion
+
+    //region: Inner class: OnGetCroppedImageCompleteListener
+
+    /**
+     * Interface definition for a callback to be invoked when image async cropping is complete.
+     */
+    public interface OnGetCroppedImageCompleteListener {
+
+        /**
+         * Called when a crop image view has completed loading image for cropping.<br>
+         * If loading failed error parameter will contain the error.
+         *
+         * @param view The crop image view that cropping of image was complete.
+         * @param bitmap the cropped image bitmap (null if failed)
+         * @param error if error occurred during cropping will contain the error, otherwise null.
+         */
+        void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error);
     }
     //endregion
 }

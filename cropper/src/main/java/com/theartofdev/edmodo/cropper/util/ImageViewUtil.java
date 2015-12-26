@@ -19,8 +19,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -181,6 +186,58 @@ public class ImageViewUtil {
         } finally {
             closeSafe(stream);
         }
+    }
+
+    /**
+     * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.
+     */
+    public static Bitmap cropBitmap(Context context, Uri loadedImageUri, Rect rect, int degreesRotated, int reqWidth, int reqHeight) {
+
+        reqWidth = reqWidth > 0 ? reqWidth : rect.width();
+        reqHeight = reqHeight > 0 ? reqHeight : rect.height();
+        ImageViewUtil.DecodeBitmapResult result =
+                ImageViewUtil.decodeSampledBitmapRegion(context, loadedImageUri, rect, reqWidth, reqHeight);
+
+        Bitmap bitmap = result.bitmap;
+        if (degreesRotated > 0) {
+            bitmap = ImageViewUtil.rotateBitmap(bitmap, degreesRotated);
+        }
+
+        return bitmap;
+    }
+
+    /**
+     * Crop image bitmap from given bitmap.
+     */
+    public static Bitmap cropBitmap(Bitmap bitmap, Rect rect) {
+        return Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
+    }
+
+    /**
+     * Create a new bitmap that has all pixels beyond the oval shape transparent.
+     */
+    public static Bitmap toOvalBitmap(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(output);
+
+        int color = 0xff424242;
+        Paint paint = new Paint();
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+
+        RectF rect = new RectF(0, 0, width, height);
+        canvas.drawOval(rect, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+
+        bitmap.recycle();
+
+        return output;
     }
 
     /**

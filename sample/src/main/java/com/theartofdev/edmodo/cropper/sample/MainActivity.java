@@ -32,7 +32,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity implements CropImageView.OnSetImageUriCompleteListener {
+public class MainActivity extends Activity implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnGetCroppedImageCompleteListener {
 
     //region: Fields and Consts
 
@@ -201,11 +201,7 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
 
             @Override
             public void onClick(View v) {
-                croppedImage = mCropImageView.getCropShape() == CropImageView.CropShape.OVAL
-                        ? mCropImageView.getCroppedOvalImage()
-                        : mCropImageView.getCroppedImage();
-                ImageView croppedImageView = (ImageView) findViewById(R.id.croppedImageView);
-                croppedImageView.setImageBitmap(croppedImage);
+                mCropImageView.getCroppedImageAsync(mCropImageView.getCropShape(), 0, 0);
             }
         });
 
@@ -222,12 +218,14 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
     protected void onStart() {
         super.onStart();
         mCropImageView.setOnSetImageUriCompleteListener(this);
+        mCropImageView.setOnGetCroppedImageCompleteListener(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         mCropImageView.setOnSetImageUriCompleteListener(null);
+        mCropImageView.setOnGetCroppedImageCompleteListener(null);
     }
 
     @Override
@@ -236,6 +234,17 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
             Toast.makeText(mCropImageView.getContext(), "Image load successful", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(mCropImageView.getContext(), "Image load failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error) {
+        if (error == null) {
+            croppedImage = bitmap;
+            ImageView croppedImageView = (ImageView) findViewById(R.id.croppedImageView);
+            croppedImageView.setImageBitmap(croppedImage);
+        } else {
+            Toast.makeText(mCropImageView.getContext(), "Image crop failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

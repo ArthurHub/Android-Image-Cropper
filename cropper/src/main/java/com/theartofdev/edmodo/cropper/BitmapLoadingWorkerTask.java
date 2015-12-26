@@ -25,7 +25,7 @@ import java.lang.ref.WeakReference;
 /**
  * Task to load bitmap asynchronously from the UI thread.
  */
-class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWorkerTaskResult> {
+class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingWorkerTask.Result> {
 
     //region: Fields and Consts
 
@@ -47,7 +47,7 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
     /**
      * The context of the crop image view widget used for loading of bitmap by Android URI
      */
-    private final Context context;
+    private final Context mContext;
 
     /**
      * required width of the cropping image after density adjustment
@@ -60,12 +60,12 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
     private final int mHeight;
     //endregion
 
-    public BitmapWorkerTask(CropImageView cropImageView, Uri uri, Integer preSetRotation) {
+    public BitmapLoadingWorkerTask(CropImageView cropImageView, Uri uri, Integer preSetRotation) {
         mUri = uri;
         mPreSetRotation = preSetRotation;
         mCropImageViewReference = new WeakReference<>(cropImageView);
 
-        context = cropImageView.getContext();
+        mContext = cropImageView.getContext();
 
         DisplayMetrics metrics = cropImageView.getResources().getDisplayMetrics();
         double densityAdj = metrics.density > 1 ? 1 / metrics.density : 1;
@@ -87,25 +87,25 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
      * @return the decoded bitmap data
      */
     @Override
-    protected BitmapWorkerTask.BitmapWorkerTaskResult doInBackground(Void... params) {
+    protected Result doInBackground(Void... params) {
         try {
             if (!isCancelled()) {
 
                 ImageViewUtil.DecodeBitmapResult decodeResult =
-                        ImageViewUtil.decodeSampledBitmap(context, mUri, mWidth, mHeight);
+                        ImageViewUtil.decodeSampledBitmap(mContext, mUri, mWidth, mHeight);
 
                 if (!isCancelled()) {
 
                     ImageViewUtil.RotateBitmapResult rotateResult = mPreSetRotation != null
                             ? ImageViewUtil.rotateBitmapResult(decodeResult.bitmap, mPreSetRotation)
-                            : ImageViewUtil.rotateBitmapByExif(context, decodeResult.bitmap, mUri);
+                            : ImageViewUtil.rotateBitmapByExif(mContext, decodeResult.bitmap, mUri);
 
-                    return new BitmapWorkerTaskResult(mUri, rotateResult.bitmap, decodeResult.sampleSize, rotateResult.degrees);
+                    return new Result(mUri, rotateResult.bitmap, decodeResult.sampleSize, rotateResult.degrees);
                 }
             }
             return null;
         } catch (Exception e) {
-            return new BitmapWorkerTaskResult(mUri, e);
+            return new Result(mUri, e);
         }
     }
 
@@ -115,7 +115,7 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
      * @param result the result of bitmap loading
      */
     @Override
-    protected void onPostExecute(BitmapWorkerTask.BitmapWorkerTaskResult result) {
+    protected void onPostExecute(Result result) {
         if (result != null) {
             boolean completeCalled = false;
             if (!isCancelled()) {
@@ -132,12 +132,12 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
         }
     }
 
-    //region: Inner class: BitmapWorkerTaskResult
+    //region: Inner class: Result
 
     /**
-     * The result of BitmapWorkerTask async loading.
+     * The result of BitmapLoadingWorkerTask async loading.
      */
-    public static final class BitmapWorkerTaskResult {
+    public static final class Result {
 
         /**
          * The Android URI of the image to load
@@ -164,7 +164,7 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
          */
         public final Exception error;
 
-        BitmapWorkerTaskResult(Uri uri, Bitmap bitmap, int loadSampleSize, int degreesRotated) {
+        Result(Uri uri, Bitmap bitmap, int loadSampleSize, int degreesRotated) {
             this.uri = uri;
             this.bitmap = bitmap;
             this.loadSampleSize = loadSampleSize;
@@ -172,7 +172,7 @@ class BitmapWorkerTask extends AsyncTask<Void, Void, BitmapWorkerTask.BitmapWork
             this.error = null;
         }
 
-        public BitmapWorkerTaskResult(Uri uri, Exception error) {
+        Result(Uri uri, Exception error) {
             this.uri = uri;
             this.bitmap = null;
             this.loadSampleSize = 0;
