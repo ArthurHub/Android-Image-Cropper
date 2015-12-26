@@ -73,6 +73,12 @@ public class CropImageView extends FrameLayout {
     private CropShape mCropShape;
 
     /**
+     * if to show progress bar when image async loading/cropping is in progress.<br>
+     * default: true, disable to provide custom progress bar UI.
+     */
+    private boolean mShowProgressBar = true;
+
+    /**
      * callback to be invoked when image async loading is complete
      */
     private WeakReference<OnSetImageUriCompleteListener> mOnSetImageUriCompleteListener;
@@ -138,7 +144,7 @@ public class CropImageView extends FrameLayout {
         mCropOverlayView.setVisibility(mBitmap != null ? VISIBLE : INVISIBLE);
 
         mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
-        mProgressBar.setVisibility(mBitmap == null && mBitmapLoadingWorkerTask != null ? VISIBLE : INVISIBLE);
+        setProgressBarVisibility();
     }
 
     /**
@@ -219,6 +225,23 @@ public class CropImageView extends FrameLayout {
         if (snapRadius >= 0) {
             mCropOverlayView.setSnapRadius(snapRadius);
         }
+    }
+
+    /**
+     * if to show progress bar when image async loading/cropping is in progress.<br>
+     * default: true, disable to provide custom progress bar UI.
+     */
+    public boolean isShowProgressBar() {
+        return mShowProgressBar;
+    }
+
+    /**
+     * if to show progress bar when image async loading/cropping is in progress.<br>
+     * default: true, disable to provide custom progress bar UI.
+     */
+    public void setShowProgressBar(boolean showProgressBar) {
+        mShowProgressBar = showProgressBar;
+        setProgressBarVisibility();
     }
 
     /**
@@ -380,11 +403,11 @@ public class CropImageView extends FrameLayout {
             currentTask.cancel(true);
         }
 
-        mProgressBar.setVisibility(VISIBLE);
         mBitmapCroppingWorkerTask = mLoadedImageUri != null && mLoadedSampleSize > 1
                 ? new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getActualCropRectNoRotation(), cropShape, mDegreesRotated, reqWidth, reqHeight))
                 : new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getActualCropRect(), cropShape));
         mBitmapCroppingWorkerTask.get().execute();
+        setProgressBarVisibility();
     }
 
     /**
@@ -526,9 +549,9 @@ public class CropImageView extends FrameLayout {
 
             // either no existing task is working or we canceled it, need to load new URI
             clearImage(true);
-            mProgressBar.setVisibility(VISIBLE);
             mBitmapLoadingWorkerTask = new WeakReference<>(new BitmapLoadingWorkerTask(this, uri, preSetRotation));
             mBitmapLoadingWorkerTask.get().execute();
+            setProgressBarVisibility();
         }
     }
 
@@ -541,7 +564,7 @@ public class CropImageView extends FrameLayout {
     void onSetImageUriAsyncComplete(BitmapLoadingWorkerTask.Result result) {
 
         mBitmapLoadingWorkerTask = null;
-        mProgressBar.setVisibility(INVISIBLE);
+        setProgressBarVisibility();
 
         if (result.error == null) {
             setBitmap(result.bitmap, true);
@@ -565,7 +588,7 @@ public class CropImageView extends FrameLayout {
     void onGetImageCroppingAsyncComplete(BitmapCroppingWorkerTask.Result result) {
 
         mBitmapCroppingWorkerTask = null;
-        mProgressBar.setVisibility(INVISIBLE);
+        setProgressBarVisibility();
 
         OnGetCroppedImageCompleteListener listener = mOnGetCroppedImageCompleteListener != null
                 ? mOnGetCroppedImageCompleteListener.get() : null;
@@ -597,7 +620,7 @@ public class CropImageView extends FrameLayout {
      * Full clear will also clear the data of the set image like Uri or Resource id while partial clear
      * will only clear the bitmap and recycle if required.
      */
-    public void clearImage(boolean full) {
+    private void clearImage(boolean full) {
 
         // if we allocated the bitmap, release it as fast as possible
         if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
@@ -795,6 +818,17 @@ public class CropImageView extends FrameLayout {
         }
 
         return spec;
+    }
+
+    /**
+     * Set visibility of progress bar when async loading/cropping is in process and show is enabled.
+     */
+    private void setProgressBarVisibility() {
+        boolean visible =
+                mShowProgressBar && (
+                        (mBitmap == null && mBitmapLoadingWorkerTask != null) ||
+                                (mBitmapCroppingWorkerTask != null));
+        mProgressBar.setVisibility(visible ? VISIBLE : INVISIBLE);
     }
     //endregion
 
