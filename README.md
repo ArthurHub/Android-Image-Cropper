@@ -1,7 +1,5 @@
 Android Image Cropper
 =======
-Forked from [edmodo/cropper](https://github.com/edmodo/cropper) fixing some bugs and adding some features.
-
 Image cropping tool, displays a resizable, rectengular/oval crop window on top of image.
 
 [Optimized for cropping image picked from Camera or Gallery](http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/)
@@ -29,10 +27,27 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
 
 ## Gradle
 ```
-compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
+compile 'com.theartofdev.edmodo:android-image-cropper:1.1.+'
 ```
 
+## Posts
+ - [Android cropping image from camera or gallery](http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/)
+
+## Change log
+*1.1.0*
+- Deprecated `setImageUri(Uri)`.
+- Added `setImageUriAsync(Uri)` for better handling of slowe image loading/decode.
+- Fixed Save/Restore state handling, proper orientation change expirience.
+- Bug fixes on rotation and bitmap recycled error.
+
+*1.0.7*
+ - Added `setSnapRadius(float)` allowing to disable snap by setting 0.
+ - Nicer rectengular crop border.
+ - Fix oval shape rendering on old devices by disabling hardware rendering when required.
+
 ## License
+Forked from [edmodo/cropper](https://github.com/edmodo/cropper) fixing some bugs and adding some features.
+
 Copyright 2013, Edmodo, Inc. 
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the   License.
