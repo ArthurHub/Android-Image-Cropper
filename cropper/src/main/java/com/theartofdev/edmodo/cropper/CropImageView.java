@@ -107,7 +107,7 @@ public class CropImageView extends FrameLayout {
     /**
      * callback to be invoked when image async loading is complete
      */
-    private OnSetImageCompleteListener mOnSetImageCompleteListener;
+    private OnSetImageUriCompleteListener mOnSetImageUriCompleteListener;
 
     /**
      * The URI that the image was loaded from (if loaded from URI)
@@ -393,10 +393,11 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Set the callback to be invoked when image async loading is complete (successful or failed).
+     * Set the callback to be invoked when image async loading (of {@link #setImageUriAsync(Uri)})
+     * is complete (successful or failed).
      */
-    public void setOnSetImageCompleteListener(OnSetImageCompleteListener onSetImageCompleteListener) {
-        mOnSetImageCompleteListener = onSetImageCompleteListener;
+    public void setOnSetImageUriCompleteListener(OnSetImageUriCompleteListener onSetImageUriCompleteListener) {
+        mOnSetImageUriCompleteListener = onSetImageUriCompleteListener;
     }
 
     /**
@@ -546,9 +547,9 @@ public class CropImageView extends FrameLayout {
             mDegreesRotated = result.degreesRotated;
         }
 
-        OnSetImageCompleteListener onSetImageCompleteListener = mOnSetImageCompleteListener;
-        if (onSetImageCompleteListener != null) {
-            onSetImageCompleteListener.onComplete(this, result.uri, result.error);
+        OnSetImageUriCompleteListener onSetImageUriCompleteListener = mOnSetImageUriCompleteListener;
+        if (onSetImageUriCompleteListener != null) {
+            onSetImageUriCompleteListener.onSetImageUriComplete(this, result.uri, result.error);
         }
     }
 
@@ -789,22 +790,22 @@ public class CropImageView extends FrameLayout {
     }
     //endregion
 
-    //region: Inner class: OnSetImageCompleteListener
+    //region: Inner class: OnSetImageUriCompleteListener
 
     /**
      * Interface definition for a callback to be invoked when image async loading is complete.
      */
-    public interface OnSetImageCompleteListener {
+    public interface OnSetImageUriCompleteListener {
 
         /**
          * Called when a crop image view has completed loading image for cropping.<br>
          * If loading failed error parameter will contain the error.
          *
-         * @param v The crop image view that loading of image was complete.
+         * @param view The crop image view that loading of image was complete.
          * @param uri the URI of the image that was loading
          * @param error if error occurred during loading will contain the error, otherwise null.
          */
-        void onComplete(CropImageView v, Uri uri, Exception error);
+        void onSetImageUriComplete(CropImageView view, Uri uri, Exception error);
     }
     //endregion
 }

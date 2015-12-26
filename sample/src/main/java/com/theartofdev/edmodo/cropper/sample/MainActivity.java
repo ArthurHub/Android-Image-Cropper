@@ -32,9 +32,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements CropImageView.OnSetImageUriCompleteListener {
 
-    // Static final constants
+    //region: Fields and Consts
+
     private static final int DEFAULT_ASPECT_RATIO_VALUES = 20;
 
     private static final int ROTATE_NINETY_DEGREES = 90;
@@ -45,12 +46,14 @@ public class MainActivity extends Activity {
 
     private static final int ON_TOUCH = 1;
 
-    // Instance variables
+    private CropImageView mCropImageView;
+
     private int mAspectRatioX = DEFAULT_ASPECT_RATIO_VALUES;
 
     private int mAspectRatioY = DEFAULT_ASPECT_RATIO_VALUES;
 
     Bitmap croppedImage;
+    //endregion
 
     // Saves the state upon rotating the screen/restarting the activity
     @Override
@@ -75,26 +78,15 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         // Initialize components of the app
-        final CropImageView cropImageView = (CropImageView) findViewById(R.id.CropImageView);
+        mCropImageView = (CropImageView) findViewById(R.id.CropImageView);
         final SeekBar aspectRatioXSeek = (SeekBar) findViewById(R.id.aspectRatioXSeek);
         final SeekBar aspectRatioYSeek = (SeekBar) findViewById(R.id.aspectRatioYSeek);
         Spinner showGuidelinesSpin = (Spinner) findViewById(R.id.showGuidelinesSpin);
         final TextView aspectRatioNum = (TextView) findViewById(R.id.aspectRatioNum);
 
         if (savedInstanceState == null) {
-            cropImageView.setImageResource(R.drawable.butterfly);
+            mCropImageView.setImageResource(R.drawable.butterfly);
         }
-
-        cropImageView.setOnSetImageCompleteListener(new CropImageView.OnSetImageCompleteListener() {
-            @Override
-            public void onComplete(CropImageView v, Uri uri, Exception error) {
-                if (error == null) {
-                    Toast.makeText(cropImageView.getContext(), "Image load successful", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(cropImageView.getContext(), "Image load failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
 
         // Sets sliders to be disabled until fixedAspectRatio is set
         aspectRatioXSeek.setEnabled(false);
@@ -109,7 +101,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                cropImageView.rotateImage(ROTATE_NINETY_DEGREES);
+                mCropImageView.rotateImage(ROTATE_NINETY_DEGREES);
             }
         });
 
@@ -118,7 +110,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                cropImageView.setFixedAspectRatio(isChecked);
+                mCropImageView.setFixedAspectRatio(isChecked);
                 if (isChecked) {
                     aspectRatioXSeek.setEnabled(true);
                     aspectRatioYSeek.setEnabled(true);
@@ -134,18 +126,18 @@ public class MainActivity extends Activity {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                cropImageView.setCropShape(isChecked ? CropImageView.CropShape.OVAL : CropImageView.CropShape.RECTANGLE);
+                mCropImageView.setCropShape(isChecked ? CropImageView.CropShape.OVAL : CropImageView.CropShape.RECTANGLE);
             }
         });
 
         // Sets initial aspect ratio to 10/10, for demonstration purposes
-        cropImageView.setAspectRatio(DEFAULT_ASPECT_RATIO_VALUES, DEFAULT_ASPECT_RATIO_VALUES);
+        mCropImageView.setAspectRatio(DEFAULT_ASPECT_RATIO_VALUES, DEFAULT_ASPECT_RATIO_VALUES);
 
         aspectRatioXSeek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar aspectRatioXSeek, int progress, boolean fromUser) {
                 mAspectRatioX = Math.max(1, progress);
-                cropImageView.setAspectRatio(mAspectRatioX, mAspectRatioY);
+                mCropImageView.setAspectRatio(mAspectRatioX, mAspectRatioY);
                 aspectRatioNum.setText("(" + mAspectRatioX + ", " + mAspectRatioY + ")");
             }
 
@@ -162,7 +154,7 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(SeekBar aspectRatioYSeek, int progress, boolean fromUser) {
                 mAspectRatioY = Math.max(1, progress);
-                cropImageView.setAspectRatio(mAspectRatioX, mAspectRatioY);
+                mCropImageView.setAspectRatio(mAspectRatioX, mAspectRatioY);
                 aspectRatioNum.setText("(" + mAspectRatioX + ", " + mAspectRatioY + ")");
             }
 
@@ -178,7 +170,7 @@ public class MainActivity extends Activity {
         // Sets up the Spinner
         showGuidelinesSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                cropImageView.setGuidelines(i);
+                mCropImageView.setGuidelines(i);
             }
 
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -190,7 +182,7 @@ public class MainActivity extends Activity {
         ((SeekBar) findViewById(R.id.snapRadiusSeek)).setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                cropImageView.setSnapRadius(progress);
+                mCropImageView.setSnapRadius(progress);
                 snapRadiusNum.setText(Integer.toString(progress));
             }
 
@@ -209,9 +201,9 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                croppedImage = cropImageView.getCropShape() == CropImageView.CropShape.OVAL
-                        ? cropImageView.getCroppedOvalImage()
-                        : cropImageView.getCroppedImage();
+                croppedImage = mCropImageView.getCropShape() == CropImageView.CropShape.OVAL
+                        ? mCropImageView.getCroppedOvalImage()
+                        : mCropImageView.getCroppedImage();
                 ImageView croppedImageView = (ImageView) findViewById(R.id.croppedImageView);
                 croppedImageView.setImageBitmap(croppedImage);
             }
@@ -224,6 +216,27 @@ public class MainActivity extends Activity {
                 startActivityForResult(getPickImageChooserIntent(), 200);
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mCropImageView.setOnSetImageUriCompleteListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mCropImageView.setOnSetImageUriCompleteListener(null);
+    }
+
+    @Override
+    public void onSetImageUriComplete(CropImageView view, Uri uri, Exception error) {
+        if (error == null) {
+            Toast.makeText(mCropImageView.getContext(), "Image load successful", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mCropImageView.getContext(), "Image load failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
