@@ -34,8 +34,6 @@
         <h1>
 <a id="android-image-cropper" class="anchor" href="#android-image-cropper" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android Image Cropper</h1>
 
-<p>Forked from <a href="https://github.com/edmodo/cropper">edmodo/cropper</a> fixing some bugs and adding some features.</p>
-
 <p>Image cropping tool, displays a resizable, rectengular/oval crop window on top of image.</p>
 
 <p><a href="http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/">Optimized for cropping image picked from Camera or Gallery</a></p>
@@ -71,20 +69,49 @@
 <h2>
 <a id="gradle" class="anchor" href="#gradle" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gradle</h2>
 
-<pre><code>compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
+<pre><code>compile 'com.theartofdev.edmodo:android-image-cropper:1.1.+'
 </code></pre>
+
+<h2>
+<a id="posts" class="anchor" href="#posts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Posts</h2>
+
+<ul>
+<li><a href="http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/">Android cropping image from camera or gallery</a></li>
+</ul>
+
+<h2>
+<a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span class="octicon octicon-link"></span></a>Change log</h2>
+
+<p><em>1.1.0</em></p>
+
+<ul>
+<li>Deprecated <code>setImageUri(Uri)</code>.</li>
+<li>Added <code>setImageUriAsync(Uri)</code> and <code>getCroppedImageAsync()</code> for better handling of slow image loading/decode/cropping.</li>
+<li>Fixed Save/Restore state handling, proper orientation change expirience.</li>
+<li>Bug fixes on rotation and bitmap recycled error.</li>
+</ul>
+
+<p><em>1.0.7</em></p>
+
+<ul>
+<li>Added <code>setSnapRadius(float)</code> allowing to disable snap by setting 0.</li>
+<li>Nicer rectengular crop border.</li>
+<li>Fix oval shape rendering on old devices by disabling hardware rendering when required.</li>
+</ul>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
+<p>Forked from <a href="https://github.com/edmodo/cropper">edmodo/cropper</a> fixing some bugs and adding some features.</p>
+
 <p>Copyright 2013, Edmodo, Inc. </p>
 
-<p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the License.
+<p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the   License.
 You may obtain a copy of the License in the LICENSE file, or at:</p>
 
 <p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
 
-<p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
+<p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS   IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
       </section>
     </div>
 
@@ -92,7 +119,7 @@ You may obtain a copy of the License in the LICENSE file, or at:</p>
     <div id="footer_wrap" class="outer">
       <footer class="inner">
         <p class="copyright">Android Image Cropper maintained by <a href="https://github.com/ArthurHub">ArthurHub</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
 
