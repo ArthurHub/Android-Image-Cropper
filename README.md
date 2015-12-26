@@ -36,7 +36,7 @@ compile 'com.theartofdev.edmodo:android-image-cropper:1.1.+'
 ## Change log
 *1.1.0*
 - Deprecated `setImageUri(Uri)`.
-- Added `setImageUriAsync(Uri)` for better handling of slowe image loading/decode.
+- Added `setImageUriAsync(Uri)` and `getCroppedImageAsync()` for better handling of slow image loading/decode/cropping.
 - Fixed Save/Restore state handling, proper orientation change expirience.
 - Bug fixes on rotation and bitmap recycled error.
 
