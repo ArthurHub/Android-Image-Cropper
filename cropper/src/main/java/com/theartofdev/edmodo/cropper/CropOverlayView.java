@@ -156,6 +156,13 @@ class CropOverlayView extends View {
     /**
      * The shape of the cropping area - rectangle/circular.
      */
+    public CropImageView.CropShape getCropShape() {
+        return mCropShape;
+    }
+
+    /**
+     * The shape of the cropping area - rectangle/circular.
+     */
     public void setCropShape(CropImageView.CropShape cropShape) {
         if (mCropShape != cropShape) {
             mCropShape = cropShape;
