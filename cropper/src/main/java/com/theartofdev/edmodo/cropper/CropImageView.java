@@ -32,7 +32,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.edmodo.cropper.R;
 import com.theartofdev.edmodo.cropper.cropwindow.edge.Edge;
 import com.theartofdev.edmodo.cropper.util.ImageViewUtil;
 
