@@ -11,14 +11,13 @@
  * governing permissions and limitations under the License. 
  */
 
-package com.theartofdev.edmodo.cropper.cropwindow;
+package com.theartofdev.edmodo.cropper;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Region;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -28,42 +27,17 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.theartofdev.edmodo.cropper.CropImageView;
 import com.theartofdev.edmodo.cropper.cropwindow.edge.Edge;
 import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
 import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
-import com.theartofdev.edmodo.cropper.util.HandleUtil;
 import com.theartofdev.edmodo.cropper.util.PaintUtil;
 
 /**
  * A custom View representing the crop window and the shaded background outside the crop window.
  */
-public class CropOverlayView extends View {
+class CropOverlayView extends View {
 
     //region: Fields and Consts
-
-    private static final int SNAP_RADIUS_DP = 3;
-
-    private static final float DEFAULT_SHOW_GUIDELINES_LIMIT = 100;
-
-    // Gets default values from PaintUtil, sets a bunch of values such that the
-    // corners will draw correctly
-    private static final float DEFAULT_CORNER_THICKNESS_DP = PaintUtil.getCornerThickness();
-
-    private static final float DEFAULT_LINE_THICKNESS_DP = PaintUtil.getLineThickness();
-
-    private static final float DEFAULT_CORNER_OFFSET_DP = (DEFAULT_CORNER_THICKNESS_DP / 2) - (DEFAULT_LINE_THICKNESS_DP / 2);
-
-    private static final float DEFAULT_CORNER_EXTENSION_DP = DEFAULT_CORNER_THICKNESS_DP / 2
-            + DEFAULT_CORNER_OFFSET_DP;
-
-    private static final float DEFAULT_CORNER_LENGTH_DP = 15;
-
-    private static final int GUIDELINES_ON_TOUCH = 1;
-
-    private static final int GUIDELINES_ON = 2;
-
-    private static RectF mRectF = new RectF();
 
     /**
      * The Paint used to draw the white rectangle around the crop area.
@@ -110,12 +84,12 @@ public class CropOverlayView extends View {
 
     // Flag indicating if the crop area should always be a certain aspect ratio
     // (indicated by mTargetAspectRatio).
-    private boolean mFixAspectRatio = CropImageView.DEFAULT_FIXED_ASPECT_RATIO;
+    private boolean mFixAspectRatio = Defaults.DEFAULT_FIXED_ASPECT_RATIO;
 
     // Floats to save the current aspect ratio of the image
-    private int mAspectRatioX = CropImageView.DEFAULT_ASPECT_RATIO_X;
+    private int mAspectRatioX = Defaults.DEFAULT_ASPECT_RATIO_X;
 
-    private int mAspectRatioY = CropImageView.DEFAULT_ASPECT_RATIO_Y;
+    private int mAspectRatioY = Defaults.DEFAULT_ASPECT_RATIO_Y;
 
     // The aspect ratio that the crop area should maintain; this variable is
     // only used when mMaintainAspectRatio is true.
@@ -345,9 +319,9 @@ public class CropOverlayView extends View {
 
         if (showGuidelines()) {
             // Determines whether guidelines should be drawn or not
-            if (mGuidelines == GUIDELINES_ON) {
+            if (mGuidelines == Defaults.GUIDELINES_ON) {
                 drawRuleOfThirdsGuidelines(canvas);
-            } else if (mGuidelines == GUIDELINES_ON_TOUCH) {
+            } else if (mGuidelines == Defaults.GUIDELINES_ON_TOUCH) {
                 // Draw only when resizing
                 if (mPressedHandle != null)
                     drawRuleOfThirdsGuidelines(canvas);
@@ -365,8 +339,8 @@ public class CropOverlayView extends View {
             drawCorners(canvas);
         } else {
             // Draw circular crop window border
-            mRectF.set(l, t, r, b);
-            canvas.drawOval(mRectF, mBorderPaint);
+            Defaults.EMPTY_RECT_F.set(l, t, r, b);
+            canvas.drawOval(Defaults.EMPTY_RECT_F, mBorderPaint);
         }
     }
 
@@ -406,7 +380,7 @@ public class CropOverlayView extends View {
 
         mHandleRadius = HandleUtil.getTargetRadius(context);
 
-        mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PT, SNAP_RADIUS_DP, displayMetrics);
+        mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PT, Defaults.SNAP_RADIUS_DP, displayMetrics);
 
         mBorderPaint = PaintUtil.newBorderPaint(context);
         mGuidelinePaint = PaintUtil.newGuidelinePaint();
@@ -415,17 +389,17 @@ public class CropOverlayView extends View {
 
         // Sets the values for the corner sizes
         mCornerOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                DEFAULT_CORNER_OFFSET_DP,
+                Defaults.DEFAULT_CORNER_OFFSET_DP,
                 displayMetrics);
         mCornerExtension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                DEFAULT_CORNER_EXTENSION_DP,
+                Defaults.DEFAULT_CORNER_EXTENSION_DP,
                 displayMetrics);
         mCornerLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                DEFAULT_CORNER_LENGTH_DP,
+                Defaults.DEFAULT_CORNER_LENGTH_DP,
                 displayMetrics);
 
         // Sets guidelines to default until specified otherwise
-        mGuidelines = CropImageView.DEFAULT_GUIDELINES;
+        mGuidelines = Defaults.DEFAULT_GUIDELINES;
     }
 
     /**
@@ -524,8 +498,8 @@ public class CropOverlayView extends View {
      * @return boolean Whether the guidelines should be shown or not
      */
     public static boolean showGuidelines() {
-        if ((Math.abs(Edge.LEFT.getCoordinate() - Edge.RIGHT.getCoordinate()) < DEFAULT_SHOW_GUIDELINES_LIMIT)
-                || (Math.abs(Edge.TOP.getCoordinate() - Edge.BOTTOM.getCoordinate()) < DEFAULT_SHOW_GUIDELINES_LIMIT)) {
+        if ((Math.abs(Edge.LEFT.getCoordinate() - Edge.RIGHT.getCoordinate()) < Defaults.DEFAULT_SHOW_GUIDELINES_LIMIT)
+                || (Math.abs(Edge.TOP.getCoordinate() - Edge.BOTTOM.getCoordinate()) < Defaults.DEFAULT_SHOW_GUIDELINES_LIMIT)) {
             return false;
         } else {
             return true;
@@ -592,11 +566,11 @@ public class CropOverlayView extends View {
         } else {
             Path circleSelectionPath = new Path();
             if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17 && mCropShape == CropImageView.CropShape.OVAL) {
-                mRectF.set(l + 2, t + 2, r - 2, b - 2);
+                Defaults.EMPTY_RECT_F.set(l + 2, t + 2, r - 2, b - 2);
             } else {
-                mRectF.set(l, t, r, b);
+                Defaults.EMPTY_RECT_F.set(l, t, r, b);
             }
-            circleSelectionPath.addOval(mRectF, Path.Direction.CW);
+            circleSelectionPath.addOval(Defaults.EMPTY_RECT_F, Path.Direction.CW);
             canvas.save();
             canvas.clipPath(circleSelectionPath, Region.Op.XOR);
             canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);

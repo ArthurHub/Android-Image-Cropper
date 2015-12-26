@@ -11,20 +11,18 @@
  * governing permissions and limitations under the License. 
  */
 
-package com.theartofdev.edmodo.cropper.util;
+package com.theartofdev.edmodo.cropper;
 
 import android.content.Context;
 import android.util.Pair;
 import android.util.TypedValue;
 
-import com.theartofdev.edmodo.cropper.CropImageView;
-import com.theartofdev.edmodo.cropper.cropwindow.CropOverlayView;
 import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
 
 /**
  * Utility class to perform basic operations with Handles.
  */
-public class HandleUtil {
+class HandleUtil {
 
     // Private Constants ///////////////////////////////////////////////////////
 
@@ -173,7 +171,7 @@ public class HandleUtil {
         if (x < leftCenter) {
             if (y < topCenter) {
                 pressedHandle = Handle.TOP_LEFT;
-            } else if(y < bottomCenter) {
+            } else if (y < bottomCenter) {
                 pressedHandle = Handle.LEFT;
             } else {
                 pressedHandle = Handle.BOTTOM_LEFT;
@@ -181,7 +179,7 @@ public class HandleUtil {
         } else if (x < rightCenter) {
             if (y < topCenter) {
                 pressedHandle = Handle.TOP;
-            } else if(y < bottomCenter) {
+            } else if (y < bottomCenter) {
                 pressedHandle = Handle.CENTER;
             } else {
                 pressedHandle = Handle.BOTTOM;
@@ -189,7 +187,7 @@ public class HandleUtil {
         } else {
             if (y < topCenter) {
                 pressedHandle = Handle.TOP_RIGHT;
-            } else if(y < bottomCenter) {
+            } else if (y < bottomCenter) {
                 pressedHandle = Handle.RIGHT;
             } else {
                 pressedHandle = Handle.BOTTOM_RIGHT;

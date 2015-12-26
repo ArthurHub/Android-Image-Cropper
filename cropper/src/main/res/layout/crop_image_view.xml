@@ -10,7 +10,7 @@
         android:scaleType="centerInside"
         tools:ignore="contentDescription"/>
 
-    <com.theartofdev.edmodo.cropper.cropwindow.CropOverlayView
+    <com.theartofdev.edmodo.cropper.CropOverlayView
         android:id="@+id/CropOverlayView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

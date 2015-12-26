@@ -33,7 +33,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.edmodo.cropper.R;
-import com.theartofdev.edmodo.cropper.cropwindow.CropOverlayView;
 import com.theartofdev.edmodo.cropper.cropwindow.edge.Edge;
 import com.theartofdev.edmodo.cropper.util.ImageViewUtil;
 
@@ -45,25 +44,6 @@ import java.lang.ref.WeakReference;
 public class CropImageView extends FrameLayout {
 
     //region: Fields and Consts
-
-    private static final Rect EMPTY_RECT = new Rect();
-
-    // Sets the default image guidelines to show when resizing
-    public static final int DEFAULT_GUIDELINES = 1;
-
-    public static final boolean DEFAULT_FIXED_ASPECT_RATIO = false;
-
-    public static final int DEFAULT_ASPECT_RATIO_X = 1;
-
-    public static final int DEFAULT_ASPECT_RATIO_Y = 1;
-
-    public static final int DEFAULT_SCALE_TYPE_INDEX = 0;
-
-    public static final int DEFAULT_CROP_SHAPE_INDEX = 0;
-
-    private static final ImageView.ScaleType[] VALID_SCALE_TYPES = new ImageView.ScaleType[]{ImageView.ScaleType.CENTER_INSIDE, ImageView.ScaleType.FIT_CENTER};
-
-    private static final CropShape[] VALID_CROP_SHAPES = new CropShape[]{CropShape.RECTANGLE, CropShape.OVAL};
 
     private final ImageView mImageView;
 
@@ -79,13 +59,13 @@ public class CropImageView extends FrameLayout {
 
     private int mLayoutHeight;
 
-    private int mAspectRatioX = DEFAULT_ASPECT_RATIO_X;
+    private int mAspectRatioX = Defaults.DEFAULT_ASPECT_RATIO_X;
 
-    private int mAspectRatioY = DEFAULT_ASPECT_RATIO_Y;
+    private int mAspectRatioY = Defaults.DEFAULT_ASPECT_RATIO_Y;
 
     private int mImageResource = 0;
 
-    private ImageView.ScaleType mScaleType = VALID_SCALE_TYPES[DEFAULT_SCALE_TYPE_INDEX];
+    private ImageView.ScaleType mScaleType = Defaults.VALID_SCALE_TYPES[Defaults.DEFAULT_SCALE_TYPE_INDEX];
 
     /**
      * The shape of the cropping area - rectangle/circular.
@@ -130,17 +110,17 @@ public class CropImageView extends FrameLayout {
     public CropImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        int guidelines = DEFAULT_GUIDELINES;
-        boolean fixAspectRatio = DEFAULT_FIXED_ASPECT_RATIO;
+        int guidelines = Defaults.DEFAULT_GUIDELINES;
+        boolean fixAspectRatio = Defaults.DEFAULT_FIXED_ASPECT_RATIO;
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
                 guidelines = ta.getInteger(R.styleable.CropImageView_guidelines, guidelines);
-                fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_fixAspectRatio, DEFAULT_FIXED_ASPECT_RATIO);
-                mAspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, DEFAULT_ASPECT_RATIO_X);
-                mAspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, DEFAULT_ASPECT_RATIO_Y);
-                mScaleType = VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, DEFAULT_SCALE_TYPE_INDEX)];
-                mCropShape = VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, DEFAULT_CROP_SHAPE_INDEX)];
+                fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_fixAspectRatio, Defaults.DEFAULT_FIXED_ASPECT_RATIO);
+                mAspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, Defaults.DEFAULT_ASPECT_RATIO_X);
+                mAspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, Defaults.DEFAULT_ASPECT_RATIO_Y);
+                mScaleType = Defaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, Defaults.DEFAULT_SCALE_TYPE_INDEX)];
+                mCropShape = Defaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, Defaults.DEFAULT_CROP_SHAPE_INDEX)];
             } finally {
                 ta.recycle();
             }
@@ -706,7 +686,7 @@ public class CropImageView extends FrameLayout {
             final Rect bitmapRect = ImageViewUtil.getBitmapRect(mBitmap, this, mScaleType);
             mCropOverlayView.setBitmapRect(bitmapRect);
         } else {
-            mCropOverlayView.setBitmapRect(EMPTY_RECT);
+            mCropOverlayView.setBitmapRect(Defaults.EMPTY_RECT);
         }
     }
 
@@ -772,7 +752,7 @@ public class CropImageView extends FrameLayout {
             setMeasuredDimension(mLayoutWidth, mLayoutHeight);
 
         } else {
-            mCropOverlayView.setBitmapRect(EMPTY_RECT);
+            mCropOverlayView.setBitmapRect(Defaults.EMPTY_RECT);
             setMeasuredDimension(widthSize, heightSize);
         }
     }
