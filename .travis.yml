@@ -1,0 +1,10 @@
+language: android
+sudo: false
+
+android:
+  components:
+    - build-tools-23.0.2
+    - android-23
+
+script:
+ - ./gradlew clean build
