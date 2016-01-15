@@ -377,8 +377,12 @@ public class CropOverlayView extends View {
 
         mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PT, Defaults.SNAP_RADIUS_DP, displayMetrics);
 
-        mBorderPaint = HandleUtil.newBorderPaint(displayMetrics, mBorderLineThickness, mBorderLineColor);
-        mCornerPaint = HandleUtil.newCornerPaint(displayMetrics, mBorderCornerThickness, mBorderCornerColor);
+        mBorderPaint = mBorderLineThickness > 0
+                ? HandleUtil.newBorderPaint(displayMetrics, mBorderLineThickness, mBorderLineColor)
+                : null;
+        mCornerPaint = mBorderCornerThickness > 0
+                ? HandleUtil.newCornerPaint(displayMetrics, mBorderCornerThickness, mBorderCornerColor)
+                : null;
         mGuidelinePaint = HandleUtil.newGuidelinePaint(Defaults.DEFAULT_GUIDELINE_COLOR);
         mBackgroundPaint = HandleUtil.newBackgroundPaint(Defaults.DEFAULT_BACKGROUND_COLOR);
 
@@ -510,19 +514,10 @@ public class CropOverlayView extends View {
             }
         }
 
-        float w = mBorderPaint.getStrokeWidth();
-        float l = Edge.LEFT.getCoordinate() + w / 2;
-        float t = Edge.TOP.getCoordinate() + w / 2;
-        float r = Edge.RIGHT.getCoordinate() - w / 2;
-        float b = Edge.BOTTOM.getCoordinate() - w / 2;
+        drawBorders(canvas);
+
         if (mCropShape == CropImageView.CropShape.RECTANGLE) {
-            // Draw rectangle crop window border.
-            canvas.drawRect(l, t, r, b, mBorderPaint);
             drawCorners(canvas);
-        } else {
-            // Draw circular crop window border
-            Defaults.EMPTY_RECT_F.set(l, t, r, b);
-            canvas.drawOval(Defaults.EMPTY_RECT_F, mBorderPaint);
         }
     }
 
@@ -558,7 +553,7 @@ public class CropOverlayView extends View {
 
     private void drawRuleOfThirdsGuidelines(Canvas canvas) {
 
-        float sw = mBorderPaint.getStrokeWidth();
+        float sw = mBorderPaint != null ? mBorderPaint.getStrokeWidth() : 0;
         float l = Edge.LEFT.getCoordinate() + sw;
         float t = Edge.TOP.getCoordinate() + sw;
         float r = Edge.RIGHT.getCoordinate() - sw;
@@ -632,31 +627,54 @@ public class CropOverlayView extends View {
     }
 
     /**
+     * Draw borders of the crop area.
+     */
+    private void drawBorders(Canvas canvas) {
+        if (mBorderPaint != null) {
+            float w = mBorderPaint.getStrokeWidth();
+            float l = Edge.LEFT.getCoordinate() + w / 2;
+            float t = Edge.TOP.getCoordinate() + w / 2;
+            float r = Edge.RIGHT.getCoordinate() - w / 2;
+            float b = Edge.BOTTOM.getCoordinate() - w / 2;
+            if (mCropShape == CropImageView.CropShape.RECTANGLE) {
+                // Draw rectangle crop window border.
+                canvas.drawRect(l, t, r, b, mBorderPaint);
+            } else {
+                // Draw circular crop window border
+                Defaults.EMPTY_RECT_F.set(l, t, r, b);
+                canvas.drawOval(Defaults.EMPTY_RECT_F, mBorderPaint);
+            }
+        }
+    }
+
+    /**
      * Draw the corner of crop overlay.
      */
     private void drawCorners(Canvas canvas) {
+        if (mCornerPaint != null) {
 
-        float w = mBorderPaint.getStrokeWidth() + mCornerPaint.getStrokeWidth() + 1;
-        float l = Edge.LEFT.getCoordinate() + w;
-        float t = Edge.TOP.getCoordinate() + w;
-        float r = Edge.RIGHT.getCoordinate() - w;
-        float b = Edge.BOTTOM.getCoordinate() - w;
+            float w = (mBorderPaint != null ? mBorderPaint.getStrokeWidth() : 0) + mCornerPaint.getStrokeWidth() + 1;
+            float l = Edge.LEFT.getCoordinate() + w;
+            float t = Edge.TOP.getCoordinate() + w;
+            float r = Edge.RIGHT.getCoordinate() - w;
+            float b = Edge.BOTTOM.getCoordinate() - w;
 
-        // Top left
-        canvas.drawLine(l - mCornerOffset, t - mCornerExtension, l - mCornerOffset, t + mCornerLength, mCornerPaint);
-        canvas.drawLine(l - mCornerExtension, t - mCornerOffset, l + mCornerLength, t - mCornerOffset, mCornerPaint);
+            // Top left
+            canvas.drawLine(l - mCornerOffset, t - mCornerExtension, l - mCornerOffset, t + mCornerLength, mCornerPaint);
+            canvas.drawLine(l - mCornerExtension, t - mCornerOffset, l + mCornerLength, t - mCornerOffset, mCornerPaint);
 
-        // Top right
-        canvas.drawLine(r + mCornerOffset, t - mCornerExtension, r + mCornerOffset, t + mCornerLength, mCornerPaint);
-        canvas.drawLine(r + mCornerExtension, t - mCornerOffset, r - mCornerLength, t - mCornerOffset, mCornerPaint);
+            // Top right
+            canvas.drawLine(r + mCornerOffset, t - mCornerExtension, r + mCornerOffset, t + mCornerLength, mCornerPaint);
+            canvas.drawLine(r + mCornerExtension, t - mCornerOffset, r - mCornerLength, t - mCornerOffset, mCornerPaint);
 
-        // Bottom left
-        canvas.drawLine(l - mCornerOffset, b + mCornerExtension, l - mCornerOffset, b - mCornerLength, mCornerPaint);
-        canvas.drawLine(l - mCornerExtension, b + mCornerOffset, l + mCornerLength, b + mCornerOffset, mCornerPaint);
+            // Bottom left
+            canvas.drawLine(l - mCornerOffset, b + mCornerExtension, l - mCornerOffset, b - mCornerLength, mCornerPaint);
+            canvas.drawLine(l - mCornerExtension, b + mCornerOffset, l + mCornerLength, b + mCornerOffset, mCornerPaint);
 
-        // Bottom left
-        canvas.drawLine(r + mCornerOffset, b + mCornerExtension, r + mCornerOffset, b - mCornerLength, mCornerPaint);
-        canvas.drawLine(r + mCornerExtension, b + mCornerOffset, r - mCornerLength, b + mCornerOffset, mCornerPaint);
+            // Bottom left
+            canvas.drawLine(r + mCornerOffset, b + mCornerExtension, r + mCornerOffset, b - mCornerLength, mCornerPaint);
+            canvas.drawLine(r + mCornerExtension, b + mCornerOffset, r - mCornerLength, b + mCornerOffset, mCornerPaint);
+        }
     }
 
     /**
