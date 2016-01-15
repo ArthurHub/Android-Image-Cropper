@@ -39,7 +39,7 @@ class Defaults {
 
     public static final int DEFAULT_CROP_SHAPE_INDEX = 0;
 
-    public static final float SNAP_RADIUS_DP = 3;
+    public static final float SNAP_RADIUS = 3;
 
     public static final float DEFAULT_SHOW_GUIDELINES_LIMIT = 100;
 
@@ -62,7 +62,7 @@ class Defaults {
 
     public static final float DEFAULT_BORDER_CORNER_OFFSET = 5;
 
-    public static final float DEFAULT_CORNER_LENGTH = 15;
+    public static final float DEFAULT_BORDER_CORNER_LENGTH = 15;
 
     public static final float DEFAULT_GUIDELINE_THICKNESS = 1;
 

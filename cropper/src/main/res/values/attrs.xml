@@ -21,9 +21,11 @@
         <attr name="borderLineColor" format="color"/>
         <attr name="borderCornerThickness" format="float"/>
         <attr name="borderCornerOffset" format="float"/>
+        <attr name="borderCornerLength" format="float"/>
         <attr name="borderCornerColor" format="color"/>
         <attr name="guidelinesThickness" format="float"/>
         <attr name="guidelinesColor" format="color"/>
+        <attr name="backgroundColor" format="color"/>
         <attr name="snapRadius" format="float"/>
         <attr name="showProgressBar" format="boolean"/>
     </declare-styleable>

@@ -308,9 +308,11 @@ public class CropOverlayView extends View {
                                           int borderLineColor,
                                           float borderCornerThickness,
                                           float borderCornerOffset,
+                                          float borderCornerLength,
                                           int borderCornerColor,
                                           float guidelinesThickness,
-                                          int guidelinesColor) {
+                                          int guidelinesColor,
+                                          int backgroundColor) {
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
 
@@ -335,6 +337,7 @@ public class CropOverlayView extends View {
             throw new IllegalArgumentException("Cannot set corner thickness value to a number less than 0.");
         }
         mBorderCornerOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, borderCornerOffset, dm);
+        mBorderCornerLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, borderCornerLength, dm);
         mBorderCornerPaint = HandleUtil.getNewPaintOrNull(dm, borderCornerThickness, borderCornerColor);
 
         if (guidelinesThickness < 0) {
@@ -342,16 +345,9 @@ public class CropOverlayView extends View {
         }
         mGuidelinePaint = HandleUtil.getNewPaintOrNull(dm, guidelinesThickness, guidelinesColor);
 
+        mBackgroundPaint = HandleUtil.getNewPaint(backgroundColor);
+
         mHandleRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Defaults.TARGET_RADIUS, dm);
-
-        mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PT, Defaults.SNAP_RADIUS_DP, dm);
-
-        mBackgroundPaint = HandleUtil.getNewPaint(Defaults.DEFAULT_BACKGROUND_COLOR);
-
-        // Sets the values for the corner sizes
-        mBorderCornerLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                Defaults.DEFAULT_CORNER_LENGTH,
-                dm);
     }
 
     /**
