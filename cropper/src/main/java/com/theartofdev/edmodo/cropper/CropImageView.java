@@ -122,6 +122,7 @@ public class CropImageView extends FrameLayout {
         float borderLineThickness = Defaults.DEFAULT_BORDER_LINE_THICKNESS;
         int borderLineColor = Defaults.DEFAULT_BORDER_LINE_COLOR;
         float borderCornerThickness = Defaults.DEFAULT_BORDER_CORNER_THICKNESS;
+        float borderCornerOffset = Defaults.DEFAULT_BORDER_CORNER_OFFSET;
         int borderCornerColor = Defaults.DEFAULT_BORDER_CORNER_COLOR;
         float guidelinesThickness = Defaults.DEFAULT_GUIDELINE_THICKNESS;
         int guidelinesColor = Defaults.DEFAULT_GUIDELINE_COLOR;
@@ -138,6 +139,7 @@ public class CropImageView extends FrameLayout {
                 borderLineThickness = ta.getFloat(R.styleable.CropImageView_borderLineThickness, borderLineThickness);
                 borderLineColor = ta.getInteger(R.styleable.CropImageView_borderLineColor, borderLineColor);
                 borderCornerThickness = ta.getFloat(R.styleable.CropImageView_borderCornerThickness, borderCornerThickness);
+                borderCornerOffset = ta.getFloat(R.styleable.CropImageView_borderCornerOffset, borderCornerOffset);
                 borderCornerColor = ta.getInteger(R.styleable.CropImageView_borderCornerColor, borderCornerColor);
                 guidelinesThickness = ta.getFloat(R.styleable.CropImageView_guidelinesThickness, guidelinesThickness);
                 guidelinesColor = ta.getInteger(R.styleable.CropImageView_guidelinesColor, guidelinesColor);
@@ -158,7 +160,7 @@ public class CropImageView extends FrameLayout {
                 cropShape, snapRadius, guidelines,
                 fixAspectRatio, aspectRatioX, aspectRatioY,
                 borderLineThickness, borderLineColor,
-                borderCornerThickness, borderCornerColor,
+                borderCornerThickness, borderCornerOffset, borderCornerColor,
                 guidelinesThickness, guidelinesColor);
 
         mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);

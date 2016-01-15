@@ -20,6 +20,7 @@
         <attr name="borderLineThickness" format="float"/>
         <attr name="borderLineColor" format="color"/>
         <attr name="borderCornerThickness" format="float"/>
+        <attr name="borderCornerOffset" format="float"/>
         <attr name="borderCornerColor" format="color"/>
         <attr name="guidelinesThickness" format="float"/>
         <attr name="guidelinesColor" format="color"/>

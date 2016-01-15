@@ -44,14 +44,14 @@ public class CropOverlayView extends View {
     private Paint mBorderPaint;
 
     /**
+     * The Paint used to draw the corners of the Border
+     */
+    private Paint mBorderCornerPaint;
+
+    /**
      * The Paint used to draw the guidelines within the crop area when pressed.
      */
     private Paint mGuidelinePaint;
-
-    /**
-     * The Paint used to draw the corners of the Border
-     */
-    private Paint mCornerPaint;
 
     /**
      * The Paint used to darken the surrounding areas outside the crop area.
@@ -62,6 +62,16 @@ public class CropOverlayView extends View {
      * The bounding box around the Bitmap that we are cropping.
      */
     private Rect mBitmapRect;
+
+    /**
+     * The offset to draw the border corener from the border
+     */
+    private float mBorderCornerOffset;
+
+    /**
+     * the length of the border corner to draw
+     */
+    private float mBorderCornerLength;
 
     /**
      * The radius of the touch zone (in pixels) around a given Handle.
@@ -115,33 +125,10 @@ public class CropOverlayView extends View {
      */
     private CropImageView.CropShape mCropShape;
 
-    private float mBorderLineThickness = Defaults.DEFAULT_BORDER_LINE_THICKNESS;
-
-    private int mBorderLineColor = Defaults.DEFAULT_BORDER_LINE_COLOR;
-
-    private float mBorderCornerThickness = Defaults.DEFAULT_BORDER_CORNER_THICKNESS;
-
-    private int mBorderCornerColor = Defaults.DEFAULT_BORDER_CORNER_COLOR;
-
-    private float mGuidelinesThickness = Defaults.DEFAULT_GUIDELINE_THICKNESS;
-
-    private int mGuidelinesColor = Defaults.DEFAULT_GUIDELINE_COLOR;
-
-    private int mBackgroundColor = Defaults.DEFAULT_BACKGROUND_COLOR;
-
     /**
      * Whether the Crop View has been initialized for the first time
      */
     private boolean initializedCropWindow = false;
-
-    /**
-     * Instance variables for the corner values
-     */
-    private float mCornerExtension;
-
-    private float mCornerOffset;
-
-    private float mCornerLength;
 
     /**
      * Used to set back LayerType after changing to software.
@@ -320,9 +307,12 @@ public class CropOverlayView extends View {
                                           float borderLineThickness,
                                           int borderLineColor,
                                           float borderCornerThickness,
+                                          float borderCornerOffset,
                                           int borderCornerColor,
                                           float guidelinesThickness,
                                           int guidelinesColor) {
+
+        DisplayMetrics dm = getResources().getDisplayMetrics();
 
         setCropShape(cropShape);
 
@@ -338,29 +328,30 @@ public class CropOverlayView extends View {
 
         if (borderLineThickness < 0) {
             throw new IllegalArgumentException("Cannot set line thickness value to a number less than 0.");
-        } else {
-            mBorderLineThickness = borderLineThickness;
         }
-
-        mBorderLineColor = borderLineColor;
+        mBorderPaint = HandleUtil.getNewPaintOrNull(dm, borderLineThickness, borderLineColor);
 
         if (borderCornerThickness < 0) {
             throw new IllegalArgumentException("Cannot set corner thickness value to a number less than 0.");
-        } else {
-            mBorderCornerThickness = borderCornerThickness;
         }
-
-        mBorderCornerColor = borderCornerColor;
+        mBorderCornerOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, borderCornerOffset, dm);
+        mBorderCornerPaint = HandleUtil.getNewPaintOrNull(dm, borderCornerThickness, borderCornerColor);
 
         if (guidelinesThickness < 0) {
             throw new IllegalArgumentException("Cannot set guidelines thickness value to a number less than 0.");
-        } else {
-            mGuidelinesThickness = guidelinesThickness;
         }
+        mGuidelinePaint = HandleUtil.getNewPaintOrNull(dm, guidelinesThickness, guidelinesColor);
 
-        mGuidelinesColor = guidelinesColor;
+        mHandleRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Defaults.TARGET_RADIUS, dm);
 
-        init();
+        mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PT, Defaults.SNAP_RADIUS_DP, dm);
+
+        mBackgroundPaint = HandleUtil.getNewPaint(Defaults.DEFAULT_BACKGROUND_COLOR);
+
+        // Sets the values for the corner sizes
+        mBorderCornerLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                Defaults.DEFAULT_CORNER_LENGTH,
+                dm);
     }
 
     /**
@@ -380,29 +371,6 @@ public class CropOverlayView extends View {
     }
 
     //region: Private methods
-
-    private void init() {
-
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-
-        mHandleRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Defaults.TARGET_RADIUS, displayMetrics);
-
-        mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PT, Defaults.SNAP_RADIUS_DP, displayMetrics);
-
-        mBorderPaint = HandleUtil.getNewPaintOrNull(displayMetrics, mBorderLineThickness, mBorderLineColor);
-        mCornerPaint = HandleUtil.getNewPaintOrNull(displayMetrics, mBorderCornerThickness, mBorderCornerColor);
-        mGuidelinePaint = HandleUtil.getNewPaintOrNull(displayMetrics, mGuidelinesThickness, mGuidelinesColor);
-        mBackgroundPaint = HandleUtil.getNewPaint(mBackgroundColor);
-
-        // Sets the values for the corner sizes
-        float cornerOffset = (mBorderCornerThickness / 2) - (mBorderLineThickness / 2);
-        float cornerExtension = mBorderCornerThickness / 2 + cornerOffset;
-        mCornerOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerOffset, displayMetrics);
-        mCornerExtension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerExtension, displayMetrics);
-        mCornerLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                Defaults.DEFAULT_CORNER_LENGTH,
-                displayMetrics);
-    }
 
     /**
      * Set the initial crop window size and position. This is dependent on the
@@ -634,29 +602,34 @@ public class CropOverlayView extends View {
      * Draw the corner of crop overlay.
      */
     private void drawCorners(Canvas canvas) {
-        if (mCornerPaint != null) {
+        if (mBorderCornerPaint != null) {
 
-            float w = (mBorderPaint != null ? mBorderPaint.getStrokeWidth() : 0) + mCornerPaint.getStrokeWidth() + 1;
+            float lineWidth = mBorderPaint != null ? mBorderPaint.getStrokeWidth() : 0;
+            float cornerWidth = mBorderCornerPaint.getStrokeWidth();
+            float w = cornerWidth / 2 + mBorderCornerOffset;
             float l = Edge.LEFT.getCoordinate() + w;
             float t = Edge.TOP.getCoordinate() + w;
             float r = Edge.RIGHT.getCoordinate() - w;
             float b = Edge.BOTTOM.getCoordinate() - w;
 
+            float cornerOffset = (cornerWidth - lineWidth) / 2;
+            float cornerExtension = cornerWidth / 2 + cornerOffset;
+
             // Top left
-            canvas.drawLine(l - mCornerOffset, t - mCornerExtension, l - mCornerOffset, t + mCornerLength, mCornerPaint);
-            canvas.drawLine(l - mCornerExtension, t - mCornerOffset, l + mCornerLength, t - mCornerOffset, mCornerPaint);
+            canvas.drawLine(l - cornerOffset, t - cornerExtension, l - cornerOffset, t + mBorderCornerLength, mBorderCornerPaint);
+            canvas.drawLine(l - cornerExtension, t - cornerOffset, l + mBorderCornerLength, t - cornerOffset, mBorderCornerPaint);
 
             // Top right
-            canvas.drawLine(r + mCornerOffset, t - mCornerExtension, r + mCornerOffset, t + mCornerLength, mCornerPaint);
-            canvas.drawLine(r + mCornerExtension, t - mCornerOffset, r - mCornerLength, t - mCornerOffset, mCornerPaint);
+            canvas.drawLine(r + cornerOffset, t - cornerExtension, r + cornerOffset, t + mBorderCornerLength, mBorderCornerPaint);
+            canvas.drawLine(r + cornerExtension, t - cornerOffset, r - mBorderCornerLength, t - cornerOffset, mBorderCornerPaint);
 
             // Bottom left
-            canvas.drawLine(l - mCornerOffset, b + mCornerExtension, l - mCornerOffset, b - mCornerLength, mCornerPaint);
-            canvas.drawLine(l - mCornerExtension, b + mCornerOffset, l + mCornerLength, b + mCornerOffset, mCornerPaint);
+            canvas.drawLine(l - cornerOffset, b + cornerExtension, l - cornerOffset, b - mBorderCornerLength, mBorderCornerPaint);
+            canvas.drawLine(l - cornerExtension, b + cornerOffset, l + mBorderCornerLength, b + cornerOffset, mBorderCornerPaint);
 
             // Bottom left
-            canvas.drawLine(r + mCornerOffset, b + mCornerExtension, r + mCornerOffset, b - mCornerLength, mCornerPaint);
-            canvas.drawLine(r + mCornerExtension, b + mCornerOffset, r - mCornerLength, b + mCornerOffset, mCornerPaint);
+            canvas.drawLine(r + cornerOffset, b + cornerExtension, r + cornerOffset, b - mBorderCornerLength, mBorderCornerPaint);
+            canvas.drawLine(r + cornerExtension, b + cornerOffset, r - mBorderCornerLength, b + cornerOffset, mBorderCornerPaint);
         }
     }
 

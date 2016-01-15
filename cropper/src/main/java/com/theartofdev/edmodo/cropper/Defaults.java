@@ -60,6 +60,8 @@ class Defaults {
 
     public static final float DEFAULT_BORDER_CORNER_THICKNESS = 2;
 
+    public static final float DEFAULT_BORDER_CORNER_OFFSET = 5;
+
     public static final float DEFAULT_CORNER_LENGTH = 15;
 
     public static final float DEFAULT_GUIDELINE_THICKNESS = 1;
