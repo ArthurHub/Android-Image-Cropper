@@ -18,8 +18,6 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.theartofdev.edmodo.cropper.util.ImageViewUtil;
-
 import java.lang.ref.WeakReference;
 
 /**
@@ -119,7 +117,7 @@ class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppingWorke
 
                 Bitmap bitmap = null;
                 if (mUri != null) {
-                    bitmap = ImageViewUtil.cropBitmap(
+                    bitmap = BitmapUtil.cropBitmap(
                             mContext,
                             mUri,
                             mRect,
@@ -127,10 +125,10 @@ class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppingWorke
                             mReqWidth,
                             mReqHeight);
                 } else if (mBitmap != null) {
-                    bitmap = ImageViewUtil.cropBitmap(mBitmap, mRect);
+                    bitmap = BitmapUtil.cropBitmap(mBitmap, mRect);
                 }
                 if (bitmap != null && mCropShape == CropImageView.CropShape.OVAL) {
-                    bitmap = ImageViewUtil.toOvalBitmap(bitmap);
+                    bitmap = BitmapUtil.toOvalBitmap(bitmap);
                 }
                 return new Result(bitmap);
             }

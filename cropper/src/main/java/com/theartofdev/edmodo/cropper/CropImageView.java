@@ -33,7 +33,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.theartofdev.edmodo.cropper.cropwindow.edge.Edge;
-import com.theartofdev.edmodo.cropper.util.ImageViewUtil;
 
 import java.lang.ref.WeakReference;
 
@@ -277,7 +276,7 @@ public class CropImageView extends FrameLayout {
      */
     public Rect getActualCropRect() {
         if (mBitmap != null) {
-            final Rect displayedImageRect = ImageViewUtil.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
+            final Rect displayedImageRect = BitmapUtil.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
 
             // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width.
             final float actualImageWidth = mBitmap.getWidth();
@@ -357,7 +356,7 @@ public class CropImageView extends FrameLayout {
     public Bitmap getCroppedImage(int reqWidth, int reqHeight) {
         if (mBitmap != null) {
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
-                return ImageViewUtil.cropBitmap(
+                return BitmapUtil.cropBitmap(
                         getContext(),
                         mLoadedImageUri,
                         getActualCropRectNoRotation(),
@@ -365,7 +364,7 @@ public class CropImageView extends FrameLayout {
                         reqWidth,
                         reqHeight);
             } else {
-                return ImageViewUtil.cropBitmap(mBitmap, getActualCropRect());
+                return BitmapUtil.cropBitmap(mBitmap, getActualCropRect());
             }
         } else {
             return null;
@@ -382,7 +381,7 @@ public class CropImageView extends FrameLayout {
     public Bitmap getCroppedOvalImage() {
         if (mBitmap != null) {
             Bitmap cropped = getCroppedImage();
-            return ImageViewUtil.toOvalBitmap(cropped);
+            return BitmapUtil.toOvalBitmap(cropped);
         } else {
             return null;
         }
@@ -457,7 +456,7 @@ public class CropImageView extends FrameLayout {
      */
     public void setImageBitmap(Bitmap bitmap, ExifInterface exif) {
         if (bitmap != null && exif != null) {
-            ImageViewUtil.RotateBitmapResult result = ImageViewUtil.rotateBitmapByExif(bitmap, exif);
+            BitmapUtil.RotateBitmapResult result = BitmapUtil.rotateBitmapByExif(bitmap, exif);
             bitmap = result.bitmap;
             mDegreesRotated = result.degrees;
         }
@@ -494,11 +493,11 @@ public class CropImageView extends FrameLayout {
 
             int width = (int) (metrics.widthPixels * densityAdj);
             int height = (int) (metrics.heightPixels * densityAdj);
-            ImageViewUtil.DecodeBitmapResult decodeResult =
-                    ImageViewUtil.decodeSampledBitmap(getContext(), uri, width, height);
+            BitmapUtil.DecodeBitmapResult decodeResult =
+                    BitmapUtil.decodeSampledBitmap(getContext(), uri, width, height);
 
-            ImageViewUtil.RotateBitmapResult rotateResult =
-                    ImageViewUtil.rotateBitmapByExif(getContext(), decodeResult.bitmap, uri);
+            BitmapUtil.RotateBitmapResult rotateResult =
+                    BitmapUtil.rotateBitmapByExif(getContext(), decodeResult.bitmap, uri);
 
             setBitmap(rotateResult.bitmap, true);
 
@@ -717,7 +716,7 @@ public class CropImageView extends FrameLayout {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 
         if (mBitmap != null) {
-            Rect bitmapRect = ImageViewUtil.getBitmapRect(mBitmap, this, mImageView.getScaleType());
+            Rect bitmapRect = BitmapUtil.getBitmapRect(mBitmap, this, mImageView.getScaleType());
             mCropOverlayView.setBitmapRect(bitmapRect);
         } else {
             mCropOverlayView.setBitmapRect(Defaults.EMPTY_RECT);
@@ -775,7 +774,7 @@ public class CropImageView extends FrameLayout {
             mLayoutWidth = width;
             mLayoutHeight = height;
 
-            Rect bitmapRect = ImageViewUtil.getBitmapRect(mBitmap.getWidth(),
+            Rect bitmapRect = BitmapUtil.getBitmapRect(mBitmap.getWidth(),
                     mBitmap.getHeight(),
                     mLayoutWidth,
                     mLayoutHeight,

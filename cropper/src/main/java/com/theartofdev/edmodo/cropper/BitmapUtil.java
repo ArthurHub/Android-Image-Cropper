@@ -11,7 +11,7 @@
  * governing permissions and limitations under the License. 
  */
 
-package com.theartofdev.edmodo.cropper.util;
+package com.theartofdev.edmodo.cropper;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -40,7 +40,7 @@ import java.io.InputStream;
 /**
  * Utility class that deals with operations with an ImageView.
  */
-public class ImageViewUtil {
+class BitmapUtil {
 
     /**
      * Gets the rectangular position of a Bitmap if it were placed inside a View.
@@ -195,12 +195,12 @@ public class ImageViewUtil {
 
         reqWidth = reqWidth > 0 ? reqWidth : rect.width();
         reqHeight = reqHeight > 0 ? reqHeight : rect.height();
-        ImageViewUtil.DecodeBitmapResult result =
-                ImageViewUtil.decodeSampledBitmapRegion(context, loadedImageUri, rect, reqWidth, reqHeight);
+        BitmapUtil.DecodeBitmapResult result =
+                BitmapUtil.decodeSampledBitmapRegion(context, loadedImageUri, rect, reqWidth, reqHeight);
 
         Bitmap bitmap = result.bitmap;
         if (degreesRotated > 0) {
-            bitmap = ImageViewUtil.rotateBitmap(bitmap, degreesRotated);
+            bitmap = BitmapUtil.rotateBitmap(bitmap, degreesRotated);
         }
 
         return bitmap;

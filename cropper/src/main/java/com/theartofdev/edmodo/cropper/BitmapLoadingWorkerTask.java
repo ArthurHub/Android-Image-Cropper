@@ -18,8 +18,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 
-import com.theartofdev.edmodo.cropper.util.ImageViewUtil;
-
 import java.lang.ref.WeakReference;
 
 /**
@@ -91,14 +89,14 @@ class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingWorkerT
         try {
             if (!isCancelled()) {
 
-                ImageViewUtil.DecodeBitmapResult decodeResult =
-                        ImageViewUtil.decodeSampledBitmap(mContext, mUri, mWidth, mHeight);
+                BitmapUtil.DecodeBitmapResult decodeResult =
+                        BitmapUtil.decodeSampledBitmap(mContext, mUri, mWidth, mHeight);
 
                 if (!isCancelled()) {
 
-                    ImageViewUtil.RotateBitmapResult rotateResult = mPreSetRotation != null
-                            ? ImageViewUtil.rotateBitmapResult(decodeResult.bitmap, mPreSetRotation)
-                            : ImageViewUtil.rotateBitmapByExif(mContext, decodeResult.bitmap, mUri);
+                    BitmapUtil.RotateBitmapResult rotateResult = mPreSetRotation != null
+                            ? BitmapUtil.rotateBitmapResult(decodeResult.bitmap, mPreSetRotation)
+                            : BitmapUtil.rotateBitmapByExif(mContext, decodeResult.bitmap, mUri);
 
                     return new Result(mUri, rotateResult.bitmap, decodeResult.sampleSize, rotateResult.degrees);
                 }
