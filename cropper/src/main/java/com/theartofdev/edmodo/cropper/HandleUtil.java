@@ -13,7 +13,8 @@
 
 package com.theartofdev.edmodo.cropper;
 
-import android.content.Context;
+import android.graphics.Paint;
+import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.util.TypedValue;
 
@@ -23,30 +24,6 @@ import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
  * Utility class to perform basic operations with Handles.
  */
 class HandleUtil {
-
-    // Private Constants ///////////////////////////////////////////////////////
-
-    // The radius (in dp) of the touchable area around the handle. We are basing
-    // this value off of the recommended 48dp Rhythm. See:
-    // http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
-    private static final int TARGET_RADIUS_DP = 24;
-
-    // Public Methods //////////////////////////////////////////////////////////
-
-    /**
-     * Gets the default target radius (in pixels). This is the radius of the
-     * circular area that can be touched in order to activate the handle.
-     *
-     * @param context the Context
-     * @return the target radius (in pixels)
-     */
-    public static float getTargetRadius(Context context) {
-
-        final float targetRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                TARGET_RADIUS_DP,
-                context.getResources().getDisplayMetrics());
-        return targetRadius;
-    }
 
     /**
      * Determines which, if any, of the handles are pressed given the touch
@@ -80,6 +57,59 @@ class HandleUtil {
 
         return pressedHandle;
     }
+
+    /**
+     * Creates the Paint object for drawing the crop window border.
+     */
+    public static Paint newBorderPaint(DisplayMetrics displayMetrics, float thickness, int color) {
+
+        // Set the line thickness for the crop window border.
+        float lineThicknessPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thickness, displayMetrics);
+
+        Paint borderPaint = new Paint();
+        borderPaint.setColor(color);
+        borderPaint.setStrokeWidth(lineThicknessPx);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setAntiAlias(true);
+
+        return borderPaint;
+    }
+
+    /**
+     * Creates the Paint object for drawing the crop window guidelines.
+     */
+    public static Paint newGuidelinePaint(int color) {
+        Paint paint = new Paint();
+        paint.setColor(color);
+        paint.setStrokeWidth(Defaults.DEFAULT_GUIDELINE_THICKNESS_PX);
+        return paint;
+    }
+
+    /**
+     * Creates the Paint object for drawing the translucent overlay outside the crop window.
+     */
+    public static Paint newBackgroundPaint(int color) {
+        Paint paint = new Paint();
+        paint.setColor(color);
+        return paint;
+    }
+
+    /**
+     * Creates the Paint object for drawing the corners of the border.
+     */
+    public static Paint newCornerPaint(DisplayMetrics displayMetrics, float thickness, int color) {
+
+        // Set the line thickness for the crop window border.
+        float lineThicknessPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thickness, displayMetrics);
+
+        Paint cornerPaint = new Paint();
+        cornerPaint.setColor(color);
+        cornerPaint.setStrokeWidth(lineThicknessPx);
+        cornerPaint.setStyle(Paint.Style.STROKE);
+        return cornerPaint;
+    }
+
+    //region: Private methods
 
     /**
      * Determines which, if any, of the handles are pressed given the touch
@@ -266,8 +296,6 @@ class HandleUtil {
         return result;
     }
 
-    // Private Methods /////////////////////////////////////////////////////////
-
     /**
      * Determines if the specified coordinate is in the target touch zone for a
      * corner handle.
@@ -383,4 +411,5 @@ class HandleUtil {
     private static boolean focusCenter() {
         return (!CropOverlayView.showGuidelines());
     }
+    //endregion
 }

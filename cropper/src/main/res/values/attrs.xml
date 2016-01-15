@@ -17,6 +17,10 @@
         <attr name="fixAspectRatio" format="boolean"/>
         <attr name="aspectRatioX" format="integer"/>
         <attr name="aspectRatioY" format="integer"/>
+        <attr name="borderLineThickness" format="float"/>
+        <attr name="borderCornerThickness" format="float"/>
+        <attr name="borderLineColor" format="color"/>
+        <attr name="borderCornerColor" format="color"/>
         <attr name="snapRadius" format="float"/>
         <attr name="showProgressBar" format="boolean"/>
     </declare-styleable>
