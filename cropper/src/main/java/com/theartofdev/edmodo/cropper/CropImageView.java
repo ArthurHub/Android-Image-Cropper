@@ -622,8 +622,8 @@ public class CropImageView extends FrameLayout {
         // if we allocated the bitmap, release it as fast as possible
         if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
             mBitmap.recycle();
-            mBitmap = null;
         }
+        mBitmap = null;
 
         if (full) {
             // clean the loaded image flags for new image
@@ -821,10 +821,8 @@ public class CropImageView extends FrameLayout {
      * Set visibility of progress bar when async loading/cropping is in process and show is enabled.
      */
     private void setProgressBarVisibility() {
-        boolean visible =
-                mShowProgressBar && (
-                        (mBitmap == null && mBitmapLoadingWorkerTask != null) ||
-                                (mBitmapCroppingWorkerTask != null));
+        boolean visible = mShowProgressBar &&
+                (mBitmap == null && mBitmapLoadingWorkerTask != null || mBitmapCroppingWorkerTask != null);
         mProgressBar.setVisibility(visible ? VISIBLE : INVISIBLE);
     }
     //endregion
