@@ -59,54 +59,28 @@ class HandleUtil {
     }
 
     /**
-     * Creates the Paint object for drawing the crop window border.
+     * Creates the Paint object for drawing.
      */
-    public static Paint newBorderPaint(DisplayMetrics displayMetrics, float thickness, int color) {
-
-        // Set the line thickness for the crop window border.
-        float lineThicknessPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thickness, displayMetrics);
-
-        Paint borderPaint = new Paint();
-        borderPaint.setColor(color);
-        borderPaint.setStrokeWidth(lineThicknessPx);
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setAntiAlias(true);
-
-        return borderPaint;
-    }
-
-    /**
-     * Creates the Paint object for drawing the crop window guidelines.
-     */
-    public static Paint newGuidelinePaint(int color) {
-        Paint paint = new Paint();
-        paint.setColor(color);
-        paint.setStrokeWidth(Defaults.DEFAULT_GUIDELINE_THICKNESS_PX);
-        return paint;
-    }
-
-    /**
-     * Creates the Paint object for drawing the translucent overlay outside the crop window.
-     */
-    public static Paint newBackgroundPaint(int color) {
+    public static Paint getNewPaint(int color) {
         Paint paint = new Paint();
         paint.setColor(color);
         return paint;
     }
 
     /**
-     * Creates the Paint object for drawing the corners of the border.
+     * Creates the Paint object for given thickness and color, if thickness < 0 return null.
      */
-    public static Paint newCornerPaint(DisplayMetrics displayMetrics, float thickness, int color) {
-
-        // Set the line thickness for the crop window border.
-        float lineThicknessPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thickness, displayMetrics);
-
-        Paint cornerPaint = new Paint();
-        cornerPaint.setColor(color);
-        cornerPaint.setStrokeWidth(lineThicknessPx);
-        cornerPaint.setStyle(Paint.Style.STROKE);
-        return cornerPaint;
+    public static Paint getNewPaintOrNull(DisplayMetrics displayMetrics, float thickness, int color) {
+        if (thickness > 0) {
+            Paint borderPaint = new Paint();
+            borderPaint.setColor(color);
+            borderPaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thickness, displayMetrics));
+            borderPaint.setStyle(Paint.Style.STROKE);
+            borderPaint.setAntiAlias(true);
+            return borderPaint;
+        } else {
+            return null;
+        }
     }
 
     //region: Private methods

@@ -108,7 +108,7 @@ public class CropOverlayView extends View {
     /**
      * Instance variables for customizable attributes
      */
-    private int mGuidelines;
+    private int mGuidelines = Defaults.DEFAULT_GUIDELINES;
 
     /**
      * The shape of the cropping area - rectangle/circular.
@@ -122,6 +122,12 @@ public class CropOverlayView extends View {
     private float mBorderCornerThickness = Defaults.DEFAULT_BORDER_CORNER_THICKNESS;
 
     private int mBorderCornerColor = Defaults.DEFAULT_BORDER_CORNER_COLOR;
+
+    private float mGuidelinesThickness = Defaults.DEFAULT_GUIDELINE_THICKNESS;
+
+    private int mGuidelinesColor = Defaults.DEFAULT_GUIDELINE_COLOR;
+
+    private int mBackgroundColor = Defaults.DEFAULT_BACKGROUND_COLOR;
 
     /**
      * Whether the Crop View has been initialized for the first time
@@ -373,18 +379,14 @@ public class CropOverlayView extends View {
 
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 
-        mHandleRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Defaults.TARGET_RADIUS_DP, displayMetrics);
+        mHandleRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Defaults.TARGET_RADIUS, displayMetrics);
 
         mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PT, Defaults.SNAP_RADIUS_DP, displayMetrics);
 
-        mBorderPaint = mBorderLineThickness > 0
-                ? HandleUtil.newBorderPaint(displayMetrics, mBorderLineThickness, mBorderLineColor)
-                : null;
-        mCornerPaint = mBorderCornerThickness > 0
-                ? HandleUtil.newCornerPaint(displayMetrics, mBorderCornerThickness, mBorderCornerColor)
-                : null;
-        mGuidelinePaint = HandleUtil.newGuidelinePaint(Defaults.DEFAULT_GUIDELINE_COLOR);
-        mBackgroundPaint = HandleUtil.newBackgroundPaint(Defaults.DEFAULT_BACKGROUND_COLOR);
+        mBorderPaint = HandleUtil.getNewPaintOrNull(displayMetrics, mBorderLineThickness, mBorderLineColor);
+        mCornerPaint = HandleUtil.getNewPaintOrNull(displayMetrics, mBorderCornerThickness, mBorderCornerColor);
+        mGuidelinePaint = HandleUtil.getNewPaintOrNull(displayMetrics, mGuidelinesThickness, mGuidelinesColor);
+        mBackgroundPaint = HandleUtil.getNewPaint(mBackgroundColor);
 
         // Sets the values for the corner sizes
         float cornerOffset = (mBorderCornerThickness / 2) - (mBorderLineThickness / 2);
@@ -392,11 +394,8 @@ public class CropOverlayView extends View {
         mCornerOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerOffset, displayMetrics);
         mCornerExtension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerExtension, displayMetrics);
         mCornerLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                Defaults.DEFAULT_CORNER_LENGTH_DP,
+                Defaults.DEFAULT_CORNER_LENGTH,
                 displayMetrics);
-
-        // Sets guidelines to default until specified otherwise
-        mGuidelines = Defaults.DEFAULT_GUIDELINES;
     }
 
     /**

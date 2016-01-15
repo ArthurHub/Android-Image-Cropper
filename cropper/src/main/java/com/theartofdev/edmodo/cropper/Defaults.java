@@ -54,15 +54,15 @@ class Defaults {
     // The radius (in dp) of the touchable area around the handle. We are basing
     // this value off of the recommended 48dp Rhythm. See:
     // http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
-    public static final int TARGET_RADIUS_DP = 24;
+    public static final int TARGET_RADIUS = 24;
 
     public static final float DEFAULT_BORDER_LINE_THICKNESS = 3;
 
     public static final float DEFAULT_BORDER_CORNER_THICKNESS = 2;
 
-    public static final float DEFAULT_GUIDELINE_THICKNESS_PX = 2;
+    public static final float DEFAULT_CORNER_LENGTH = 15;
 
-    public static final float DEFAULT_CORNER_LENGTH_DP = 15;
+    public static final float DEFAULT_GUIDELINE_THICKNESS = 1;
 
     public static final int DEFAULT_BORDER_LINE_COLOR = Color.argb(170, 255, 255, 255);
 
