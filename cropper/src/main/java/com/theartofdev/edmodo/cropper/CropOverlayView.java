@@ -492,14 +492,17 @@ public class CropOverlayView extends View {
         }
     }
 
+    /**
+     * Initialize the crop window here because we need the size of the view to have been determined.
+     */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-
-        // Initialize the crop window here because we need the size of the view
-        // to have been determined.
         initCropWindow(mBitmapRect);
     }
 
+    /**
+     * Draw crop overview by drawing background over image not in the cripping area, then borders and guidelines.
+     */
     @Override
     protected void onDraw(Canvas canvas) {
 
@@ -527,33 +530,33 @@ public class CropOverlayView extends View {
         }
     }
 
-    @Override
-    public boolean onTouchEvent(@SuppressWarnings("NullableProblems") MotionEvent event) {
+    /**
+     * Draw shadow background over the image not including the crop area.
+     */
+    private void drawBackground(Canvas canvas, Rect bitmapRect) {
 
-        // If this View is not enabled, don't allow for touch interactions.
-        if (!isEnabled()) {
-            return false;
-        }
+        float l = Edge.LEFT.getCoordinate();
+        float t = Edge.TOP.getCoordinate();
+        float r = Edge.RIGHT.getCoordinate();
+        float b = Edge.BOTTOM.getCoordinate();
 
-        switch (event.getAction()) {
-
-            case MotionEvent.ACTION_DOWN:
-                onActionDown(event.getX(), event.getY());
-                return true;
-
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                getParent().requestDisallowInterceptTouchEvent(false);
-                onActionUp();
-                return true;
-
-            case MotionEvent.ACTION_MOVE:
-                onActionMove(event.getX(), event.getY());
-                getParent().requestDisallowInterceptTouchEvent(true);
-                return true;
-
-            default:
-                return false;
+        if (mCropShape == CropImageView.CropShape.RECTANGLE) {
+            canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, t, mBackgroundPaint);
+            canvas.drawRect(bitmapRect.left, b, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
+            canvas.drawRect(bitmapRect.left, t, l, b, mBackgroundPaint);
+            canvas.drawRect(r, t, bitmapRect.right, b, mBackgroundPaint);
+        } else {
+            Path circleSelectionPath = new Path();
+            if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17 && mCropShape == CropImageView.CropShape.OVAL) {
+                Defaults.EMPTY_RECT_F.set(l + 2, t + 2, r - 2, b - 2);
+            } else {
+                Defaults.EMPTY_RECT_F.set(l, t, r, b);
+            }
+            circleSelectionPath.addOval(Defaults.EMPTY_RECT_F, Path.Direction.CW);
+            canvas.save();
+            canvas.clipPath(circleSelectionPath, Region.Op.XOR);
+            canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
+            canvas.restore();
         }
     }
 
@@ -607,36 +610,6 @@ public class CropOverlayView extends View {
     }
 
     /**
-     * Draw shadow background over the image not including the crop area.
-     */
-    private void drawBackground(Canvas canvas, Rect bitmapRect) {
-
-        float l = Edge.LEFT.getCoordinate();
-        float t = Edge.TOP.getCoordinate();
-        float r = Edge.RIGHT.getCoordinate();
-        float b = Edge.BOTTOM.getCoordinate();
-
-        if (mCropShape == CropImageView.CropShape.RECTANGLE) {
-            canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, t, mBackgroundPaint);
-            canvas.drawRect(bitmapRect.left, b, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
-            canvas.drawRect(bitmapRect.left, t, l, b, mBackgroundPaint);
-            canvas.drawRect(r, t, bitmapRect.right, b, mBackgroundPaint);
-        } else {
-            Path circleSelectionPath = new Path();
-            if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17 && mCropShape == CropImageView.CropShape.OVAL) {
-                Defaults.EMPTY_RECT_F.set(l + 2, t + 2, r - 2, b - 2);
-            } else {
-                Defaults.EMPTY_RECT_F.set(l, t, r, b);
-            }
-            circleSelectionPath.addOval(Defaults.EMPTY_RECT_F, Path.Direction.CW);
-            canvas.save();
-            canvas.clipPath(circleSelectionPath, Region.Op.XOR);
-            canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
-            canvas.restore();
-        }
-    }
-
-    /**
      * Draw borders of the crop area.
      */
     private void drawBorders(Canvas canvas) {
@@ -684,6 +657,36 @@ public class CropOverlayView extends View {
             // Bottom left
             canvas.drawLine(r + mCornerOffset, b + mCornerExtension, r + mCornerOffset, b - mCornerLength, mCornerPaint);
             canvas.drawLine(r + mCornerExtension, b + mCornerOffset, r - mCornerLength, b + mCornerOffset, mCornerPaint);
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(@SuppressWarnings("NullableProblems") MotionEvent event) {
+
+        // If this View is not enabled, don't allow for touch interactions.
+        if (!isEnabled()) {
+            return false;
+        }
+
+        switch (event.getAction()) {
+
+            case MotionEvent.ACTION_DOWN:
+                onActionDown(event.getX(), event.getY());
+                return true;
+
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                getParent().requestDisallowInterceptTouchEvent(false);
+                onActionUp();
+                return true;
+
+            case MotionEvent.ACTION_MOVE:
+                onActionMove(event.getX(), event.getY());
+                getParent().requestDisallowInterceptTouchEvent(true);
+                return true;
+
+            default:
+                return false;
         }
     }
 
