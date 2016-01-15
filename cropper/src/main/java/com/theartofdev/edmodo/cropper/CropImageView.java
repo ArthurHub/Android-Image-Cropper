@@ -124,6 +124,8 @@ public class CropImageView extends FrameLayout {
         int borderLineColor = Defaults.DEFAULT_BORDER_LINE_COLOR;
         float borderCornerThickness = Defaults.DEFAULT_BORDER_CORNER_THICKNESS;
         int borderCornerColor = Defaults.DEFAULT_BORDER_CORNER_COLOR;
+        float guidelinesThickness = Defaults.DEFAULT_GUIDELINE_THICKNESS;
+        int guidelinesColor = Defaults.DEFAULT_GUIDELINE_COLOR;
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
@@ -135,9 +137,11 @@ public class CropImageView extends FrameLayout {
                 cropShape = Defaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, Defaults.DEFAULT_CROP_SHAPE_INDEX)];
                 snapRadius = ta.getFloat(R.styleable.CropImageView_snapRadius, snapRadius);
                 borderLineThickness = ta.getFloat(R.styleable.CropImageView_borderLineThickness, borderLineThickness);
-                borderCornerThickness = ta.getFloat(R.styleable.CropImageView_borderCornerThickness, borderCornerThickness);
                 borderLineColor = ta.getInteger(R.styleable.CropImageView_borderLineColor, borderLineColor);
+                borderCornerThickness = ta.getFloat(R.styleable.CropImageView_borderCornerThickness, borderCornerThickness);
                 borderCornerColor = ta.getInteger(R.styleable.CropImageView_borderCornerColor, borderCornerColor);
+                guidelinesThickness = ta.getFloat(R.styleable.CropImageView_guidelinesThickness, guidelinesThickness);
+                guidelinesColor = ta.getInteger(R.styleable.CropImageView_guidelinesColor, guidelinesColor);
                 mShowProgressBar = ta.getBoolean(R.styleable.CropImageView_showProgressBar, mShowProgressBar);
             } finally {
                 ta.recycle();
@@ -152,7 +156,8 @@ public class CropImageView extends FrameLayout {
 
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
         mCropOverlayView.setInitialAttributeValues(guidelines, fixAspectRatio, aspectRatioX, aspectRatioY,
-                borderLineThickness, borderLineColor, borderCornerThickness, borderCornerColor);
+                borderLineThickness, borderLineColor, borderCornerThickness, borderCornerColor,
+                guidelinesThickness, guidelinesColor);
         mCropOverlayView.setCropShape(cropShape);
         mCropOverlayView.setSnapRadius(snapRadius);
         mCropOverlayView.setVisibility(mBitmap != null ? VISIBLE : INVISIBLE);

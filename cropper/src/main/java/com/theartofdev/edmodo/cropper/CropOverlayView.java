@@ -306,7 +306,8 @@ public class CropOverlayView extends View {
      * @param aspectRatioX float that specifies the new X value of the aspect
      * ratio
      * @param aspectRatioY float that specifies the new Y value of the aspect
-     * ratio
+     * @param guidelinesThickness
+     * @param guidelinesColor
      */
     public void setInitialAttributeValues(int guidelines,
                                           boolean fixAspectRatio,
@@ -315,7 +316,9 @@ public class CropOverlayView extends View {
                                           float borderLineThickness,
                                           int borderLineColor,
                                           float borderCornerThickness,
-                                          int borderCornerColor) {
+                                          int borderCornerColor,
+                                          float guidelinesThickness,
+                                          int guidelinesColor) {
 
         if (guidelines < 0 || guidelines > 2) {
             throw new IllegalArgumentException("Guideline value must be set between 0 and 2. See documentation.");
@@ -345,14 +348,23 @@ public class CropOverlayView extends View {
             mBorderLineThickness = borderLineThickness;
         }
 
+        mBorderLineColor = borderLineColor;
+
         if (borderCornerThickness < 0) {
             throw new IllegalArgumentException("Cannot set corner thickness value to a number less than 0.");
         } else {
             mBorderCornerThickness = borderCornerThickness;
         }
 
-        mBorderLineColor = borderLineColor;
         mBorderCornerColor = borderCornerColor;
+
+        if (guidelinesThickness < 0) {
+            throw new IllegalArgumentException("Cannot set guidelines thickness value to a number less than 0.");
+        } else {
+            mGuidelinesThickness = guidelinesThickness;
+        }
+
+        mGuidelinesColor = guidelinesColor;
 
         init();
     }
@@ -505,11 +517,12 @@ public class CropOverlayView extends View {
         if (showGuidelines()) {
             // Determines whether guidelines should be drawn or not
             if (mGuidelines == Defaults.GUIDELINES_ON) {
-                drawRuleOfThirdsGuidelines(canvas);
+                drawGuidelines(canvas);
             } else if (mGuidelines == Defaults.GUIDELINES_ON_TOUCH) {
                 // Draw only when resizing
-                if (mPressedHandle != null)
-                    drawRuleOfThirdsGuidelines(canvas);
+                if (mPressedHandle != null) {
+                    drawGuidelines(canvas);
+                }
             }
         }
 
@@ -550,48 +563,52 @@ public class CropOverlayView extends View {
         }
     }
 
-    private void drawRuleOfThirdsGuidelines(Canvas canvas) {
+    /**
+     * Draw 2 veritcal and 2 horizontal guidelines inside the cropping area to split it into 9 equal parts.
+     */
+    private void drawGuidelines(Canvas canvas) {
+        if (mGuidelinePaint != null) {
+            float sw = mBorderPaint != null ? mBorderPaint.getStrokeWidth() : 0;
+            float l = Edge.LEFT.getCoordinate() + sw;
+            float t = Edge.TOP.getCoordinate() + sw;
+            float r = Edge.RIGHT.getCoordinate() - sw;
+            float b = Edge.BOTTOM.getCoordinate() - sw;
 
-        float sw = mBorderPaint != null ? mBorderPaint.getStrokeWidth() : 0;
-        float l = Edge.LEFT.getCoordinate() + sw;
-        float t = Edge.TOP.getCoordinate() + sw;
-        float r = Edge.RIGHT.getCoordinate() - sw;
-        float b = Edge.BOTTOM.getCoordinate() - sw;
+            float oneThirdCropWidth = Edge.getWidth() / 3;
+            float oneThirdCropHeight = Edge.getHeight() / 3;
 
-        float oneThirdCropWidth = Edge.getWidth() / 3;
-        float oneThirdCropHeight = Edge.getHeight() / 3;
+            if (mCropShape == CropImageView.CropShape.OVAL) {
 
-        if (mCropShape == CropImageView.CropShape.OVAL) {
+                float w = Edge.getWidth() / 2 - sw;
+                float h = Edge.getHeight() / 2 - sw;
 
-            float w = Edge.getWidth() / 2 - sw;
-            float h = Edge.getHeight() / 2 - sw;
+                // Draw vertical guidelines.
+                float x1 = l + oneThirdCropWidth;
+                float x2 = r - oneThirdCropWidth;
+                float yv = (float) (h * Math.sin(Math.acos((w - oneThirdCropWidth) / w)));
+                canvas.drawLine(x1, t + h - yv, x1, b - h + yv, mGuidelinePaint);
+                canvas.drawLine(x2, t + h - yv, x2, b - h + yv, mGuidelinePaint);
 
-            // Draw vertical guidelines.
-            float x1 = l + oneThirdCropWidth;
-            float x2 = r - oneThirdCropWidth;
-            float yv = (float) (h * Math.sin(Math.acos((w - oneThirdCropWidth) / w)));
-            canvas.drawLine(x1, t + h - yv, x1, b - h + yv, mGuidelinePaint);
-            canvas.drawLine(x2, t + h - yv, x2, b - h + yv, mGuidelinePaint);
+                // Draw horizontal guidelines.
+                float y1 = t + oneThirdCropHeight;
+                float y2 = b - oneThirdCropHeight;
+                float xv = (float) (w * Math.cos(Math.asin((h - oneThirdCropHeight) / h)));
+                canvas.drawLine(l + w - xv, y1, r - w + xv, y1, mGuidelinePaint);
+                canvas.drawLine(l + w - xv, y2, r - w + xv, y2, mGuidelinePaint);
+            } else {
 
-            // Draw horizontal guidelines.
-            float y1 = t + oneThirdCropHeight;
-            float y2 = b - oneThirdCropHeight;
-            float xv = (float) (w * Math.cos(Math.asin((h - oneThirdCropHeight) / h)));
-            canvas.drawLine(l + w - xv, y1, r - w + xv, y1, mGuidelinePaint);
-            canvas.drawLine(l + w - xv, y2, r - w + xv, y2, mGuidelinePaint);
-        } else {
+                // Draw vertical guidelines.
+                float x1 = l + oneThirdCropWidth;
+                float x2 = r - oneThirdCropWidth;
+                canvas.drawLine(x1, t, x1, b, mGuidelinePaint);
+                canvas.drawLine(x2, t, x2, b, mGuidelinePaint);
 
-            // Draw vertical guidelines.
-            float x1 = l + oneThirdCropWidth;
-            float x2 = r - oneThirdCropWidth;
-            canvas.drawLine(x1, t, x1, b, mGuidelinePaint);
-            canvas.drawLine(x2, t, x2, b, mGuidelinePaint);
-
-            // Draw horizontal guidelines.
-            float y1 = t + oneThirdCropHeight;
-            float y2 = b - oneThirdCropHeight;
-            canvas.drawLine(l, y1, r, y1, mGuidelinePaint);
-            canvas.drawLine(l, y2, r, y2, mGuidelinePaint);
+                // Draw horizontal guidelines.
+                float y1 = t + oneThirdCropHeight;
+                float y2 = b - oneThirdCropHeight;
+                canvas.drawLine(l, y1, r, y1, mGuidelinePaint);
+                canvas.drawLine(l, y2, r, y2, mGuidelinePaint);
+            }
         }
     }
 
