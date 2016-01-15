@@ -299,6 +299,8 @@ public class CropOverlayView extends View {
      * Sets all initial values, but does not call initCropWindow to reset the
      * views. Used once at the very start to initialize the attributes.
      *
+     * @param cropShape
+     * @param snapRadius
      * @param guidelines Integer that signals whether the guidelines should be
      * on, off, or only showing when resizing.
      * @param fixAspectRatio Boolean that signals whether the aspect ratio
@@ -309,7 +311,9 @@ public class CropOverlayView extends View {
      * @param guidelinesThickness
      * @param guidelinesColor
      */
-    public void setInitialAttributeValues(int guidelines,
+    public void setInitialAttributeValues(CropImageView.CropShape cropShape,
+                                          float snapRadius,
+                                          int guidelines,
                                           boolean fixAspectRatio,
                                           int aspectRatioX,
                                           int aspectRatioY,
@@ -319,6 +323,10 @@ public class CropOverlayView extends View {
                                           int borderCornerColor,
                                           float guidelinesThickness,
                                           int guidelinesColor) {
+
+        setCropShape(cropShape);
+
+        setSnapRadius(snapRadius);
 
         if (guidelines < 0 || guidelines > 2) {
             throw new IllegalArgumentException("Guideline value must be set between 0 and 2. See documentation.");

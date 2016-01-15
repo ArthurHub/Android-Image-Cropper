@@ -154,12 +154,12 @@ public class CropImageView extends FrameLayout {
         mImageView.setScaleType(scaleType);
 
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
-        mCropOverlayView.setInitialAttributeValues(guidelines, fixAspectRatio, aspectRatioX, aspectRatioY,
-                borderLineThickness, borderLineColor, borderCornerThickness, borderCornerColor,
+        mCropOverlayView.setInitialAttributeValues(
+                cropShape, snapRadius, guidelines,
+                fixAspectRatio, aspectRatioX, aspectRatioY,
+                borderLineThickness, borderLineColor,
+                borderCornerThickness, borderCornerColor,
                 guidelinesThickness, guidelinesColor);
-        mCropOverlayView.setCropShape(cropShape);
-        mCropOverlayView.setSnapRadius(snapRadius);
-        mCropOverlayView.setVisibility(mBitmap != null ? VISIBLE : INVISIBLE);
 
         mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
         setProgressBarVisibility();
