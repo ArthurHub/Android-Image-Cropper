@@ -328,27 +328,13 @@ public class CropOverlayView extends View {
 
         setSnapRadius(snapRadius);
 
-        if (guidelines < 0 || guidelines > 2) {
-            throw new IllegalArgumentException("Guideline value must be set between 0 and 2. See documentation.");
-        } else {
-            mGuidelines = guidelines;
-        }
+        setGuidelines(guidelines);
 
-        mFixAspectRatio = fixAspectRatio;
+        setFixedAspectRatio(fixAspectRatio);
 
-        if (aspectRatioX <= 0) {
-            throw new IllegalArgumentException("Cannot set aspect ratio value to a number less than or equal to 0.");
-        } else {
-            mAspectRatioX = aspectRatioX;
-            mTargetAspectRatio = ((float) mAspectRatioX) / mAspectRatioY;
-        }
+        setAspectRatioX(aspectRatioX);
 
-        if (aspectRatioY <= 0) {
-            throw new IllegalArgumentException("Cannot set aspect ratio value to a number less than or equal to 0.");
-        } else {
-            mAspectRatioY = aspectRatioY;
-            mTargetAspectRatio = ((float) mAspectRatioX) / mAspectRatioY;
-        }
+        setAspectRatioY(aspectRatioY);
 
         if (borderLineThickness < 0) {
             throw new IllegalArgumentException("Cannot set line thickness value to a number less than 0.");
