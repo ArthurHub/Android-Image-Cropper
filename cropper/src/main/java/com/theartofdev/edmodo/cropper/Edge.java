@@ -11,7 +11,7 @@
  * governing permissions and limitations under the License. 
 */
 
-package com.theartofdev.edmodo.cropper.cropwindow.edge;
+package com.theartofdev.edmodo.cropper;
 
 import android.graphics.Rect;
 import android.view.View;
@@ -28,11 +28,9 @@ public enum Edge {
     RIGHT,
     BOTTOM;
 
-    // Private Constants ///////////////////////////////////////////////////////
-
-    // Minimum distance in pixels that one edge can get to its opposing edge.
-    // This is an arbitrary value that simply prevents the crop window from
-    // becoming too small.
+    /**
+     * Minimum distance in pixels that one edge can get to its opposing edge.
+     */
     public static final int MIN_CROP_LENGTH_PX = 40;
 
     // Member Variables ////////////////////////////////////////////////////////

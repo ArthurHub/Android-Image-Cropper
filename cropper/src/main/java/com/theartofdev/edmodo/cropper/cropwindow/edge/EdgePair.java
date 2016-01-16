@@ -13,6 +13,8 @@
 
 package com.theartofdev.edmodo.cropper.cropwindow.edge;
 
+import com.theartofdev.edmodo.cropper.Edge;
+
 /**
  * Simple class to hold a pair of Edges.
  */

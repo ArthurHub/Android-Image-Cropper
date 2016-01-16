@@ -15,7 +15,7 @@ package com.theartofdev.edmodo.cropper.cropwindow.handle;
 
 import android.graphics.Rect;
 
-import com.theartofdev.edmodo.cropper.cropwindow.edge.Edge;
+import com.theartofdev.edmodo.cropper.Edge;
 import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
 
 /**

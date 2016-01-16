@@ -27,7 +27,6 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.theartofdev.edmodo.cropper.cropwindow.edge.Edge;
 import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
 import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
 
