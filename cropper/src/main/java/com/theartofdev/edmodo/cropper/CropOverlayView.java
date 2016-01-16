@@ -379,20 +379,17 @@ public class CropOverlayView extends View {
             return;
         }
 
-        // Tells the attribute functions the crop window has already been
-        // initialized
-        if (!initializedCropWindow) {
-            initializedCropWindow = true;
-        }
+        // Tells the attribute functions the crop window has already been initialized
+        initializedCropWindow = true;
 
         if (mFixAspectRatio
                 && (bitmapRect.left != 0 || bitmapRect.right != 0
                 || bitmapRect.top != 0 || bitmapRect.bottom != 0)) {
 
             // If the image aspect ratio is wider than the crop aspect ratio,
-            // then the image height is the determining initial length. Else,
-            // vice-versa.
-            if (AspectRatioUtil.calculateAspectRatio(bitmapRect) > mTargetAspectRatio) {
+            // then the image height is the determining initial length. Else, vice-versa.
+            float bitmapAspectRatio = (float) bitmapRect.width() / (float) bitmapRect.height();
+            if (bitmapAspectRatio > mTargetAspectRatio) {
 
                 Edge.TOP.setCoordinate(bitmapRect.top);
                 Edge.BOTTOM.setCoordinate(bitmapRect.bottom);
@@ -403,15 +400,14 @@ public class CropOverlayView extends View {
                 mTargetAspectRatio = (float) mAspectRatioX / mAspectRatioY;
 
                 // Limits the aspect ratio to no less than 40 wide or 40 tall
-                float cropWidth = Math.max(Edge.MIN_CROP_LENGTH_PX,
+                float cropWidth = Math.max(Edge.MIN_CROP_HORIZONTAL_LENGTH,
                         AspectRatioUtil.calculateWidth(Edge.TOP.getCoordinate(),
                                 Edge.BOTTOM.getCoordinate(),
                                 mTargetAspectRatio));
 
-                // Create new TargetAspectRatio if the original one does not fit
-                // the screen
-                if (cropWidth == Edge.MIN_CROP_LENGTH_PX) {
-                    mTargetAspectRatio = (Edge.MIN_CROP_LENGTH_PX) / (Edge.BOTTOM.getCoordinate() - Edge.TOP.getCoordinate());
+                // Create new TargetAspectRatio if the original one does not fit the screen
+                if (cropWidth == Edge.MIN_CROP_HORIZONTAL_LENGTH) {
+                    mTargetAspectRatio = (Edge.MIN_CROP_HORIZONTAL_LENGTH) / (Edge.BOTTOM.getCoordinate() - Edge.TOP.getCoordinate());
                 }
 
                 float halfCropWidth = cropWidth / 2f;
@@ -426,23 +422,22 @@ public class CropOverlayView extends View {
                 float centerY = getHeight() / 2f;
 
                 // Limits the aspect ratio to no less than 40 wide or 40 tall
-                float cropHeight = Math.max(Edge.MIN_CROP_LENGTH_PX,
+                float cropHeight = Math.max(Edge.MIN_CROP_VERTICAL_LENGTH,
                         AspectRatioUtil.calculateHeight(Edge.LEFT.getCoordinate(),
                                 Edge.RIGHT.getCoordinate(),
                                 mTargetAspectRatio));
 
-                // Create new TargetAspectRatio if the original one does not fit
-                // the screen
-                if (cropHeight == Edge.MIN_CROP_LENGTH_PX) {
-                    mTargetAspectRatio = (Edge.RIGHT.getCoordinate() - Edge.LEFT.getCoordinate()) / Edge.MIN_CROP_LENGTH_PX;
+                // Create new TargetAspectRatio if the original one does not fit the screen
+                if (cropHeight == Edge.MIN_CROP_VERTICAL_LENGTH) {
+                    mTargetAspectRatio = (Edge.RIGHT.getCoordinate() - Edge.LEFT.getCoordinate()) / Edge.MIN_CROP_VERTICAL_LENGTH;
                 }
 
                 float halfCropHeight = cropHeight / 2f;
                 Edge.TOP.setCoordinate(centerY - halfCropHeight);
                 Edge.BOTTOM.setCoordinate(centerY + halfCropHeight);
             }
-
-        } else { // ... do not fix aspect ratio...
+        } else {
+            // ... do not fix aspect ratio...
 
             // Initialize crop window to have 10% padding w/ respect to image.
             float horizontalPadding = 0.1f * bitmapRect.width();

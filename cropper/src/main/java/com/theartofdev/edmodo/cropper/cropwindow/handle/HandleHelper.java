@@ -24,19 +24,18 @@ import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
  */
 abstract class HandleHelper {
 
-    // Member Variables ////////////////////////////////////////////////////////
-
-    private static final float UNFIXED_ASPECT_RATIO_CONSTANT = 1;
+    //region: Fields and Consts
 
     private Edge mHorizontalEdge;
 
     private Edge mVerticalEdge;
 
-    // Save the Pair object as a member variable to avoid having to instantiate
-    // a new Object every time getActiveEdges() is called.
+    /**
+     * Save the Pair object as a member variable to avoid having to instantiate
+     * a new Object every time getActiveEdges() is called.
+     */
     private EdgePair mActiveEdges;
-
-    // Constructor /////////////////////////////////////////////////////////////
+    //endregion
 
     /**
      * Constructor.
@@ -64,20 +63,19 @@ abstract class HandleHelper {
      * @param snapRadius the maximum distance (in pixels) at which the crop
      * window should snap to the image
      */
-    void updateCropWindow(float x,
-                          float y,
-                          Rect imageRect,
-                          float snapRadius) {
+    void updateCropWindow(float x, float y, Rect imageRect, float snapRadius) {
 
         final EdgePair activeEdges = getActiveEdges();
         final Edge primaryEdge = activeEdges.primary;
         final Edge secondaryEdge = activeEdges.secondary;
 
-        if (primaryEdge != null)
-            primaryEdge.adjustCoordinate(x, y, imageRect, snapRadius, UNFIXED_ASPECT_RATIO_CONSTANT);
+        if (primaryEdge != null) {
+            primaryEdge.adjustCoordinate(x, y, imageRect, snapRadius, 0);
+        }
 
-        if (secondaryEdge != null)
-            secondaryEdge.adjustCoordinate(x, y, imageRect, snapRadius, UNFIXED_ASPECT_RATIO_CONSTANT);
+        if (secondaryEdge != null) {
+            secondaryEdge.adjustCoordinate(x, y, imageRect, snapRadius, 0);
+        }
     }
 
     /**

@@ -13,8 +13,6 @@
 
 package com.theartofdev.edmodo.cropper.util;
 
-import android.graphics.Rect;
-
 /**
  * Utility class for handling calculations involving a fixed aspect ratio.
  */
@@ -28,16 +26,6 @@ public class AspectRatioUtil {
         final float width = right - left;
         final float height = bottom - top;
         final float aspectRatio = width / height;
-
-        return aspectRatio;
-    }
-
-    /**
-     * Calculates the aspect ratio given a rectangle.
-     */
-    public static float calculateAspectRatio(Rect rect) {
-
-        final float aspectRatio = (float) rect.width() / (float) rect.height();
 
         return aspectRatio;
     }
