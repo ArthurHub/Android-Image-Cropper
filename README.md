@@ -20,6 +20,7 @@ Image cropping tool, displays a resizable, rectengular/oval crop window on top o
 - Set image Scale type in the cropping image view: center or fit.
 - Control the appearance of guidelines in the crop window.
 - Control cropping window aspect ratio, ability to fix it (squared).
+- Customization for border line, border corner, guidelines and background.
 - Auto rotate bitmap by provided Exif data or loading from Android URI.
 - Rotate image API to allow the user to rotate the image during cropping.
 - Get cropping rectangle or the cropped bitmap.
@@ -36,8 +37,13 @@ compile 'com.theartofdev.edmodo:android-image-cropper:1.1.+'
 
 ## Posts
  - [Android cropping image from camera or gallery](http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/)
+ - [Android Image Cropper async support and custom progress UI](http://theartofdev.com/2016/01/15/android-image-cropper-async-support-and-custom-progress-ui/)
 
 ## Change log
+*1.1.1*
+- Add customization support for border line, border corner, guidelines and background.
+- Fix progress bar not showing on loading if previously bitmap was directly set.
+
 *1.1.0*
 - Deprecated `setImageUri(Uri)`.
 - Added `setImageUriAsync(Uri)` and `getCroppedImageAsync()` for better handling of slow image loading/decode/cropping.
