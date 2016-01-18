@@ -18,6 +18,8 @@ import android.view.View;
 
 import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
 
+import java.security.InvalidParameterException;
+
 /**
  * Enum representing an edge in the crop window.
  */
@@ -31,12 +33,12 @@ public enum Edge {
     /**
      * Minimum distance in pixels that one edge can get to its opposing edge.
      */
-    public static final int MIN_CROP_VERTICAL_LENGTH = 40;
+    public static final int MIN_CROP_VERTICAL_LENGTH = 60;
 
     /**
      * Minimum distance in pixels that one edge can get to its opposing edge.
      */
-    public static final int MIN_CROP_HORIZONTAL_LENGTH = 140;
+    public static final int MIN_CROP_HORIZONTAL_LENGTH = 60;
 
     /**
      * the coordinate of the crop edge, x - left/right, y - top/bottom.
@@ -99,6 +101,8 @@ public enum Edge {
             case BOTTOM:
                 mCoordinate = adjustBottom(y, imageRect, imageSnapRadius, aspectRatio);
                 break;
+            default:
+                throw new InvalidParameterException("Unknown enum: " + this);
         }
     }
 
@@ -110,10 +114,10 @@ public enum Edge {
      */
     public void adjustCoordinate(float aspectRatio) {
 
-        final float left = Edge.LEFT.getCoordinate();
-        final float top = Edge.TOP.getCoordinate();
-        final float right = Edge.RIGHT.getCoordinate();
-        final float bottom = Edge.BOTTOM.getCoordinate();
+        float left = Edge.LEFT.getCoordinate();
+        float top = Edge.TOP.getCoordinate();
+        float right = Edge.RIGHT.getCoordinate();
+        float bottom = Edge.BOTTOM.getCoordinate();
 
         switch (this) {
             case LEFT:
@@ -128,6 +132,8 @@ public enum Edge {
             case BOTTOM:
                 mCoordinate = AspectRatioUtil.calculateBottom(left, top, right, aspectRatio);
                 break;
+            default:
+                throw new InvalidParameterException("Unknown enum: " + this);
         }
     }
 
@@ -221,6 +227,8 @@ public enum Edge {
 
                 }
                 break;
+            default:
+                throw new InvalidParameterException("Unknown enum: " + this);
         }
         return true;
     }
@@ -248,7 +256,7 @@ public enum Edge {
      */
     public float snapToRect(Rect imageRect) {
 
-        final float oldCoordinate = mCoordinate;
+        float oldCoordinate = mCoordinate;
 
         switch (this) {
             case LEFT:
@@ -263,10 +271,11 @@ public enum Edge {
             case BOTTOM:
                 mCoordinate = imageRect.bottom;
                 break;
+            default:
+                throw new InvalidParameterException("Unknown enum: " + this);
         }
 
-        final float offset = mCoordinate - oldCoordinate;
-        return offset;
+        return mCoordinate - oldCoordinate;
     }
 
     /**
@@ -294,6 +303,8 @@ public enum Edge {
             case BOTTOM:
                 newCoordinate = imageRect.bottom;
                 break;
+            default:
+                throw new InvalidParameterException("Unknown enum: " + this);
         }
 
         final float offset = newCoordinate - oldCoordinate;
@@ -320,6 +331,8 @@ public enum Edge {
             case BOTTOM:
                 mCoordinate = view.getHeight();
                 break;
+            default:
+                throw new InvalidParameterException("Unknown enum: " + this);
         }
     }
 
@@ -359,6 +372,8 @@ public enum Edge {
             case BOTTOM:
                 result = rect.bottom - mCoordinate < margin;
                 break;
+            default:
+                throw new InvalidParameterException("Unknown enum: " + this);
         }
         return result;
     }
@@ -385,6 +400,8 @@ public enum Edge {
             case BOTTOM:
                 result = rect.bottom - mCoordinate < margin;
                 break;
+            default:
+                throw new InvalidParameterException("Unknown enum: " + this);
         }
         return result;
     }
@@ -413,11 +430,9 @@ public enum Edge {
             rx = Edge.RIGHT.getCoordinate() - MIN_CROP_HORIZONTAL_LENGTH;
         }
 
-        if (aspectRatio > 0) {
-            // Checks if the window is too small vertically
-            if ((Edge.RIGHT.getCoordinate() - rx) / aspectRatio < MIN_CROP_VERTICAL_LENGTH) {
-                rx = Edge.RIGHT.getCoordinate() - (MIN_CROP_VERTICAL_LENGTH * aspectRatio);
-            }
+        // Checks if the window is too small vertically
+        if (aspectRatio > 0 && (Edge.RIGHT.getCoordinate() - rx) / aspectRatio < MIN_CROP_VERTICAL_LENGTH) {
+            rx = Edge.RIGHT.getCoordinate() - (MIN_CROP_VERTICAL_LENGTH * aspectRatio);
         }
 
         return rx;
@@ -446,11 +461,9 @@ public enum Edge {
             rx = Edge.LEFT.getCoordinate() + MIN_CROP_HORIZONTAL_LENGTH;
         }
 
-        if (aspectRatio > 0) {
-            // Checks if the window is too small vertically
-            if ((rx - Edge.LEFT.getCoordinate()) / aspectRatio < MIN_CROP_VERTICAL_LENGTH) {
-                rx = Edge.LEFT.getCoordinate() + (MIN_CROP_VERTICAL_LENGTH * aspectRatio);
-            }
+        // Checks if the window is too small vertically
+        if (aspectRatio > 0 && (rx - Edge.LEFT.getCoordinate()) / aspectRatio < MIN_CROP_VERTICAL_LENGTH) {
+            rx = Edge.LEFT.getCoordinate() + (MIN_CROP_VERTICAL_LENGTH * aspectRatio);
         }
 
         return rx;
@@ -478,11 +491,9 @@ public enum Edge {
             ry = Edge.BOTTOM.getCoordinate() - MIN_CROP_VERTICAL_LENGTH;
         }
 
-        if (aspectRatio > 0) {
-            // Checks if the window is too small horizontally
-            if (((Edge.BOTTOM.getCoordinate() - ry) * aspectRatio) < MIN_CROP_HORIZONTAL_LENGTH) {
-                ry = Edge.BOTTOM.getCoordinate() - (MIN_CROP_HORIZONTAL_LENGTH / aspectRatio);
-            }
+        // Checks if the window is too small horizontally
+        if (aspectRatio > 0 && ((Edge.BOTTOM.getCoordinate() - ry) * aspectRatio) < MIN_CROP_HORIZONTAL_LENGTH) {
+            ry = Edge.BOTTOM.getCoordinate() - (MIN_CROP_HORIZONTAL_LENGTH / aspectRatio);
         }
 
         return ry;
@@ -510,11 +521,9 @@ public enum Edge {
             ry = Edge.TOP.getCoordinate() + MIN_CROP_VERTICAL_LENGTH;
         }
 
-        if (aspectRatio > 0) {
-            // Checks if the window is too small horizontally
-            if (((ry - Edge.TOP.getCoordinate()) * aspectRatio) < MIN_CROP_HORIZONTAL_LENGTH) {
-                ry = Edge.TOP.getCoordinate() + (MIN_CROP_HORIZONTAL_LENGTH / aspectRatio);
-            }
+        // Checks if the window is too small horizontally
+        if (aspectRatio > 0 && ((ry - Edge.TOP.getCoordinate()) * aspectRatio) < MIN_CROP_HORIZONTAL_LENGTH) {
+            ry = Edge.TOP.getCoordinate() + (MIN_CROP_HORIZONTAL_LENGTH / aspectRatio);
         }
 
         return ry;
