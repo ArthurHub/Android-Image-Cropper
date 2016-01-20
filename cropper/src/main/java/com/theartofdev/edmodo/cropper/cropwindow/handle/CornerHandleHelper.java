@@ -16,7 +16,6 @@ package com.theartofdev.edmodo.cropper.cropwindow.handle;
 import android.graphics.Rect;
 
 import com.theartofdev.edmodo.cropper.Edge;
-import com.theartofdev.edmodo.cropper.cropwindow.edge.EdgePair;
 
 /**
  * HandleHelper class to handle corner Handles (i.e. top-left, top-right,
@@ -33,15 +32,10 @@ class CornerHandleHelper extends HandleHelper {
     // HandleHelper Methods ////////////////////////////////////////////////////
 
     @Override
-    void updateCropWindow(float x,
-                          float y,
-                          float targetAspectRatio,
-                          Rect imageRect,
-                          float snapRadius) {
+    void updateCropWindow(float x, float y, float targetAspectRatio, Rect imageRect, float snapRadius) {
 
-        final EdgePair activeEdges = getActiveEdges(x, y, targetAspectRatio);
-        final Edge primaryEdge = activeEdges.primary;
-        final Edge secondaryEdge = activeEdges.secondary;
+        Edge primaryEdge = getActivePrimaryEdge(x, y, targetAspectRatio);
+        Edge secondaryEdge = getActiveSecondaryEdge(x, y, targetAspectRatio);
 
         primaryEdge.adjustCoordinate(x, y, imageRect, snapRadius, targetAspectRatio);
         secondaryEdge.adjustCoordinate(targetAspectRatio);

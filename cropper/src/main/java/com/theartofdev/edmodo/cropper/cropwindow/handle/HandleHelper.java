@@ -16,7 +16,6 @@ package com.theartofdev.edmodo.cropper.cropwindow.handle;
 import android.graphics.Rect;
 
 import com.theartofdev.edmodo.cropper.Edge;
-import com.theartofdev.edmodo.cropper.cropwindow.edge.EdgePair;
 import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
 
 /**
@@ -29,12 +28,6 @@ abstract class HandleHelper {
     private Edge mHorizontalEdge;
 
     private Edge mVerticalEdge;
-
-    /**
-     * Save the Pair object as a member variable to avoid having to instantiate
-     * a new Object every time getActiveEdges() is called.
-     */
-    private EdgePair mActiveEdges;
     //endregion
 
     /**
@@ -48,7 +41,6 @@ abstract class HandleHelper {
     HandleHelper(Edge horizontalEdge, Edge verticalEdge) {
         mHorizontalEdge = horizontalEdge;
         mVerticalEdge = verticalEdge;
-        mActiveEdges = new EdgePair(mHorizontalEdge, mVerticalEdge);
     }
 
     // Package-Private Methods /////////////////////////////////////////////////
@@ -65,16 +57,12 @@ abstract class HandleHelper {
      */
     void updateCropWindow(float x, float y, Rect imageRect, float snapRadius) {
 
-        final EdgePair activeEdges = getActiveEdges();
-        final Edge primaryEdge = activeEdges.primary;
-        final Edge secondaryEdge = activeEdges.secondary;
-
-        if (primaryEdge != null) {
-            primaryEdge.adjustCoordinate(x, y, imageRect, snapRadius, 0);
+        if (mHorizontalEdge != null) {
+            mHorizontalEdge.adjustCoordinate(x, y, imageRect, snapRadius, 0);
         }
 
-        if (secondaryEdge != null) {
-            secondaryEdge.adjustCoordinate(x, y, imageRect, snapRadius, 0);
+        if (mVerticalEdge != null) {
+            mVerticalEdge.adjustCoordinate(x, y, imageRect, snapRadius, 0);
         }
     }
 
@@ -90,22 +78,25 @@ abstract class HandleHelper {
      * @param snapRadius the maximum distance (in pixels) at which the crop
      * window should snap to the image
      */
-    abstract void updateCropWindow(float x,
-                                   float y,
-                                   float targetAspectRatio,
-                                   Rect imageRect,
-                                   float snapRadius);
+    abstract void updateCropWindow(float x, float y, float targetAspectRatio, Rect imageRect, float snapRadius);
 
     /**
-     * Gets the Edges associated with this handle (i.e. the Edges that should be
-     * moved when this handle is dragged). This is used when we are not
-     * maintaining the aspect ratio.
+     * Gets the Edges associated with this handle as an ordered Pair. The
+     * <code>primary</code> Edge in the pair is the determining side. This
+     * method is used when we need to maintain the aspect ratio.
      *
-     * @return the active edge as a pair (the pair may contain null values for
-     * the <code>primary</code>, <code>secondary</code> or both fields)
+     * @param x the x-coordinate of the touch point
+     * @param y the y-coordinate of the touch point
+     * @param targetAspectRatio the aspect ratio that we are maintaining
+     * @return the active edges as an ordered pair
      */
-    EdgePair getActiveEdges() {
-        return mActiveEdges;
+    Edge getActivePrimaryEdge(float x, float y, float targetAspectRatio) {
+
+        // Calculate the aspect ratio if this handle were dragged to the given x-y coordinate.
+        float potentialAspectRatio = getAspectRatio(x, y);
+
+        // If the touched point is wider than the aspect ratio, then x is the determining side. Else, y is the determining side.
+        return potentialAspectRatio > targetAspectRatio ? mVerticalEdge : mHorizontalEdge;
     }
 
     /**
@@ -118,22 +109,13 @@ abstract class HandleHelper {
      * @param targetAspectRatio the aspect ratio that we are maintaining
      * @return the active edges as an ordered pair
      */
-    EdgePair getActiveEdges(float x, float y, float targetAspectRatio) {
+    Edge getActiveSecondaryEdge(float x, float y, float targetAspectRatio) {
 
-        // Calculate the aspect ratio if this handle were dragged to the given
-        // x-y coordinate.
-        final float potentialAspectRatio = getAspectRatio(x, y);
+        // Calculate the aspect ratio if this handle were dragged to the given x-y coordinate.
+        float potentialAspectRatio = getAspectRatio(x, y);
 
-        // If the touched point is wider than the aspect ratio, then x
-        // is the determining side. Else, y is the determining side.
-        if (potentialAspectRatio > targetAspectRatio) {
-            mActiveEdges.primary = mVerticalEdge;
-            mActiveEdges.secondary = mHorizontalEdge;
-        } else {
-            mActiveEdges.primary = mHorizontalEdge;
-            mActiveEdges.secondary = mVerticalEdge;
-        }
-        return mActiveEdges;
+        // If the touched point is wider than the aspect ratio, then x is the determining side. Else, y is the determining side.
+        return potentialAspectRatio > targetAspectRatio ? mHorizontalEdge : mVerticalEdge;
     }
 
     // Private Methods /////////////////////////////////////////////////////////
@@ -149,12 +131,12 @@ abstract class HandleHelper {
     private float getAspectRatio(float x, float y) {
 
         // Replace the active edge coordinate with the given touch coordinate.
-        final float left = (mVerticalEdge == Edge.LEFT) ? x : Edge.LEFT.getCoordinate();
-        final float top = (mHorizontalEdge == Edge.TOP) ? y : Edge.TOP.getCoordinate();
-        final float right = (mVerticalEdge == Edge.RIGHT) ? x : Edge.RIGHT.getCoordinate();
-        final float bottom = (mHorizontalEdge == Edge.BOTTOM) ? y : Edge.BOTTOM.getCoordinate();
+        float left = mVerticalEdge == Edge.LEFT ? x : Edge.LEFT.getCoordinate();
+        float top = mHorizontalEdge == Edge.TOP ? y : Edge.TOP.getCoordinate();
+        float right = mVerticalEdge == Edge.RIGHT ? x : Edge.RIGHT.getCoordinate();
+        float bottom = mHorizontalEdge == Edge.BOTTOM ? y : Edge.BOTTOM.getCoordinate();
 
-        final float aspectRatio = AspectRatioUtil.calculateAspectRatio(left, top, right, bottom);
+        float aspectRatio = AspectRatioUtil.calculateAspectRatio(left, top, right, bottom);
 
         return aspectRatio;
     }
