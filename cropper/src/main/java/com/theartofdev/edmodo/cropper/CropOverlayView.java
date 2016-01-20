@@ -27,9 +27,6 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
-import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
-
 /**
  * A custom View representing the crop window and the shaded background outside the crop window.
  */

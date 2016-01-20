@@ -18,8 +18,6 @@ import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.util.TypedValue;
 
-import com.theartofdev.edmodo.cropper.cropwindow.handle.Handle;
-
 /**
  * Utility class to perform basic operations with Handles.
  */

@@ -10,12 +10,9 @@
 // - Sun Tsu,
 // "The Art of War"
 
-package com.theartofdev.edmodo.cropper.cropwindow.handle;
+package com.theartofdev.edmodo.cropper;
 
 import android.graphics.Rect;
-
-import com.theartofdev.edmodo.cropper.Edge;
-import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
 
 /**
  * Handler to update crop window edges by the move type - Horizontal, Vertical, Corner or Center.<br/>

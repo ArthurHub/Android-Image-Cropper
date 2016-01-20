@@ -11,12 +11,12 @@
  * governing permissions and limitations under the License. 
  */
 
-package com.theartofdev.edmodo.cropper.util;
+package com.theartofdev.edmodo.cropper;
 
 /**
  * Utility class for handling calculations involving a fixed aspect ratio.
  */
-public class AspectRatioUtil {
+class AspectRatioUtil {
 
     /**
      * Calculates the aspect ratio given a rectangle.

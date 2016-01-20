@@ -11,16 +11,14 @@
  * governing permissions and limitations under the License. 
  */
 
-package com.theartofdev.edmodo.cropper.cropwindow.handle;
+package com.theartofdev.edmodo.cropper;
 
 import android.graphics.Rect;
-
-import com.theartofdev.edmodo.cropper.Edge;
 
 /**
  * Enum representing a pressable, draggable Handle on the crop window.
  */
-public enum Handle {
+enum Handle {
 
     TOP_LEFT(new CropWindowMoveHandler(Edge.TOP, Edge.LEFT)),
     TOP_RIGHT(new CropWindowMoveHandler(Edge.TOP, Edge.RIGHT)),

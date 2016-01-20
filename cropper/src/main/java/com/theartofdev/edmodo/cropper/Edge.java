@@ -16,14 +16,12 @@ package com.theartofdev.edmodo.cropper;
 import android.graphics.Rect;
 import android.view.View;
 
-import com.theartofdev.edmodo.cropper.util.AspectRatioUtil;
-
 import java.security.InvalidParameterException;
 
 /**
  * Enum representing an edge in the crop window.
  */
-public enum Edge {
+enum Edge {
 
     LEFT,
     TOP,
