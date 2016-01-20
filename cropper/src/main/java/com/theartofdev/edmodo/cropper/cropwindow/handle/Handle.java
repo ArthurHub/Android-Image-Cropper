@@ -22,42 +22,23 @@ import com.theartofdev.edmodo.cropper.Edge;
  */
 public enum Handle {
 
-    TOP_LEFT(new CornerHandleHelper(Edge.TOP, Edge.LEFT)),
-    TOP_RIGHT(new CornerHandleHelper(Edge.TOP, Edge.RIGHT)),
-    BOTTOM_LEFT(new CornerHandleHelper(Edge.BOTTOM, Edge.LEFT)),
-    BOTTOM_RIGHT(new CornerHandleHelper(Edge.BOTTOM, Edge.RIGHT)),
-    LEFT(new VerticalHandleHelper(Edge.LEFT)),
-    TOP(new HorizontalHandleHelper(Edge.TOP)),
-    RIGHT(new VerticalHandleHelper(Edge.RIGHT)),
-    BOTTOM(new HorizontalHandleHelper(Edge.BOTTOM)),
-    CENTER(new CenterHandleHelper());
+    TOP_LEFT(new CropWindowMoveHandler(Edge.TOP, Edge.LEFT)),
+    TOP_RIGHT(new CropWindowMoveHandler(Edge.TOP, Edge.RIGHT)),
+    BOTTOM_LEFT(new CropWindowMoveHandler(Edge.BOTTOM, Edge.LEFT)),
+    BOTTOM_RIGHT(new CropWindowMoveHandler(Edge.BOTTOM, Edge.RIGHT)),
+    LEFT(new CropWindowMoveHandler(null, Edge.LEFT)),
+    TOP(new CropWindowMoveHandler(Edge.TOP, null)),
+    RIGHT(new CropWindowMoveHandler(null, Edge.RIGHT)),
+    BOTTOM(new CropWindowMoveHandler(Edge.BOTTOM, null)),
+    CENTER(new CropWindowMoveHandler(null, null));
 
-    // Member Variables ////////////////////////////////////////////////////////
+    private CropWindowMoveHandler mHelper;
 
-    private HandleHelper mHelper;
-
-    // Constructors ////////////////////////////////////////////////////////////
-
-    Handle(HandleHelper helper) {
+    Handle(CropWindowMoveHandler helper) {
         mHelper = helper;
     }
 
-    // Public Methods //////////////////////////////////////////////////////////
-
-    public void updateCropWindow(float x,
-                                 float y,
-                                 Rect imageRect,
-                                 float snapRadius) {
-
-        mHelper.updateCropWindow(x, y, imageRect, snapRadius);
-    }
-
-    public void updateCropWindow(float x,
-                                 float y,
-                                 float targetAspectRatio,
-                                 Rect imageRect,
-                                 float snapRadius) {
-
-        mHelper.updateCropWindow(x, y, targetAspectRatio, imageRect, snapRadius);
+    public void updateCropWindow(float x, float y, Rect imageRect, float snapRadius, boolean fixAspectRatio, float targetAspectRatio) {
+        mHelper.move(x, y, imageRect, snapRadius, fixAspectRatio, targetAspectRatio);
     }
 }

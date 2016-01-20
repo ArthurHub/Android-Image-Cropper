@@ -712,11 +712,7 @@ public class CropOverlayView extends View {
         y += mTouchOffset.second;
 
         // Calculate the new crop window size/position.
-        if (mFixAspectRatio) {
-            mPressedHandle.updateCropWindow(x, y, mTargetAspectRatio, mBitmapRect, mSnapRadius);
-        } else {
-            mPressedHandle.updateCropWindow(x, y, mBitmapRect, mSnapRadius);
-        }
+        mPressedHandle.updateCropWindow(x, y, mBitmapRect, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
         invalidate();
     }
     //endregion
