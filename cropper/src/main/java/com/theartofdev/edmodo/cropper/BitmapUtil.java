@@ -76,17 +76,10 @@ class BitmapUtil {
      * @param scaleType the desired scale type
      * @return the rectangular position of the Bitmap
      */
-    public static Rect getBitmapRect(int bitmapWidth,
-                                     int bitmapHeight,
-                                     int viewWidth,
-                                     int viewHeight, ImageView.ScaleType scaleType) {
-        switch (scaleType) {
-            default:
-            case CENTER_INSIDE:
-                return getBitmapRectCenterInsideHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
-            case FIT_CENTER:
-                return getBitmapRectFitCenterHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
-        }
+    public static Rect getBitmapRect(int bitmapWidth, int bitmapHeight, int viewWidth, int viewHeight, ImageView.ScaleType scaleType) {
+        return scaleType == ImageView.ScaleType.FIT_CENTER
+                ? getBitmapRectFitCenterHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight)
+                : getBitmapRectCenterInsideHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
     }
 
     /**
@@ -112,7 +105,7 @@ class BitmapUtil {
      * New bitmap is created and the old one is recycled.
      */
     public static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, ExifInterface exif) {
-        int degrees = 0;
+        int degrees;
         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
         switch (orientation) {
             case ExifInterface.ORIENTATION_ROTATE_90:
@@ -124,11 +117,12 @@ class BitmapUtil {
             case ExifInterface.ORIENTATION_ROTATE_270:
                 degrees = 270;
                 break;
+            default:
+                degrees = 0;
+                break;
         }
-        if (degrees > 0) {
-            bitmap = rotateBitmap(bitmap, degrees);
-        }
-        return new RotateBitmapResult(bitmap, degrees);
+        Bitmap rotatedBitmap = rotateBitmap(bitmap, degrees);
+        return new RotateBitmapResult(rotatedBitmap, degrees);
     }
 
     /**
@@ -192,18 +186,11 @@ class BitmapUtil {
      * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.
      */
     public static Bitmap cropBitmap(Context context, Uri loadedImageUri, Rect rect, int degreesRotated, int reqWidth, int reqHeight) {
-
-        reqWidth = reqWidth > 0 ? reqWidth : rect.width();
-        reqHeight = reqHeight > 0 ? reqHeight : rect.height();
+        int width = reqWidth > 0 ? reqWidth : rect.width();
+        int height = reqHeight > 0 ? reqHeight : rect.height();
         BitmapUtil.DecodeBitmapResult result =
-                BitmapUtil.decodeSampledBitmapRegion(context, loadedImageUri, rect, reqWidth, reqHeight);
-
-        Bitmap bitmap = result.bitmap;
-        if (degreesRotated > 0) {
-            bitmap = BitmapUtil.rotateBitmap(bitmap, degreesRotated);
-        }
-
-        return bitmap;
+                BitmapUtil.decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
+        return BitmapUtil.rotateBitmap(result.bitmap, degreesRotated);
     }
 
     /**
@@ -279,8 +266,9 @@ class BitmapUtil {
             file = new File(realPath);
         } catch (Exception ignored) {
         } finally {
-            if (cursor != null)
+            if (cursor != null) {
                 cursor.close();
+            }
         }
 
         return file;
@@ -336,10 +324,7 @@ class BitmapUtil {
      * @param viewHeight the parent View's height
      * @return the rectangular position of the Bitmap
      */
-    private static Rect getBitmapRectCenterInsideHelper(int bitmapWidth,
-                                                        int bitmapHeight,
-                                                        int viewWidth,
-                                                        int viewHeight) {
+    private static Rect getBitmapRectCenterInsideHelper(int bitmapWidth, int bitmapHeight, int viewWidth, int viewHeight) {
         double resultWidth;
         double resultHeight;
         int resultX;
@@ -356,20 +341,17 @@ class BitmapUtil {
             viewToBitmapHeightRatio = (double) viewHeight / (double) bitmapHeight;
         }
 
-        // If either needs to be fixed, choose smallest ratio and calculate from
-        // there
+        // If either needs to be fixed, choose smallest ratio and calculate from there
         if (viewToBitmapWidthRatio != Double.POSITIVE_INFINITY || viewToBitmapHeightRatio != Double.POSITIVE_INFINITY) {
             if (viewToBitmapWidthRatio <= viewToBitmapHeightRatio) {
                 resultWidth = viewWidth;
-                resultHeight = (bitmapHeight * resultWidth / bitmapWidth);
+                resultHeight = bitmapHeight * resultWidth / bitmapWidth;
             } else {
                 resultHeight = viewHeight;
-                resultWidth = (bitmapWidth * resultHeight / bitmapHeight);
+                resultWidth = bitmapWidth * resultHeight / bitmapHeight;
             }
-        }
-        // Otherwise, the picture is within frame layout bounds. Desired width
-        // is simply picture size
-        else {
+        } else {
+            // Otherwise, the picture is within frame layout bounds. Desired width is simply picture size
             resultHeight = bitmapHeight;
             resultWidth = bitmapWidth;
         }
@@ -386,12 +368,7 @@ class BitmapUtil {
             resultY = (int) Math.round((viewHeight - resultHeight) / 2);
         }
 
-        final Rect result = new Rect(resultX,
-                resultY,
-                resultX + (int) Math.ceil(resultWidth),
-                resultY + (int) Math.ceil(resultHeight));
-
-        return result;
+        return new Rect(resultX, resultY, resultX + (int) Math.ceil(resultWidth), resultY + (int) Math.ceil(resultHeight));
     }
 
     /**
