@@ -117,7 +117,7 @@ class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppingWorke
 
                 Bitmap bitmap = null;
                 if (mUri != null) {
-                    bitmap = BitmapUtil.cropBitmap(
+                    bitmap = BitmapUtils.cropBitmap(
                             mContext,
                             mUri,
                             mRect,
@@ -125,10 +125,10 @@ class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppingWorke
                             mReqWidth,
                             mReqHeight);
                 } else if (mBitmap != null) {
-                    bitmap = BitmapUtil.cropBitmap(mBitmap, mRect);
+                    bitmap = BitmapUtils.cropBitmap(mBitmap, mRect);
                 }
                 if (bitmap != null && mCropShape == CropImageView.CropShape.OVAL) {
-                    bitmap = BitmapUtil.toOvalBitmap(bitmap);
+                    bitmap = BitmapUtils.toOvalBitmap(bitmap);
                 }
                 return new Result(bitmap);
             }

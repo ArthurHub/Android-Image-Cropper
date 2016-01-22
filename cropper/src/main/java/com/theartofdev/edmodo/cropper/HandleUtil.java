@@ -36,24 +36,10 @@ class HandleUtil {
      * @param targetRadius the target radius in pixels
      * @return the Handle that was pressed; null if no Handle was pressed
      */
-    public static Handle getPressedHandle(float x,
-                                          float y,
-                                          float left,
-                                          float top,
-                                          float right,
-                                          float bottom,
-                                          float targetRadius,
-                                          CropImageView.CropShape cropShape) {
-
-        Handle pressedHandle = null;
-
-        if (cropShape == CropImageView.CropShape.RECTANGLE) {
-            pressedHandle = getRectanglePressedHandle(x, y, left, top, right, bottom, targetRadius);
-        } else if (cropShape == CropImageView.CropShape.OVAL) {
-            pressedHandle = getOvalPressedHandle(x, y, left, top, right, bottom);
-        }
-
-        return pressedHandle;
+    public static Handle getPressedHandle(float x, float y, float left, float top, float right, float bottom, float targetRadius, CropImageView.CropShape cropShape) {
+        return cropShape == CropImageView.CropShape.OVAL
+                ? getOvalPressedHandle(x, y, left, top, right, bottom)
+                : getRectanglePressedHandle(x, y, left, top, right, bottom, targetRadius);
     }
 
     /**
@@ -96,13 +82,7 @@ class HandleUtil {
      * @param targetRadius the target radius in pixels
      * @return the Handle that was pressed; null if no Handle was pressed
      */
-    private static Handle getRectanglePressedHandle(float x,
-                                                    float y,
-                                                    float left,
-                                                    float top,
-                                                    float right,
-                                                    float bottom,
-                                                    float targetRadius) {
+    private static Handle getRectanglePressedHandle(float x, float y, float left, float top, float right, float bottom, float targetRadius) {
         Handle pressedHandle = null;
 
         // Note: corner-handles take precedence, then side-handles, then center.
@@ -143,12 +123,7 @@ class HandleUtil {
      * @param bottom the y-coordinate of the bottom bound
      * @return the Handle that was pressed; null if no Handle was pressed
      */
-    private static Handle getOvalPressedHandle(float x,
-                                               float y,
-                                               float left,
-                                               float top,
-                                               float right,
-                                               float bottom) {
+    private static Handle getOvalPressedHandle(float x, float y, float left, float top, float right, float bottom) {
 
         /*
            Use a 6x6 grid system divided into 9 "handles", with the center the biggest region. While
@@ -206,13 +181,7 @@ class HandleUtil {
      * @return the offset as a Pair where the x-offset is the first value and
      * the y-offset is the second value; null if the handle is null
      */
-    public static Pair<Float, Float> getOffset(Handle handle,
-                                               float x,
-                                               float y,
-                                               float left,
-                                               float top,
-                                               float right,
-                                               float bottom) {
+    public static Pair<Float, Float> getOffset(Handle handle, float x, float y, float left, float top, float right, float bottom) {
 
         if (handle == null) {
             return null;
@@ -223,7 +192,6 @@ class HandleUtil {
 
         // Calculate the offset from the appropriate handle.
         switch (handle) {
-
             case TOP_LEFT:
                 touchOffsetX = left - x;
                 touchOffsetY = top - y;
@@ -257,15 +225,12 @@ class HandleUtil {
                 touchOffsetY = bottom - y;
                 break;
             case CENTER:
-                final float centerX = (right + left) / 2;
-                final float centerY = (top + bottom) / 2;
-                touchOffsetX = centerX - x;
-                touchOffsetY = centerY - y;
+                touchOffsetX = (right + left) / 2 - x;
+                touchOffsetY = (top + bottom) / 2 - y;
                 break;
         }
 
-        final Pair<Float, Float> result = new Pair<Float, Float>(touchOffsetX, touchOffsetY);
-        return result;
+        return new Pair<Float, Float>(touchOffsetX, touchOffsetY);
     }
 
     /**
@@ -280,16 +245,8 @@ class HandleUtil {
      * @return true if the touch point is in the target touch zone; false
      * otherwise
      */
-    private static boolean isInCornerTargetZone(float x,
-                                                float y,
-                                                float handleX,
-                                                float handleY,
-                                                float targetRadius) {
-
-        if (Math.abs(x - handleX) <= targetRadius && Math.abs(y - handleY) <= targetRadius) {
-            return true;
-        }
-        return false;
+    private static boolean isInCornerTargetZone(float x, float y, float handleX, float handleY, float targetRadius) {
+        return Math.abs(x - handleX) <= targetRadius && Math.abs(y - handleY) <= targetRadius;
     }
 
     /**
@@ -305,17 +262,8 @@ class HandleUtil {
      * @return true if the touch point is in the target touch zone; false
      * otherwise
      */
-    private static boolean isInHorizontalTargetZone(float x,
-                                                    float y,
-                                                    float handleXStart,
-                                                    float handleXEnd,
-                                                    float handleY,
-                                                    float targetRadius) {
-
-        if (x > handleXStart && x < handleXEnd && Math.abs(y - handleY) <= targetRadius) {
-            return true;
-        }
-        return false;
+    private static boolean isInHorizontalTargetZone(float x, float y, float handleXStart, float handleXEnd, float handleY, float targetRadius) {
+        return x > handleXStart && x < handleXEnd && Math.abs(y - handleY) <= targetRadius;
     }
 
     /**
@@ -331,17 +279,8 @@ class HandleUtil {
      * @return true if the touch point is in the target touch zone; false
      * otherwise
      */
-    private static boolean isInVerticalTargetZone(float x,
-                                                  float y,
-                                                  float handleX,
-                                                  float handleYStart,
-                                                  float handleYEnd,
-                                                  float targetRadius) {
-
-        if (Math.abs(x - handleX) <= targetRadius && y > handleYStart && y < handleYEnd) {
-            return true;
-        }
-        return false;
+    private static boolean isInVerticalTargetZone(float x, float y, float handleX, float handleYStart, float handleYEnd, float targetRadius) {
+        return Math.abs(x - handleX) <= targetRadius && y > handleYStart && y < handleYEnd;
     }
 
     /**
@@ -357,17 +296,8 @@ class HandleUtil {
      * @return true if the touch point is inside the bounding rectangle; false
      * otherwise
      */
-    private static boolean isInCenterTargetZone(float x,
-                                                float y,
-                                                float left,
-                                                float top,
-                                                float right,
-                                                float bottom) {
-
-        if (x > left && x < right && y > top && y < bottom) {
-            return true;
-        }
-        return false;
+    private static boolean isInCenterTargetZone(float x, float y, float left, float top, float right, float bottom) {
+        return x > left && x < right && y > top && y < bottom;
     }
 
     /**
@@ -381,7 +311,7 @@ class HandleUtil {
      * center; less than show_guidelines limit
      */
     private static boolean focusCenter() {
-        return (!CropOverlayView.showGuidelines());
+        return !CropOverlayView.showGuidelines();
     }
     //endregion
 }

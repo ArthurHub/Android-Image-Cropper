@@ -40,7 +40,7 @@ import java.io.InputStream;
 /**
  * Utility class that deals with operations with an ImageView.
  */
-class BitmapUtil {
+class BitmapUtils {
 
     /**
      * Gets the rectangular position of a Bitmap if it were placed inside a View.
@@ -188,9 +188,9 @@ class BitmapUtil {
     public static Bitmap cropBitmap(Context context, Uri loadedImageUri, Rect rect, int degreesRotated, int reqWidth, int reqHeight) {
         int width = reqWidth > 0 ? reqWidth : rect.width();
         int height = reqHeight > 0 ? reqHeight : rect.height();
-        BitmapUtil.DecodeBitmapResult result =
-                BitmapUtil.decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
-        return BitmapUtil.rotateBitmap(result.bitmap, degreesRotated);
+        BitmapUtils.DecodeBitmapResult result =
+                BitmapUtils.decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
+        return BitmapUtils.rotateBitmap(result.bitmap, degreesRotated);
     }
 
     /**

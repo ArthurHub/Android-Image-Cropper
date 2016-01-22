@@ -14,7 +14,6 @@
 package com.theartofdev.edmodo.cropper;
 
 import android.graphics.Rect;
-import android.view.View;
 
 import java.security.InvalidParameterException;
 
@@ -232,20 +231,6 @@ enum Edge {
     }
 
     /**
-     * Returns whether the new rectangle would be out of bounds.
-     *
-     * @param top
-     * @param left
-     * @param bottom
-     * @param right
-     * @param imageRect the Image to be compared with.
-     * @return whether it would be out of bounds
-     */
-    private boolean isOutOfBounds(float top, float left, float bottom, float right, Rect imageRect) {
-        return (top < imageRect.top || left < imageRect.left || bottom > imageRect.bottom || right > imageRect.right);
-    }
-
-    /**
      * Snap this Edge to the given image boundaries.
      *
      * @param imageRect the bounding rectangle of the image to snap to
@@ -274,64 +259,6 @@ enum Edge {
         }
 
         return mCoordinate - oldCoordinate;
-    }
-
-    /**
-     * Returns the potential snap offset of snaptoRect, without changing the coordinate.
-     *
-     * @param imageRect the bounding rectangle of the image to snap to
-     * @return the amount (in pixels) that this coordinate was changed (i.e. the
-     * new coordinate minus the old coordinate value)
-     */
-    public float snapOffset(Rect imageRect) {
-
-        final float oldCoordinate = mCoordinate;
-        float newCoordinate = oldCoordinate;
-
-        switch (this) {
-            case LEFT:
-                newCoordinate = imageRect.left;
-                break;
-            case TOP:
-                newCoordinate = imageRect.top;
-                break;
-            case RIGHT:
-                newCoordinate = imageRect.right;
-                break;
-            case BOTTOM:
-                newCoordinate = imageRect.bottom;
-                break;
-            default:
-                throw new InvalidParameterException("Unknown enum: " + this);
-        }
-
-        final float offset = newCoordinate - oldCoordinate;
-        return offset;
-    }
-
-    /**
-     * Snap this Edge to the given View boundaries.
-     *
-     * @param view the View to snap to
-     */
-    public void snapToView(View view) {
-
-        switch (this) {
-            case LEFT:
-                mCoordinate = 0;
-                break;
-            case TOP:
-                mCoordinate = 0;
-                break;
-            case RIGHT:
-                mCoordinate = view.getWidth();
-                break;
-            case BOTTOM:
-                mCoordinate = view.getHeight();
-                break;
-            default:
-                throw new InvalidParameterException("Unknown enum: " + this);
-        }
     }
 
     /**
@@ -376,35 +303,54 @@ enum Edge {
         return result;
     }
 
-    /**
-     * Determines if this Edge is outside the image frame of the given bounding
-     * rectangle.
-     */
-    public boolean isOutsideFrame(Rect rect) {
+    //region: Private methods
 
-        double margin = 0;
-        boolean result = false;
+    /**
+     * Returns the potential snap offset of snaptoRect, without changing the coordinate.
+     *
+     * @param imageRect the bounding rectangle of the image to snap to
+     * @return the amount (in pixels) that this coordinate was changed (i.e. the
+     * new coordinate minus the old coordinate value)
+     */
+    private float snapOffset(Rect imageRect) {
+
+        final float oldCoordinate = mCoordinate;
+        float newCoordinate = oldCoordinate;
 
         switch (this) {
             case LEFT:
-                result = mCoordinate - rect.left < margin;
+                newCoordinate = imageRect.left;
                 break;
             case TOP:
-                result = mCoordinate - rect.top < margin;
+                newCoordinate = imageRect.top;
                 break;
             case RIGHT:
-                result = rect.right - mCoordinate < margin;
+                newCoordinate = imageRect.right;
                 break;
             case BOTTOM:
-                result = rect.bottom - mCoordinate < margin;
+                newCoordinate = imageRect.bottom;
                 break;
             default:
                 throw new InvalidParameterException("Unknown enum: " + this);
         }
-        return result;
+
+        final float offset = newCoordinate - oldCoordinate;
+        return offset;
     }
 
-    // Private Methods /////////////////////////////////////////////////////////
+    /**
+     * Returns whether the new rectangle would be out of bounds.
+     *
+     * @param top
+     * @param left
+     * @param bottom
+     * @param right
+     * @param imageRect the Image to be compared with.
+     * @return whether it would be out of bounds
+     */
+    private boolean isOutOfBounds(float top, float left, float bottom, float right, Rect imageRect) {
+        return (top < imageRect.top || left < imageRect.left || bottom > imageRect.bottom || right > imageRect.right);
+    }
 
     /**
      * Get the resulting x-position of the left edge of the crop window given
@@ -526,4 +472,5 @@ enum Edge {
 
         return ry;
     }
+    //endregion
 }

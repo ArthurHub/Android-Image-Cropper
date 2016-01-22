@@ -21,8 +21,14 @@ class CropWindowMoveHandler {
 
     //region: Fields and Consts
 
+    /**
+     * Horizontal edge of the crop window, can be left or right esge.
+     */
     private final Edge mHorizontalEdge;
 
+    /**
+     * Vertical edge of the crop window, can be top or bottom esge.
+     */
     private final Edge mVerticalEdge;
     //endregion
 
