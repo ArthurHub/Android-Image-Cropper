@@ -110,31 +110,31 @@ public class CropImageView extends FrameLayout {
     public CropImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        int guidelines = Defaults.DEFAULT_GUIDELINES;
-        boolean fixAspectRatio = Defaults.DEFAULT_FIXED_ASPECT_RATIO;
-        int aspectRatioX = Defaults.DEFAULT_ASPECT_RATIO_X;
-        int aspectRatioY = Defaults.DEFAULT_ASPECT_RATIO_Y;
-        ImageView.ScaleType scaleType = Defaults.VALID_SCALE_TYPES[Defaults.DEFAULT_SCALE_TYPE_INDEX];
+        int guidelines = CropDefaults.DEFAULT_GUIDELINES;
+        boolean fixAspectRatio = CropDefaults.DEFAULT_FIXED_ASPECT_RATIO;
+        int aspectRatioX = CropDefaults.DEFAULT_ASPECT_RATIO_X;
+        int aspectRatioY = CropDefaults.DEFAULT_ASPECT_RATIO_Y;
+        ImageView.ScaleType scaleType = CropDefaults.VALID_SCALE_TYPES[CropDefaults.DEFAULT_SCALE_TYPE_INDEX];
         CropShape cropShape = CropShape.RECTANGLE;
-        float snapRadius = Defaults.SNAP_RADIUS;
-        float borderLineThickness = Defaults.DEFAULT_BORDER_LINE_THICKNESS;
-        int borderLineColor = Defaults.DEFAULT_BORDER_LINE_COLOR;
-        float borderCornerThickness = Defaults.DEFAULT_BORDER_CORNER_THICKNESS;
-        float borderCornerOffset = Defaults.DEFAULT_BORDER_CORNER_OFFSET;
-        float borderCornerLength = Defaults.DEFAULT_BORDER_CORNER_LENGTH;
-        int borderCornerColor = Defaults.DEFAULT_BORDER_CORNER_COLOR;
-        float guidelinesThickness = Defaults.DEFAULT_GUIDELINE_THICKNESS;
-        int guidelinesColor = Defaults.DEFAULT_GUIDELINE_COLOR;
-        int backgroundColor = Defaults.DEFAULT_BACKGROUND_COLOR;
+        float snapRadius = CropDefaults.SNAP_RADIUS;
+        float borderLineThickness = CropDefaults.DEFAULT_BORDER_LINE_THICKNESS;
+        int borderLineColor = CropDefaults.DEFAULT_BORDER_LINE_COLOR;
+        float borderCornerThickness = CropDefaults.DEFAULT_BORDER_CORNER_THICKNESS;
+        float borderCornerOffset = CropDefaults.DEFAULT_BORDER_CORNER_OFFSET;
+        float borderCornerLength = CropDefaults.DEFAULT_BORDER_CORNER_LENGTH;
+        int borderCornerColor = CropDefaults.DEFAULT_BORDER_CORNER_COLOR;
+        float guidelinesThickness = CropDefaults.DEFAULT_GUIDELINE_THICKNESS;
+        int guidelinesColor = CropDefaults.DEFAULT_GUIDELINE_COLOR;
+        int backgroundColor = CropDefaults.DEFAULT_BACKGROUND_COLOR;
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
                 guidelines = ta.getInteger(R.styleable.CropImageView_guidelines, guidelines);
-                fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_fixAspectRatio, Defaults.DEFAULT_FIXED_ASPECT_RATIO);
-                aspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, Defaults.DEFAULT_ASPECT_RATIO_X);
-                aspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, Defaults.DEFAULT_ASPECT_RATIO_Y);
-                scaleType = Defaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, Defaults.DEFAULT_SCALE_TYPE_INDEX)];
-                cropShape = Defaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, Defaults.DEFAULT_CROP_SHAPE_INDEX)];
+                fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_fixAspectRatio, CropDefaults.DEFAULT_FIXED_ASPECT_RATIO);
+                aspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, CropDefaults.DEFAULT_ASPECT_RATIO_X);
+                aspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, CropDefaults.DEFAULT_ASPECT_RATIO_Y);
+                scaleType = CropDefaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, CropDefaults.DEFAULT_SCALE_TYPE_INDEX)];
+                cropShape = CropDefaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
                 snapRadius = ta.getFloat(R.styleable.CropImageView_snapRadius, snapRadius);
                 borderLineThickness = ta.getFloat(R.styleable.CropImageView_borderLineThickness, borderLineThickness);
                 borderLineColor = ta.getInteger(R.styleable.CropImageView_borderLineColor, borderLineColor);
@@ -724,7 +724,7 @@ public class CropImageView extends FrameLayout {
             Rect bitmapRect = BitmapUtils.getBitmapRect(mBitmap, this, mImageView.getScaleType());
             mCropOverlayView.setBitmapRect(bitmapRect);
         } else {
-            mCropOverlayView.setBitmapRect(Defaults.EMPTY_RECT);
+            mCropOverlayView.setBitmapRect(CropDefaults.EMPTY_RECT);
         }
     }
 
@@ -790,7 +790,7 @@ public class CropImageView extends FrameLayout {
             setMeasuredDimension(mLayoutWidth, mLayoutHeight);
 
         } else {
-            mCropOverlayView.setBitmapRect(Defaults.EMPTY_RECT);
+            mCropOverlayView.setBitmapRect(CropDefaults.EMPTY_RECT);
             setMeasuredDimension(widthSize, heightSize);
         }
     }

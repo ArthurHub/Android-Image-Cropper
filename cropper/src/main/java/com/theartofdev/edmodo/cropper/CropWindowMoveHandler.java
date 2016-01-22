@@ -85,11 +85,11 @@ class CropWindowMoveHandler {
         float right = Edge.RIGHT.getCoordinate();
         float bottom = Edge.BOTTOM.getCoordinate();
 
-        final float currentCenterX = (left + right) / 2;
-        final float currentCenterY = (top + bottom) / 2;
+        float currentCenterX = (left + right) / 2;
+        float currentCenterY = (top + bottom) / 2;
 
-        final float offsetX = x - currentCenterX;
-        final float offsetY = y - currentCenterY;
+        float offsetX = x - currentCenterX;
+        float offsetY = y - currentCenterY;
 
         // Adjust the crop window.
         Edge.LEFT.offset(offsetX);
@@ -99,19 +99,19 @@ class CropWindowMoveHandler {
 
         // Check if we have gone out of bounds on the sides, and fix.
         if (Edge.LEFT.isOutsideMargin(imageRect, snapRadius)) {
-            final float offset = Edge.LEFT.snapToRect(imageRect);
+            float offset = Edge.LEFT.snapToRect(imageRect);
             Edge.RIGHT.offset(offset);
         } else if (Edge.RIGHT.isOutsideMargin(imageRect, snapRadius)) {
-            final float offset = Edge.RIGHT.snapToRect(imageRect);
+            float offset = Edge.RIGHT.snapToRect(imageRect);
             Edge.LEFT.offset(offset);
         }
 
         // Check if we have gone out of bounds on the top or bottom, and fix.
         if (Edge.TOP.isOutsideMargin(imageRect, snapRadius)) {
-            final float offset = Edge.TOP.snapToRect(imageRect);
+            float offset = Edge.TOP.snapToRect(imageRect);
             Edge.BOTTOM.offset(offset);
         } else if (Edge.BOTTOM.isOutsideMargin(imageRect, snapRadius)) {
-            final float offset = Edge.BOTTOM.snapToRect(imageRect);
+            float offset = Edge.BOTTOM.snapToRect(imageRect);
             Edge.TOP.offset(offset);
         }
     }
