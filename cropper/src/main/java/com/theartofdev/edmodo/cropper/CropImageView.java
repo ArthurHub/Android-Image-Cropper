@@ -68,6 +68,13 @@ public class CropImageView extends FrameLayout {
     private int mImageResource = 0;
 
     /**
+     * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
+     * image.<br>
+     * default: true, may disable for animation or frame transition.
+     */
+    private boolean mShowCropOverlay = true;
+
+    /**
      * if to show progress bar when image async loading/cropping is in progress.<br>
      * default: true, disable to provide custom progress bar UI.
      */
@@ -146,6 +153,7 @@ public class CropImageView extends FrameLayout {
                 guidelinesThickness = ta.getFloat(R.styleable.CropImageView_cropGuidelinesThickness, guidelinesThickness);
                 guidelinesColor = ta.getInteger(R.styleable.CropImageView_cropGuidelinesColor, guidelinesColor);
                 backgroundColor = ta.getInteger(R.styleable.CropImageView_cropBackgroundColor, backgroundColor);
+                mShowCropOverlay = ta.getBoolean(R.styleable.CropImageView_cropShowCropOverlay, mShowCropOverlay);
                 mShowProgressBar = ta.getBoolean(R.styleable.CropImageView_cropShowProgressBar, mShowProgressBar);
             } finally {
                 ta.recycle();
@@ -249,6 +257,24 @@ public class CropImageView extends FrameLayout {
      */
     public boolean isShowProgressBar() {
         return mShowProgressBar;
+    }
+
+    /**
+     * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
+     * image.<br>
+     * default: true, may disable for animation or frame transition.
+     */
+    public boolean isShowCropOverlay() {
+        return mShowCropOverlay;
+    }
+
+    /**
+     * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
+     * image.<br>
+     * default: true, may disable for animation or frame transition.
+     */
+    public void setShowCropOverlay(boolean showCropOverlay) {
+        mShowCropOverlay = showCropOverlay;
     }
 
     /**
@@ -627,7 +653,7 @@ public class CropImageView extends FrameLayout {
             mImageView.setImageBitmap(mBitmap);
             if (mCropOverlayView != null) {
                 mCropOverlayView.resetCropOverlayView();
-                mCropOverlayView.setVisibility(VISIBLE);
+                setCropOverlayVisibility();
             }
         }
     }
@@ -654,9 +680,7 @@ public class CropImageView extends FrameLayout {
 
             mImageView.setImageBitmap(null);
 
-            if (mCropOverlayView != null) {
-                mCropOverlayView.setVisibility(INVISIBLE);
-            }
+            setCropOverlayVisibility();
         }
     }
 
@@ -838,6 +862,15 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * Set visibility of crop overlay to hide it when there is no image or specificly set by client.
+     */
+    private void setCropOverlayVisibility() {
+        if (mCropOverlayView != null) {
+            mCropOverlayView.setVisibility(mShowCropOverlay && mBitmap != null ? VISIBLE : INVISIBLE);
+        }
+    }
+
+    /**
      * Set visibility of progress bar when async loading/cropping is in process and show is enabled.
      */
     private void setProgressBarVisibility() {
@@ -858,7 +891,7 @@ public class CropImageView extends FrameLayout {
     }
     //endregion
 
-    //region: Inner class: CropShape
+    //region: Inner class: Guidelines
 
     /**
      * The possible guidelines showing types.

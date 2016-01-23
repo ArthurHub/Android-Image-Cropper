@@ -27,6 +27,7 @@
         <attr name="cropGuidelinesColor" format="color"/>
         <attr name="cropBackgroundColor" format="color"/>
         <attr name="cropSnapRadius" format="float"/>
+        <attr name="cropShowCropOverlay" format="boolean"/>
         <attr name="cropShowProgressBar" format="boolean"/>
     </declare-styleable>
 
