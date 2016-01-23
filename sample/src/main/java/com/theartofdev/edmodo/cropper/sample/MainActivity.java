@@ -170,7 +170,17 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
         // Sets up the Spinner
         showGuidelinesSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                mCropImageView.setGuidelines(i);
+                switch (i) {
+                    case 0:
+                        mCropImageView.setGuidelines(CropImageView.Guidelines.OFF);
+                        break;
+                    case 1:
+                        mCropImageView.setGuidelines(CropImageView.Guidelines.ON_TOUCH);
+                        break;
+                    case 2:
+                        mCropImageView.setGuidelines(CropImageView.Guidelines.ON);
+                        break;
+                }
             }
 
             public void onNothingSelected(AdapterView<?> adapterView) {

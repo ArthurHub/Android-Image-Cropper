@@ -111,12 +111,12 @@ public class CropImageView extends FrameLayout {
     public CropImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        int guidelines = CropDefaults.DEFAULT_GUIDELINES;
         boolean fixAspectRatio = CropDefaults.DEFAULT_FIXED_ASPECT_RATIO;
         int aspectRatioX = CropDefaults.DEFAULT_ASPECT_RATIO_X;
         int aspectRatioY = CropDefaults.DEFAULT_ASPECT_RATIO_Y;
         ImageView.ScaleType scaleType = CropDefaults.VALID_SCALE_TYPES[CropDefaults.DEFAULT_SCALE_TYPE_INDEX];
         CropShape cropShape = CropShape.RECTANGLE;
+        Guidelines guidelines = CropImageView.Guidelines.ON_TOUCH;
         float snapRadius = CropDefaults.SNAP_RADIUS;
         float borderLineThickness = CropDefaults.DEFAULT_BORDER_LINE_THICKNESS;
         int borderLineColor = CropDefaults.DEFAULT_BORDER_LINE_COLOR;
@@ -130,12 +130,12 @@ public class CropImageView extends FrameLayout {
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
-                guidelines = ta.getInteger(R.styleable.CropImageView_guidelines, guidelines);
                 fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_cropFixAspectRatio, CropDefaults.DEFAULT_FIXED_ASPECT_RATIO);
                 aspectRatioX = ta.getInteger(R.styleable.CropImageView_cropAspectRatioX, CropDefaults.DEFAULT_ASPECT_RATIO_X);
                 aspectRatioY = ta.getInteger(R.styleable.CropImageView_cropAspectRatioY, CropDefaults.DEFAULT_ASPECT_RATIO_Y);
                 scaleType = CropDefaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, CropDefaults.DEFAULT_SCALE_TYPE_INDEX)];
                 cropShape = CropDefaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
+                guidelines = CropDefaults.VALID_GUIDELINES[ta.getInt(R.styleable.CropImageView_guidelines, CropDefaults.DEFAULT_GUIDELINES_INDEX)];
                 snapRadius = ta.getFloat(R.styleable.CropImageView_cropSnapRadius, snapRadius);
                 borderLineThickness = ta.getFloat(R.styleable.CropImageView_cropBorderLineThickness, borderLineThickness);
                 borderLineColor = ta.getInteger(R.styleable.CropImageView_cropBorderLineColor, borderLineColor);
@@ -217,7 +217,7 @@ public class CropImageView extends FrameLayout {
      * @param guidelines Integer that signals whether the guidelines should be on, off, or
      * only showing when resizing.
      */
-    public void setGuidelines(int guidelines) {
+    public void setGuidelines(Guidelines guidelines) {
         mCropOverlayView.setGuidelines(guidelines);
     }
 
@@ -855,6 +855,29 @@ public class CropImageView extends FrameLayout {
     public enum CropShape {
         RECTANGLE,
         OVAL
+    }
+    //endregion
+
+    //region: Inner class: CropShape
+
+    /**
+     * The possible guidelines showing types.
+     */
+    public enum Guidelines {
+        /**
+         * Never show
+         */
+        OFF,
+
+        /**
+         * Show when crop move action is live
+         */
+        ON_TOUCH,
+
+        /**
+         * Always show
+         */
+        ON
     }
     //endregion
 

@@ -111,7 +111,7 @@ public class CropOverlayView extends View {
     /**
      * Instance variables for customizable attributes
      */
-    private int mGuidelines = CropDefaults.DEFAULT_GUIDELINES;
+    private CropImageView.Guidelines mGuidelines;
 
     /**
      * The shape of the cropping area - rectangle/circular.
@@ -205,15 +205,11 @@ public class CropOverlayView extends View {
      * @param guidelines Integer that signals whether the guidelines should be
      * on, off, or only showing when resizing.
      */
-    public void setGuidelines(int guidelines) {
-        if (guidelines < 0 || guidelines > 2)
-            throw new IllegalArgumentException("Guideline value must be set between 0 and 2. See documentation.");
-        else {
-            mGuidelines = guidelines;
-            if (initializedCropWindow) {
-                initCropWindow(mBitmapRect);
-                invalidate();
-            }
+    public void setGuidelines(CropImageView.Guidelines guidelines) {
+        mGuidelines = guidelines;
+        if (initializedCropWindow) {
+            initCropWindow(mBitmapRect);
+            invalidate();
         }
     }
 
@@ -300,7 +296,7 @@ public class CropOverlayView extends View {
      */
     public void setInitialAttributeValues(CropImageView.CropShape cropShape,
                                           float snapRadius,
-                                          int guidelines,
+                                          CropImageView.Guidelines guidelines,
                                           boolean fixAspectRatio,
                                           int aspectRatioX,
                                           int aspectRatioY,
@@ -452,9 +448,9 @@ public class CropOverlayView extends View {
 
         if (mCropWindowHandler.showGuidelines()) {
             // Determines whether guidelines should be drawn or not
-            if (mGuidelines == CropDefaults.GUIDELINES_ON) {
+            if (mGuidelines == CropImageView.Guidelines.ON) {
                 drawGuidelines(canvas);
-            } else if (mGuidelines == CropDefaults.GUIDELINES_ON_TOUCH) {
+            } else if (mGuidelines == CropImageView.Guidelines.ON_TOUCH) {
                 // Draw only when resizing
                 if (mMoveHandler != null) {
                     drawGuidelines(canvas);
