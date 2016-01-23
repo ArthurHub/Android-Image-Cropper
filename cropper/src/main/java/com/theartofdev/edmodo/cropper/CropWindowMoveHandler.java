@@ -12,6 +12,7 @@
 
 package com.theartofdev.edmodo.cropper;
 
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -33,37 +34,36 @@ final class CropWindowMoveHandler {
     public static final int MIN_CROP_HORIZONTAL_LENGTH = 60;
 
     /**
-     * The type of crop window move that is handled.
+     * Handler to get/set the crop window edges.
      */
-    final Type mType;
-
-    /**
-     * the x-location of the initial touch that started the move
-     */
-    private final float mTouchX;
-
-    /**
-     * the y-location of the initial touch that started the move
-     */
-    private final float mTouchY;
-
     private final CropWindowHandler mCropWindowHandler;
 
+    /**
+     * The type of crop window move that is handled.
+     */
+    private final Type mType;
+
+    /**
+     * Holds the x and y offset between the exact touch location and the exact handle location that is activated.
+     * There may be an offset because we allow for some leeway (specified by mHandleRadius) in activating a handle.
+     * However, we want to maintain these offset values while the handle is being dragged so that the handle
+     * doesn't jump.
+     */
+    private final PointF mTouchOffset = new PointF();
     //endregion
 
     /**
      * @param edgeMoveType the type of move this handler is executing
      * @param horizontalEdge the primary edge associated with this handle; may be null
      * @param verticalEdge the secondary edge associated with this handle; may be null
+     * @param cropWindowHandler
      * @param touchX
      * @param touchY
-     * @param cropWindowHandler
      */
-    public CropWindowMoveHandler(Type type, float touchX, float touchY, CropWindowHandler cropWindowHandler) {
-        mTouchX = touchX;
-        mTouchY = touchY;
-        mCropWindowHandler = cropWindowHandler;
+    public CropWindowMoveHandler(Type type, CropWindowHandler cropWindowHandler, float touchX, float touchY) {
         mType = type;
+        mCropWindowHandler = cropWindowHandler;
+        calculateTouchOffset(touchX, touchY);
     }
 
     /**
@@ -78,6 +78,14 @@ final class CropWindowMoveHandler {
      * @param aspectRatio the aspect ratio to maintain
      */
     public void move(float x, float y, Rect bounds, float snapMargin, boolean fixedAspectRatio, float aspectRatio) {
+
+        // Adjust the coordinates for the finger position's offset (i.e. the
+        // distance from the initial touch to the precise handle location).
+        // We want to maintain the initial touch's distance to the pressed
+        // handle so that the crop window size does not "jump".
+        x += mTouchOffset.x;
+        y += mTouchOffset.y;
+
         if (mType == Type.CENTER) {
             moveCenter(x, y, bounds, snapMargin);
         } else {
@@ -90,6 +98,61 @@ final class CropWindowMoveHandler {
     }
 
     //region: Private methods
+
+    /**
+     * Calculates the offset of the touch point from the precise location of the specified handle.<br>
+     * Save these values in a member variable since we want to maintain this offset as we drag the handle.
+     */
+    private void calculateTouchOffset(float touchX, float touchY) {
+
+        float touchOffsetX = 0;
+        float touchOffsetY = 0;
+
+        RectF rect = mCropWindowHandler.getRect();
+
+        // Calculate the offset from the appropriate handle.
+        switch (mType) {
+            case TOP_LEFT:
+                touchOffsetX = rect.left - touchX;
+                touchOffsetY = rect.top - touchY;
+                break;
+            case TOP_RIGHT:
+                touchOffsetX = rect.right - touchX;
+                touchOffsetY = rect.top - touchY;
+                break;
+            case BOTTOM_LEFT:
+                touchOffsetX = rect.left - touchX;
+                touchOffsetY = rect.bottom - touchY;
+                break;
+            case BOTTOM_RIGHT:
+                touchOffsetX = rect.right - touchX;
+                touchOffsetY = rect.bottom - touchY;
+                break;
+            case LEFT:
+                touchOffsetX = rect.left - touchX;
+                touchOffsetY = 0;
+                break;
+            case TOP:
+                touchOffsetX = 0;
+                touchOffsetY = rect.top - touchY;
+                break;
+            case RIGHT:
+                touchOffsetX = rect.right - touchX;
+                touchOffsetY = 0;
+                break;
+            case BOTTOM:
+                touchOffsetX = 0;
+                touchOffsetY = rect.bottom - touchY;
+                break;
+            case CENTER:
+                touchOffsetX = rect.centerX() - touchX;
+                touchOffsetY = rect.centerY() - touchY;
+                break;
+        }
+
+        mTouchOffset.x = touchOffsetX;
+        mTouchOffset.y = touchOffsetY;
+    }
 
     private void moveCenter(float x, float y, Rect imageRect, float snapRadius) {
         RectF rect = mCropWindowHandler.getRect();

@@ -23,7 +23,6 @@ import android.graphics.Region;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Pair;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -85,14 +84,6 @@ public class CropOverlayView extends View {
      * when the crop window edge is less than or equal to this distance (in pixels) away from the bounding box edge.
      */
     private float mSnapRadius;
-
-    /**
-     * Holds the x and y offset between the exact touch location and the exact handle location that is activated.
-     * There may be an offset because we allow for some leeway (specified by mHandleRadius) in activating a handle.
-     * However, we want to maintain these offset values while the handle is being dragged so that the handle
-     * doesn't jump.
-     */
-    private Pair<Float, Float> mTouchOffset;
 
     /**
      * The Handle that is currently pressed; null if no Handle is pressed.
@@ -631,61 +622,42 @@ public class CropOverlayView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         // If this View is not enabled, don't allow for touch interactions.
-        if (!isEnabled()) {
+        if (isEnabled()) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    onActionDown(event.getX(), event.getY());
+                    return true;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    getParent().requestDisallowInterceptTouchEvent(false);
+                    onActionUp();
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    onActionMove(event.getX(), event.getY());
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    return true;
+                default:
+                    return false;
+            }
+        } else {
             return false;
         }
-
-        switch (event.getAction()) {
-
-            case MotionEvent.ACTION_DOWN:
-                onActionDown(event.getX(), event.getY());
-                return true;
-
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                getParent().requestDisallowInterceptTouchEvent(false);
-                onActionUp();
-                return true;
-
-            case MotionEvent.ACTION_MOVE:
-                onActionMove(event.getX(), event.getY());
-                getParent().requestDisallowInterceptTouchEvent(true);
-                return true;
-
-            default:
-                return false;
-        }
     }
 
     /**
-     * Handles a {@link android.view.MotionEvent#ACTION_DOWN} event.
-     *
-     * @param x the x-coordinate of the down action
-     * @param y the y-coordinate of the down action
+     * On press down start crop window movment depending on the location of the press.<br>
+     * if press is far from crop window then no move handler is returned (null).
      */
     private void onActionDown(float x, float y) {
-
-        RectF rect = mCropWindowHandler.getRect();
-
-        mMoveHandler = mCropWindowHandler.getPressedHandle(x, y, rect.left, rect.top, rect.right, rect.bottom, mHandleRadius, mCropShape);
-
-        if (mMoveHandler == null) {
-            return;
+        mMoveHandler = mCropWindowHandler.getMoveHandler(x, y, mHandleRadius, mCropShape);
+        if (mMoveHandler != null) {
+            invalidate();
         }
-
-        // Calculate the offset of the touch point from the precise location
-        // of the handle. Save these values in a member variable since we want
-        // to maintain this offset as we drag the handle.
-        mTouchOffset = mCropWindowHandler.getOffset(mMoveHandler, x, y, rect.left, rect.top, rect.right, rect.bottom);
-
-        invalidate();
     }
 
     /**
-     * Handles a {@link android.view.MotionEvent#ACTION_UP} or
-     * {@link android.view.MotionEvent#ACTION_CANCEL} event.
+     * Clear move handler starting in {@link #onActionDown(float, float)} if exists.
      */
     private void onActionUp() {
         if (mMoveHandler != null) {
@@ -695,22 +667,11 @@ public class CropOverlayView extends View {
     }
 
     /**
-     * Handles a {@link android.view.MotionEvent#ACTION_MOVE} event.
-     *
-     * @param x the x-coordinate of the move event
-     * @param y the y-coordinate of the move event
+     * Handle move of crop window using the move handler created in {@link #onActionDown(float, float)}.<br>
+     * The move handler will do the proper move/resize of the crop window.
      */
     private void onActionMove(float x, float y) {
         if (mMoveHandler != null) {
-
-            // Adjust the coordinates for the finger position's offset (i.e. the
-            // distance from the initial touch to the precise handle location).
-            // We want to maintain the initial touch's distance to the pressed
-            // handle so that the crop window size does not "jump".
-            x += mTouchOffset.first;
-            y += mTouchOffset.second;
-
-            // Calculate the new crop window size/position.
             mMoveHandler.move(x, y, mBitmapRect, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
             invalidate();
         }
