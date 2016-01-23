@@ -14,20 +14,20 @@
             <enum name="rectangle" value="0"/>
             <enum name="oval" value="1"/>
         </attr>
-        <attr name="fixAspectRatio" format="boolean"/>
-        <attr name="aspectRatioX" format="integer"/>
-        <attr name="aspectRatioY" format="integer"/>
-        <attr name="borderLineThickness" format="float"/>
-        <attr name="borderLineColor" format="color"/>
-        <attr name="borderCornerThickness" format="float"/>
-        <attr name="borderCornerOffset" format="float"/>
-        <attr name="borderCornerLength" format="float"/>
-        <attr name="borderCornerColor" format="color"/>
-        <attr name="guidelinesThickness" format="float"/>
-        <attr name="guidelinesColor" format="color"/>
-        <attr name="backgroundColor" format="color"/>
-        <attr name="snapRadius" format="float"/>
-        <attr name="showProgressBar" format="boolean"/>
+        <attr name="cropFixAspectRatio" format="boolean"/>
+        <attr name="cropAspectRatioX" format="integer"/>
+        <attr name="cropAspectRatioY" format="integer"/>
+        <attr name="cropBorderLineThickness" format="float"/>
+        <attr name="cropBorderLineColor" format="color"/>
+        <attr name="cropBorderCornerThickness" format="float"/>
+        <attr name="cropBorderCornerOffset" format="float"/>
+        <attr name="cropBorderCornerLength" format="float"/>
+        <attr name="cropBorderCornerColor" format="color"/>
+        <attr name="cropGuidelinesThickness" format="float"/>
+        <attr name="cropGuidelinesColor" format="color"/>
+        <attr name="cropBackgroundColor" format="color"/>
+        <attr name="cropSnapRadius" format="float"/>
+        <attr name="cropShowProgressBar" format="boolean"/>
     </declare-styleable>
 
 </resources>

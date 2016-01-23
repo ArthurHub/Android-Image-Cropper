@@ -131,22 +131,22 @@ public class CropImageView extends FrameLayout {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
                 guidelines = ta.getInteger(R.styleable.CropImageView_guidelines, guidelines);
-                fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_fixAspectRatio, CropDefaults.DEFAULT_FIXED_ASPECT_RATIO);
-                aspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, CropDefaults.DEFAULT_ASPECT_RATIO_X);
-                aspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, CropDefaults.DEFAULT_ASPECT_RATIO_Y);
+                fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_cropFixAspectRatio, CropDefaults.DEFAULT_FIXED_ASPECT_RATIO);
+                aspectRatioX = ta.getInteger(R.styleable.CropImageView_cropAspectRatioX, CropDefaults.DEFAULT_ASPECT_RATIO_X);
+                aspectRatioY = ta.getInteger(R.styleable.CropImageView_cropAspectRatioY, CropDefaults.DEFAULT_ASPECT_RATIO_Y);
                 scaleType = CropDefaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, CropDefaults.DEFAULT_SCALE_TYPE_INDEX)];
                 cropShape = CropDefaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
-                snapRadius = ta.getFloat(R.styleable.CropImageView_snapRadius, snapRadius);
-                borderLineThickness = ta.getFloat(R.styleable.CropImageView_borderLineThickness, borderLineThickness);
-                borderLineColor = ta.getInteger(R.styleable.CropImageView_borderLineColor, borderLineColor);
-                borderCornerThickness = ta.getFloat(R.styleable.CropImageView_borderCornerThickness, borderCornerThickness);
-                borderCornerOffset = ta.getFloat(R.styleable.CropImageView_borderCornerOffset, borderCornerOffset);
-                borderCornerLength = ta.getFloat(R.styleable.CropImageView_borderCornerLength, borderCornerLength);
-                borderCornerColor = ta.getInteger(R.styleable.CropImageView_borderCornerColor, borderCornerColor);
-                guidelinesThickness = ta.getFloat(R.styleable.CropImageView_guidelinesThickness, guidelinesThickness);
-                guidelinesColor = ta.getInteger(R.styleable.CropImageView_guidelinesColor, guidelinesColor);
-                backgroundColor = ta.getInteger(R.styleable.CropImageView_backgroundColor, backgroundColor);
-                mShowProgressBar = ta.getBoolean(R.styleable.CropImageView_showProgressBar, mShowProgressBar);
+                snapRadius = ta.getFloat(R.styleable.CropImageView_cropSnapRadius, snapRadius);
+                borderLineThickness = ta.getFloat(R.styleable.CropImageView_cropBorderLineThickness, borderLineThickness);
+                borderLineColor = ta.getInteger(R.styleable.CropImageView_cropBorderLineColor, borderLineColor);
+                borderCornerThickness = ta.getFloat(R.styleable.CropImageView_cropBorderCornerThickness, borderCornerThickness);
+                borderCornerOffset = ta.getFloat(R.styleable.CropImageView_cropBorderCornerOffset, borderCornerOffset);
+                borderCornerLength = ta.getFloat(R.styleable.CropImageView_cropBorderCornerLength, borderCornerLength);
+                borderCornerColor = ta.getInteger(R.styleable.CropImageView_cropBorderCornerColor, borderCornerColor);
+                guidelinesThickness = ta.getFloat(R.styleable.CropImageView_cropGuidelinesThickness, guidelinesThickness);
+                guidelinesColor = ta.getInteger(R.styleable.CropImageView_cropGuidelinesColor, guidelinesColor);
+                backgroundColor = ta.getInteger(R.styleable.CropImageView_cropBackgroundColor, backgroundColor);
+                mShowProgressBar = ta.getBoolean(R.styleable.CropImageView_cropShowProgressBar, mShowProgressBar);
             } finally {
                 ta.recycle();
             }
