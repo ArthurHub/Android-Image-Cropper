@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference;
 /**
  * Task to load bitmap asynchronously from the UI thread.
  */
-class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingWorkerTask.Result> {
+final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingWorkerTask.Result> {
 
     //region: Fields and Consts
 

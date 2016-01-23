@@ -12,36 +12,50 @@
 
 package com.theartofdev.edmodo.cropper;
 
+import android.graphics.RectF;
 import android.util.Pair;
 
 /**
  * Handler from crop window stuff, moving and knowing possition.
  */
-class CropWindowHandler {
+final class CropWindowHandler {
 
     //region: Fields and Consts
 
-    private final CropWindowMoveHandler mTopLeftMoveHandler = new CropWindowMoveHandler(Edge.TOP, Edge.LEFT);
+    private final RectF mEdges = new RectF();
 
-    private final CropWindowMoveHandler mTopRightMoveHandler = new CropWindowMoveHandler(Edge.TOP, Edge.RIGHT);
-
-    private final CropWindowMoveHandler mBottomLeftMoveHandler = new CropWindowMoveHandler(Edge.BOTTOM, Edge.LEFT);
-
-    private final CropWindowMoveHandler mBottomRightMoveHandler = new CropWindowMoveHandler(Edge.BOTTOM, Edge.RIGHT);
-
-    private final CropWindowMoveHandler mLeftMoveHandler = new CropWindowMoveHandler(null, Edge.LEFT);
-
-    private final CropWindowMoveHandler mTopMoveHandler = new CropWindowMoveHandler(Edge.TOP, null);
-
-    private final CropWindowMoveHandler mRightMoveHandler = new CropWindowMoveHandler(null, Edge.RIGHT);
-
-    private final CropWindowMoveHandler mBottomMoveHandler = new CropWindowMoveHandler(Edge.BOTTOM, null);
-
-    private final CropWindowMoveHandler mCenterMoveHandler = new CropWindowMoveHandler(null, null);
-
-    //private final Edge mLeft = new ;
-
+    /**
+     * Rectangle used to return the edges rectangle without ability to change it and without creating new all the time.
+     */
+    private final RectF mGetEdges = new RectF();
     //endregion
+
+    /**
+     * Get the left/top/right/bottom coordinates of the crop window.
+     */
+    public RectF getRect() {
+        mGetEdges.set(mEdges);
+        return mGetEdges;
+    }
+
+    /**
+     * Set the left/top/right/bottom coordinates of the crop window.
+     */
+    public void setRect(RectF rect) {
+        mEdges.set(rect);
+    }
+
+    /**
+     * Indicates whether the crop window is small enough that the guidelines
+     * should be shown. Public because this function is also used to determine
+     * if the center handle should be focused.
+     *
+     * @return boolean Whether the guidelines should be shown or not
+     */
+    public boolean showGuidelines() {
+        return !(mEdges.width() < CropDefaults.DEFAULT_SHOW_GUIDELINES_LIMIT
+                || mEdges.height() < CropDefaults.DEFAULT_SHOW_GUIDELINES_LIMIT);
+    }
 
     /**
      * Determines which, if any, of the handles are pressed given the touch
@@ -57,9 +71,10 @@ class CropWindowHandler {
      * @return the Handle that was pressed; null if no Handle was pressed
      */
     public CropWindowMoveHandler getPressedHandle(float x, float y, float left, float top, float right, float bottom, float targetRadius, CropImageView.CropShape cropShape) {
-        return cropShape == CropImageView.CropShape.OVAL
-                ? getOvalPressedHandle(x, y, left, top, right, bottom)
-                : getRectanglePressedHandle(x, y, left, top, right, bottom, targetRadius);
+        CropWindowMoveHandler.Type type = cropShape == CropImageView.CropShape.OVAL
+                ? getOvalPressedMoveType(x, y, left, top, right, bottom)
+                : getRectanglePressedMoveType(x, y, left, top, right, bottom, targetRadius);
+        return type != null ? new CropWindowMoveHandler(type, x, y, this) : null;
     }
 
     //region: Private methods
@@ -77,33 +92,33 @@ class CropWindowHandler {
      * @param targetRadius the target radius in pixels
      * @return the Handle that was pressed; null if no Handle was pressed
      */
-    private CropWindowMoveHandler getRectanglePressedHandle(float x, float y, float left, float top, float right, float bottom, float targetRadius) {
-        CropWindowMoveHandler pressedHandle = null;
+    private CropWindowMoveHandler.Type getRectanglePressedMoveType(float x, float y, float left, float top, float right, float bottom, float targetRadius) {
+        CropWindowMoveHandler.Type moveType = null;
 
         // Note: corner-handles take precedence, then side-handles, then center.
         if (CropWindowHandler.isInCornerTargetZone(x, y, left, top, targetRadius)) {
-            pressedHandle = mTopLeftMoveHandler;
+            moveType = CropWindowMoveHandler.Type.TOP_LEFT;
         } else if (CropWindowHandler.isInCornerTargetZone(x, y, right, top, targetRadius)) {
-            pressedHandle = mTopRightMoveHandler;
+            moveType = CropWindowMoveHandler.Type.TOP_RIGHT;
         } else if (CropWindowHandler.isInCornerTargetZone(x, y, left, bottom, targetRadius)) {
-            pressedHandle = mBottomLeftMoveHandler;
+            moveType = CropWindowMoveHandler.Type.BOTTOM_LEFT;
         } else if (CropWindowHandler.isInCornerTargetZone(x, y, right, bottom, targetRadius)) {
-            pressedHandle = mBottomRightMoveHandler;
+            moveType = CropWindowMoveHandler.Type.BOTTOM_RIGHT;
         } else if (CropWindowHandler.isInCenterTargetZone(x, y, left, top, right, bottom) && focusCenter()) {
-            pressedHandle = mCenterMoveHandler;
+            moveType = CropWindowMoveHandler.Type.CENTER;
         } else if (CropWindowHandler.isInHorizontalTargetZone(x, y, left, right, top, targetRadius)) {
-            pressedHandle = mTopMoveHandler;
+            moveType = CropWindowMoveHandler.Type.TOP;
         } else if (CropWindowHandler.isInHorizontalTargetZone(x, y, left, right, bottom, targetRadius)) {
-            pressedHandle = mBottomMoveHandler;
+            moveType = CropWindowMoveHandler.Type.BOTTOM;
         } else if (CropWindowHandler.isInVerticalTargetZone(x, y, left, top, bottom, targetRadius)) {
-            pressedHandle = mLeftMoveHandler;
+            moveType = CropWindowMoveHandler.Type.LEFT;
         } else if (CropWindowHandler.isInVerticalTargetZone(x, y, right, top, bottom, targetRadius)) {
-            pressedHandle = mRightMoveHandler;
+            moveType = CropWindowMoveHandler.Type.RIGHT;
         } else if (CropWindowHandler.isInCenterTargetZone(x, y, left, top, right, bottom) && !focusCenter()) {
-            pressedHandle = mCenterMoveHandler;
+            moveType = CropWindowMoveHandler.Type.CENTER;
         }
 
-        return pressedHandle;
+        return moveType;
     }
 
     /**
@@ -118,7 +133,7 @@ class CropWindowHandler {
      * @param bottom the y-coordinate of the bottom bound
      * @return the Handle that was pressed; null if no Handle was pressed
      */
-    private CropWindowMoveHandler getOvalPressedHandle(float x, float y, float left, float top, float right, float bottom) {
+    private CropWindowMoveHandler.Type getOvalPressedMoveType(float x, float y, float left, float top, float right, float bottom) {
 
         /*
            Use a 6x6 grid system divided into 9 "handles", with the center the biggest region. While
@@ -139,34 +154,34 @@ class CropWindowHandler {
         float topCenter = top + cellHeight;
         float bottomCenter = top + 5 * cellHeight;
 
-        CropWindowMoveHandler pressedHandle;
+        CropWindowMoveHandler.Type moveType;
         if (x < leftCenter) {
             if (y < topCenter) {
-                pressedHandle = mTopLeftMoveHandler;
+                moveType = CropWindowMoveHandler.Type.TOP_LEFT;
             } else if (y < bottomCenter) {
-                pressedHandle = mLeftMoveHandler;
+                moveType = CropWindowMoveHandler.Type.LEFT;
             } else {
-                pressedHandle = mBottomLeftMoveHandler;
+                moveType = CropWindowMoveHandler.Type.BOTTOM_LEFT;
             }
         } else if (x < rightCenter) {
             if (y < topCenter) {
-                pressedHandle = mTopMoveHandler;
+                moveType = CropWindowMoveHandler.Type.TOP;
             } else if (y < bottomCenter) {
-                pressedHandle = mCenterMoveHandler;
+                moveType = CropWindowMoveHandler.Type.CENTER;
             } else {
-                pressedHandle = mBottomMoveHandler;
+                moveType = CropWindowMoveHandler.Type.BOTTOM;
             }
         } else {
             if (y < topCenter) {
-                pressedHandle = mTopRightMoveHandler;
+                moveType = CropWindowMoveHandler.Type.TOP_RIGHT;
             } else if (y < bottomCenter) {
-                pressedHandle = mRightMoveHandler;
+                moveType = CropWindowMoveHandler.Type.RIGHT;
             } else {
-                pressedHandle = mBottomRightMoveHandler;
+                moveType = CropWindowMoveHandler.Type.BOTTOM_RIGHT;
             }
         }
 
-        return pressedHandle;
+        return moveType;
     }
 
     /**
@@ -186,33 +201,43 @@ class CropWindowHandler {
         float touchOffsetY = 0;
 
         // Calculate the offset from the appropriate handle.
-        if (handler == mTopLeftMoveHandler) {
-            touchOffsetX = left - x;
-            touchOffsetY = top - y;
-        } else if (handler == mTopRightMoveHandler) {
-            touchOffsetX = right - x;
-            touchOffsetY = top - y;
-        } else if (handler == mBottomLeftMoveHandler) {
-            touchOffsetX = left - x;
-            touchOffsetY = bottom - y;
-        } else if (handler == mBottomRightMoveHandler) {
-            touchOffsetX = right - x;
-            touchOffsetY = bottom - y;
-        } else if (handler == mLeftMoveHandler) {
-            touchOffsetX = left - x;
-            touchOffsetY = 0;
-        } else if (handler == mTopMoveHandler) {
-            touchOffsetX = 0;
-            touchOffsetY = top - y;
-        } else if (handler == mRightMoveHandler) {
-            touchOffsetX = right - x;
-            touchOffsetY = 0;
-        } else if (handler == mBottomMoveHandler) {
-            touchOffsetX = 0;
-            touchOffsetY = bottom - y;
-        } else if (handler == mCenterMoveHandler) {
-            touchOffsetX = (right + left) / 2 - x;
-            touchOffsetY = (top + bottom) / 2 - y;
+        switch (handler.mType) {
+            case TOP_LEFT:
+                touchOffsetX = left - x;
+                touchOffsetY = top - y;
+                break;
+            case TOP_RIGHT:
+                touchOffsetX = right - x;
+                touchOffsetY = top - y;
+                break;
+            case BOTTOM_LEFT:
+                touchOffsetX = left - x;
+                touchOffsetY = bottom - y;
+                break;
+            case BOTTOM_RIGHT:
+                touchOffsetX = right - x;
+                touchOffsetY = bottom - y;
+                break;
+            case LEFT:
+                touchOffsetX = left - x;
+                touchOffsetY = 0;
+                break;
+            case TOP:
+                touchOffsetX = 0;
+                touchOffsetY = top - y;
+                break;
+            case RIGHT:
+                touchOffsetX = right - x;
+                touchOffsetY = 0;
+                break;
+            case BOTTOM:
+                touchOffsetX = 0;
+                touchOffsetY = bottom - y;
+                break;
+            case CENTER:
+                touchOffsetX = (right + left) / 2 - x;
+                touchOffsetY = (top + bottom) / 2 - y;
+                break;
         }
 
         return new Pair<Float, Float>(touchOffsetX, touchOffsetY);
@@ -295,8 +320,8 @@ class CropWindowHandler {
      * @return true if it is small enough such that it should focus on the
      * center; less than show_guidelines limit
      */
-    private static boolean focusCenter() {
-        return !CropOverlayView.showGuidelines();
+    private boolean focusCenter() {
+        return !showGuidelines();
     }
     //endregion
 }

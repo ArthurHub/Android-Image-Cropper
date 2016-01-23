@@ -20,7 +20,7 @@ import android.widget.ImageView;
 /**
  * Defaults used in the library.
  */
-class CropDefaults {
+final class CropDefaults {
 
     public static final Rect EMPTY_RECT = new Rect();
 

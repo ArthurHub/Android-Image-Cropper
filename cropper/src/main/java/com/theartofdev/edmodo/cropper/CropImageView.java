@@ -19,6 +19,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -281,23 +282,24 @@ public class CropImageView extends FrameLayout {
      */
     public Rect getActualCropRect() {
         if (mBitmap != null) {
-            final Rect displayedImageRect = BitmapUtils.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
+            Rect displayedImageRect = BitmapUtils.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
 
             // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width.
-            final float actualImageWidth = mBitmap.getWidth();
-            final float displayedImageWidth = displayedImageRect.width();
-            final float scaleFactorWidth = actualImageWidth / displayedImageWidth;
+            float actualImageWidth = mBitmap.getWidth();
+            float displayedImageWidth = displayedImageRect.width();
+            float scaleFactorWidth = actualImageWidth / displayedImageWidth;
 
             // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for height.
-            final float actualImageHeight = mBitmap.getHeight();
-            final float displayedImageHeight = displayedImageRect.height();
-            final float scaleFactorHeight = actualImageHeight / displayedImageHeight;
+            float actualImageHeight = mBitmap.getHeight();
+            float displayedImageHeight = displayedImageRect.height();
+            float scaleFactorHeight = actualImageHeight / displayedImageHeight;
 
             // Get crop window position relative to the displayed image.
-            final float displayedCropLeft = Edge.LEFT.getCoordinate() - displayedImageRect.left;
-            final float displayedCropTop = Edge.TOP.getCoordinate() - displayedImageRect.top;
-            final float displayedCropWidth = Edge.getWidth();
-            final float displayedCropHeight = Edge.getHeight();
+            RectF cropWindowRect = mCropOverlayView.getCropWindowRect();
+            float displayedCropLeft = cropWindowRect.left - displayedImageRect.left;
+            float displayedCropTop = cropWindowRect.top - displayedImageRect.top;
+            float displayedCropWidth = cropWindowRect.width();
+            float displayedCropHeight = cropWindowRect.height();
 
             // Scale the crop window position to the actual size of the Bitmap.
             float actualCropLeft = displayedCropLeft * scaleFactorWidth;

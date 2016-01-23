@@ -1,15 +1,14 @@
-/*
- * Copyright 2013, Edmodo, Inc. 
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the License.
- * You may obtain a copy of the License in the LICENSE file, or at:
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" 
- * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
- * governing permissions and limitations under the License. 
- */
+// "Therefore those skilled at the unorthodox
+// are infinite as heaven and earth,
+// inexhaustible as the great rivers.
+// When they come to an end,
+// they begin again,
+// like the days and months;
+// they die and are reborn,
+// like the four seasons."
+//
+// - Sun Tsu,
+// "The Art of War"
 
 package com.theartofdev.edmodo.cropper;
 
@@ -40,7 +39,7 @@ import java.io.InputStream;
 /**
  * Utility class that deals with operations with an ImageView.
  */
-class BitmapUtils {
+final class BitmapUtils {
 
     /**
      * Gets the rectangular position of a Bitmap if it were placed inside a View.

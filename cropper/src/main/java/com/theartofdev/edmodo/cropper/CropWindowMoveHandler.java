@@ -13,33 +13,57 @@
 package com.theartofdev.edmodo.cropper;
 
 import android.graphics.Rect;
+import android.graphics.RectF;
 
 /**
  * Handler to update crop window edges by the move type - Horizontal, Vertical, Corner or Center.<br/>
  */
-class CropWindowMoveHandler {
+final class CropWindowMoveHandler {
 
     //region: Fields and Consts
 
     /**
-     * Horizontal edge of the crop window, can be left or right esge.
+     * Minimum distance in pixels that one edge can get to its opposing edge.
      */
-    private final Edge mHorizontalEdge;
+    public static final int MIN_CROP_VERTICAL_LENGTH = 60;
 
     /**
-     * Vertical edge of the crop window, can be top or bottom esge.
+     * Minimum distance in pixels that one edge can get to its opposing edge.
      */
-    private final Edge mVerticalEdge;
+    public static final int MIN_CROP_HORIZONTAL_LENGTH = 60;
+
+    /**
+     * The type of crop window move that is handled.
+     */
+    final Type mType;
+
+    /**
+     * the x-location of the initial touch that started the move
+     */
+    private final float mTouchX;
+
+    /**
+     * the y-location of the initial touch that started the move
+     */
+    private final float mTouchY;
+
+    private final CropWindowHandler mCropWindowHandler;
+
     //endregion
 
     /**
      * @param edgeMoveType the type of move this handler is executing
      * @param horizontalEdge the primary edge associated with this handle; may be null
      * @param verticalEdge the secondary edge associated with this handle; may be null
+     * @param touchX
+     * @param touchY
+     * @param cropWindowHandler
      */
-    public CropWindowMoveHandler(Edge horizontalEdge, Edge verticalEdge) {
-        mHorizontalEdge = horizontalEdge;
-        mVerticalEdge = verticalEdge;
+    public CropWindowMoveHandler(Type type, float touchX, float touchY, CropWindowHandler cropWindowHandler) {
+        mTouchX = touchX;
+        mTouchY = touchY;
+        mCropWindowHandler = cropWindowHandler;
+        mType = type;
     }
 
     /**
@@ -47,31 +71,20 @@ class CropWindowMoveHandler {
      *
      * @param x the new x-coordinate of this handle
      * @param y the new y-coordinate of this handle
-     * @param imageRect the bounding rectangle of the image
+     * @param bounds the bounding rectangle of the image
      * @param parentView the parent View containing the image
-     * @param snapRadius the maximum distance (in pixels) at which the crop window should snap to the image
-     * @param fixAspectRatio is the aspect ration fixed and 'targetAspectRatio' should be used
-     * @param targetAspectRatio the aspect ratio to maintain
+     * @param snapMargin the maximum distance (in pixels) at which the crop window should snap to the image
+     * @param fixedAspectRatio is the aspect ration fixed and 'targetAspectRatio' should be used
+     * @param aspectRatio the aspect ratio to maintain
      */
-    public void move(float x, float y, Rect imageRect, float snapRadius, boolean fixAspectRatio, float targetAspectRatio) {
-        if (mHorizontalEdge == null && mVerticalEdge == null) {
-            moveCenter(x, y, imageRect, snapRadius);
+    public void move(float x, float y, Rect bounds, float snapMargin, boolean fixedAspectRatio, float aspectRatio) {
+        if (mType == Type.CENTER) {
+            moveCenter(x, y, bounds, snapMargin);
         } else {
-            if (fixAspectRatio) {
-                if (mHorizontalEdge != null && mVerticalEdge != null) {
-                    moveCorner(x, y, imageRect, snapRadius, targetAspectRatio);
-                } else if (mHorizontalEdge != null) {
-                    moveHorizontal(x, y, imageRect, snapRadius, targetAspectRatio);
-                } else {
-                    moveVertical(x, y, imageRect, snapRadius, targetAspectRatio);
-                }
+            if (fixedAspectRatio) {
+                MoveWithFixedAspectRatio(x, y, bounds, snapMargin, aspectRatio);
             } else {
-                if (mHorizontalEdge != null) {
-                    mHorizontalEdge.adjustCoordinate(x, y, imageRect, snapRadius, 0);
-                }
-                if (mVerticalEdge != null) {
-                    mVerticalEdge.adjustCoordinate(x, y, imageRect, snapRadius, 0);
-                }
+                MoveWithFreeAspectRatio(x, y, bounds, snapMargin);
             }
         }
     }
@@ -79,158 +92,396 @@ class CropWindowMoveHandler {
     //region: Private methods
 
     private void moveCenter(float x, float y, Rect imageRect, float snapRadius) {
+        RectF rect = mCropWindowHandler.getRect();
+        rect.offset(x - rect.centerX(), y - rect.centerY());
+        snapEdgesToBounds(rect, imageRect, snapRadius);
+        mCropWindowHandler.setRect(rect);
+    }
 
-        float left = Edge.LEFT.getCoordinate();
-        float top = Edge.TOP.getCoordinate();
-        float right = Edge.RIGHT.getCoordinate();
-        float bottom = Edge.BOTTOM.getCoordinate();
-
-        float currentCenterX = (left + right) / 2;
-        float currentCenterY = (top + bottom) / 2;
-
-        float offsetX = x - currentCenterX;
-        float offsetY = y - currentCenterY;
-
-        // Adjust the crop window.
-        Edge.LEFT.offset(offsetX);
-        Edge.TOP.offset(offsetY);
-        Edge.RIGHT.offset(offsetX);
-        Edge.BOTTOM.offset(offsetY);
-
-        // Check if we have gone out of bounds on the sides, and fix.
-        if (Edge.LEFT.isOutsideMargin(imageRect, snapRadius)) {
-            float offset = Edge.LEFT.snapToRect(imageRect);
-            Edge.RIGHT.offset(offset);
-        } else if (Edge.RIGHT.isOutsideMargin(imageRect, snapRadius)) {
-            float offset = Edge.RIGHT.snapToRect(imageRect);
-            Edge.LEFT.offset(offset);
-        }
-
-        // Check if we have gone out of bounds on the top or bottom, and fix.
-        if (Edge.TOP.isOutsideMargin(imageRect, snapRadius)) {
-            float offset = Edge.TOP.snapToRect(imageRect);
-            Edge.BOTTOM.offset(offset);
-        } else if (Edge.BOTTOM.isOutsideMargin(imageRect, snapRadius)) {
-            float offset = Edge.BOTTOM.snapToRect(imageRect);
-            Edge.TOP.offset(offset);
+    private void MoveWithFreeAspectRatio(float x, float y, Rect bounds, float snapMargin) {
+        switch (mType) {
+            case TOP_LEFT:
+                adjustTop(y, bounds, snapMargin, 0, false, false);
+                adjustLeft(x, bounds, snapMargin, 0, false, false);
+                break;
+            case TOP_RIGHT:
+                adjustTop(y, bounds, snapMargin, 0, false, false);
+                adjustRight(x, bounds, snapMargin, 0, false, false);
+                break;
+            case BOTTOM_LEFT:
+                adjustBottom(y, bounds, snapMargin, 0, false, false);
+                adjustLeft(x, bounds, snapMargin, 0, false, false);
+                break;
+            case BOTTOM_RIGHT:
+                adjustBottom(y, bounds, snapMargin, 0, false, false);
+                adjustRight(x, bounds, snapMargin, 0, false, false);
+                break;
+            case LEFT:
+                adjustLeft(x, bounds, snapMargin, 0, false, false);
+                break;
+            case TOP:
+                adjustTop(y, bounds, snapMargin, 0, false, false);
+                break;
+            case RIGHT:
+                adjustRight(x, bounds, snapMargin, 0, false, false);
+                break;
+            case BOTTOM:
+                adjustBottom(y, bounds, snapMargin, 0, false, false);
+            default:
+                break;
         }
     }
 
-    private void moveCorner(float x, float y, Rect imageRect, float snapRadius, float targetAspectRatio) {
-
-        float potentialAspectRatio = getAspectRatio(x, y);
-        Edge primaryEdge = potentialAspectRatio > targetAspectRatio ? mVerticalEdge : mHorizontalEdge;
-        Edge secondaryEdge = potentialAspectRatio > targetAspectRatio ? mHorizontalEdge : mVerticalEdge;
-
-        primaryEdge.adjustCoordinate(x, y, imageRect, snapRadius, targetAspectRatio);
-        secondaryEdge.adjustCoordinate(targetAspectRatio);
-
-        if (secondaryEdge.isOutsideMargin(imageRect, snapRadius)) {
-            secondaryEdge.snapToRect(imageRect);
-            primaryEdge.adjustCoordinate(targetAspectRatio);
-        }
-    }
-
-    private void moveHorizontal(float x, float y, Rect imageRect, float snapRadius, float targetAspectRatio) {
-
-        // Adjust this Edge accordingly.
-        mHorizontalEdge.adjustCoordinate(x, y, imageRect, snapRadius, targetAspectRatio);
-
-        float left = Edge.LEFT.getCoordinate();
-        float top = Edge.TOP.getCoordinate();
-        float right = Edge.RIGHT.getCoordinate();
-        float bottom = Edge.BOTTOM.getCoordinate();
-
-        // After this Edge is moved, our crop window is now out of proportion.
-        final float targetWidth = AspectRatioUtil.calculateWidth(top, bottom, targetAspectRatio);
-        final float currentWidth = right - left;
-
-        // Adjust the crop window so that it maintains the given aspect ratio by
-        // moving the adjacent edges symmetrically in or out.
-        final float difference = targetWidth - currentWidth;
-        final float halfDifference = difference / 2;
-        left -= halfDifference;
-        right += halfDifference;
-
-        Edge.LEFT.setCoordinate(left);
-        Edge.RIGHT.setCoordinate(right);
-
-        // Check if we have gone out of bounds on the sides, and fix.
-        if (Edge.LEFT.isOutsideMargin(imageRect, snapRadius) && !mHorizontalEdge.isNewRectangleOutOfBounds(Edge.LEFT,
-                imageRect,
-                targetAspectRatio)) {
-            final float offset = Edge.LEFT.snapToRect(imageRect);
-            Edge.RIGHT.offset(-offset);
-            mHorizontalEdge.adjustCoordinate(targetAspectRatio);
-
-        }
-        if (Edge.RIGHT.isOutsideMargin(imageRect, snapRadius) && !mHorizontalEdge.isNewRectangleOutOfBounds(Edge.RIGHT,
-                imageRect,
-                targetAspectRatio)) {
-            final float offset = Edge.RIGHT.snapToRect(imageRect);
-            Edge.LEFT.offset(-offset);
-            mHorizontalEdge.adjustCoordinate(targetAspectRatio);
-        }
-    }
-
-    private void moveVertical(float x, float y, Rect imageRect, float snapRadius, float targetAspectRatio) {
-
-        // Adjust this Edge accordingly.
-        mVerticalEdge.adjustCoordinate(x, y, imageRect, snapRadius, targetAspectRatio);
-
-        float left = Edge.LEFT.getCoordinate();
-        float top = Edge.TOP.getCoordinate();
-        float right = Edge.RIGHT.getCoordinate();
-        float bottom = Edge.BOTTOM.getCoordinate();
-
-        // After this Edge is moved, our crop window is now out of proportion.
-        final float targetHeight = AspectRatioUtil.calculateHeight(left, right, targetAspectRatio);
-        final float currentHeight = bottom - top;
-
-        // Adjust the crop window so that it maintains the given aspect ratio by
-        // moving the adjacent edges symmetrically in or out.
-        final float difference = targetHeight - currentHeight;
-        final float halfDifference = difference / 2;
-        top -= halfDifference;
-        bottom += halfDifference;
-
-        Edge.TOP.setCoordinate(top);
-        Edge.BOTTOM.setCoordinate(bottom);
-
-        // Check if we have gone out of bounds on the top or bottom, and fix.
-        if (Edge.TOP.isOutsideMargin(imageRect, snapRadius) &&
-                !mVerticalEdge.isNewRectangleOutOfBounds(Edge.TOP, imageRect, targetAspectRatio)) {
-            float offset = Edge.TOP.snapToRect(imageRect);
-            Edge.BOTTOM.offset(-offset);
-            mVerticalEdge.adjustCoordinate(targetAspectRatio);
-        }
-        if (Edge.BOTTOM.isOutsideMargin(imageRect, snapRadius) &&
-                !mVerticalEdge.isNewRectangleOutOfBounds(Edge.BOTTOM, imageRect, targetAspectRatio)) {
-            float offset = Edge.BOTTOM.snapToRect(imageRect);
-            Edge.TOP.offset(-offset);
-            mVerticalEdge.adjustCoordinate(targetAspectRatio);
+    private void MoveWithFixedAspectRatio(float x, float y, Rect bounds, float snapMargin, float aspectRatio) {
+        RectF rect = mCropWindowHandler.getRect();
+        switch (mType) {
+            case TOP_LEFT:
+                if (calculateAspectRatio(x, y, rect.right, rect.bottom) < aspectRatio) {
+                    adjustTop(y, bounds, snapMargin, aspectRatio, true, false);
+                    adjustLeftByAspectRatio(aspectRatio);
+                } else {
+                    adjustLeft(x, bounds, snapMargin, aspectRatio, true, false);
+                    adjustTopByAspectRatio(aspectRatio);
+                }
+                break;
+            case TOP_RIGHT:
+                if (calculateAspectRatio(rect.left, y, x, rect.bottom) < aspectRatio) {
+                    adjustTop(y, bounds, snapMargin, aspectRatio, false, true);
+                    adjustRightByAspectRatio(aspectRatio);
+                } else {
+                    adjustRight(x, bounds, snapMargin, aspectRatio, true, false);
+                    adjustTopByAspectRatio(aspectRatio);
+                }
+                break;
+            case BOTTOM_LEFT:
+                if (calculateAspectRatio(x, rect.top, rect.right, y) < aspectRatio) {
+                    adjustBottom(y, bounds, snapMargin, aspectRatio, true, false);
+                    adjustLeftByAspectRatio(aspectRatio);
+                } else {
+                    adjustLeft(x, bounds, snapMargin, aspectRatio, false, true);
+                    adjustBottomByAspectRatio(aspectRatio);
+                }
+                break;
+            case BOTTOM_RIGHT:
+                if (calculateAspectRatio(rect.left, rect.top, x, y) < aspectRatio) {
+                    adjustBottom(y, bounds, snapMargin, aspectRatio, false, true);
+                    adjustRightByAspectRatio(aspectRatio);
+                } else {
+                    adjustRight(x, bounds, snapMargin, aspectRatio, false, true);
+                    adjustBottomByAspectRatio(aspectRatio);
+                }
+                break;
+            case LEFT:
+                adjustLeft(x, bounds, snapMargin, aspectRatio, true, true);
+                adjustTopBottomByAspectRatio(aspectRatio);
+                break;
+            case TOP:
+                adjustTop(y, bounds, snapMargin, aspectRatio, true, true);
+                adjustLeftRightByAspectRatio(aspectRatio);
+                break;
+            case RIGHT:
+                adjustRight(x, bounds, snapMargin, aspectRatio, true, true);
+                adjustTopBottomByAspectRatio(aspectRatio);
+                break;
+            case BOTTOM:
+                adjustBottom(y, bounds, snapMargin, aspectRatio, true, true);
+                adjustLeftRightByAspectRatio(aspectRatio);
+                break;
+            default:
+                break;
         }
     }
 
     /**
-     * Gets the aspect ratio of the resulting crop window if this handle were
-     * dragged to the given point.
-     *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
-     * @return the aspect ratio
+     * Check if edges have gone out of bounds (including snap margin), and fix if needed.
      */
-    private float getAspectRatio(float x, float y) {
+    private void snapEdgesToBounds(RectF edges, Rect bounds, float margin) {
+        if (edges.left < bounds.left + margin) {
+            edges.offset(bounds.left - edges.left, 0);
+        }
+        if (edges.top < bounds.top + margin) {
+            edges.offset(0, bounds.top - edges.top);
+        }
+        if (edges.right > bounds.right - margin) {
+            edges.offset(bounds.right - edges.right, 0);
+        }
+        if (edges.bottom > bounds.bottom - margin) {
+            edges.offset(0, bounds.bottom - edges.bottom);
+        }
+    }
 
-        // Replace the active edge coordinate with the given touch coordinate.
-        float left = mVerticalEdge == Edge.LEFT ? x : Edge.LEFT.getCoordinate();
-        float top = mHorizontalEdge == Edge.TOP ? y : Edge.TOP.getCoordinate();
-        float right = mVerticalEdge == Edge.RIGHT ? x : Edge.RIGHT.getCoordinate();
-        float bottom = mHorizontalEdge == Edge.BOTTOM ? y : Edge.BOTTOM.getCoordinate();
+    /**
+     * Get the resulting x-position of the left edge of the crop window given
+     * the handle's position and the image's bounding box and snap radius.
+     *
+     * @param left the position that the left edge is dragged to
+     * @param bounds the bounding box of the image that is being cropped
+     * @param snapMargin the snap distance to the image edge (in pixels)
+     */
+    private void adjustLeft(float left, Rect bounds, float snapMargin, float aspectRatio, boolean topMoves, boolean bottomMoves) {
 
-        float aspectRatio = AspectRatioUtil.calculateAspectRatio(left, top, right, bottom);
+        RectF rect = mCropWindowHandler.getRect();
 
-        return aspectRatio;
+        float newLeft = left;
+
+        if (newLeft - bounds.left < snapMargin) {
+            newLeft = bounds.left;
+        }
+
+        // Checks if the window is too small horizontally
+        if (rect.right - newLeft < MIN_CROP_HORIZONTAL_LENGTH) {
+            newLeft = rect.right - MIN_CROP_HORIZONTAL_LENGTH;
+        }
+
+        // check vertical bounds if aspect ratio is in play
+        if (aspectRatio > 0) {
+            float newHeight = (rect.right - newLeft) / aspectRatio;
+
+            // Checks if the window is too small vertically
+            if (newHeight < MIN_CROP_VERTICAL_LENGTH) {
+                newLeft = rect.right - (MIN_CROP_VERTICAL_LENGTH * aspectRatio);
+            }
+
+            // if top edge moves by aspect ratio check that it is within bounds
+            if (topMoves && rect.bottom - newHeight < bounds.top) {
+                newLeft = rect.right - ((rect.bottom - bounds.top) * aspectRatio);
+            }
+
+            // if bottom edge moves by aspect ratio check that it is within bounds
+            if (bottomMoves && rect.top + newHeight > bounds.bottom) {
+                newLeft = Math.max(newLeft, rect.right - ((bounds.bottom - rect.top) * aspectRatio));
+            }
+        }
+
+        rect.left = newLeft;
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Get the resulting x-position of the right edge of the crop window given
+     * the handle's position and the image's bounding box and snap radius.
+     *
+     * @param right the position that the right edge is dragged to
+     * @param bounds the bounding box of the image that is being cropped
+     * @param snapMargin the snap distance to the image edge (in pixels)
+     */
+    private void adjustRight(float right, Rect bounds, float snapMargin, float aspectRatio, boolean topMoves, boolean bottomMoves) {
+
+        RectF rect = mCropWindowHandler.getRect();
+
+        float newRight = right;
+
+        // If close to the edge
+        if (bounds.right - newRight < snapMargin) {
+            newRight = bounds.right;
+        }
+
+        // Checks if the window is too small horizontally
+        if (newRight - rect.left < MIN_CROP_HORIZONTAL_LENGTH) {
+            newRight = rect.left + MIN_CROP_HORIZONTAL_LENGTH;
+        }
+
+        // check vertical bounds if aspect ratio is in play
+        if (aspectRatio > 0) {
+            float newHeight = (newRight - rect.left) / aspectRatio;
+
+            // Checks if the window is too small vertically
+            if (newHeight < MIN_CROP_VERTICAL_LENGTH) {
+                newRight = rect.left + (MIN_CROP_VERTICAL_LENGTH * aspectRatio);
+            }
+
+            // if top edge moves by aspect ratio check that it is within bounds
+            if (topMoves && rect.bottom - newHeight < bounds.top) {
+                newRight = rect.left + ((rect.bottom - bounds.top) * aspectRatio);
+            }
+
+            // if bottom edge moves by aspect ratio check that it is within bounds
+            if (bottomMoves && rect.top + newHeight > bounds.bottom) {
+                newRight = Math.min(newRight, rect.left + ((bounds.bottom - rect.top) * aspectRatio));
+            }
+        }
+
+        rect.right = newRight;
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Get the resulting y-position of the top edge of the crop window given the
+     * handle's position and the image's bounding box and snap radius.
+     *
+     * @param top the x-position that the top edge is dragged to
+     * @param bounds the bounding box of the image that is being cropped
+     * @param snapMargin the snap distance to the image edge (in pixels)
+     */
+    private void adjustTop(float top, Rect bounds, float snapMargin, float aspectRatio, boolean leftMoves, boolean rightMoves) {
+
+        RectF rect = mCropWindowHandler.getRect();
+
+        float newTop = top;
+
+        if (newTop - bounds.top < snapMargin) {
+            newTop = bounds.top;
+        }
+
+        // Checks if the window is too small vertically
+        if (rect.bottom - newTop < MIN_CROP_VERTICAL_LENGTH) {
+            newTop = rect.bottom - MIN_CROP_VERTICAL_LENGTH;
+        }
+
+        // check horizontal bounds if aspect ratio is in play
+        if (aspectRatio > 0) {
+            float newWidth = (rect.bottom - newTop) * aspectRatio;
+
+            // Checks if the crop window is too small horizontally due to aspect ratio adjustment
+            if (newWidth < MIN_CROP_HORIZONTAL_LENGTH) {
+                newTop = rect.bottom - (MIN_CROP_HORIZONTAL_LENGTH / aspectRatio);
+            }
+
+            // if left edge moves by aspect ratio check that it is within bounds
+            if (leftMoves && rect.right - newWidth < bounds.left) {
+                newTop = rect.bottom - ((rect.right - bounds.left) / aspectRatio);
+            }
+
+            // if right edge moves by aspect ratio check that it is within bounds
+            if (rightMoves && rect.left + newWidth > bounds.right) {
+                newTop = Math.max(newTop, rect.bottom - ((bounds.right - rect.left) / aspectRatio));
+            }
+        }
+
+        rect.top = newTop;
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Get the resulting y-position of the bottom edge of the crop window given
+     * the handle's position and the image's bounding box and snap radius.
+     *
+     * @param bottom the position that the bottom edge is dragged to
+     * @param bounds the bounding box of the image that is being cropped
+     * @param snapMargin the snap distance to the image edge (in pixels)
+     */
+    private void adjustBottom(float bottom, Rect bounds, float snapMargin, float aspectRatio, boolean leftMoves, boolean rightMoves) {
+
+        RectF rect = mCropWindowHandler.getRect();
+
+        float newBottom = bottom;
+
+        if (bounds.bottom - newBottom < snapMargin) {
+            newBottom = bounds.bottom;
+        }
+
+        // Checks if the window is too small vertically
+        if (newBottom - rect.top < MIN_CROP_VERTICAL_LENGTH) {
+            newBottom = rect.top + MIN_CROP_VERTICAL_LENGTH;
+        }
+
+        // check horizontal bounds if aspect ratio is in play
+        if (aspectRatio > 0) {
+            float newWidth = (newBottom - rect.top) * aspectRatio;
+
+            // Checks if the window is too small horizontally
+            if (newWidth < MIN_CROP_HORIZONTAL_LENGTH) {
+                newBottom = rect.top + (MIN_CROP_HORIZONTAL_LENGTH / aspectRatio);
+            }
+
+            // if left edge moves by aspect ratio check that it is within bounds
+            if (leftMoves && rect.right - newWidth < bounds.left) {
+                newBottom = rect.top + ((rect.right - bounds.left) / aspectRatio);
+            }
+
+            // if right edge moves by aspect ratio check that it is within bounds
+            if (rightMoves && rect.left + newWidth > bounds.right) {
+                newBottom = Math.min(newBottom, rect.top + ((bounds.right - rect.left) / aspectRatio));
+            }
+        }
+
+        rect.bottom = newBottom;
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Adjust left edge by current crop window height and the given aspect ratio,
+     * the right edge remains in possition while the left adjusts to keep aspect ratio to the height.
+     */
+    private void adjustLeftByAspectRatio(float aspectRatio) {
+        RectF rect = mCropWindowHandler.getRect();
+        rect.left = rect.right - (rect.height() * aspectRatio);
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Adjust top edge by current crop window width and the given aspect ratio,
+     * the bottom edge remains in possition while the top adjusts to keep aspect ratio to the width.
+     */
+    private void adjustTopByAspectRatio(float aspectRatio) {
+        RectF rect = mCropWindowHandler.getRect();
+        rect.top = rect.bottom - (rect.width() / aspectRatio);
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Adjust right edge by current crop window height and the given aspect ratio,
+     * the left edge remains in possition while the left adjusts to keep aspect ratio to the height.
+     */
+    private void adjustRightByAspectRatio(float aspectRatio) {
+        RectF rect = mCropWindowHandler.getRect();
+        rect.right = rect.left + (rect.height() * aspectRatio);
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Adjust bottom edge by current crop window width and the given aspect ratio,
+     * the top edge remains in possition while the top adjusts to keep aspect ratio to the width.
+     */
+    private void adjustBottomByAspectRatio(float aspectRatio) {
+        RectF rect = mCropWindowHandler.getRect();
+        rect.bottom = rect.top + (rect.width() / aspectRatio);
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Adjust left and right edges by current crop window height and the given aspect ratio,
+     * both right and left edges adjusts equally relative to center to keep aspect ratio to the height.
+     */
+    private void adjustLeftRightByAspectRatio(float aspectRatio) {
+        RectF rect = mCropWindowHandler.getRect();
+        rect.inset((rect.width() - (rect.height() * aspectRatio)) / 2, 0);
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Adjust top and bottom edges by current crop window width and the given aspect ratio,
+     * both top and bottom edges adjusts equally relative to center to keep aspect ratio to the width.
+     */
+    private void adjustTopBottomByAspectRatio(float aspectRatio) {
+        RectF rect = mCropWindowHandler.getRect();
+        rect.inset(0, (rect.height() - (rect.width() / aspectRatio)) / 2);
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Calculates the aspect ratio given a rectangle.
+     */
+    private static float calculateAspectRatio(float left, float top, float right, float bottom) {
+        return (right - left) / (bottom - top);
+    }
+    //endregion
+
+    //region: Inner class: Type
+
+    /**
+     * The type of crop window move that is handled.
+     */
+    public enum Type {
+        TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        LEFT,
+        TOP,
+        RIGHT,
+        BOTTOM,
+        CENTER
     }
     //endregion
 }
