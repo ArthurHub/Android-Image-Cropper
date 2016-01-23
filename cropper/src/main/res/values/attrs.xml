@@ -17,6 +17,7 @@
         <attr name="cropFixAspectRatio" format="boolean"/>
         <attr name="cropAspectRatioX" format="integer"/>
         <attr name="cropAspectRatioY" format="integer"/>
+        <attr name="cropInitialCropWindowPaddingRatio" format="float"/>
         <attr name="cropBorderLineThickness" format="float"/>
         <attr name="cropBorderLineColor" format="color"/>
         <attr name="cropBorderCornerThickness" format="float"/>

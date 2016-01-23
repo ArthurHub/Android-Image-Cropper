@@ -125,6 +125,7 @@ public class CropImageView extends FrameLayout {
         CropShape cropShape = CropShape.RECTANGLE;
         Guidelines guidelines = CropImageView.Guidelines.ON_TOUCH;
         float snapRadius = CropDefaults.SNAP_RADIUS;
+        float initialCropWindowPaddingRatio = CropDefaults.DEFAULT_INITIAL_CROP_WINDOW_PADDING_RATIO;
         float borderLineThickness = CropDefaults.DEFAULT_BORDER_LINE_THICKNESS;
         int borderLineColor = CropDefaults.DEFAULT_BORDER_LINE_COLOR;
         float borderCornerThickness = CropDefaults.DEFAULT_BORDER_CORNER_THICKNESS;
@@ -144,6 +145,7 @@ public class CropImageView extends FrameLayout {
                 cropShape = CropDefaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
                 guidelines = CropDefaults.VALID_GUIDELINES[ta.getInt(R.styleable.CropImageView_cropGuidelines, CropDefaults.DEFAULT_GUIDELINES_INDEX)];
                 snapRadius = ta.getFloat(R.styleable.CropImageView_cropSnapRadius, snapRadius);
+                initialCropWindowPaddingRatio = ta.getFloat(R.styleable.CropImageView_cropInitialCropWindowPaddingRatio, initialCropWindowPaddingRatio);
                 borderLineThickness = ta.getFloat(R.styleable.CropImageView_cropBorderLineThickness, borderLineThickness);
                 borderLineColor = ta.getInteger(R.styleable.CropImageView_cropBorderLineColor, borderLineColor);
                 borderCornerThickness = ta.getFloat(R.styleable.CropImageView_cropBorderCornerThickness, borderCornerThickness);
@@ -170,6 +172,7 @@ public class CropImageView extends FrameLayout {
         mCropOverlayView.setInitialAttributeValues(
                 cropShape, snapRadius, guidelines,
                 fixAspectRatio, aspectRatioX, aspectRatioY,
+                initialCropWindowPaddingRatio,
                 borderLineThickness, borderLineColor,
                 borderCornerThickness, borderCornerOffset, borderCornerLength, borderCornerColor,
                 guidelinesThickness, guidelinesColor,

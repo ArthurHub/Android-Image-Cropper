@@ -75,6 +75,11 @@ public class CropOverlayView extends View {
     private float mBorderCornerLength;
 
     /**
+     * The initial crop window padding from image borders
+     */
+    private float mInitialCropWindowPaddingRatio;
+
+    /**
      * The radius of the touch zone (in pixels) around a given Handle.
      */
     private float mHandleRadius;
@@ -300,6 +305,7 @@ public class CropOverlayView extends View {
                                           boolean fixAspectRatio,
                                           int aspectRatioX,
                                           int aspectRatioY,
+                                          float initialCropWindowPaddingRatio,
                                           float borderLineThickness,
                                           int borderLineColor,
                                           float borderCornerThickness,
@@ -323,6 +329,11 @@ public class CropOverlayView extends View {
         setAspectRatioX(aspectRatioX);
 
         setAspectRatioY(aspectRatioY);
+
+        if (initialCropWindowPaddingRatio < 0 || initialCropWindowPaddingRatio >= 0.5) {
+            throw new IllegalArgumentException("Cannot set initial crop window padding value to a number less < 0 or >= 0.5");
+        }
+        mInitialCropWindowPaddingRatio = initialCropWindowPaddingRatio;
 
         if (borderLineThickness < 0) {
             throw new IllegalArgumentException("Cannot set line thickness value to a number less than 0.");
@@ -365,8 +376,8 @@ public class CropOverlayView extends View {
         // Tells the attribute functions the crop window has already been initialized
         initializedCropWindow = true;
 
-        float horizontalPadding = 0.1f * bitmapRect.width();
-        float verticalPadding = 0.1f * bitmapRect.height();
+        float horizontalPadding = mInitialCropWindowPaddingRatio * bitmapRect.width();
+        float verticalPadding = mInitialCropWindowPaddingRatio * bitmapRect.height();
 
         if (mFixAspectRatio && (bitmapRect.left != 0 || bitmapRect.right != 0 || bitmapRect.top != 0 || bitmapRect.bottom != 0)) {
 

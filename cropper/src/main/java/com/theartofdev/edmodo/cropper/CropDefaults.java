@@ -53,6 +53,8 @@ final class CropDefaults {
     // http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
     public static final int TARGET_RADIUS = 24;
 
+    public static final float DEFAULT_INITIAL_CROP_WINDOW_PADDING_RATIO = 0.1f;
+
     public static final float DEFAULT_BORDER_LINE_THICKNESS = 3;
 
     public static final float DEFAULT_BORDER_CORNER_THICKNESS = 2;
