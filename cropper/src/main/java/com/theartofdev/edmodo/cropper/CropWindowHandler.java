@@ -21,12 +21,25 @@ final class CropWindowHandler {
 
     //region: Fields and Consts
 
+    /**
+     * The 4 edges of the crop window defining its coordinates and size
+     */
     private final RectF mEdges = new RectF();
 
     /**
      * Rectangle used to return the edges rectangle without ability to change it and without creating new all the time.
      */
     private final RectF mGetEdges = new RectF();
+
+    /**
+     * Minimum width in pixels that the crop window can get.
+     */
+    private int mMinCropHeight = 60;
+
+    /**
+     * Minimum height in pixels that the crop window can get.
+     */
+    private int mMinCropWidth = 60;
     //endregion
 
     /**
@@ -35,6 +48,20 @@ final class CropWindowHandler {
     public RectF getRect() {
         mGetEdges.set(mEdges);
         return mGetEdges;
+    }
+
+    /**
+     * Minimum width in pixels that the crop window can get.
+     */
+    public int getMinCropHeight() {
+        return mMinCropHeight;
+    }
+
+    /**
+     * Minimum height in pixels that the crop window can get.
+     */
+    public int getMinCropWidth() {
+        return mMinCropWidth;
     }
 
     /**

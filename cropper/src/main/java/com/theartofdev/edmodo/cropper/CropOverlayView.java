@@ -395,11 +395,11 @@ public class CropOverlayView extends View {
                 mTargetAspectRatio = (float) mAspectRatioX / mAspectRatioY;
 
                 // Limits the aspect ratio to no less than 40 wide or 40 tall
-                float cropWidth = Math.max(40, rect.height() * mTargetAspectRatio);
+                float cropWidth = Math.max(mCropWindowHandler.getMinCropWidth(), rect.height() * mTargetAspectRatio);
 
                 // Create new TargetAspectRatio if the original one does not fit the screen
-                if (cropWidth == 40) {
-                    mTargetAspectRatio = 40 / rect.height();
+                if (cropWidth == mCropWindowHandler.getMinCropWidth()) {
+                    mTargetAspectRatio = mCropWindowHandler.getMinCropWidth() / rect.height();
                 }
 
                 float halfCropWidth = cropWidth / 2f;
@@ -414,11 +414,11 @@ public class CropOverlayView extends View {
                 float centerY = getHeight() / 2f;
 
                 // Limits the aspect ratio to no less than 40 wide or 40 tall
-                float cropHeight = Math.max(40, rect.width() / mTargetAspectRatio);
+                float cropHeight = Math.max(mCropWindowHandler.getMinCropHeight(), rect.width() / mTargetAspectRatio);
 
                 // Create new TargetAspectRatio if the original one does not fit the screen
-                if (cropHeight == 40) {
-                    mTargetAspectRatio = rect.width() / 40;
+                if (cropHeight == mCropWindowHandler.getMinCropHeight()) {
+                    mTargetAspectRatio = rect.width() / mCropWindowHandler.getMinCropHeight();
                 }
 
                 float halfCropHeight = cropHeight / 2f;
@@ -426,8 +426,6 @@ public class CropOverlayView extends View {
                 rect.bottom = centerY + halfCropHeight;
             }
         } else {
-            // ... do not fix aspect ratio...
-
             // Initialize crop window to have 10% padding w/ respect to image.
             rect.left = bitmapRect.left + horizontalPadding;
             rect.top = bitmapRect.top + verticalPadding;
