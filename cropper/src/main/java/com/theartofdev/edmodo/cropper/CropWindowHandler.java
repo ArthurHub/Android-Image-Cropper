@@ -34,12 +34,24 @@ final class CropWindowHandler {
     /**
      * Minimum width in pixels that the crop window can get.
      */
-    private float mMinCropHeight;
+    private float mMinCropWindowWidth;
 
     /**
      * Minimum height in pixels that the crop window can get.
      */
-    private float mMinCropWidth;
+    private float mMinCropWindowHeight;
+
+    /**
+     * Minimum width in pixels that the result of cropping an image can get,
+     * affects crop window width adjusted by width scale factor.
+     */
+    private float mMinCropResultWidth;
+
+    /**
+     * Minimum height in pixels that the result of cropping an image can get,
+     * affects crop window height adjusted by height scale factor.
+     */
+    private float mMinCropResultHeight;
 
     /**
      * The width scale factor of shown image and actual image
@@ -64,14 +76,14 @@ final class CropWindowHandler {
      * Minimum height in pixels that the crop window can get.
      */
     public float getMinCropWidth() {
-        return mMinCropWidth / mScaleFactorWidth;
+        return Math.max(mMinCropWindowWidth, mMinCropResultWidth / mScaleFactorWidth);
     }
 
     /**
      * Minimum width in pixels that the crop window can get.
      */
     public float getMinCropHeight() {
-        return mMinCropHeight / mScaleFactorHeight;
+        return Math.max(mMinCropWindowHeight, mMinCropResultHeight / mScaleFactorHeight);
     }
 
     /**
@@ -85,9 +97,11 @@ final class CropWindowHandler {
     /**
      * Set the variables to be used during crop window handling.
      */
-    public void setInitialAttributeValues(float minCropWidth, float minCropHeight) {
-        mMinCropWidth = minCropWidth;
-        mMinCropHeight = minCropHeight;
+    public void setInitialAttributeValues(float minCropWidth, float minCropHeight, float minCropResultWidth, float minCropResultHeight) {
+        mMinCropWindowWidth = minCropWidth;
+        mMinCropWindowHeight = minCropHeight;
+        mMinCropResultWidth = minCropResultWidth;
+        mMinCropResultHeight = minCropResultHeight;
     }
 
     /**

@@ -139,8 +139,10 @@ public class CropImageView extends FrameLayout {
         float guidelinesThickness = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.DEFAULT_GUIDELINE_THICKNESS, dm);
         int guidelinesColor = CropDefaults.DEFAULT_GUIDELINE_COLOR;
         int backgroundColor = CropDefaults.DEFAULT_BACKGROUND_COLOR;
-        float minCropWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_WINDOW_SIZE, dm);
-        float minCropHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_WINDOW_SIZE, dm);
+        float minCropWindowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.MIN_CROP_WINDOW_SIZE, dm);
+        float minCropWindowHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.MIN_CROP_WINDOW_SIZE, dm);
+        float minCropResultWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_RESULT_SIZE, dm);
+        float minCropResultHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_RESULT_SIZE, dm);
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
@@ -165,8 +167,10 @@ public class CropImageView extends FrameLayout {
                 mShowCropOverlay = ta.getBoolean(R.styleable.CropImageView_cropShowCropOverlay, mShowCropOverlay);
                 mShowProgressBar = ta.getBoolean(R.styleable.CropImageView_cropShowProgressBar, mShowProgressBar);
                 borderCornerThickness = ta.getDimension(R.styleable.CropImageView_cropBorderCornerThickness, borderCornerThickness);
-                minCropWidth = ta.getDimension(R.styleable.CropImageView_cropMinCropWindowWidth, minCropWidth);
-                minCropHeight = ta.getDimension(R.styleable.CropImageView_cropMinCropWindowHeight, minCropHeight);
+                minCropWindowWidth = ta.getDimension(R.styleable.CropImageView_cropMinCropWindowWidth, minCropWindowWidth);
+                minCropWindowHeight = ta.getDimension(R.styleable.CropImageView_cropMinCropWindowHeight, minCropWindowHeight);
+                minCropResultWidth = ta.getDimension(R.styleable.CropImageView_cropMinCropResultWidth, minCropResultWidth);
+                minCropResultHeight = ta.getDimension(R.styleable.CropImageView_cropMinCropResultHeight, minCropResultHeight);
             } finally {
                 ta.recycle();
             }
@@ -187,7 +191,8 @@ public class CropImageView extends FrameLayout {
                 borderCornerThickness, borderCornerOffset, borderCornerLength, borderCornerColor,
                 guidelinesThickness, guidelinesColor,
                 backgroundColor,
-                minCropWidth, minCropHeight);
+                minCropWindowWidth, minCropWindowHeight,
+                minCropResultWidth, minCropResultHeight);
 
         mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
         setProgressBarVisibility();

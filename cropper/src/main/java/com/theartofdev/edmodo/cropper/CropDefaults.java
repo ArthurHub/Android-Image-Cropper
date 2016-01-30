@@ -38,7 +38,9 @@ final class CropDefaults {
 
     public static final int DEFAULT_GUIDELINES_INDEX = 1;
 
-    public static final float MIN_CROP_WINDOW_SIZE = 100;
+    public static final float MIN_CROP_WINDOW_SIZE = 42;
+
+    public static final float MIN_CROP_RESULT_SIZE = 80;
 
     public static final float SNAP_RADIUS = 3;
 

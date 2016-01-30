@@ -304,6 +304,8 @@ public class CropOverlayView extends View {
      * @param aspectRatioY float that specifies the new Y value of the aspect
      * @param guidelinesThickness
      * @param guidelinesColor
+     * @param minCropResultWidth
+     * @param minCropResultHeight
      */
     public void setInitialAttributeValues(CropImageView.CropShape cropShape,
                                           float snapRadius,
@@ -322,12 +324,15 @@ public class CropOverlayView extends View {
                                           float guidelinesThickness,
                                           int guidelinesColor,
                                           int backgroundColor,
-                                          float minCropWidth,
-                                          float minCropHeight) {
+                                          float minCropWindowWidth,
+                                          float minCropWindowHeight,
+                                          float minCropResultWidth,
+                                          float minCropResultHeight) {
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
 
-        mCropWindowHandler.setInitialAttributeValues(minCropWidth, minCropHeight);
+        mCropWindowHandler.setInitialAttributeValues(minCropWindowWidth, minCropWindowHeight,
+                minCropResultWidth, minCropResultHeight);
 
         setCropShape(cropShape);
 
