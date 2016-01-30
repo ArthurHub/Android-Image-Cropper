@@ -338,19 +338,19 @@ public class CropOverlayView extends View {
         if (borderLineThickness < 0) {
             throw new IllegalArgumentException("Cannot set line thickness value to a number less than 0.");
         }
-        mBorderPaint = getNewPaintOrNull(dm, borderLineThickness, borderLineColor);
+        mBorderPaint = getNewPaintOrNull(borderLineThickness, borderLineColor);
 
         if (borderCornerThickness < 0) {
             throw new IllegalArgumentException("Cannot set corner thickness value to a number less than 0.");
         }
-        mBorderCornerOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, borderCornerOffset, dm);
-        mBorderCornerLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, borderCornerLength, dm);
-        mBorderCornerPaint = getNewPaintOrNull(dm, borderCornerThickness, borderCornerColor);
+        mBorderCornerOffset = borderCornerOffset;
+        mBorderCornerLength = borderCornerLength;
+        mBorderCornerPaint = getNewPaintOrNull(borderCornerThickness, borderCornerColor);
 
         if (guidelinesThickness < 0) {
             throw new IllegalArgumentException("Cannot set guidelines thickness value to a number less than 0.");
         }
-        mGuidelinePaint = getNewPaintOrNull(dm, guidelinesThickness, guidelinesColor);
+        mGuidelinePaint = getNewPaintOrNull(guidelinesThickness, guidelinesColor);
 
         mBackgroundPaint = getNewPaint(backgroundColor);
 
@@ -612,11 +612,11 @@ public class CropOverlayView extends View {
     /**
      * Creates the Paint object for given thickness and color, if thickness < 0 return null.
      */
-    private static Paint getNewPaintOrNull(DisplayMetrics displayMetrics, float thickness, int color) {
+    private static Paint getNewPaintOrNull(float thickness, int color) {
         if (thickness > 0) {
             Paint borderPaint = new Paint();
             borderPaint.setColor(color);
-            borderPaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thickness, displayMetrics));
+            borderPaint.setStrokeWidth(thickness);
             borderPaint.setStyle(Paint.Style.STROKE);
             borderPaint.setAntiAlias(true);
             return borderPaint;

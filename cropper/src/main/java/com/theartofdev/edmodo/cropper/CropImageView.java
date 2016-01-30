@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,21 +119,23 @@ public class CropImageView extends FrameLayout {
     public CropImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+
         boolean fixAspectRatio = CropDefaults.DEFAULT_FIXED_ASPECT_RATIO;
         int aspectRatioX = CropDefaults.DEFAULT_ASPECT_RATIO_X;
         int aspectRatioY = CropDefaults.DEFAULT_ASPECT_RATIO_Y;
         ImageView.ScaleType scaleType = CropDefaults.VALID_SCALE_TYPES[CropDefaults.DEFAULT_SCALE_TYPE_INDEX];
         CropShape cropShape = CropShape.RECTANGLE;
         Guidelines guidelines = CropImageView.Guidelines.ON_TOUCH;
-        float snapRadius = CropDefaults.SNAP_RADIUS;
+        float snapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.SNAP_RADIUS, dm);
         float initialCropWindowPaddingRatio = CropDefaults.DEFAULT_INITIAL_CROP_WINDOW_PADDING_RATIO;
-        float borderLineThickness = CropDefaults.DEFAULT_BORDER_LINE_THICKNESS;
+        float borderLineThickness = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.DEFAULT_BORDER_LINE_THICKNESS, dm);
         int borderLineColor = CropDefaults.DEFAULT_BORDER_LINE_COLOR;
-        float borderCornerThickness = CropDefaults.DEFAULT_BORDER_CORNER_THICKNESS;
-        float borderCornerOffset = CropDefaults.DEFAULT_BORDER_CORNER_OFFSET;
-        float borderCornerLength = CropDefaults.DEFAULT_BORDER_CORNER_LENGTH;
+        float borderCornerThickness = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.DEFAULT_BORDER_CORNER_THICKNESS, dm);
+        float borderCornerOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.DEFAULT_BORDER_CORNER_OFFSET, dm);
+        float borderCornerLength = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.DEFAULT_BORDER_CORNER_LENGTH, dm);
         int borderCornerColor = CropDefaults.DEFAULT_BORDER_CORNER_COLOR;
-        float guidelinesThickness = CropDefaults.DEFAULT_GUIDELINE_THICKNESS;
+        float guidelinesThickness = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.DEFAULT_GUIDELINE_THICKNESS, dm);
         int guidelinesColor = CropDefaults.DEFAULT_GUIDELINE_COLOR;
         int backgroundColor = CropDefaults.DEFAULT_BACKGROUND_COLOR;
         if (attrs != null) {
@@ -146,7 +149,7 @@ public class CropImageView extends FrameLayout {
                 guidelines = CropDefaults.VALID_GUIDELINES[ta.getInt(R.styleable.CropImageView_cropGuidelines, CropDefaults.DEFAULT_GUIDELINES_INDEX)];
                 snapRadius = ta.getFloat(R.styleable.CropImageView_cropSnapRadius, snapRadius);
                 initialCropWindowPaddingRatio = ta.getFloat(R.styleable.CropImageView_cropInitialCropWindowPaddingRatio, initialCropWindowPaddingRatio);
-                borderLineThickness = ta.getFloat(R.styleable.CropImageView_cropBorderLineThickness, borderLineThickness);
+                borderLineThickness = ta.getDimension(R.styleable.CropImageView_cropBorderLineThickness, borderLineThickness);
                 borderLineColor = ta.getInteger(R.styleable.CropImageView_cropBorderLineColor, borderLineColor);
                 borderCornerThickness = ta.getFloat(R.styleable.CropImageView_cropBorderCornerThickness, borderCornerThickness);
                 borderCornerOffset = ta.getFloat(R.styleable.CropImageView_cropBorderCornerOffset, borderCornerOffset);

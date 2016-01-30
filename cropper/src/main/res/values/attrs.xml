@@ -18,16 +18,16 @@
         <attr name="cropAspectRatioX" format="integer"/>
         <attr name="cropAspectRatioY" format="integer"/>
         <attr name="cropInitialCropWindowPaddingRatio" format="float"/>
-        <attr name="cropBorderLineThickness" format="float"/>
+        <attr name="cropBorderLineThickness" format="dimension"/>
         <attr name="cropBorderLineColor" format="color"/>
-        <attr name="cropBorderCornerThickness" format="float"/>
-        <attr name="cropBorderCornerOffset" format="float"/>
-        <attr name="cropBorderCornerLength" format="float"/>
+        <attr name="cropBorderCornerThickness" format="dimension"/>
+        <attr name="cropBorderCornerOffset" format="dimension"/>
+        <attr name="cropBorderCornerLength" format="dimension"/>
         <attr name="cropBorderCornerColor" format="color"/>
-        <attr name="cropGuidelinesThickness" format="float"/>
+        <attr name="cropGuidelinesThickness" format="dimension"/>
         <attr name="cropGuidelinesColor" format="color"/>
         <attr name="cropBackgroundColor" format="color"/>
-        <attr name="cropSnapRadius" format="float"/>
+        <attr name="cropSnapRadius" format="dimension"/>
         <attr name="cropShowCropOverlay" format="boolean"/>
         <attr name="cropShowProgressBar" format="boolean"/>
     </declare-styleable>
