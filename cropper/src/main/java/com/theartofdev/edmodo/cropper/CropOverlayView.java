@@ -283,6 +283,13 @@ public class CropOverlayView extends View {
     }
 
     /**
+     * set the scale factor of the showen image to original image to scale the limits appropriately.
+     */
+    public void setScaleFactor(float scaleFactorWidth, float scaleFactorHeight) {
+        mCropWindowHandler.setScaleFactor(scaleFactorWidth, scaleFactorHeight);
+    }
+
+    /**
      * Sets all initial values, but does not call initCropWindow to reset the
      * views. Used once at the very start to initialize the attributes.
      *
@@ -314,9 +321,13 @@ public class CropOverlayView extends View {
                                           int borderCornerColor,
                                           float guidelinesThickness,
                                           int guidelinesColor,
-                                          int backgroundColor) {
+                                          int backgroundColor,
+                                          float minCropWidth,
+                                          float minCropHeight) {
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
+
+        mCropWindowHandler.setInitialAttributeValues(minCropWidth, minCropHeight);
 
         setCropShape(cropShape);
 

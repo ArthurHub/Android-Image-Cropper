@@ -34,12 +34,22 @@ final class CropWindowHandler {
     /**
      * Minimum width in pixels that the crop window can get.
      */
-    private int mMinCropHeight = 60;
+    private float mMinCropHeight;
 
     /**
      * Minimum height in pixels that the crop window can get.
      */
-    private int mMinCropWidth = 60;
+    private float mMinCropWidth;
+
+    /**
+     * The width scale factor of shown image and actual image
+     */
+    private float mScaleFactorWidth;
+
+    /**
+     * The height scale factor of shown image and actual image
+     */
+    private float mScaleFactorHeight;
     //endregion
 
     /**
@@ -51,17 +61,33 @@ final class CropWindowHandler {
     }
 
     /**
-     * Minimum width in pixels that the crop window can get.
+     * Minimum height in pixels that the crop window can get.
      */
-    public int getMinCropHeight() {
-        return mMinCropHeight;
+    public float getMinCropWidth() {
+        return mMinCropWidth / mScaleFactorWidth;
     }
 
     /**
-     * Minimum height in pixels that the crop window can get.
+     * Minimum width in pixels that the crop window can get.
      */
-    public int getMinCropWidth() {
-        return mMinCropWidth;
+    public float getMinCropHeight() {
+        return mMinCropHeight / mScaleFactorHeight;
+    }
+
+    /**
+     * set the scale factor of the showen image to original image to scale the limits appropriately.
+     */
+    public void setScaleFactor(float scaleFactorWidth, float scaleFactorHeight) {
+        mScaleFactorWidth = scaleFactorWidth;
+        mScaleFactorHeight = scaleFactorHeight;
+    }
+
+    /**
+     * Set the variables to be used during crop window handling.
+     */
+    public void setInitialAttributeValues(float minCropWidth, float minCropHeight) {
+        mMinCropWidth = minCropWidth;
+        mMinCropHeight = minCropHeight;
     }
 
     /**

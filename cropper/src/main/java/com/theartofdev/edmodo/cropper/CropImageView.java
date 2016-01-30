@@ -139,6 +139,8 @@ public class CropImageView extends FrameLayout {
         float guidelinesThickness = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.DEFAULT_GUIDELINE_THICKNESS, dm);
         int guidelinesColor = CropDefaults.DEFAULT_GUIDELINE_COLOR;
         int backgroundColor = CropDefaults.DEFAULT_BACKGROUND_COLOR;
+        float minCropWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_WINDOW_SIZE, dm);
+        float minCropHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_WINDOW_SIZE, dm);
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
@@ -148,20 +150,23 @@ public class CropImageView extends FrameLayout {
                 scaleType = CropDefaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_cropScaleType, CropDefaults.DEFAULT_SCALE_TYPE_INDEX)];
                 cropShape = CropDefaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
                 guidelines = CropDefaults.VALID_GUIDELINES[ta.getInt(R.styleable.CropImageView_cropGuidelines, CropDefaults.DEFAULT_GUIDELINES_INDEX)];
-                snapRadius = ta.getFloat(R.styleable.CropImageView_cropSnapRadius, snapRadius);
-                touchRadius = ta.getFloat(R.styleable.CropImageView_cropTouchRadius, touchRadius);
+                snapRadius = ta.getDimension(R.styleable.CropImageView_cropSnapRadius, snapRadius);
+                touchRadius = ta.getDimension(R.styleable.CropImageView_cropTouchRadius, touchRadius);
                 initialCropWindowPaddingRatio = ta.getFloat(R.styleable.CropImageView_cropInitialCropWindowPaddingRatio, initialCropWindowPaddingRatio);
                 borderLineThickness = ta.getDimension(R.styleable.CropImageView_cropBorderLineThickness, borderLineThickness);
                 borderLineColor = ta.getInteger(R.styleable.CropImageView_cropBorderLineColor, borderLineColor);
-                borderCornerThickness = ta.getFloat(R.styleable.CropImageView_cropBorderCornerThickness, borderCornerThickness);
-                borderCornerOffset = ta.getFloat(R.styleable.CropImageView_cropBorderCornerOffset, borderCornerOffset);
-                borderCornerLength = ta.getFloat(R.styleable.CropImageView_cropBorderCornerLength, borderCornerLength);
+                borderCornerThickness = ta.getDimension(R.styleable.CropImageView_cropBorderCornerThickness, borderCornerThickness);
+                borderCornerOffset = ta.getDimension(R.styleable.CropImageView_cropBorderCornerOffset, borderCornerOffset);
+                borderCornerLength = ta.getDimension(R.styleable.CropImageView_cropBorderCornerLength, borderCornerLength);
                 borderCornerColor = ta.getInteger(R.styleable.CropImageView_cropBorderCornerColor, borderCornerColor);
-                guidelinesThickness = ta.getFloat(R.styleable.CropImageView_cropGuidelinesThickness, guidelinesThickness);
+                guidelinesThickness = ta.getDimension(R.styleable.CropImageView_cropGuidelinesThickness, guidelinesThickness);
                 guidelinesColor = ta.getInteger(R.styleable.CropImageView_cropGuidelinesColor, guidelinesColor);
                 backgroundColor = ta.getInteger(R.styleable.CropImageView_cropBackgroundColor, backgroundColor);
                 mShowCropOverlay = ta.getBoolean(R.styleable.CropImageView_cropShowCropOverlay, mShowCropOverlay);
                 mShowProgressBar = ta.getBoolean(R.styleable.CropImageView_cropShowProgressBar, mShowProgressBar);
+                borderCornerThickness = ta.getDimension(R.styleable.CropImageView_cropBorderCornerThickness, borderCornerThickness);
+                minCropWidth = ta.getDimension(R.styleable.CropImageView_cropMinCropWindowWidth, minCropWidth);
+                minCropHeight = ta.getDimension(R.styleable.CropImageView_cropMinCropWindowHeight, minCropHeight);
             } finally {
                 ta.recycle();
             }
@@ -181,7 +186,8 @@ public class CropImageView extends FrameLayout {
                 borderLineThickness, borderLineColor,
                 borderCornerThickness, borderCornerOffset, borderCornerLength, borderCornerColor,
                 guidelinesThickness, guidelinesColor,
-                backgroundColor);
+                backgroundColor,
+                minCropWidth, minCropHeight);
 
         mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
         setProgressBarVisibility();
@@ -840,6 +846,8 @@ public class CropImageView extends FrameLayout {
             origParams.height = mLayoutHeight;
             setLayoutParams(origParams);
         }
+
+        updateScaleFactor();
     }
 
     /**
@@ -886,6 +894,27 @@ public class CropImageView extends FrameLayout {
                 (mBitmap == null && mBitmapLoadingWorkerTask != null || mBitmapCroppingWorkerTask != null);
         mProgressBar.setVisibility(visible ? VISIBLE : INVISIBLE);
     }
+
+    /**
+     * Update the scale factor between the actual image bitmap and the shown image.
+     */
+    private void updateScaleFactor() {
+        if (mBitmap != null) {
+
+            Rect displayedImageRect = BitmapUtils.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
+            if (displayedImageRect.width() > 0 && displayedImageRect.height() > 0) {
+
+                // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width.
+                float scaleFactorWidth = mBitmap.getWidth() * mLoadedSampleSize / (float) displayedImageRect.width();
+
+                // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for height.
+                float scaleFactorHeight = mBitmap.getHeight() * mLoadedSampleSize / (float) displayedImageRect.height();
+
+                mCropOverlayView.setScaleFactor(scaleFactorWidth, scaleFactorHeight);
+            }
+        }
+    }
+
     //endregion
 
     //region: Inner class: CropShape

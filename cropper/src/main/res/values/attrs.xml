@@ -31,6 +31,8 @@
         <attr name="cropTouchRadius" format="dimension"/>
         <attr name="cropShowCropOverlay" format="boolean"/>
         <attr name="cropShowProgressBar" format="boolean"/>
+        <attr name="cropMinCropWindowWidth" format="dimension"/>
+        <attr name="cropMinCropWindowHeight" format="dimension"/>
     </declare-styleable>
 
 </resources>

@@ -38,6 +38,8 @@ final class CropDefaults {
 
     public static final int DEFAULT_GUIDELINES_INDEX = 1;
 
+    public static final float MIN_CROP_WINDOW_SIZE = 100;
+
     public static final float SNAP_RADIUS = 3;
 
     public static final float DEFAULT_SHOW_GUIDELINES_LIMIT = 100;
@@ -61,7 +63,7 @@ final class CropDefaults {
 
     public static final float DEFAULT_BORDER_CORNER_OFFSET = 5;
 
-    public static final float DEFAULT_BORDER_CORNER_LENGTH = 15;
+    public static final float DEFAULT_BORDER_CORNER_LENGTH = 14;
 
     public static final float DEFAULT_GUIDELINE_THICKNESS = 1;
 
