@@ -35,6 +35,8 @@
         <attr name="cropMinCropWindowHeight" format="dimension"/>
         <attr name="cropMinCropResultWidth" format="dimension"/>
         <attr name="cropMinCropResultHeight" format="dimension"/>
+        <attr name="cropMaxCropResultWidth" format="dimension"/>
+        <attr name="cropMaxCropResultHeight" format="dimension"/>
     </declare-styleable>
 
 </resources>

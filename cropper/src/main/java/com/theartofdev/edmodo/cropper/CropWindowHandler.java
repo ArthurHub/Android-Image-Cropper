@@ -54,6 +54,18 @@ final class CropWindowHandler {
     private float mMinCropResultHeight;
 
     /**
+     * Maximum width in pixels that the result of cropping an image can get,
+     * affects crop window width adjusted by width scale factor.
+     */
+    private float mMaxCropResultWidth;
+
+    /**
+     * Maximum height in pixels that the result of cropping an image can get,
+     * affects crop window height adjusted by height scale factor.
+     */
+    private float mMaxCropResultHeight;
+
+    /**
      * The width scale factor of shown image and actual image
      */
     private float mScaleFactorWidth;
@@ -87,6 +99,20 @@ final class CropWindowHandler {
     }
 
     /**
+     * Maximum height in pixels that the crop window can get.
+     */
+    public float getMaxCropWidth() {
+        return mMaxCropResultWidth / mScaleFactorWidth;
+    }
+
+    /**
+     * Maximum width in pixels that the crop window can get.
+     */
+    public float getMaxCropHeight() {
+        return mMaxCropResultHeight / mScaleFactorHeight;
+    }
+
+    /**
      * set the scale factor of the showen image to original image to scale the limits appropriately.
      */
     public void setScaleFactor(float scaleFactorWidth, float scaleFactorHeight) {
@@ -97,11 +123,38 @@ final class CropWindowHandler {
     /**
      * Set the variables to be used during crop window handling.
      */
-    public void setInitialAttributeValues(float minCropWidth, float minCropHeight, float minCropResultWidth, float minCropResultHeight) {
-        mMinCropWindowWidth = minCropWidth;
-        mMinCropWindowHeight = minCropHeight;
+    public void setInitialAttributeValues(float minCropWindowWidth, float minCropWindowHeight,
+                                          float minCropResultWidth, float minCropResultHeight,
+                                          float maxCropResultWidth, float maxCropResultHeight) {
+        if (minCropWindowWidth < 0) {
+            throw new IllegalArgumentException("Cannot set min crop window width value to a number < 0 ");
+        }
+        mMinCropWindowWidth = minCropWindowWidth;
+
+        if (minCropWindowHeight < 0) {
+            throw new IllegalArgumentException("Cannot set min crop window height value to a number < 0 ");
+        }
+        mMinCropWindowHeight = minCropWindowHeight;
+
+        if (minCropResultWidth < 0) {
+            throw new IllegalArgumentException("Cannot set min crop result width value to a number < 0 ");
+        }
         mMinCropResultWidth = minCropResultWidth;
+
+        if (minCropResultHeight < 0) {
+            throw new IllegalArgumentException("Cannot set min crop result height value to a number < 0 ");
+        }
         mMinCropResultHeight = minCropResultHeight;
+
+        if (maxCropResultWidth < minCropResultWidth) {
+            throw new IllegalArgumentException("Cannot set max crop result width to smaller value than min crop result width");
+        }
+        mMaxCropResultWidth = maxCropResultWidth;
+
+        if (maxCropResultHeight < minCropResultHeight) {
+            throw new IllegalArgumentException("Cannot set max crop result height to smaller value than min crop result height");
+        }
+        mMaxCropResultHeight = maxCropResultHeight;
     }
 
     /**

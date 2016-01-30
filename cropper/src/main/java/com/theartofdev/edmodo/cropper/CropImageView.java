@@ -143,6 +143,8 @@ public class CropImageView extends FrameLayout {
         float minCropWindowHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.MIN_CROP_WINDOW_SIZE, dm);
         float minCropResultWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_RESULT_SIZE, dm);
         float minCropResultHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_RESULT_SIZE, dm);
+        float maxCropResultWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MAX_CROP_RESULT_SIZE, dm);
+        float maxCropResultHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MAX_CROP_RESULT_SIZE, dm);
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
@@ -171,6 +173,8 @@ public class CropImageView extends FrameLayout {
                 minCropWindowHeight = ta.getDimension(R.styleable.CropImageView_cropMinCropWindowHeight, minCropWindowHeight);
                 minCropResultWidth = ta.getDimension(R.styleable.CropImageView_cropMinCropResultWidth, minCropResultWidth);
                 minCropResultHeight = ta.getDimension(R.styleable.CropImageView_cropMinCropResultHeight, minCropResultHeight);
+                maxCropResultWidth = ta.getDimension(R.styleable.CropImageView_cropMaxCropResultWidth, maxCropResultWidth);
+                maxCropResultHeight = ta.getDimension(R.styleable.CropImageView_cropMaxCropResultHeight, maxCropResultHeight);
             } finally {
                 ta.recycle();
             }
@@ -192,7 +196,8 @@ public class CropImageView extends FrameLayout {
                 guidelinesThickness, guidelinesColor,
                 backgroundColor,
                 minCropWindowWidth, minCropWindowHeight,
-                minCropResultWidth, minCropResultHeight);
+                minCropResultWidth, minCropResultHeight,
+                maxCropResultWidth, maxCropResultHeight);
 
         mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
         setProgressBarVisibility();

@@ -42,6 +42,8 @@ final class CropDefaults {
 
     public static final float MIN_CROP_RESULT_SIZE = 80;
 
+    public static final float MAX_CROP_RESULT_SIZE = 99999;
+
     public static final float SNAP_RADIUS = 3;
 
     public static final float DEFAULT_SHOW_GUIDELINES_LIMIT = 100;

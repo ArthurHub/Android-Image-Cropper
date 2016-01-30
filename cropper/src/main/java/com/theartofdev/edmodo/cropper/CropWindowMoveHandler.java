@@ -286,6 +286,11 @@ final class CropWindowMoveHandler {
             newLeft = rect.right - mCropWindowHandler.getMinCropWidth();
         }
 
+        // Checks if the window is too large horizontally
+        if (rect.right - newLeft > mCropWindowHandler.getMaxCropWidth()) {
+            newLeft = rect.right - mCropWindowHandler.getMaxCropWidth();
+        }
+
         // check vertical bounds if aspect ratio is in play
         if (aspectRatio > 0) {
             float newHeight = (rect.right - newLeft) / aspectRatio;
@@ -293,6 +298,11 @@ final class CropWindowMoveHandler {
             // Checks if the window is too small vertically
             if (newHeight < mCropWindowHandler.getMinCropHeight()) {
                 newLeft = rect.right - mCropWindowHandler.getMinCropHeight() * aspectRatio;
+            }
+
+            // Checks if the window is too large vertically
+            if (newHeight < mCropWindowHandler.getMaxCropHeight()) {
+                newLeft = rect.right - mCropWindowHandler.getMaxCropHeight() * aspectRatio;
             }
 
             // if top edge moves by aspect ratio check that it is within bounds
@@ -334,6 +344,11 @@ final class CropWindowMoveHandler {
             newRight = rect.left + mCropWindowHandler.getMinCropWidth();
         }
 
+        // Checks if the window is too large horizontally
+        if (newRight - rect.left > mCropWindowHandler.getMaxCropWidth()) {
+            newRight = rect.left + mCropWindowHandler.getMaxCropWidth();
+        }
+
         // check vertical bounds if aspect ratio is in play
         if (aspectRatio > 0) {
             float newHeight = (newRight - rect.left) / aspectRatio;
@@ -341,6 +356,11 @@ final class CropWindowMoveHandler {
             // Checks if the window is too small vertically
             if (newHeight < mCropWindowHandler.getMinCropHeight()) {
                 newRight = rect.left + mCropWindowHandler.getMinCropHeight() * aspectRatio;
+            }
+
+            // Checks if the window is too large vertically
+            if (newHeight > mCropWindowHandler.getMaxCropHeight()) {
+                newRight = rect.left + mCropWindowHandler.getMaxCropHeight() * aspectRatio;
             }
 
             // if top edge moves by aspect ratio check that it is within bounds
@@ -381,6 +401,11 @@ final class CropWindowMoveHandler {
             newTop = rect.bottom - mCropWindowHandler.getMinCropHeight();
         }
 
+        // Checks if the window is too large vertically
+        if (rect.bottom - newTop > mCropWindowHandler.getMaxCropHeight()) {
+            newTop = rect.bottom - mCropWindowHandler.getMaxCropHeight();
+        }
+
         // check horizontal bounds if aspect ratio is in play
         if (aspectRatio > 0) {
             float newWidth = (rect.bottom - newTop) * aspectRatio;
@@ -388,6 +413,11 @@ final class CropWindowMoveHandler {
             // Checks if the crop window is too small horizontally due to aspect ratio adjustment
             if (newWidth < mCropWindowHandler.getMinCropWidth()) {
                 newTop = rect.bottom - (mCropWindowHandler.getMinCropWidth() / aspectRatio);
+            }
+
+            // Checks if the crop window is too large horizontally due to aspect ratio adjustment
+            if (newWidth > mCropWindowHandler.getMaxCropWidth()) {
+                newTop = rect.bottom - (mCropWindowHandler.getMaxCropWidth() / aspectRatio);
             }
 
             // if left edge moves by aspect ratio check that it is within bounds
@@ -428,6 +458,11 @@ final class CropWindowMoveHandler {
             newBottom = rect.top + mCropWindowHandler.getMinCropHeight();
         }
 
+        // Checks if the window is too small vertically
+        if (newBottom - rect.top > mCropWindowHandler.getMaxCropHeight()) {
+            newBottom = rect.top + mCropWindowHandler.getMaxCropHeight();
+        }
+
         // check horizontal bounds if aspect ratio is in play
         if (aspectRatio > 0) {
             float newWidth = (newBottom - rect.top) * aspectRatio;
@@ -435,6 +470,11 @@ final class CropWindowMoveHandler {
             // Checks if the window is too small horizontally
             if (newWidth < mCropWindowHandler.getMinCropWidth()) {
                 newBottom = rect.top + mCropWindowHandler.getMinCropWidth() / aspectRatio;
+            }
+
+            // Checks if the window is too large horizontally
+            if (newWidth > mCropWindowHandler.getMaxCropWidth()) {
+                newBottom = rect.top + mCropWindowHandler.getMaxCropWidth() / aspectRatio;
             }
 
             // if left edge moves by aspect ratio check that it is within bounds

@@ -292,20 +292,18 @@ public class CropOverlayView extends View {
     /**
      * Sets all initial values, but does not call initCropWindow to reset the
      * views. Used once at the very start to initialize the attributes.
-     *
      * @param cropShape
      * @param snapRadius
-     * @param guidelines Integer that signals whether the guidelines should be
-     * on, off, or only showing when resizing.
-     * @param fixAspectRatio Boolean that signals whether the aspect ratio
-     * should be maintained.
-     * @param aspectRatioX float that specifies the new X value of the aspect
-     * ratio
+     * @param guidelines Integer that signals whether the guidelines should be on, off, or only showing when resizing.
+     * @param fixAspectRatio Boolean that signals whether the aspect ratio should be maintained.
+     * @param aspectRatioX float that specifies the new X value of the aspect ratio
      * @param aspectRatioY float that specifies the new Y value of the aspect
      * @param guidelinesThickness
      * @param guidelinesColor
      * @param minCropResultWidth
      * @param minCropResultHeight
+     * @param maxCropResultWidth
+     * @param maxCropResultHeight
      */
     public void setInitialAttributeValues(CropImageView.CropShape cropShape,
                                           float snapRadius,
@@ -327,12 +325,15 @@ public class CropOverlayView extends View {
                                           float minCropWindowWidth,
                                           float minCropWindowHeight,
                                           float minCropResultWidth,
-                                          float minCropResultHeight) {
+                                          float minCropResultHeight,
+                                          float maxCropResultWidth,
+                                          float maxCropResultHeight) {
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
 
         mCropWindowHandler.setInitialAttributeValues(minCropWindowWidth, minCropWindowHeight,
-                minCropResultWidth, minCropResultHeight);
+                minCropResultWidth, minCropResultHeight,
+                maxCropResultWidth, maxCropResultHeight);
 
         setCropShape(cropShape);
 
