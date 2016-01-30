@@ -23,7 +23,6 @@ import android.graphics.Region;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -82,7 +81,7 @@ public class CropOverlayView extends View {
     /**
      * The radius of the touch zone (in pixels) around a given Handle.
      */
-    private float mHandleRadius;
+    private float mTouchRadius;
 
     /**
      * An edge of the crop window will snap to the corresponding edge of a specified bounding box
@@ -280,7 +279,7 @@ public class CropOverlayView extends View {
      * this distance (in pixels) away from the bounding box edge. (default: 3)
      */
     public void setSnapRadius(float snapRadius) {
-        mSnapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, snapRadius, getResources().getDisplayMetrics());
+        mSnapRadius = snapRadius;
     }
 
     /**
@@ -301,6 +300,7 @@ public class CropOverlayView extends View {
      */
     public void setInitialAttributeValues(CropImageView.CropShape cropShape,
                                           float snapRadius,
+                                          float touchRadius,
                                           CropImageView.Guidelines guidelines,
                                           boolean fixAspectRatio,
                                           int aspectRatioX,
@@ -330,8 +330,13 @@ public class CropOverlayView extends View {
 
         setAspectRatioY(aspectRatioY);
 
+        if (touchRadius < 0) {
+            throw new IllegalArgumentException("Cannot set touch radius value to a number <= 0 ");
+        }
+        mTouchRadius = touchRadius;
+
         if (initialCropWindowPaddingRatio < 0 || initialCropWindowPaddingRatio >= 0.5) {
-            throw new IllegalArgumentException("Cannot set initial crop window padding value to a number less < 0 or >= 0.5");
+            throw new IllegalArgumentException("Cannot set initial crop window padding value to a number < 0 or >= 0.5");
         }
         mInitialCropWindowPaddingRatio = initialCropWindowPaddingRatio;
 
@@ -353,8 +358,6 @@ public class CropOverlayView extends View {
         mGuidelinePaint = getNewPaintOrNull(guidelinesThickness, guidelinesColor);
 
         mBackgroundPaint = getNewPaint(backgroundColor);
-
-        mHandleRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.TARGET_RADIUS, dm);
     }
 
     //region: Private methods
@@ -655,7 +658,7 @@ public class CropOverlayView extends View {
      * if press is far from crop window then no move handler is returned (null).
      */
     private void onActionDown(float x, float y) {
-        mMoveHandler = mCropWindowHandler.getMoveHandler(x, y, mHandleRadius, mCropShape);
+        mMoveHandler = mCropWindowHandler.getMoveHandler(x, y, mTouchRadius, mCropShape);
         if (mMoveHandler != null) {
             invalidate();
         }

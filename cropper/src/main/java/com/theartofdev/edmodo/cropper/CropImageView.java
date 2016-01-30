@@ -128,6 +128,7 @@ public class CropImageView extends FrameLayout {
         CropShape cropShape = CropShape.RECTANGLE;
         Guidelines guidelines = CropImageView.Guidelines.ON_TOUCH;
         float snapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.SNAP_RADIUS, dm);
+        float touchRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.TOUCH_RADIUS, dm);
         float initialCropWindowPaddingRatio = CropDefaults.DEFAULT_INITIAL_CROP_WINDOW_PADDING_RATIO;
         float borderLineThickness = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.DEFAULT_BORDER_LINE_THICKNESS, dm);
         int borderLineColor = CropDefaults.DEFAULT_BORDER_LINE_COLOR;
@@ -148,6 +149,7 @@ public class CropImageView extends FrameLayout {
                 cropShape = CropDefaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
                 guidelines = CropDefaults.VALID_GUIDELINES[ta.getInt(R.styleable.CropImageView_cropGuidelines, CropDefaults.DEFAULT_GUIDELINES_INDEX)];
                 snapRadius = ta.getFloat(R.styleable.CropImageView_cropSnapRadius, snapRadius);
+                touchRadius = ta.getFloat(R.styleable.CropImageView_cropTouchRadius, touchRadius);
                 initialCropWindowPaddingRatio = ta.getFloat(R.styleable.CropImageView_cropInitialCropWindowPaddingRatio, initialCropWindowPaddingRatio);
                 borderLineThickness = ta.getDimension(R.styleable.CropImageView_cropBorderLineThickness, borderLineThickness);
                 borderLineColor = ta.getInteger(R.styleable.CropImageView_cropBorderLineColor, borderLineColor);
@@ -173,7 +175,7 @@ public class CropImageView extends FrameLayout {
 
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
         mCropOverlayView.setInitialAttributeValues(
-                cropShape, snapRadius, guidelines,
+                cropShape, snapRadius, touchRadius, guidelines,
                 fixAspectRatio, aspectRatioX, aspectRatioY,
                 initialCropWindowPaddingRatio,
                 borderLineThickness, borderLineColor,
@@ -249,7 +251,7 @@ public class CropImageView extends FrameLayout {
     /**
      * An edge of the crop window will snap to the corresponding edge of a
      * specified bounding box when the crop window edge is less than or equal to
-     * this distance (in pixels) away from the bounding box edge. (default: 3)
+     * this distance (in pixels) away from the bounding box edge. (default: 3dp)
      */
     public void setSnapRadius(float snapRadius) {
         if (snapRadius >= 0) {

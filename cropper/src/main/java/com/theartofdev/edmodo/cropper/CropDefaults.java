@@ -51,7 +51,7 @@ final class CropDefaults {
     // The radius (in dp) of the touchable area around the handle. We are basing
     // this value off of the recommended 48dp Rhythm. See:
     // http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
-    public static final int TARGET_RADIUS = 24;
+    public static final int TOUCH_RADIUS = 24;
 
     public static final float DEFAULT_INITIAL_CROP_WINDOW_PADDING_RATIO = 0.1f;
 
