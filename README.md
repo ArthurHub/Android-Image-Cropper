@@ -51,7 +51,7 @@ Due too large changes in the internals please consider this a **beta** release, 
 - Add `showCropOverlay` attribute and `setShowCropOverlay(boolean)` method allowing to hide/show crop overlay UI for animation or element transition.
 - Add `cropInitialCropWindowPaddingRatio` customization [0 - 0.5) to control initial crop window padding from image borders relative to image size.
 - Add min limit config on cropping window width/height in the UI (`cropMinCropWindowWidth`, `cropMinCropWindowHeight`)
-Add min/max config on cropping image result width/height (`cropMinCropResultWidthPX`,`cropMinCropResultHeightPX`,`cropMaxCropResultWidthPX`,`cropMaxCropResultHeightPX`)
+- Add min/max config on cropping image result width/height (`cropMinCropResultWidthPX`,`cropMinCropResultHeightPX`,`cropMaxCropResultWidthPX`,`cropMaxCropResultHeightPX`)
 
 *1.1.1*
 - Add customization support for border line, border corner, guidelines and background.
