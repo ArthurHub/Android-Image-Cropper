@@ -141,10 +141,10 @@ public class CropImageView extends FrameLayout {
         int backgroundColor = CropDefaults.DEFAULT_BACKGROUND_COLOR;
         float minCropWindowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.MIN_CROP_WINDOW_SIZE, dm);
         float minCropWindowHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.MIN_CROP_WINDOW_SIZE, dm);
-        float minCropResultWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_RESULT_SIZE, dm);
-        float minCropResultHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MIN_CROP_RESULT_SIZE, dm);
-        float maxCropResultWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MAX_CROP_RESULT_SIZE, dm);
-        float maxCropResultHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, CropDefaults.MAX_CROP_RESULT_SIZE, dm);
+        float minCropResultWidth = CropDefaults.MIN_CROP_RESULT_SIZE;
+        float minCropResultHeight = CropDefaults.MIN_CROP_RESULT_SIZE;
+        float maxCropResultWidth = CropDefaults.MAX_CROP_RESULT_SIZE;
+        float maxCropResultHeight = CropDefaults.MAX_CROP_RESULT_SIZE;
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
             try {
@@ -171,10 +171,10 @@ public class CropImageView extends FrameLayout {
                 borderCornerThickness = ta.getDimension(R.styleable.CropImageView_cropBorderCornerThickness, borderCornerThickness);
                 minCropWindowWidth = ta.getDimension(R.styleable.CropImageView_cropMinCropWindowWidth, minCropWindowWidth);
                 minCropWindowHeight = ta.getDimension(R.styleable.CropImageView_cropMinCropWindowHeight, minCropWindowHeight);
-                minCropResultWidth = ta.getDimension(R.styleable.CropImageView_cropMinCropResultWidth, minCropResultWidth);
-                minCropResultHeight = ta.getDimension(R.styleable.CropImageView_cropMinCropResultHeight, minCropResultHeight);
-                maxCropResultWidth = ta.getDimension(R.styleable.CropImageView_cropMaxCropResultWidth, maxCropResultWidth);
-                maxCropResultHeight = ta.getDimension(R.styleable.CropImageView_cropMaxCropResultHeight, maxCropResultHeight);
+                minCropResultWidth = ta.getFloat(R.styleable.CropImageView_cropMinCropResultWidthPX, minCropResultWidth);
+                minCropResultHeight = ta.getFloat(R.styleable.CropImageView_cropMinCropResultHeightPX, minCropResultHeight);
+                maxCropResultWidth = ta.getFloat(R.styleable.CropImageView_cropMaxCropResultWidthPX, maxCropResultWidth);
+                maxCropResultHeight = ta.getFloat(R.styleable.CropImageView_cropMaxCropResultHeightPX, maxCropResultHeight);
             } finally {
                 ta.recycle();
             }

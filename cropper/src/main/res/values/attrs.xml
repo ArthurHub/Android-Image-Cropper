@@ -33,10 +33,10 @@
         <attr name="cropShowProgressBar" format="boolean"/>
         <attr name="cropMinCropWindowWidth" format="dimension"/>
         <attr name="cropMinCropWindowHeight" format="dimension"/>
-        <attr name="cropMinCropResultWidth" format="dimension"/>
-        <attr name="cropMinCropResultHeight" format="dimension"/>
-        <attr name="cropMaxCropResultWidth" format="dimension"/>
-        <attr name="cropMaxCropResultHeight" format="dimension"/>
+        <attr name="cropMinCropResultWidthPX" format="float"/>
+        <attr name="cropMinCropResultHeightPX" format="float"/>
+        <attr name="cropMaxCropResultWidthPX" format="float"/>
+        <attr name="cropMaxCropResultHeightPX" format="float"/>
     </declare-styleable>
 
 </resources>
