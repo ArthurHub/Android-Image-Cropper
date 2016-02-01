@@ -68,12 +68,12 @@ final class CropWindowHandler {
     /**
      * The width scale factor of shown image and actual image
      */
-    private float mScaleFactorWidth;
+    private float mScaleFactorWidth = 1;
 
     /**
      * The height scale factor of shown image and actual image
      */
-    private float mScaleFactorHeight;
+    private float mScaleFactorHeight = 1;
     //endregion
 
     /**

@@ -291,6 +291,10 @@ final class CropWindowMoveHandler {
             newLeft = rect.right - mCropWindowHandler.getMaxCropWidth();
         }
 
+        if (newLeft - bounds.left < snapMargin) {
+            newLeft = bounds.left;
+        }
+
         // check vertical bounds if aspect ratio is in play
         if (aspectRatio > 0) {
             float newHeight = (rect.right - newLeft) / aspectRatio;
@@ -347,6 +351,11 @@ final class CropWindowMoveHandler {
         // Checks if the window is too large horizontally
         if (newRight - rect.left > mCropWindowHandler.getMaxCropWidth()) {
             newRight = rect.left + mCropWindowHandler.getMaxCropWidth();
+        }
+
+        // If close to the edge
+        if (bounds.right - newRight < snapMargin) {
+            newRight = bounds.right;
         }
 
         // check vertical bounds if aspect ratio is in play
@@ -406,6 +415,10 @@ final class CropWindowMoveHandler {
             newTop = rect.bottom - mCropWindowHandler.getMaxCropHeight();
         }
 
+        if (newTop - bounds.top < snapMargin) {
+            newTop = bounds.top;
+        }
+
         // check horizontal bounds if aspect ratio is in play
         if (aspectRatio > 0) {
             float newWidth = (rect.bottom - newTop) * aspectRatio;
@@ -461,6 +474,10 @@ final class CropWindowMoveHandler {
         // Checks if the window is too small vertically
         if (newBottom - rect.top > mCropWindowHandler.getMaxCropHeight()) {
             newBottom = rect.top + mCropWindowHandler.getMaxCropHeight();
+        }
+
+        if (bounds.bottom - newBottom < snapMargin) {
+            newBottom = bounds.bottom;
         }
 
         // check horizontal bounds if aspect ratio is in play

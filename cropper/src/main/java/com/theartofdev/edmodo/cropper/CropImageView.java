@@ -772,9 +772,9 @@ public class CropImageView extends FrameLayout {
 
         if (mBitmap != null) {
             Rect bitmapRect = BitmapUtils.getBitmapRect(mBitmap, this, mImageView.getScaleType());
-            mCropOverlayView.setBitmapRect(bitmapRect);
+            updateBitmapRect(bitmapRect);
         } else {
-            mCropOverlayView.setBitmapRect(CropDefaults.EMPTY_RECT);
+            updateBitmapRect(CropDefaults.EMPTY_RECT);
         }
     }
 
@@ -834,13 +834,13 @@ public class CropImageView extends FrameLayout {
                     mLayoutWidth,
                     mLayoutHeight,
                     mImageView.getScaleType());
-            mCropOverlayView.setBitmapRect(bitmapRect);
+            updateBitmapRect(bitmapRect);
 
             // MUST CALL THIS
             setMeasuredDimension(mLayoutWidth, mLayoutHeight);
 
         } else {
-            mCropOverlayView.setBitmapRect(CropDefaults.EMPTY_RECT);
+            updateBitmapRect(CropDefaults.EMPTY_RECT);
             setMeasuredDimension(widthSize, heightSize);
         }
     }
@@ -856,8 +856,6 @@ public class CropImageView extends FrameLayout {
             origParams.height = mLayoutHeight;
             setLayoutParams(origParams);
         }
-
-        updateScaleFactor();
     }
 
     /**
@@ -906,22 +904,24 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Update the scale factor between the actual image bitmap and the shown image.
+     * Update the scale factor between the actual image bitmap and the shown image.<br>
      */
+    private void updateBitmapRect(Rect bitmapRect) {
+        if (mBitmap != null && bitmapRect.width() > 0 && bitmapRect.height() > 0) {
+
+            // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width/height.
+            float scaleFactorWidth = mBitmap.getWidth() * mLoadedSampleSize / (float) bitmapRect.width();
+            float scaleFactorHeight = mBitmap.getHeight() * mLoadedSampleSize / (float) bitmapRect.height();
+            mCropOverlayView.setScaleFactor(scaleFactorWidth, scaleFactorHeight);
+        }
+
+        // set the bitmap rectangle and update the crop window after scale factor is set
+        mCropOverlayView.setBitmapRect(bitmapRect);
+    }
+
     private void updateScaleFactor() {
         if (mBitmap != null) {
 
-            Rect displayedImageRect = BitmapUtils.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
-            if (displayedImageRect.width() > 0 && displayedImageRect.height() > 0) {
-
-                // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width.
-                float scaleFactorWidth = mBitmap.getWidth() * mLoadedSampleSize / (float) displayedImageRect.width();
-
-                // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for height.
-                float scaleFactorHeight = mBitmap.getHeight() * mLoadedSampleSize / (float) displayedImageRect.height();
-
-                mCropOverlayView.setScaleFactor(scaleFactorWidth, scaleFactorHeight);
-            }
         }
     }
 

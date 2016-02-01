@@ -292,6 +292,7 @@ public class CropOverlayView extends View {
     /**
      * Sets all initial values, but does not call initCropWindow to reset the
      * views. Used once at the very start to initialize the attributes.
+     *
      * @param cropShape
      * @param snapRadius
      * @param guidelines Integer that signals whether the guidelines should be on, off, or only showing when resizing.
@@ -451,6 +452,39 @@ public class CropOverlayView extends View {
             rect.top = bitmapRect.top + verticalPadding;
             rect.right = bitmapRect.right - horizontalPadding;
             rect.bottom = bitmapRect.bottom - verticalPadding;
+        }
+
+        if (rect.width() < mCropWindowHandler.getMinCropWidth()) {
+            float adj = (mCropWindowHandler.getMinCropWidth() - rect.width()) / 2;
+            rect.left -= adj;
+            rect.right += adj;
+        }
+        if (rect.height() < mCropWindowHandler.getMinCropHeight()) {
+            float adj = (mCropWindowHandler.getMinCropHeight() - rect.height()) / 2;
+            rect.top -= adj;
+            rect.bottom += adj;
+        }
+        if (rect.width() > mCropWindowHandler.getMaxCropWidth()) {
+            float adj = (rect.width() - mCropWindowHandler.getMaxCropWidth()) / 2;
+            rect.left += adj;
+            rect.right -= adj;
+        }
+        if (rect.height() > mCropWindowHandler.getMaxCropHeight()) {
+            float adj = (rect.height() - mCropWindowHandler.getMaxCropHeight()) / 2;
+            rect.top += adj;
+            rect.bottom -= adj;
+        }
+        if (rect.left < bitmapRect.left) {
+            rect.left = bitmapRect.left;
+        }
+        if (rect.top < bitmapRect.top) {
+            rect.top = bitmapRect.top;
+        }
+        if (rect.right > bitmapRect.right) {
+            rect.right = bitmapRect.right;
+        }
+        if (rect.bottom > bitmapRect.bottom) {
+            rect.bottom = bitmapRect.bottom;
         }
 
         mCropWindowHandler.setRect(rect);
