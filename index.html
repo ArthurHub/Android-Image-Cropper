@@ -32,7 +32,7 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>
-<a id="android-image-cropper" class="anchor" href="#android-image-cropper" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android Image Cropper</h1>
+<a id="android-image-cropper" class="anchor" href="#android-image-cropper" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Android Image Cropper</h1>
 
 <p><a href="https://travis-ci.org/ArthurHub/Android-Image-Cropper"><img src="https://travis-ci.org/ArthurHub/Android-Image-Cropper.svg" alt="build status"></a> 
 <a href="https://www.codacy.com/app/tep-arthur/Android-Image-Cropper"><img src="https://api.codacy.com/project/badge/grade/4d3781df0cce40959881a8d91365407a" alt="Codacy Badge"></a>
@@ -52,7 +52,7 @@
 <p><img src="https://github.com/ArthurHub/Android-Image-Cropper/blob/master/crop.jpg?raw=true" alt="Crop"></p>
 
 <h3>
-<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features:</h3>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features:</h3>
 
 <ul>
 <li>Set cropping image as Bitmap, Resource or Android URI.</li>
@@ -61,6 +61,7 @@
 <li>Control the appearance of guidelines in the crop window.</li>
 <li>Control cropping window aspect ratio, ability to fix it (squared).</li>
 <li>Customization for border line, border corner, guidelines and background.</li>
+<li>Set result image min/max limits in pixels.</li>
 <li>Auto rotate bitmap by provided Exif data or loading from Android URI.</li>
 <li>Rotate image API to allow the user to rotate the image during cropping.</li>
 <li>Get cropping rectangle or the cropped bitmap.</li>
@@ -72,13 +73,13 @@
 <p><img src="https://github.com/ArthurHub/Android-Image-Cropper/blob/master/demo.jpg?raw=true" alt="ScreenShot"></p>
 
 <h2>
-<a id="gradle" class="anchor" href="#gradle" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gradle</h2>
+<a id="gradle" class="anchor" href="#gradle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Gradle</h2>
 
-<pre><code>compile 'com.theartofdev.edmodo:android-image-cropper:1.1.+'
+<pre><code>compile 'com.theartofdev.edmodo:android-image-cropper:1.2.+'
 </code></pre>
 
 <h2>
-<a id="posts" class="anchor" href="#posts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Posts</h2>
+<a id="posts" class="anchor" href="#posts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Posts</h2>
 
 <ul>
 <li><a href="http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/">Android cropping image from camera or gallery</a></li>
@@ -86,7 +87,22 @@
 </ul>
 
 <h2>
-<a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span class="octicon octicon-link"></span></a>Change log</h2>
+<a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Change log</h2>
+
+<p><em>1.2.0 (beta)</em></p>
+
+<p>Due too large changes in the internals please consider this a <strong>beta</strong> release, if you use it be sure to test is thoroughly and report any bugs you find (report no bugs will also be awesome) or use 1.1.0 until I feel 1.2.* is stable enough.</p>
+
+<ul>
+<li>Rewrite internal crop window handling.</li>
+<li> Add <code>crop</code> prefix to all customization resources to prevent naming collision (<strong>breaking change</strong>).</li>
+<li>Add <code>CropImageView.Guidelines</code> enum of guidelines config instead of integer (<strong>breaking change</strong>).</li>
+<li>Change custom attributes types to <code>dimension</code> where appropriate (<strong>breaking change</strong>).</li>
+<li>Add <code>showCropOverlay</code> attribute and <code>setShowCropOverlay(boolean)</code> method allowing to hide/show crop overlay UI for animation or element transition.</li>
+<li>Add <code>cropInitialCropWindowPaddingRatio</code> customization [0 - 0.5) to control initial crop window padding from image borders relative to image size.</li>
+<li>Add min limit config on cropping window width/height in the UI (<code>cropMinCropWindowWidth</code>, <code>cropMinCropWindowHeight</code>)
+Add min/max config on cropping image result width/height (<code>cropMinCropResultWidthPX</code>,<code>cropMinCropResultHeightPX</code>,<code>cropMaxCropResultWidthPX</code>,<code>cropMaxCropResultHeightPX</code>)</li>
+</ul>
 
 <p><em>1.1.1</em></p>
 
@@ -95,25 +111,10 @@
 <li>Fix progress bar not showing on loading if previously bitmap was directly set.</li>
 </ul>
 
-<p><em>1.1.0</em></p>
-
-<ul>
-<li>Deprecated <code>setImageUri(Uri)</code>.</li>
-<li>Added <code>setImageUriAsync(Uri)</code> and <code>getCroppedImageAsync()</code> for better handling of slow image loading/decode/cropping.</li>
-<li>Fixed Save/Restore state handling, proper orientation change expirience.</li>
-<li>Bug fixes on rotation and bitmap recycled error.</li>
-</ul>
-
-<p><em>1.0.7</em></p>
-
-<ul>
-<li>Added <code>setSnapRadius(float)</code> allowing to disable snap by setting 0.</li>
-<li>Nicer rectengular crop border.</li>
-<li>Fix oval shape rendering on old devices by disabling hardware rendering when required.</li>
-</ul>
+<p>See <a href="https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log">full change log</a>.</p>
 
 <h2>
-<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
 
 <p>Forked from <a href="https://github.com/edmodo/cropper">edmodo/cropper</a> fixing some bugs and adding some features.</p>
 
