@@ -446,6 +446,7 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Gets the cropped image based on the current crop window.<br>
+     * Get rectangle crop shape matching exactly the visual crop window pixel-to-pixel.<br>
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      */
     public void getCroppedImageAsync() {
@@ -454,11 +455,31 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Gets the cropped image based on the current crop window.<br>
-     * If image loaded from URI will use sample size to fit in the requested width and height down-sampling
-     * if required - optimization to get best size to quality.<br>
+     * Use the given cropShape to "fix" resulting crop image for {@link CropShape#OVAL} by setting pixels
+     * outside the oval (circular) shape to transparent.<br>
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      *
-     * @param cropShape the shape to crop the image
+     * @param cropShape the shape to crop the image: {@link CropShape#RECTANGLE} will get the raw crop rectangle from
+     * the image, {@link CropShape#OVAL} will "fix" rectangle to oval by setting outside pixels to transparent.
+     * @param reqWidth the width to downsample the cropped image to
+     * @param reqHeight the height to downsample the cropped image to
+     */
+    public void getCroppedImageAsync(CropShape cropShape) {
+        getCroppedImageAsync(cropShape, 0, 0);
+    }
+
+    /**
+     * Gets the cropped image based on the current crop window.<br>
+     * Use the given cropShape to "fix" resulting crop image for {@link CropShape#OVAL} by setting pixels
+     * outside the oval (circular) shape to transparent.<br>
+     * If (reqWidth,reqHeight) is given AND image is loaded from URI cropping will try to use sample size to fit in
+     * the requested width and height down-sampling if possible - optimization to get best size to quality.<br>
+     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     *
+     * @param cropShape the shape to crop the image: {@link CropShape#RECTANGLE} will get the raw crop rectangle from
+     * the image, {@link CropShape#OVAL} will "fix" rectangle to oval by setting outside pixels to transparent.
+     * @param reqWidth the width to downsample the cropped image to
+     * @param reqHeight the height to downsample the cropped image to
      */
     public void getCroppedImageAsync(CropShape cropShape, int reqWidth, int reqHeight) {
         if (mOnGetCroppedImageCompleteListener == null) {
