@@ -204,10 +204,19 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Set the scale type of the image in the crop view
+     * Get the scale type of the image in the crop view.
      */
     public ImageView.ScaleType getScaleType() {
         return mImageView.getScaleType();
+    }
+
+    /**
+     * Get the amount of degrees the cropping image is rotated cloackwise.<br>
+     *
+     * @return 0-360
+     */
+    public int getRotatedDegrees() {
+        return mDegreesRotated;
     }
 
     /**
@@ -604,8 +613,8 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Rotates image by the specified number of degrees clockwise. Cycles from 0 to 360
-     * degrees.
+     * Rotates image by the specified number of degrees clockwise.<br>
+     * Cycles from 0 to 360 degrees.
      *
      * @param degrees Integer specifying the number of degrees to rotate.
      */
