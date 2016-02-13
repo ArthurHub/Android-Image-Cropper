@@ -295,7 +295,14 @@ public class CropOverlayView extends View {
     }
 
     /**
-     * Set crop window rectangle to the given value, fixing if it doesn't fit bitmap, min/max or aspect ratio rules.
+     * Get crop window initial rectangle.
+     */
+    public Rect getInitialCropWindowRect() {
+        return mInitialCropWindowRect;
+    }
+
+    /**
+     * Set crop window initial rectangle to be used instead of default.
      */
     public void setInitialCropWindowRect(Rect rect) {
         mInitialCropWindowRect = rect;

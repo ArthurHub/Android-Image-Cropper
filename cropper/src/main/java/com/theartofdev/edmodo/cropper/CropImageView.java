@@ -765,6 +765,7 @@ public class CropImageView extends FrameLayout {
             }
         }
         bundle.putInt("DEGREES_ROTATED", mDegreesRotated);
+        bundle.putParcelable("INITIAL_CROP_RECT", mCropOverlayView.getInitialCropWindowRect());
         return bundle;
     }
 
@@ -801,6 +802,8 @@ public class CropImageView extends FrameLayout {
                 rotateImage(mDegreesRotated);
                 mDegreesRotated = tmpRotated;
             }
+
+            mCropOverlayView.setInitialCropWindowRect((Rect) bundle.getParcelable("INITIAL_CROP_RECT"));
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
         } else {
