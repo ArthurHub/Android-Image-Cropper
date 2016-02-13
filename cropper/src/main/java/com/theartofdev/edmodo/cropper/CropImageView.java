@@ -338,7 +338,7 @@ public class CropImageView extends FrameLayout {
      * Set the crop window position and size to the given rectangle.<br>
      * Image to crop must be first set before invoking this, for async after complete callback.
      *
-     * @param crop window rectangle (position and size) relative to source bitmap
+     * @param rect window rectangle (position and size) relative to source bitmap
      */
     public void setCropRect(Rect rect) {
         mCropOverlayView.setInitialCropWindowRect(rect);
@@ -474,8 +474,6 @@ public class CropImageView extends FrameLayout {
      *
      * @param cropShape the shape to crop the image: {@link CropShape#RECTANGLE} will get the raw crop rectangle from
      * the image, {@link CropShape#OVAL} will "fix" rectangle to oval by setting outside pixels to transparent.
-     * @param reqWidth the width to downsample the cropped image to
-     * @param reqHeight the height to downsample the cropped image to
      */
     public void getCroppedImageAsync(CropShape cropShape) {
         getCroppedImageAsync(cropShape, 0, 0);
