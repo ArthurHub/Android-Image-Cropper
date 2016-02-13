@@ -156,7 +156,7 @@ public class CropOverlayView extends View {
      */
     public void setBitmapRect(Rect bitmapRect) {
         mBitmapRect = bitmapRect;
-        initCropWindow(mBitmapRect);
+        initCropWindow();
     }
 
     /**
@@ -165,7 +165,7 @@ public class CropOverlayView extends View {
     public void resetCropOverlayView() {
 
         if (initializedCropWindow) {
-            initCropWindow(mBitmapRect);
+            initCropWindow();
             invalidate();
         }
     }
@@ -212,7 +212,7 @@ public class CropOverlayView extends View {
     public void setGuidelines(CropImageView.Guidelines guidelines) {
         mGuidelines = guidelines;
         if (initializedCropWindow) {
-            initCropWindow(mBitmapRect);
+            initCropWindow();
             invalidate();
         }
     }
@@ -228,7 +228,7 @@ public class CropOverlayView extends View {
         mFixAspectRatio = fixAspectRatio;
 
         if (initializedCropWindow) {
-            initCropWindow(mBitmapRect);
+            initCropWindow();
             invalidate();
         }
     }
@@ -247,7 +247,7 @@ public class CropOverlayView extends View {
             mTargetAspectRatio = ((float) mAspectRatioX) / mAspectRatioY;
 
             if (initializedCropWindow) {
-                initCropWindow(mBitmapRect);
+                initCropWindow();
                 invalidate();
             }
         }
@@ -267,7 +267,7 @@ public class CropOverlayView extends View {
             mTargetAspectRatio = ((float) mAspectRatioX) / mAspectRatioY;
 
             if (initializedCropWindow) {
-                initCropWindow(mBitmapRect);
+                initCropWindow();
                 invalidate();
             }
         }
@@ -287,6 +287,15 @@ public class CropOverlayView extends View {
      */
     public void setScaleFactor(float scaleFactorWidth, float scaleFactorHeight) {
         mCropWindowHandler.setScaleFactor(scaleFactorWidth, scaleFactorHeight);
+    }
+
+    /**
+     * Set crop window rectangle to the given value, fixing if it doesn't fit bitmap, min/max or aspect ratio rules.
+     */
+    public void setCropWindowRect(RectF rect) {
+        fixCropWindowRectByRules(rect);
+        mCropWindowHandler.setRect(rect);
+        invalidate();
     }
 
     /**
@@ -384,11 +393,11 @@ public class CropOverlayView extends View {
      * Set the initial crop window size and position. This is dependent on the
      * size and position of the image being cropped.
      *
-     * @param bitmapRect the bounding box around the image being cropped
+     * @param mBitmapRect the bounding box around the image being cropped
      */
-    private void initCropWindow(Rect bitmapRect) {
+    private void initCropWindow() {
 
-        if (bitmapRect.width() == 0 || bitmapRect.height() == 0) {
+        if (mBitmapRect.width() == 0 || mBitmapRect.height() == 0) {
             return;
         }
 
@@ -397,18 +406,18 @@ public class CropOverlayView extends View {
         // Tells the attribute functions the crop window has already been initialized
         initializedCropWindow = true;
 
-        float horizontalPadding = mInitialCropWindowPaddingRatio * bitmapRect.width();
-        float verticalPadding = mInitialCropWindowPaddingRatio * bitmapRect.height();
+        float horizontalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.width();
+        float verticalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.height();
 
-        if (mFixAspectRatio && (bitmapRect.left != 0 || bitmapRect.right != 0 || bitmapRect.top != 0 || bitmapRect.bottom != 0)) {
+        if (mFixAspectRatio && (mBitmapRect.left != 0 || mBitmapRect.right != 0 || mBitmapRect.top != 0 || mBitmapRect.bottom != 0)) {
 
             // If the image aspect ratio is wider than the crop aspect ratio,
             // then the image height is the determining initial length. Else, vice-versa.
-            float bitmapAspectRatio = (float) bitmapRect.width() / (float) bitmapRect.height();
+            float bitmapAspectRatio = (float) mBitmapRect.width() / (float) mBitmapRect.height();
             if (bitmapAspectRatio > mTargetAspectRatio) {
 
-                rect.top = bitmapRect.top + verticalPadding;
-                rect.bottom = bitmapRect.bottom - verticalPadding;
+                rect.top = mBitmapRect.top + verticalPadding;
+                rect.bottom = mBitmapRect.bottom - verticalPadding;
 
                 float centerX = getWidth() / 2f;
 
@@ -429,8 +438,8 @@ public class CropOverlayView extends View {
 
             } else {
 
-                rect.left = bitmapRect.left + horizontalPadding;
-                rect.right = bitmapRect.right - horizontalPadding;
+                rect.left = mBitmapRect.left + horizontalPadding;
+                rect.right = mBitmapRect.right - horizontalPadding;
 
                 float centerY = getHeight() / 2f;
 
@@ -448,12 +457,34 @@ public class CropOverlayView extends View {
             }
         } else {
             // Initialize crop window to have 10% padding w/ respect to image.
-            rect.left = bitmapRect.left + horizontalPadding;
-            rect.top = bitmapRect.top + verticalPadding;
-            rect.right = bitmapRect.right - horizontalPadding;
-            rect.bottom = bitmapRect.bottom - verticalPadding;
+            rect.left = mBitmapRect.left + horizontalPadding;
+            rect.top = mBitmapRect.top + verticalPadding;
+            rect.right = mBitmapRect.right - horizontalPadding;
+            rect.bottom = mBitmapRect.bottom - verticalPadding;
         }
 
+        fixCropWindowRectByRules(rect);
+
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Fix the given rect to fit into bitmap rect and follow min, max and aspect ratio rules.
+     */
+    private void fixCropWindowRectByRules(RectF rect) {
+        if (mFixAspectRatio) {
+            if (Math.abs(rect.width() - rect.height() * mTargetAspectRatio) > 0.1) {
+                if (rect.width() > rect.height() * mTargetAspectRatio) {
+                    float adj = Math.abs(rect.height() * mTargetAspectRatio - rect.width()) / 2;
+                    rect.left += adj;
+                    rect.right -= adj;
+                } else {
+                    float adj = Math.abs(rect.width() / mTargetAspectRatio - rect.height()) / 2;
+                    rect.top += adj;
+                    rect.bottom -= adj;
+                }
+            }
+        }
         if (rect.width() < mCropWindowHandler.getMinCropWidth()) {
             float adj = (mCropWindowHandler.getMinCropWidth() - rect.width()) / 2;
             rect.left -= adj;
@@ -474,20 +505,18 @@ public class CropOverlayView extends View {
             rect.top += adj;
             rect.bottom -= adj;
         }
-        if (rect.left < bitmapRect.left) {
-            rect.left = bitmapRect.left;
+        if (rect.left < mBitmapRect.left) {
+            rect.left = mBitmapRect.left;
         }
-        if (rect.top < bitmapRect.top) {
-            rect.top = bitmapRect.top;
+        if (rect.top < mBitmapRect.top) {
+            rect.top = mBitmapRect.top;
         }
-        if (rect.right > bitmapRect.right) {
-            rect.right = bitmapRect.right;
+        if (rect.right > mBitmapRect.right) {
+            rect.right = mBitmapRect.right;
         }
-        if (rect.bottom > bitmapRect.bottom) {
-            rect.bottom = bitmapRect.bottom;
+        if (rect.bottom > mBitmapRect.bottom) {
+            rect.bottom = mBitmapRect.bottom;
         }
-
-        mCropWindowHandler.setRect(rect);
     }
 
     /**
@@ -495,7 +524,7 @@ public class CropOverlayView extends View {
      */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        initCropWindow(mBitmapRect);
+        initCropWindow();
     }
 
     /**

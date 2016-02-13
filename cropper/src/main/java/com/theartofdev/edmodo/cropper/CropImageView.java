@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -334,24 +335,47 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * Set the crop window position and size to the given rectangle.<br>
+     * Image to crop must be first set before invoking this, for async after complete callback.
+     *
+     * @param crop window rectangle (position and size) relative to source bitmap
+     */
+    public void setCropRect(Rect rect) {
+        if (mBitmap != null) {
+
+            Rect displayedImageRect = BitmapUtils.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
+
+            // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions.
+            Pair<Float, Float> scaleFactor = getScaleFactorWidth(displayedImageRect);
+
+            // Get crop window position relative to the displayed image.
+            float left = displayedImageRect.left + rect.left / scaleFactor.first / mLoadedSampleSize;
+            float top = displayedImageRect.top + rect.top / scaleFactor.second / mLoadedSampleSize;
+            float right = left + rect.width() / scaleFactor.first / mLoadedSampleSize;
+            float bottom = top + rect.height() / scaleFactor.second / mLoadedSampleSize;
+
+            // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
+            left = Math.max(displayedImageRect.left, left);
+            top = Math.max(displayedImageRect.top, top);
+            right = Math.min(displayedImageRect.right, right);
+            bottom = Math.min(displayedImageRect.bottom, bottom);
+
+            mCropOverlayView.setCropWindowRect(new RectF(left, top, right, bottom));
+        }
+    }
+
+    /**
      * Gets the crop window's position relative to the source Bitmap (not the image
      * displayed in the CropImageView).
      *
-     * @return a RectF instance containing cropped area boundaries of the source Bitmap
+     * @return a Rect instance containing cropped area boundaries of the source Bitmap
      */
     public Rect getActualCropRect() {
         if (mBitmap != null) {
             Rect displayedImageRect = BitmapUtils.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
 
-            // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width.
-            float actualImageWidth = mBitmap.getWidth();
-            float displayedImageWidth = displayedImageRect.width();
-            float scaleFactorWidth = actualImageWidth / displayedImageWidth;
-
-            // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for height.
-            float actualImageHeight = mBitmap.getHeight();
-            float displayedImageHeight = displayedImageRect.height();
-            float scaleFactorHeight = actualImageHeight / displayedImageHeight;
+            // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions.
+            Pair<Float, Float> scaleFactor = getScaleFactorWidth(displayedImageRect);
 
             // Get crop window position relative to the displayed image.
             RectF cropWindowRect = mCropOverlayView.getCropWindowRect();
@@ -361,10 +385,10 @@ public class CropImageView extends FrameLayout {
             float displayedCropHeight = cropWindowRect.height();
 
             // Scale the crop window position to the actual size of the Bitmap.
-            float actualCropLeft = displayedCropLeft * scaleFactorWidth;
-            float actualCropTop = displayedCropTop * scaleFactorHeight;
-            float actualCropRight = actualCropLeft + displayedCropWidth * scaleFactorWidth;
-            float actualCropBottom = actualCropTop + displayedCropHeight * scaleFactorHeight;
+            float actualCropLeft = displayedCropLeft * scaleFactor.first;
+            float actualCropTop = displayedCropTop * scaleFactor.second;
+            float actualCropRight = actualCropLeft + displayedCropWidth * scaleFactor.first;
+            float actualCropBottom = actualCropTop + displayedCropHeight * scaleFactor.second;
 
             // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
             actualCropLeft = Math.max(0f, actualCropLeft);
@@ -382,7 +406,7 @@ public class CropImageView extends FrameLayout {
      * Gets the crop window's position relative to the source Bitmap (not the image
      * displayed in the CropImageView) and the original rotation.
      *
-     * @return a RectF instance containing cropped area boundaries of the source Bitmap
+     * @return a Rect instance containing cropped area boundaries of the source Bitmap
      */
     @SuppressWarnings("SuspiciousNameCombination")
     public Rect getActualCropRectNoRotation() {
@@ -949,10 +973,19 @@ public class CropImageView extends FrameLayout {
         mCropOverlayView.setBitmapRect(bitmapRect);
     }
 
-    private void updateScaleFactor() {
-        if (mBitmap != null) {
+    /**
+     * Get the scale factor between the actual Bitmap dimensions and the displayed dimensions.
+     */
+    private Pair<Float, Float> getScaleFactorWidth(Rect displayedImageRect) {
+        float actualImageWidth = mBitmap.getWidth();
+        float displayedImageWidth = displayedImageRect.width();
+        float scaleFactorWidth = actualImageWidth / displayedImageWidth;
 
-        }
+        float actualImageHeight = mBitmap.getHeight();
+        float displayedImageHeight = displayedImageRect.height();
+        float scaleFactorHeight = actualImageHeight / displayedImageHeight;
+
+        return Pair.create(scaleFactorWidth, scaleFactorHeight);
     }
 
     //endregion
