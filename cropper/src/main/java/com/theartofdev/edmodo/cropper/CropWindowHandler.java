@@ -113,6 +113,20 @@ final class CropWindowHandler {
     }
 
     /**
+     * get the scale factor (on width) of the showen image to original image.
+     */
+    public float getScaleFactorWidth() {
+        return mScaleFactorWidth;
+    }
+
+    /**
+     * get the scale factor (on height) of the showen image to original image.
+     */
+    public float getScaleFactorHeight() {
+        return mScaleFactorHeight;
+    }
+
+    /**
      * set the scale factor of the showen image to original image to scale the limits appropriately.
      */
     public void setScaleFactor(float scaleFactorWidth, float scaleFactorHeight) {

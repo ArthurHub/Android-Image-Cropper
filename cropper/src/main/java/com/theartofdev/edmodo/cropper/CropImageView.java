@@ -341,27 +341,7 @@ public class CropImageView extends FrameLayout {
      * @param crop window rectangle (position and size) relative to source bitmap
      */
     public void setCropRect(Rect rect) {
-        if (mBitmap != null) {
-
-            Rect displayedImageRect = BitmapUtils.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
-
-            // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions.
-            Pair<Float, Float> scaleFactor = getScaleFactorWidth(displayedImageRect);
-
-            // Get crop window position relative to the displayed image.
-            float left = displayedImageRect.left + rect.left / scaleFactor.first / mLoadedSampleSize;
-            float top = displayedImageRect.top + rect.top / scaleFactor.second / mLoadedSampleSize;
-            float right = left + rect.width() / scaleFactor.first / mLoadedSampleSize;
-            float bottom = top + rect.height() / scaleFactor.second / mLoadedSampleSize;
-
-            // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
-            left = Math.max(displayedImageRect.left, left);
-            top = Math.max(displayedImageRect.top, top);
-            right = Math.min(displayedImageRect.right, right);
-            bottom = Math.min(displayedImageRect.bottom, bottom);
-
-            mCropOverlayView.setCropWindowRect(new RectF(left, top, right, bottom));
-        }
+        mCropOverlayView.setInitialCropWindowRect(rect);
     }
 
     /**
@@ -553,6 +533,7 @@ public class CropImageView extends FrameLayout {
      * @param bitmap the Bitmap to set
      */
     public void setImageBitmap(Bitmap bitmap) {
+        mCropOverlayView.setInitialCropWindowRect(null);
         setBitmap(bitmap, true);
     }
 
@@ -571,6 +552,7 @@ public class CropImageView extends FrameLayout {
             bitmap = result.bitmap;
             mDegreesRotated = result.degrees;
         }
+        mCropOverlayView.setInitialCropWindowRect(null);
         setBitmap(bitmap, true);
     }
 
@@ -581,6 +563,7 @@ public class CropImageView extends FrameLayout {
      */
     public void setImageResource(int resId) {
         if (resId != 0) {
+            mCropOverlayView.setInitialCropWindowRect(null);
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
             setBitmap(bitmap, true);
             mImageResource = resId;
@@ -598,6 +581,8 @@ public class CropImageView extends FrameLayout {
     @Deprecated
     public void setImageUri(Uri uri) {
         if (uri != null) {
+
+            mCropOverlayView.setInitialCropWindowRect(null);
 
             DisplayMetrics metrics = getResources().getDisplayMetrics();
             double densityAdj = metrics.density > 1 ? 1 / metrics.density : 1;
@@ -634,6 +619,7 @@ public class CropImageView extends FrameLayout {
      */
     public void clearImage() {
         clearImage(true);
+        mCropOverlayView.setInitialCropWindowRect(null);
     }
 
     /**
@@ -670,6 +656,7 @@ public class CropImageView extends FrameLayout {
 
             // either no existing task is working or we canceled it, need to load new URI
             clearImage(true);
+            mCropOverlayView.setInitialCropWindowRect(null);
             mBitmapLoadingWorkerTask = new WeakReference<>(new BitmapLoadingWorkerTask(this, uri, preSetRotation));
             mBitmapLoadingWorkerTask.get().execute();
             setProgressBarVisibility();

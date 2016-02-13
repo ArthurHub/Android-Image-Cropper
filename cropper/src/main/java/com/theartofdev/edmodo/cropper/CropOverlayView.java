@@ -123,6 +123,11 @@ public class CropOverlayView extends View {
     private CropImageView.CropShape mCropShape;
 
     /**
+     * the initial crop window rectangle to set
+     */
+    private Rect mInitialCropWindowRect;
+
+    /**
      * Whether the Crop View has been initialized for the first time
      */
     private boolean initializedCropWindow = false;
@@ -292,10 +297,12 @@ public class CropOverlayView extends View {
     /**
      * Set crop window rectangle to the given value, fixing if it doesn't fit bitmap, min/max or aspect ratio rules.
      */
-    public void setCropWindowRect(RectF rect) {
-        fixCropWindowRectByRules(rect);
-        mCropWindowHandler.setRect(rect);
-        invalidate();
+    public void setInitialCropWindowRect(Rect rect) {
+        mInitialCropWindowRect = rect;
+        if (initializedCropWindow) {
+            initCropWindow();
+            invalidate();
+        }
     }
 
     /**
@@ -409,7 +416,20 @@ public class CropOverlayView extends View {
         float horizontalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.width();
         float verticalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.height();
 
-        if (mFixAspectRatio && (mBitmapRect.left != 0 || mBitmapRect.right != 0 || mBitmapRect.top != 0 || mBitmapRect.bottom != 0)) {
+        if (mInitialCropWindowRect != null && mInitialCropWindowRect.width() > 0 && mInitialCropWindowRect.height() > 0) {
+            // Get crop window position relative to the displayed image.
+            rect.left = mBitmapRect.left + mInitialCropWindowRect.left / mCropWindowHandler.getScaleFactorWidth();
+            rect.top = mBitmapRect.top + mInitialCropWindowRect.top / mCropWindowHandler.getScaleFactorHeight();
+            rect.right = rect.left + mInitialCropWindowRect.width() / mCropWindowHandler.getScaleFactorWidth();
+            rect.bottom = rect.top + mInitialCropWindowRect.height() / mCropWindowHandler.getScaleFactorHeight();
+
+            // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
+            rect.left = Math.max(mBitmapRect.left, rect.left);
+            rect.top = Math.max(mBitmapRect.top, rect.top);
+            rect.right = Math.min(mBitmapRect.right, rect.right);
+            rect.bottom = Math.min(mBitmapRect.bottom, rect.bottom);
+
+        } else if (mFixAspectRatio && (mBitmapRect.left != 0 || mBitmapRect.right != 0 || mBitmapRect.top != 0 || mBitmapRect.bottom != 0)) {
 
             // If the image aspect ratio is wider than the crop aspect ratio,
             // then the image height is the determining initial length. Else, vice-versa.
@@ -505,17 +525,19 @@ public class CropOverlayView extends View {
             rect.top += adj;
             rect.bottom -= adj;
         }
-        if (rect.left < mBitmapRect.left) {
-            rect.left = mBitmapRect.left;
-        }
-        if (rect.top < mBitmapRect.top) {
-            rect.top = mBitmapRect.top;
-        }
-        if (rect.right > mBitmapRect.right) {
-            rect.right = mBitmapRect.right;
-        }
-        if (rect.bottom > mBitmapRect.bottom) {
-            rect.bottom = mBitmapRect.bottom;
+        if (mBitmapRect != null && mBitmapRect.width() > 0 && mBitmapRect.height() > 0) {
+            if (rect.left < mBitmapRect.left) {
+                rect.left = mBitmapRect.left;
+            }
+            if (rect.top < mBitmapRect.top) {
+                rect.top = mBitmapRect.top;
+            }
+            if (rect.right > mBitmapRect.right) {
+                rect.right = mBitmapRect.right;
+            }
+            if (rect.bottom > mBitmapRect.bottom) {
+                rect.bottom = mBitmapRect.bottom;
+            }
         }
     }
 
