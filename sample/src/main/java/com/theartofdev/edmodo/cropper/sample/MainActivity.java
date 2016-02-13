@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -102,8 +101,7 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
 
             @Override
             public void onClick(View v) {
-                mCropImageView.setCropRect(new Rect(250, 250, 1050, 750));
-                //mCropImageView.rotateImage(ROTATE_NINETY_DEGREES);
+                mCropImageView.rotateImage(ROTATE_NINETY_DEGREES);
             }
         });
 
