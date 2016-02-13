@@ -326,7 +326,7 @@ final class CropWindowMoveHandler {
             }
 
             // Checks if the window is too large vertically
-            if (newHeight < mCropWindowHandler.getMaxCropHeight()) {
+            if (newHeight > mCropWindowHandler.getMaxCropHeight()) {
                 newLeft = rect.right - mCropWindowHandler.getMaxCropHeight() * aspectRatio;
             }
 
