@@ -46,9 +46,9 @@ final class CropWindowMoveHandler {
      * @param edgeMoveType the type of move this handler is executing
      * @param horizontalEdge the primary edge associated with this handle; may be null
      * @param verticalEdge the secondary edge associated with this handle; may be null
-     * @param cropWindowHandler
-     * @param touchX
-     * @param touchY
+     * @param cropWindowHandler main crop window handle to get and update the crop window edges
+     * @param touchX the location of the initial toch possition to measure move distance
+     * @param touchY the location of the initial toch possition to measure move distance
      */
     public CropWindowMoveHandler(Type type, CropWindowHandler cropWindowHandler, float touchX, float touchY) {
         mType = type;
@@ -57,7 +57,14 @@ final class CropWindowMoveHandler {
     }
 
     /**
-     * Updates the crop window by directly setting the Edge coordinates.
+     * Updates the crop window by change in the toch location.<br>
+     * Move type handled by this instance, as initialized in creation, affects how the change in toch location
+     * changes the crop window position and size.<br>
+     * After the crop window position/size is changed by toch move it may result in values that vialate contraints:
+     * outside the bounds of the shown bitmap, smaller/larger than min/max size or missmatch in aspect ratio.
+     * So a series of fixes is executed on "secondary" edges to adjust it by the "primary" edge movement.<br>
+     * Primary is the edge directly affected by move type, secondary is the other edge.<br>
+     * The crop window is changed by directly setting the Edge coordinates.
      *
      * @param x the new x-coordinate of this handle
      * @param y the new y-coordinate of this handle
@@ -80,9 +87,9 @@ final class CropWindowMoveHandler {
             moveCenter(x, y, bounds, snapMargin);
         } else {
             if (fixedAspectRatio) {
-                MoveWithFixedAspectRatio(x, y, bounds, snapMargin, aspectRatio);
+                MoveSizeWithFixedAspectRatio(x, y, bounds, snapMargin, aspectRatio);
             } else {
-                MoveWithFreeAspectRatio(x, y, bounds, snapMargin);
+                MoveSizeWithFreeAspectRatio(x, y, bounds, snapMargin);
             }
         }
     }
@@ -144,6 +151,9 @@ final class CropWindowMoveHandler {
         mTouchOffset.y = touchOffsetY;
     }
 
+    /**
+     * Center move only changes the position of the crop window without changing the size.
+     */
     private void moveCenter(float x, float y, Rect imageRect, float snapRadius) {
         RectF rect = mCropWindowHandler.getRect();
         rect.offset(x - rect.centerX(), y - rect.centerY());
@@ -151,7 +161,12 @@ final class CropWindowMoveHandler {
         mCropWindowHandler.setRect(rect);
     }
 
-    private void MoveWithFreeAspectRatio(float x, float y, Rect bounds, float snapMargin) {
+    /**
+     * Change the size of the crop window on the required edge (or edges for corner size move) without
+     * affecting "secondary" edges.<br>
+     * Only the primary edge(s) are fixed to stay within limits.
+     */
+    private void MoveSizeWithFreeAspectRatio(float x, float y, Rect bounds, float snapMargin) {
         switch (mType) {
             case TOP_LEFT:
                 adjustTop(y, bounds, snapMargin, 0, false, false);
@@ -185,7 +200,13 @@ final class CropWindowMoveHandler {
         }
     }
 
-    private void MoveWithFixedAspectRatio(float x, float y, Rect bounds, float snapMargin, float aspectRatio) {
+    /**
+     * Change the size of the crop window on the required "primary" edge WITH affect to relevant "secondary"
+     * edge via aspect ratio.<br>
+     * Example: change in the left edge (primary) will affect top and bottom edges (secondary) to preserve the
+     * given aspect ratio.
+     */
+    private void MoveSizeWithFixedAspectRatio(float x, float y, Rect bounds, float snapMargin, float aspectRatio) {
         RectF rect = mCropWindowHandler.getRect();
         switch (mType) {
             case TOP_LEFT:
