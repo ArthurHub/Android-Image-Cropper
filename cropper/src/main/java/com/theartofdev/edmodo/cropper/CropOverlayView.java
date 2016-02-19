@@ -160,8 +160,10 @@ public class CropOverlayView extends View {
      * @param bitmapRect the image's bounding box
      */
     public void setBitmapRect(Rect bitmapRect) {
-        mBitmapRect = bitmapRect;
-        initCropWindow();
+        if (mBitmapRect == null || !bitmapRect.equals(mBitmapRect)) {
+            mBitmapRect = bitmapRect;
+            initCropWindow();
+        }
     }
 
     /**
