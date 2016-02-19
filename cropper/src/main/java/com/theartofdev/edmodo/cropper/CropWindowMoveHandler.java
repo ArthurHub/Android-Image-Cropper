@@ -323,16 +323,19 @@ final class CropWindowMoveHandler {
             // Checks if the window is too small vertically
             if (newHeight < mCropWindowHandler.getMinCropHeight()) {
                 newLeft = Math.max(bounds.left, rect.right - mCropWindowHandler.getMinCropHeight() * aspectRatio);
+                newHeight = (rect.right - newLeft) / aspectRatio;
             }
 
             // Checks if the window is too large vertically
             if (newHeight > mCropWindowHandler.getMaxCropHeight()) {
                 newLeft = Math.max(bounds.left, rect.right - mCropWindowHandler.getMaxCropHeight() * aspectRatio);
+                newHeight = (rect.right - newLeft) / aspectRatio;
             }
 
             // if top edge moves by aspect ratio check that it is within bounds
             if (topMoves && rect.bottom - newHeight < bounds.top) {
                 newLeft = Math.max(bounds.left, rect.right - (rect.bottom - bounds.top) * aspectRatio);
+                newHeight = (rect.right - newLeft) / aspectRatio;
             }
 
             // if bottom edge moves by aspect ratio check that it is within bounds
@@ -386,16 +389,19 @@ final class CropWindowMoveHandler {
             // Checks if the window is too small vertically
             if (newHeight < mCropWindowHandler.getMinCropHeight()) {
                 newRight = Math.min(bounds.right, rect.left + mCropWindowHandler.getMinCropHeight() * aspectRatio);
+                newHeight = (newRight - rect.left) / aspectRatio;
             }
 
             // Checks if the window is too large vertically
             if (newHeight > mCropWindowHandler.getMaxCropHeight()) {
                 newRight = Math.min(bounds.right, rect.left + mCropWindowHandler.getMaxCropHeight() * aspectRatio);
+                newHeight = (newRight - rect.left) / aspectRatio;
             }
 
             // if top edge moves by aspect ratio check that it is within bounds
             if (topMoves && rect.bottom - newHeight < bounds.top) {
                 newRight = Math.min(bounds.right, rect.left + (rect.bottom - bounds.top) * aspectRatio);
+                newHeight = (newRight - rect.left) / aspectRatio;
             }
 
             // if bottom edge moves by aspect ratio check that it is within bounds
@@ -447,16 +453,19 @@ final class CropWindowMoveHandler {
             // Checks if the crop window is too small horizontally due to aspect ratio adjustment
             if (newWidth < mCropWindowHandler.getMinCropWidth()) {
                 newTop = Math.max(bounds.top, rect.bottom - (mCropWindowHandler.getMinCropWidth() / aspectRatio));
+                newWidth = (rect.bottom - newTop) * aspectRatio;
             }
 
             // Checks if the crop window is too large horizontally due to aspect ratio adjustment
             if (newWidth > mCropWindowHandler.getMaxCropWidth()) {
                 newTop = Math.max(bounds.top, rect.bottom - (mCropWindowHandler.getMaxCropWidth() / aspectRatio));
+                newWidth = (rect.bottom - newTop) * aspectRatio;
             }
 
             // if left edge moves by aspect ratio check that it is within bounds
             if (leftMoves && rect.right - newWidth < bounds.left) {
                 newTop = Math.max(bounds.top, rect.bottom - (rect.right - bounds.left) / aspectRatio);
+                newWidth = (rect.bottom - newTop) * aspectRatio;
             }
 
             // if right edge moves by aspect ratio check that it is within bounds
@@ -508,16 +517,19 @@ final class CropWindowMoveHandler {
             // Checks if the window is too small horizontally
             if (newWidth < mCropWindowHandler.getMinCropWidth()) {
                 newBottom = Math.min(bounds.bottom, rect.top + mCropWindowHandler.getMinCropWidth() / aspectRatio);
+                newWidth = (newBottom - rect.top) * aspectRatio;
             }
 
             // Checks if the window is too large horizontally
             if (newWidth > mCropWindowHandler.getMaxCropWidth()) {
                 newBottom = Math.min(bounds.bottom, rect.top + mCropWindowHandler.getMaxCropWidth() / aspectRatio);
+                newWidth = (newBottom - rect.top) * aspectRatio;
             }
 
             // if left edge moves by aspect ratio check that it is within bounds
             if (leftMoves && rect.right - newWidth < bounds.left) {
                 newBottom = Math.min(bounds.bottom, rect.top + (rect.right - bounds.left) / aspectRatio);
+                newWidth = (newBottom - rect.top) * aspectRatio;
             }
 
             // if right edge moves by aspect ratio check that it is within bounds
