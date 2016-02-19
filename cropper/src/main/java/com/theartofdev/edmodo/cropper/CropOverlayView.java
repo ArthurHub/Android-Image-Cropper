@@ -454,11 +454,6 @@ public class CropOverlayView extends View {
                 // Limits the aspect ratio to no less than 40 wide or 40 tall
                 float cropWidth = Math.max(mCropWindowHandler.getMinCropWidth(), rect.height() * mTargetAspectRatio);
 
-                // Create new TargetAspectRatio if the original one does not fit the screen
-                if (cropWidth == mCropWindowHandler.getMinCropWidth()) {
-                    mTargetAspectRatio = mCropWindowHandler.getMinCropWidth() / rect.height();
-                }
-
                 float halfCropWidth = cropWidth / 2f;
                 rect.left = centerX - halfCropWidth;
                 rect.right = centerX + halfCropWidth;
@@ -472,11 +467,6 @@ public class CropOverlayView extends View {
 
                 // Limits the aspect ratio to no less than 40 wide or 40 tall
                 float cropHeight = Math.max(mCropWindowHandler.getMinCropHeight(), rect.width() / mTargetAspectRatio);
-
-                // Create new TargetAspectRatio if the original one does not fit the screen
-                if (cropHeight == mCropWindowHandler.getMinCropHeight()) {
-                    mTargetAspectRatio = rect.width() / mCropWindowHandler.getMinCropHeight();
-                }
 
                 float halfCropHeight = cropHeight / 2f;
                 rect.top = centerY - halfCropHeight;
