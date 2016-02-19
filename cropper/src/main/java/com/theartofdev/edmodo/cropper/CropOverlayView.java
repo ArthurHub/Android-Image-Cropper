@@ -436,7 +436,7 @@ public class CropOverlayView extends View {
             rect.right = Math.min(mBitmapRect.right, rect.right);
             rect.bottom = Math.min(mBitmapRect.bottom, rect.bottom);
 
-        } else if (mFixAspectRatio && (mBitmapRect.left != 0 || mBitmapRect.right != 0 || mBitmapRect.top != 0 || mBitmapRect.bottom != 0)) {
+        } else if (mFixAspectRatio && !mBitmapRect.isEmpty()) {
 
             // If the image aspect ratio is wider than the crop aspect ratio,
             // then the image height is the determining initial length. Else, vice-versa.
@@ -489,19 +489,6 @@ public class CropOverlayView extends View {
      * Fix the given rect to fit into bitmap rect and follow min, max and aspect ratio rules.
      */
     private void fixCropWindowRectByRules(RectF rect) {
-        if (mFixAspectRatio) {
-            if (Math.abs(rect.width() - rect.height() * mTargetAspectRatio) > 0.1) {
-                if (rect.width() > rect.height() * mTargetAspectRatio) {
-                    float adj = Math.abs(rect.height() * mTargetAspectRatio - rect.width()) / 2;
-                    rect.left += adj;
-                    rect.right -= adj;
-                } else {
-                    float adj = Math.abs(rect.width() / mTargetAspectRatio - rect.height()) / 2;
-                    rect.top += adj;
-                    rect.bottom -= adj;
-                }
-            }
-        }
         if (rect.width() < mCropWindowHandler.getMinCropWidth()) {
             float adj = (mCropWindowHandler.getMinCropWidth() - rect.width()) / 2;
             rect.left -= adj;
@@ -534,6 +521,19 @@ public class CropOverlayView extends View {
             }
             if (rect.bottom > mBitmapRect.bottom) {
                 rect.bottom = mBitmapRect.bottom;
+            }
+        }
+        if (mFixAspectRatio) {
+            if (Math.abs(rect.width() - rect.height() * mTargetAspectRatio) > 0.1) {
+                if (rect.width() > rect.height() * mTargetAspectRatio) {
+                    float adj = Math.abs(rect.height() * mTargetAspectRatio - rect.width()) / 2;
+                    rect.left += adj;
+                    rect.right -= adj;
+                } else {
+                    float adj = Math.abs(rect.width() / mTargetAspectRatio - rect.height()) / 2;
+                    rect.top += adj;
+                    rect.bottom -= adj;
+                }
             }
         }
     }
