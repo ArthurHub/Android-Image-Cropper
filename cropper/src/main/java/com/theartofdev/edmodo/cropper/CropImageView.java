@@ -309,6 +309,7 @@ public class CropImageView extends FrameLayout {
      */
     public void setShowCropOverlay(boolean showCropOverlay) {
         mShowCropOverlay = showCropOverlay;
+        setCropOverlayVisibility();
     }
 
     /**
