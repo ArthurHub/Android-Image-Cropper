@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -243,6 +244,7 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
         if (error == null) {
             Toast.makeText(mCropImageView.getContext(), "Image load successful", Toast.LENGTH_SHORT).show();
         } else {
+            Log.e("AIC", "Failed to load image by URI", error);
             Toast.makeText(mCropImageView.getContext(), "Image load failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
@@ -254,6 +256,7 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
             ImageView croppedImageView = (ImageView) findViewById(R.id.croppedImageView);
             croppedImageView.setImageBitmap(croppedImage);
         } else {
+            Log.e("AIC", "Failed to crop image", error);
             Toast.makeText(mCropImageView.getContext(), "Image crop failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
