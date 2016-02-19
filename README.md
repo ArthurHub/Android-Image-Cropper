@@ -27,7 +27,7 @@ Image cropping tool, displays a resizable, rectengular/oval crop window on top o
 - Get cropping rectangle or the cropped bitmap.
 - Supported on API Level 10 and above.
 
-For more information, see the [linked Github Wiki page](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Android-Image-Cropper). 
+For more information, see the [linked Github Wiki page](https://github.com/ArthurHub/Android-Image-Cropper/wiki). 
 
 ![ScreenShot](https://github.com/ArthurHub/Android-Image-Cropper/blob/master/demo.jpg?raw=true)
 
@@ -41,6 +41,11 @@ compile 'com.theartofdev.edmodo:android-image-cropper:1.2.+'
  - [Android Image Cropper async support and custom progress UI](http://theartofdev.com/2016/01/15/android-image-cropper-async-support-and-custom-progress-ui/)
 
 ## Change log
+*1.2.2 (beta)*
+ * Fix `setShowCropOverlay(boolean)` not working properly.
+ * Fix crop window bounds issue when cropping image is too small relative to min/max bounds with fixed aspect ratio.
+ * Fix crop window reset on on-screen keyboard show/hide.
+
 *1.2.1 (beta)*
 
  * Fix crop window resize bug with fixed aspect ratio
