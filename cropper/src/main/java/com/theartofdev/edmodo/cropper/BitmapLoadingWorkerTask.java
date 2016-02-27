@@ -100,7 +100,7 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
                             : BitmapUtils.rotateBitmapByExif(mContext, decodeResult.bitmap, mUri);
 
                     Pair<Integer, Integer> sourceImageDimens = BitmapUtils.getImageDimensions(mContext, mUri);
-                    if(mPresetRotation == null) {
+                    if(mPreSetRotation == null) {
                         // In this case, rotateResult.degrees is due to Exif data.
                         if(rotateResult.degrees == 90 || rotateResult.degrees == 270)
                             sourceImageDimens = new Pair(sourceImageDimens.second, sourceImageDimens.first);
