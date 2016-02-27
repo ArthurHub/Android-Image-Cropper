@@ -175,7 +175,7 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
          */
         public final Exception error;
 
-        Result(Uri uri, Bitmap bitmap, Pair<Integer, Integer>, sourceImageDimens, int loadSampleSize, int degreesRotated) {
+        Result(Uri uri, Bitmap bitmap, Pair<Integer, Integer> sourceImageDimens, int loadSampleSize, int degreesRotated) {
             this.uri = uri;
             this.bitmap = bitmap;
             this.sourceImageDimensions = sourceImageDimens;
