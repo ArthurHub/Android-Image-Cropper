@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 
 import java.lang.ref.WeakReference;
 
@@ -98,7 +99,14 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
                             ? BitmapUtils.rotateBitmapResult(decodeResult.bitmap, mPreSetRotation)
                             : BitmapUtils.rotateBitmapByExif(mContext, decodeResult.bitmap, mUri);
 
-                    return new Result(mUri, rotateResult.bitmap, decodeResult.sampleSize, rotateResult.degrees);
+                    Pair<Integer, Integer> sourceImageDimens = BitmapUtils.getImageDimensions(mContext, mUri);
+                    if(mPresetRotation == null) {
+                        // In this case, rotateResult.degrees is due to Exif data.
+                        if(rotateResult.degrees == 90 || rotateResult.degrees == 270)
+                            sourceImageDimens = new Pair(sourceImageDimens.second, sourceImageDimens.first);
+                    }
+
+                    return new Result(mUri, rotateResult.bitmap, sourceImageDimens, decodeResult.sampleSize, rotateResult.degrees);
                 }
             }
             return null;
@@ -148,6 +156,11 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
         public final Bitmap bitmap;
 
         /**
+         * The dimensions of source bitmap
+         */
+        public final sourceImageDimensions;
+
+        /**
          * The sample size used to load the given bitmap
          */
         public final int loadSampleSize;
@@ -162,9 +175,10 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
          */
         public final Exception error;
 
-        Result(Uri uri, Bitmap bitmap, int loadSampleSize, int degreesRotated) {
+        Result(Uri uri, Bitmap bitmap, sourceImageDimens, int loadSampleSize, int degreesRotated) {
             this.uri = uri;
             this.bitmap = bitmap;
+            this.sourceImageDimensions = sourceImageDimens;
             this.loadSampleSize = loadSampleSize;
             this.degreesRotated = degreesRotated;
             this.error = null;
@@ -173,6 +187,7 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
         Result(Uri uri, Exception error) {
             this.uri = uri;
             this.bitmap = null;
+            this.sourceImageDimensions = null;
             this.loadSampleSize = 0;
             this.degreesRotated = 0;
             this.error = error;
