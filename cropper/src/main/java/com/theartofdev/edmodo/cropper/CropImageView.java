@@ -377,7 +377,7 @@ public class CropImageView extends FrameLayout {
             actualCropLeft = Math.max(0f, actualCropLeft);
             actualCropTop = Math.max(0f, actualCropTop);
             actualCropRight = Math.min(mSourceImageDimensions.first, actualCropRight);
-            actualCropBottom = Math.min(mSourceBitmapDimensions.second, actualCropBottom);
+            actualCropBottom = Math.min(mSourceImageDimensions.second, actualCropBottom);
 
             return new Rect((int) actualCropLeft, (int) actualCropTop, (int) actualCropRight, (int) actualCropBottom);
         } else {
