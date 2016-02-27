@@ -52,8 +52,6 @@ final class BitmapUtils {
         try {
             ContentResolver resolver = c.getContentResolver();
             stream = resolver.openInputStream(uri);
-
-            // First decode with inJustDecodeBounds=true to check dimensions
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeStream(stream, new Rect(0, 0, 0, 0), options);
