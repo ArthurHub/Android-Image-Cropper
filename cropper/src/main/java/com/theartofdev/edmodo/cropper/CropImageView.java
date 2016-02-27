@@ -113,6 +113,8 @@ public class CropImageView extends FrameLayout {
     private WeakReference<BitmapCroppingWorkerTask> mBitmapCroppingWorkerTask;
     //endregion
 
+    private Pair<Integer, Integer> mSourceImageDimensions;
+
     public CropImageView(Context context) {
         this(context, null);
     }
@@ -374,8 +376,8 @@ public class CropImageView extends FrameLayout {
             // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
             actualCropLeft = Math.max(0f, actualCropLeft);
             actualCropTop = Math.max(0f, actualCropTop);
-            actualCropRight = Math.min(mBitmap.getWidth(), actualCropRight);
-            actualCropBottom = Math.min(mBitmap.getHeight(), actualCropBottom);
+            actualCropRight = Math.min(mSourceImageDimensions.first, actualCropRight);
+            actualCropBottom = Math.min(mSourceBitmapDimensions.second, actualCropBottom);
 
             return new Rect((int) actualCropLeft, (int) actualCropTop, (int) actualCropRight, (int) actualCropBottom);
         } else {
@@ -547,6 +549,7 @@ public class CropImageView extends FrameLayout {
      */
     public void setImageBitmap(Bitmap bitmap, ExifInterface exif) {
         if (bitmap != null && exif != null) {
+            mSourceImageDimensions = new Pair(bitmap.getWidth(), bitmap.getHeight());
             BitmapUtils.RotateBitmapResult result = BitmapUtils.rotateBitmapByExif(bitmap, exif);
             bitmap = result.bitmap;
             mDegreesRotated = result.degrees;
@@ -564,6 +567,7 @@ public class CropImageView extends FrameLayout {
         if (resId != 0) {
             mCropOverlayView.setInitialCropWindowRect(null);
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
+            mSourceImageDimensions = new Pair(bitmap.getWidth(), bitmap.getHeight());
             setBitmap(bitmap, true);
             mImageResource = resId;
         }
@@ -593,7 +597,7 @@ public class CropImageView extends FrameLayout {
 
             BitmapUtils.RotateBitmapResult rotateResult =
                     BitmapUtils.rotateBitmapByExif(getContext(), decodeResult.bitmap, uri);
-
+            mSourceImageDimensions = new Pair(rotateResult.bitmap.getWidth(), rotateResult.bitmap.getHeight());
             setBitmap(rotateResult.bitmap, true);
 
             mLoadedImageUri = uri;
@@ -674,6 +678,7 @@ public class CropImageView extends FrameLayout {
         setProgressBarVisibility();
 
         if (result.error == null) {
+            mSourceImageDimensions = result.sourceImageDimensions;
             setBitmap(result.bitmap, true);
             mLoadedImageUri = result.uri;
             mLoadedSampleSize = result.loadSampleSize;
@@ -714,6 +719,7 @@ public class CropImageView extends FrameLayout {
             clearImage(clearFull);
 
             mBitmap = bitmap;
+            mSourceImageDimensions = new Pair(bitmap.getWidth(), bitmap.getHeight());
             mImageView.setImageBitmap(mBitmap);
             if (mCropOverlayView != null) {
                 mCropOverlayView.resetCropOverlayView();
@@ -966,7 +972,7 @@ public class CropImageView extends FrameLayout {
      * Get the scale factor between the actual Bitmap dimensions and the displayed dimensions.
      */
     private Pair<Float, Float> getScaleFactorWidth(Rect displayedImageRect) {
-        float actualImageWidth = mBitmap.getWidth();
+        float actualImageWidth = mBitmap.getWidth
         float displayedImageWidth = displayedImageRect.width();
         float scaleFactorWidth = actualImageWidth / displayedImageWidth;
 
