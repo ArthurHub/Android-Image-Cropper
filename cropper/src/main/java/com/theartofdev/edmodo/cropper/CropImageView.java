@@ -719,7 +719,6 @@ public class CropImageView extends FrameLayout {
             clearImage(clearFull);
 
             mBitmap = bitmap;
-            mSourceImageDimensions = new Pair(bitmap.getWidth(), bitmap.getHeight());
             mImageView.setImageBitmap(mBitmap);
             if (mCropOverlayView != null) {
                 mCropOverlayView.resetCropOverlayView();
