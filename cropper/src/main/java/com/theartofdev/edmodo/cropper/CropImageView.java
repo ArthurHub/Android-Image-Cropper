@@ -972,7 +972,7 @@ public class CropImageView extends FrameLayout {
      * Get the scale factor between the actual Bitmap dimensions and the displayed dimensions.
      */
     private Pair<Float, Float> getScaleFactorWidth(Rect displayedImageRect) {
-        float actualImageWidth = mBitmap.getWidth
+        float actualImageWidth = mSourceImageDimensions.first;
         float displayedImageWidth = displayedImageRect.width();
         float scaleFactorWidth = actualImageWidth / displayedImageWidth;
 
