@@ -36,11 +36,32 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import android.util.Pair;
+
+
 /**
  * Utility class that deals with operations with an ImageView.
  */
 final class BitmapUtils {
 
+    /*
+    * Get dimensions of Bitmap from Uri
+    */
+    public static Pair<Integer, Integer> getImageDimensions(Context c, Uri uri) {
+        InputStream stream = null;
+        try {
+            ContentResolver resolver = c.getContentResolver();
+            stream = resolver.openInputStream(uri);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(stream, new Rect(0, 0, 0, 0), options);
+            closeSafe(stream);
+            return Pair.create(options.outWidth, options.outHeight);
+        } catch(Exception e) {
+            closeSafe(stream);
+            return null;
+        }
+    }
     /**
      * Gets the rectangular position of a Bitmap if it were placed inside a View.
      *
