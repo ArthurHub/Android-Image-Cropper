@@ -372,10 +372,10 @@ public class CropImageView extends FrameLayout {
             float actualCropBottom = actualCropTop + displayedCropHeight * scaleFactor.second;
 
             // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
-            actualCropLeft = Math.max(0f, actualCropLeft);
-            actualCropTop = Math.max(0f, actualCropTop);
-            actualCropRight = Math.min(mBitmap.getWidth(), actualCropRight);
-            actualCropBottom = Math.min(mBitmap.getHeight(), actualCropBottom);
+            actualCropLeft = Math.max(0f, actualCropLeft) * mLoadedSampleSize;
+            actualCropTop = Math.max(0f, actualCropTop) * mLoadedSampleSize;
+            actualCropRight = Math.min(mBitmap.getWidth(), actualCropRight) * mLoadedSampleSize;
+            actualCropBottom = Math.min(mBitmap.getHeight(), actualCropBottom) * mLoadedSampleSize;
 
             return new Rect((int) actualCropLeft, (int) actualCropTop, (int) actualCropRight, (int) actualCropBottom);
         } else {
@@ -385,7 +385,8 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Gets the crop window's position relative to the source Bitmap (not the image
-     * displayed in the CropImageView) and the original rotation.
+     * displayed in the CropImageView) using the original image rotation rotation - if the image was rotated after it
+     * was, this rotation is ignored.
      *
      * @return a Rect instance containing cropped area boundaries of the source Bitmap
      */
@@ -394,14 +395,16 @@ public class CropImageView extends FrameLayout {
         if (mBitmap != null) {
             Rect rect = getActualCropRect();
             int rotateSide = mDegreesRotated / 90;
+            int bitmapWidth = mBitmap.getWidth() * mLoadedSampleSize;
+            int bitmapHeight = mBitmap.getHeight() * mLoadedSampleSize;
             if (rotateSide == 1) {
-                rect.set(rect.top, mBitmap.getWidth() - rect.right, rect.bottom, mBitmap.getWidth() - rect.left);
+                rect.set(rect.top, bitmapWidth - rect.right, rect.bottom, bitmapWidth - rect.left);
             } else if (rotateSide == 2) {
-                rect.set(mBitmap.getWidth() - rect.right, mBitmap.getHeight() - rect.bottom, mBitmap.getWidth() - rect.left, mBitmap.getHeight() - rect.top);
+                rect.set(bitmapWidth - rect.right, bitmapHeight - rect.bottom, bitmapWidth - rect.left, bitmapHeight - rect.top);
             } else if (rotateSide == 3) {
-                rect.set(mBitmap.getHeight() - rect.bottom, rect.left, mBitmap.getHeight() - rect.top, rect.right);
+                rect.set(bitmapHeight - rect.bottom, rect.left, bitmapHeight - rect.top, rect.right);
             }
-            rect.set(rect.left * mLoadedSampleSize, rect.top * mLoadedSampleSize, rect.right * mLoadedSampleSize, rect.bottom * mLoadedSampleSize);
+            rect.set(rect.left, rect.top, rect.right, rect.bottom);
             return rect;
         } else {
             return null;
