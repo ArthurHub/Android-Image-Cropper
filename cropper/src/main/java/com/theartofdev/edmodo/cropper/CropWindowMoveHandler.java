@@ -247,19 +247,19 @@ final class CropWindowMoveHandler {
                 break;
             case LEFT:
                 adjustLeft(x, bounds, snapMargin, aspectRatio, true, true);
-                adjustTopBottomByAspectRatio(aspectRatio);
+                adjustTopBottomByAspectRatio(bounds, aspectRatio);
                 break;
             case TOP:
                 adjustTop(y, bounds, snapMargin, aspectRatio, true, true);
-                adjustLeftRightByAspectRatio(aspectRatio);
+                adjustLeftRightByAspectRatio(bounds, aspectRatio);
                 break;
             case RIGHT:
                 adjustRight(x, bounds, snapMargin, aspectRatio, true, true);
-                adjustTopBottomByAspectRatio(aspectRatio);
+                adjustTopBottomByAspectRatio(bounds, aspectRatio);
                 break;
             case BOTTOM:
                 adjustBottom(y, bounds, snapMargin, aspectRatio, true, true);
-                adjustLeftRightByAspectRatio(aspectRatio);
+                adjustLeftRightByAspectRatio(bounds, aspectRatio);
                 break;
             default:
                 break;
@@ -332,15 +332,20 @@ final class CropWindowMoveHandler {
                 newHeight = (rect.right - newLeft) / aspectRatio;
             }
 
-            // if top edge moves by aspect ratio check that it is within bounds
-            if (topMoves && rect.bottom - newHeight < bounds.top) {
-                newLeft = Math.max(bounds.left, rect.right - (rect.bottom - bounds.top) * aspectRatio);
-                newHeight = (rect.right - newLeft) / aspectRatio;
-            }
+            // if top AND bottom edge moves by aspect ratio check that it is within full height bounds
+            if (topMoves && bottomMoves) {
+                newLeft = Math.max(newLeft, Math.max(bounds.left, rect.right - bounds.height() * aspectRatio));
+            } else {
+                // if top edge moves by aspect ratio check that it is within bounds
+                if (topMoves && rect.bottom - newHeight < bounds.top) {
+                    newLeft = Math.max(bounds.left, rect.right - (rect.bottom - bounds.top) * aspectRatio);
+                    newHeight = (rect.right - newLeft) / aspectRatio;
+                }
 
-            // if bottom edge moves by aspect ratio check that it is within bounds
-            if (bottomMoves && rect.top + newHeight > bounds.bottom) {
-                newLeft = Math.max(newLeft, Math.max(bounds.left, rect.right - (bounds.bottom - rect.top) * aspectRatio));
+                // if bottom edge moves by aspect ratio check that it is within bounds
+                if (bottomMoves && rect.top + newHeight > bounds.bottom) {
+                    newLeft = Math.max(newLeft, Math.max(bounds.left, rect.right - (bounds.bottom - rect.top) * aspectRatio));
+                }
             }
         }
 
@@ -398,15 +403,20 @@ final class CropWindowMoveHandler {
                 newHeight = (newRight - rect.left) / aspectRatio;
             }
 
-            // if top edge moves by aspect ratio check that it is within bounds
-            if (topMoves && rect.bottom - newHeight < bounds.top) {
-                newRight = Math.min(bounds.right, rect.left + (rect.bottom - bounds.top) * aspectRatio);
-                newHeight = (newRight - rect.left) / aspectRatio;
-            }
+            // if top AND bottom edge moves by aspect ratio check that it is within full height bounds
+            if (topMoves && bottomMoves) {
+                newRight = Math.min(newRight, Math.min(bounds.right, rect.left + bounds.height() * aspectRatio));
+            } else {
+                // if top edge moves by aspect ratio check that it is within bounds
+                if (topMoves && rect.bottom - newHeight < bounds.top) {
+                    newRight = Math.min(bounds.right, rect.left + (rect.bottom - bounds.top) * aspectRatio);
+                    newHeight = (newRight - rect.left) / aspectRatio;
+                }
 
-            // if bottom edge moves by aspect ratio check that it is within bounds
-            if (bottomMoves && rect.top + newHeight > bounds.bottom) {
-                newRight = Math.min(newRight, Math.min(bounds.right, rect.left + (bounds.bottom - rect.top) * aspectRatio));
+                // if bottom edge moves by aspect ratio check that it is within bounds
+                if (bottomMoves && rect.top + newHeight > bounds.bottom) {
+                    newRight = Math.min(newRight, Math.min(bounds.right, rect.left + (bounds.bottom - rect.top) * aspectRatio));
+                }
             }
         }
 
@@ -462,15 +472,20 @@ final class CropWindowMoveHandler {
                 newWidth = (rect.bottom - newTop) * aspectRatio;
             }
 
-            // if left edge moves by aspect ratio check that it is within bounds
-            if (leftMoves && rect.right - newWidth < bounds.left) {
-                newTop = Math.max(bounds.top, rect.bottom - (rect.right - bounds.left) / aspectRatio);
-                newWidth = (rect.bottom - newTop) * aspectRatio;
-            }
+            // if left AND right edge moves by aspect ratio check that it is within full width bounds
+            if (leftMoves && rightMoves) {
+                newTop = Math.max(newTop, Math.max(bounds.top, rect.bottom - bounds.width() / aspectRatio));
+            } else {
+                // if left edge moves by aspect ratio check that it is within bounds
+                if (leftMoves && rect.right - newWidth < bounds.left) {
+                    newTop = Math.max(bounds.top, rect.bottom - (rect.right - bounds.left) / aspectRatio);
+                    newWidth = (rect.bottom - newTop) * aspectRatio;
+                }
 
-            // if right edge moves by aspect ratio check that it is within bounds
-            if (rightMoves && rect.left + newWidth > bounds.right) {
-                newTop = Math.max(newTop, Math.max(bounds.top, rect.bottom - (bounds.right - rect.left) / aspectRatio));
+                // if right edge moves by aspect ratio check that it is within bounds
+                if (rightMoves && rect.left + newWidth > bounds.right) {
+                    newTop = Math.max(newTop, Math.max(bounds.top, rect.bottom - (bounds.right - rect.left) / aspectRatio));
+                }
             }
         }
 
@@ -526,15 +541,20 @@ final class CropWindowMoveHandler {
                 newWidth = (newBottom - rect.top) * aspectRatio;
             }
 
-            // if left edge moves by aspect ratio check that it is within bounds
-            if (leftMoves && rect.right - newWidth < bounds.left) {
-                newBottom = Math.min(bounds.bottom, rect.top + (rect.right - bounds.left) / aspectRatio);
-                newWidth = (newBottom - rect.top) * aspectRatio;
-            }
+            // if left AND right edge moves by aspect ratio check that it is within full width bounds
+            if (leftMoves && rightMoves) {
+                newBottom = Math.min(newBottom, Math.min(bounds.bottom, rect.top + bounds.width() / aspectRatio));
+            } else {
+                // if left edge moves by aspect ratio check that it is within bounds
+                if (leftMoves && rect.right - newWidth < bounds.left) {
+                    newBottom = Math.min(bounds.bottom, rect.top + (rect.right - bounds.left) / aspectRatio);
+                    newWidth = (newBottom - rect.top) * aspectRatio;
+                }
 
-            // if right edge moves by aspect ratio check that it is within bounds
-            if (rightMoves && rect.left + newWidth > bounds.right) {
-                newBottom = Math.min(newBottom, Math.min(bounds.bottom, rect.top + (bounds.right - rect.left) / aspectRatio));
+                // if right edge moves by aspect ratio check that it is within bounds
+                if (rightMoves && rect.left + newWidth > bounds.right) {
+                    newBottom = Math.min(newBottom, Math.min(bounds.bottom, rect.top + (bounds.right - rect.left) / aspectRatio));
+                }
             }
         }
 
@@ -586,9 +606,15 @@ final class CropWindowMoveHandler {
      * Adjust left and right edges by current crop window height and the given aspect ratio,
      * both right and left edges adjusts equally relative to center to keep aspect ratio to the height.
      */
-    private void adjustLeftRightByAspectRatio(float aspectRatio) {
+    private void adjustLeftRightByAspectRatio(Rect bounds, float aspectRatio) {
         RectF rect = mCropWindowHandler.getRect();
         rect.inset((rect.width() - rect.height() * aspectRatio) / 2, 0);
+        if (rect.left < bounds.left) {
+            rect.offset(bounds.left - rect.left, 0);
+        }
+        if (rect.right > bounds.right) {
+            rect.offset(bounds.right - rect.right, 0);
+        }
         mCropWindowHandler.setRect(rect);
     }
 
@@ -596,9 +622,15 @@ final class CropWindowMoveHandler {
      * Adjust top and bottom edges by current crop window width and the given aspect ratio,
      * both top and bottom edges adjusts equally relative to center to keep aspect ratio to the width.
      */
-    private void adjustTopBottomByAspectRatio(float aspectRatio) {
+    private void adjustTopBottomByAspectRatio(Rect bounds, float aspectRatio) {
         RectF rect = mCropWindowHandler.getRect();
         rect.inset(0, (rect.height() - rect.width() / aspectRatio) / 2);
+        if (rect.top < bounds.top) {
+            rect.offset(0, bounds.top - rect.top);
+        }
+        if (rect.bottom > bounds.bottom) {
+            rect.offset(0, bounds.bottom - rect.bottom);
+        }
         mCropWindowHandler.setRect(rect);
     }
 
