@@ -555,13 +555,16 @@ public class CropImageView extends FrameLayout {
      * @param exif the EXIF information about this bitmap; may be null
      */
     public void setImageBitmap(Bitmap bitmap, ExifInterface exif) {
+        Bitmap setBitmap;
         if (bitmap != null && exif != null) {
             BitmapUtils.RotateBitmapResult result = BitmapUtils.rotateBitmapByExif(bitmap, exif);
-            bitmap = result.bitmap;
+            setBitmap = result.bitmap;
             mDegreesRotated = result.degrees;
+        } else {
+            setBitmap = bitmap;
         }
         mCropOverlayView.setInitialCropWindowRect(null);
-        setBitmap(bitmap, true);
+        setBitmap(setBitmap, true);
     }
 
     /**
@@ -718,7 +721,7 @@ public class CropImageView extends FrameLayout {
      * Optionally clear full if the bitmap is new, or partial clear if the bitmap has been manipulated.
      */
     private void setBitmap(Bitmap bitmap, boolean clearFull) {
-        if (mBitmap != bitmap) {
+        if (mBitmap == null || !mBitmap.equals(bitmap)) {
 
             clearImage(clearFull);
 

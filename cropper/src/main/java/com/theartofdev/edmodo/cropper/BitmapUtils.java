@@ -57,11 +57,11 @@ final class BitmapUtils {
         final int viewHeight = view.getHeight();
 
         switch (scaleType) {
-            default:
-            case CENTER_INSIDE:
-                return getBitmapRectCenterInsideHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
             case FIT_CENTER:
                 return getBitmapRectFitCenterHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
+            case CENTER_INSIDE:
+            default:
+                return getBitmapRectCenterInsideHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
         }
     }
 

@@ -80,16 +80,16 @@ final class CropWindowMoveHandler {
         // distance from the initial touch to the precise handle location).
         // We want to maintain the initial touch's distance to the pressed
         // handle so that the crop window size does not "jump".
-        x += mTouchOffset.x;
-        y += mTouchOffset.y;
+        float adjX = x + mTouchOffset.x;
+        float adjY = y + mTouchOffset.y;
 
         if (mType == Type.CENTER) {
-            moveCenter(x, y, bounds, snapMargin);
+            moveCenter(adjX, adjY, bounds, snapMargin);
         } else {
             if (fixedAspectRatio) {
-                MoveSizeWithFixedAspectRatio(x, y, bounds, snapMargin, aspectRatio);
+                MoveSizeWithFixedAspectRatio(adjX, adjY, bounds, snapMargin, aspectRatio);
             } else {
-                MoveSizeWithFreeAspectRatio(x, y, bounds, snapMargin);
+                MoveSizeWithFreeAspectRatio(adjX, adjY, bounds, snapMargin);
             }
         }
     }
@@ -145,6 +145,8 @@ final class CropWindowMoveHandler {
                 touchOffsetX = rect.centerX() - touchX;
                 touchOffsetY = rect.centerY() - touchY;
                 break;
+            default:
+                break;
         }
 
         mTouchOffset.x = touchOffsetX;
@@ -195,6 +197,7 @@ final class CropWindowMoveHandler {
                 break;
             case BOTTOM:
                 adjustBottom(y, bounds, snapMargin, 0, false, false);
+                break;
             default:
                 break;
         }

@@ -22,7 +22,6 @@ import android.graphics.RectF;
 import android.graphics.Region;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -354,8 +353,6 @@ public class CropOverlayView extends View {
                                           float minCropResultHeight,
                                           float maxCropResultWidth,
                                           float maxCropResultHeight) {
-
-        DisplayMetrics dm = getResources().getDisplayMetrics();
 
         mCropWindowHandler.setInitialAttributeValues(minCropWindowWidth, minCropWindowHeight,
                 minCropResultWidth, minCropResultHeight,
