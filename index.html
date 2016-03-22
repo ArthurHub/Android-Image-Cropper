@@ -89,35 +89,20 @@
 <h2>
 <a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Change log</h2>
 
+<p><em>1.2.3</em></p>
+
+<ul>
+<li>Fix <code>getActualCropRect</code> to adjust by sampling size for images loaded from URI.</li>
+<li>Fix crop window size bounded with fixed aspect ratio and move of a single edge.</li>
+<li>Added <code>CropImageHelper</code> class to simplify cropping image work.</li>
+</ul>
+
 <p><em>1.2.2 (beta)</em></p>
 
 <ul>
 <li>Fix <code>setShowCropOverlay(boolean)</code> not working properly.</li>
 <li>Fix crop window bounds issue when cropping image is too small relative to min/max bounds with fixed aspect ratio.</li>
 <li>Fix crop window reset on on-screen keyboard show/hide.</li>
-</ul>
-
-<p><em>1.2.1 (beta)</em></p>
-
-<ul>
-<li>Fix crop window resize bug with fixed aspect ratio</li>
-<li>Add <code>getRotatedDegrees()</code> to get how much the image was rotated during cropping</li>
-<li>Add <code>setCropRect(Rect)</code> to set initial cropping window location and size to specific window on the image.</li>
-</ul>
-
-<p><em>1.2.0 (beta)</em></p>
-
-<p>Due too large changes in the internals please consider this a <strong>beta</strong> release, if you use it be sure to test is thoroughly and report any bugs you find (report no bugs will also be awesome) or use 1.1.0 until I feel 1.2.* is stable enough.</p>
-
-<ul>
-<li>Rewrite internal crop window handling.</li>
-<li> Add <code>crop</code> prefix to all customization resources to prevent naming collision (<strong>breaking change</strong>).</li>
-<li>Add <code>CropImageView.Guidelines</code> enum of guidelines config instead of integer (<strong>breaking change</strong>).</li>
-<li>Change custom attributes types to <code>dimension</code> where appropriate (<strong>breaking change</strong>).</li>
-<li>Add <code>showCropOverlay</code> attribute and <code>setShowCropOverlay(boolean)</code> method allowing to hide/show crop overlay UI for animation or element transition.</li>
-<li>Add <code>cropInitialCropWindowPaddingRatio</code> customization [0 - 0.5) to control initial crop window padding from image borders relative to image size.</li>
-<li>Add min limit config on cropping window width/height in the UI (<code>cropMinCropWindowWidth</code>, <code>cropMinCropWindowHeight</code>)</li>
-<li>Add min/max config on cropping image result width/height (<code>cropMinCropResultWidthPX</code>,<code>cropMinCropResultHeightPX</code>,<code>cropMaxCropResultWidthPX</code>,<code>cropMaxCropResultHeightPX</code>)</li>
 </ul>
 
 <p>See <a href="https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log">full change log</a>.</p>
