@@ -61,13 +61,13 @@ public class CropImageView extends FrameLayout {
 
     private Bitmap mBitmap;
 
-    private int mDegreesRotated = 0;
+    private int mDegreesRotated;
 
     private int mLayoutWidth;
 
     private int mLayoutHeight;
 
-    private int mImageResource = 0;
+    private int mImageResource;
 
     /**
      * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping

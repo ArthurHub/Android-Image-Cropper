@@ -87,9 +87,9 @@ final class CropWindowMoveHandler {
             moveCenter(adjX, adjY, bounds, snapMargin);
         } else {
             if (fixedAspectRatio) {
-                MoveSizeWithFixedAspectRatio(adjX, adjY, bounds, snapMargin, aspectRatio);
+                moveSizeWithFixedAspectRatio(adjX, adjY, bounds, snapMargin, aspectRatio);
             } else {
-                MoveSizeWithFreeAspectRatio(adjX, adjY, bounds, snapMargin);
+                moveSizeWithFreeAspectRatio(adjX, adjY, bounds, snapMargin);
             }
         }
     }
@@ -168,7 +168,7 @@ final class CropWindowMoveHandler {
      * affecting "secondary" edges.<br>
      * Only the primary edge(s) are fixed to stay within limits.
      */
-    private void MoveSizeWithFreeAspectRatio(float x, float y, Rect bounds, float snapMargin) {
+    private void moveSizeWithFreeAspectRatio(float x, float y, Rect bounds, float snapMargin) {
         switch (mType) {
             case TOP_LEFT:
                 adjustTop(y, bounds, snapMargin, 0, false, false);
@@ -209,7 +209,7 @@ final class CropWindowMoveHandler {
      * Example: change in the left edge (primary) will affect top and bottom edges (secondary) to preserve the
      * given aspect ratio.
      */
-    private void MoveSizeWithFixedAspectRatio(float x, float y, Rect bounds, float snapMargin, float aspectRatio) {
+    private void moveSizeWithFixedAspectRatio(float x, float y, Rect bounds, float snapMargin, float aspectRatio) {
         RectF rect = mCropWindowHandler.getRect();
         switch (mType) {
             case TOP_LEFT:

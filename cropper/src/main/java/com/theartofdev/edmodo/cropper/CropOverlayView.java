@@ -129,7 +129,7 @@ public class CropOverlayView extends View {
     /**
      * Whether the Crop View has been initialized for the first time
      */
-    private boolean initializedCropWindow = false;
+    private boolean initializedCropWindow;
 
     /**
      * Used to set back LayerType after changing to software.
@@ -266,9 +266,9 @@ public class CropOverlayView extends View {
      * ratio
      */
     public void setAspectRatioY(int aspectRatioY) {
-        if (aspectRatioY <= 0)
+        if (aspectRatioY <= 0) {
             throw new IllegalArgumentException("Cannot set aspect ratio value to a number less than or equal to 0.");
-        else {
+        } else {
             mAspectRatioY = aspectRatioY;
             mTargetAspectRatio = ((float) mAspectRatioX) / mAspectRatioY;
 
@@ -522,17 +522,15 @@ public class CropOverlayView extends View {
                 rect.bottom = mBitmapRect.bottom;
             }
         }
-        if (mFixAspectRatio) {
-            if (Math.abs(rect.width() - rect.height() * mTargetAspectRatio) > 0.1) {
-                if (rect.width() > rect.height() * mTargetAspectRatio) {
-                    float adj = Math.abs(rect.height() * mTargetAspectRatio - rect.width()) / 2;
-                    rect.left += adj;
-                    rect.right -= adj;
-                } else {
-                    float adj = Math.abs(rect.width() / mTargetAspectRatio - rect.height()) / 2;
-                    rect.top += adj;
-                    rect.bottom -= adj;
-                }
+        if (mFixAspectRatio && Math.abs(rect.width() - rect.height() * mTargetAspectRatio) > 0.1) {
+            if (rect.width() > rect.height() * mTargetAspectRatio) {
+                float adj = Math.abs(rect.height() * mTargetAspectRatio - rect.width()) / 2;
+                rect.left += adj;
+                rect.right -= adj;
+            } else {
+                float adj = Math.abs(rect.width() / mTargetAspectRatio - rect.height()) / 2;
+                rect.top += adj;
+                rect.bottom -= adj;
             }
         }
     }
@@ -560,11 +558,9 @@ public class CropOverlayView extends View {
             // Determines whether guidelines should be drawn or not
             if (mGuidelines == CropImageView.Guidelines.ON) {
                 drawGuidelines(canvas);
-            } else if (mGuidelines == CropImageView.Guidelines.ON_TOUCH) {
+            } else if (mGuidelines == CropImageView.Guidelines.ON_TOUCH && mMoveHandler != null) {
                 // Draw only when resizing
-                if (mMoveHandler != null) {
-                    drawGuidelines(canvas);
-                }
+                drawGuidelines(canvas);
             }
         }
 

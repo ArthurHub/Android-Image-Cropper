@@ -394,10 +394,10 @@ final class BitmapUtils {
         // there
         if (viewToBitmapWidthRatio <= viewToBitmapHeightRatio) {
             resultWidth = viewWidth;
-            resultHeight = (bitmapHeight * resultWidth / bitmapWidth);
+            resultHeight = bitmapHeight * resultWidth / bitmapWidth;
         } else {
             resultHeight = viewHeight;
-            resultWidth = (bitmapWidth * resultHeight / bitmapHeight);
+            resultWidth = bitmapWidth * resultHeight / bitmapHeight;
         }
 
         // Calculate the position of the bitmap inside the ImageView.
