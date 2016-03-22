@@ -17,7 +17,7 @@
         tools:context=".MainActivity">
 
         <com.theartofdev.edmodo.cropper.CropImageView
-            android:id="@+id/CropImageView"
+            android:id="@+id/cropImageView"
             android:layout_width="match_parent"
             android:layout_height="280dp"
             android:layout_gravity="center"/>
