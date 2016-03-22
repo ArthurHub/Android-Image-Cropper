@@ -66,9 +66,8 @@ public final class CropImageHelper {
     }
 
     /**
-     * Create a chooser intent to select the  source to get image from.<br/>
-     * The source can be camera's  ({@link android.provider.MediaStore.ACTION_IMAGE_CAPTURE})
-     * or gallery's ({@link Intent.ACTION_GET_CONTENT}).<br/>
+     * Create a chooser intent to select the  source to get image from.<br>
+     * The source can be camera's  (ACTION_IMAGE_CAPTURE) or gallery's (ACTION_GET_CONTENT).<br>
      * All possible sources are added to the intent chooser.
      *
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
@@ -139,7 +138,7 @@ public final class CropImageHelper {
     }
 
     /**
-     * Get the URI of the selected image from {@link #getPickImageChooserIntent()}.<br/>
+     * Get the URI of the selected image from {@link #getPickImageChooserIntent(Context)}.<br>
      * Will return the correct URI for camera and gallery image.
      *
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
@@ -155,8 +154,8 @@ public final class CropImageHelper {
     }
 
     /**
-     * Check if the given picked image URI requires {@link Manifest.permission.READ_EXTERNAL_STORAGE} permissions.<br>
-     * Only relevant for {@link Build.VERSION_CODES.M} and above and not required for all URI's depends on the
+     * Check if the given picked image URI requires READ_EXTERNAL_STORAGE permissions.<br>
+     * Only relevant for API version 23 and above and not required for all URI's depends on the
      * implementation of the app that was used for picking the image. So we just test if we can open the stream or
      * do we get an exception when we try, Android is awesome.
      *
@@ -172,7 +171,7 @@ public final class CropImageHelper {
 
     /**
      * Test if we can open the given Android URI to test if permission required error is thrown.<br>
-     * Only relevant for {@link Build.VERSION_CODES.M} and above.
+     * Only relevant for API version 23 and above.
      *
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      * @param uri the result URI of image pick.
