@@ -423,7 +423,10 @@ public class CropImageView extends FrameLayout {
     /**
      * Gets the cropped image based on the current crop window.<br>
      * If image loaded from URI will use sample size to fit in the requested width and height down-sampling
-     * if required - optimization to get best size to quality.
+     * if required - optimization to get best size to quality.<br>
+     * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
+     * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
+     * Bitmaps Efficiently</a>
      *
      * @return a new Bitmap representing the cropped image
      */
@@ -489,6 +492,9 @@ public class CropImageView extends FrameLayout {
      * outside the oval (circular) shape to transparent.<br>
      * If (reqWidth,reqHeight) is given AND image is loaded from URI cropping will try to use sample size to fit in
      * the requested width and height down-sampling if possible - optimization to get best size to quality.<br>
+     * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
+     * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
+     * Bitmaps Efficiently</a><br>
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      *
      * @param cropShape the shape to crop the image: {@link CropShape#RECTANGLE} will get the raw crop rectangle from
