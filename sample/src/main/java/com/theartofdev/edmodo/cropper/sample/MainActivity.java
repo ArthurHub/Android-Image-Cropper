@@ -11,12 +11,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
@@ -55,8 +53,6 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
     private int mAspectRatioX = DEFAULT_ASPECT_RATIO_VALUES;
 
     private int mAspectRatioY = DEFAULT_ASPECT_RATIO_VALUES;
-
-    Bitmap croppedImage;
     //endregion
 
     // Saves the state upon rotating the screen/restarting the activity
@@ -78,7 +74,6 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
         // Initialize components of the app
@@ -286,9 +281,9 @@ public class MainActivity extends Activity implements CropImageView.OnSetImageUr
     @Override
     public void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error) {
         if (error == null) {
-            croppedImage = bitmap;
-            ImageView croppedImageView = (ImageView) findViewById(R.id.croppedImageView);
-            croppedImageView.setImageBitmap(croppedImage);
+            CropResultActivity.mImage = bitmap;
+            Intent intent = new Intent(this, CropResultActivity.class);
+            startActivity(intent);
         } else {
             Log.e("AIC", "Failed to crop image", error);
             Toast.makeText(this, "Image crop failed: " + error.getMessage(), Toast.LENGTH_LONG).show();

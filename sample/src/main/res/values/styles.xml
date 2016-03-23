@@ -1,16 +1,3 @@
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Holo.Light">
-        <item name="android:textSize">20dp</item>
-    </style>
-
-    <!-- Robo Theme. -->
-    <style name="RoboTheme2" parent="@android:style/TextAppearance.DeviceDefault.Medium">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">30dp</item>
-        <item name="android:textSize">20dp</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_marginTop">10dp</item>
-    </style>
-
 </resources>

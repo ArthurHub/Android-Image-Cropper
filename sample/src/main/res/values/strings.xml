@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Cropper Sample</string>
-    <string name="title">Cropper</string>
+    <string name="appName">Image Cropper</string>
+    <string name="resultImageDesc">crop result</string>
 
     <string-array name="showGuidelinesArray">
         <item>Guidelines=Off</item>
