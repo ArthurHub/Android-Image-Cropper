@@ -11,11 +11,11 @@
         <item>Guidelines=On</item>
     </string-array>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="main_drawer_open">Open navigation drawer</string>
+    <string name="main_drawer_close">Close navigation drawer</string>
 
-    <string name="main_action_crop">Crop</string>
-    <string name="main_action_rotate">Rotate</string>
-    <string name="main_action_load">Load</string>
+    <string name="main_action_crop">CROP</string>
+    <string name="main_action_rotate">Rotate 90 degrees clockwise</string>
+    <string name="main_action_load">Load from Gallery or Camera</string>
 
 </resources>

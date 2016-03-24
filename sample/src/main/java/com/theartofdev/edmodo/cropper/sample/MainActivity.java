@@ -12,26 +12,23 @@
 
 package com.theartofdev.edmodo.cropper.sample;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.croppersample.R;
-import com.theartofdev.edmodo.cropper.CropImageView;
+import com.theartofdev.edmodo.cropper.CropImageHelper;
 
 public class MainActivity extends Activity {
 
@@ -40,7 +37,14 @@ public class MainActivity extends Activity {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private MainFragment mCurrentFragment;
+
+    private Uri mCropImageUri;
+
     //endregion
+
+    public void setCurrentFragment(MainFragment fragment) {
+        mCurrentFragment = fragment;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,19 +56,13 @@ public class MainActivity extends Activity {
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-
-            public void onDrawerOpened(View drawerView) {
-            }
-
-            public void onDrawerClosed(View view) {
-            }
-        };
-
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.main_drawer_open, R.string.main_drawer_close);
         mDrawerToggle.setDrawerIndicatorEnabled(true);
         drawerLayout.setDrawerListener(mDrawerToggle);
 
-        setMainFragmentByPreset(CropDemoPreset.Basic);
+        if (savedInstanceState == null) {
+            setMainFragmentByPreset(CropDemoPreset.Basic);
+        }
     }
 
     @Override
@@ -88,7 +86,42 @@ public class MainActivity extends Activity {
         if (mCurrentFragment != null && mCurrentFragment.onOptionsItemSelected(item)) {
             return true;
         }
+        if (item.getItemId() == R.id.main_action_load) {
+            CropImageHelper.startPickImageActivity(this);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    @SuppressLint("NewApi")
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CropImageHelper.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = CropImageHelper.getPickImageResultUri(this, data);
+
+            // For API >= 23 we need to check specifically that we have permissions to read external storage,
+            // but we don't know if we need to for the URI so the simplest is to try open the stream and see if we get error.
+            boolean requirePermissions = false;
+            if (CropImageHelper.isReadExternalStoragePermissionsRequired(this, imageUri)) {
+
+                // request permissions and handle the result in onRequestPermissionsResult()
+                requirePermissions = true;
+                mCropImageUri = imageUri;
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+            } else {
+
+                mCurrentFragment.setImageUri(imageUri);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (mCropImageUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            mCurrentFragment.setImageUri(mCropImageUri);
+        } else {
+            Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void setMainFragmentByPreset(CropDemoPreset demoPreset) {
@@ -97,122 +130,4 @@ public class MainActivity extends Activity {
                 .replace(R.id.container, MainFragment.newInstance(demoPreset))
                 .commit();
     }
-
-    //region: Inner class: MainFragment
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class MainFragment extends Fragment
-            implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnGetCroppedImageCompleteListener {
-
-        //region: Fields and Consts
-
-        private CropDemoPreset mDemoPreset;
-
-        private CropImageView mCropImageView;
-        //endregion
-
-        /**
-         * Returns a new instance of this fragment for the given section number.
-         */
-        public static MainFragment newInstance(CropDemoPreset demoPreset) {
-            MainFragment fragment = new MainFragment();
-            Bundle args = new Bundle();
-            args.putString("DEMO_PRESET", demoPreset.name());
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootView;
-            switch (mDemoPreset) {
-                case Basic:
-                    rootView = inflater.inflate(R.layout.fragment_main_basic, container, false);
-                    break;
-                case Oval:
-                    rootView = inflater.inflate(R.layout.fragment_main_oval, container, false);
-                    break;
-                case MinMax:
-                    rootView = inflater.inflate(R.layout.fragment_main_basic, container, false);
-                    break;
-                case Custom:
-                    rootView = inflater.inflate(R.layout.fragment_main_basic, container, false);
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown preset: " + mDemoPreset);
-            }
-            return rootView;
-        }
-
-        @Override
-        public void onViewCreated(View view, Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-
-            mCropImageView = (CropImageView) view.findViewById(R.id.cropImageView);
-            mCropImageView.setImageResource(R.drawable.butterfly);
-            mCropImageView.setOnSetImageUriCompleteListener(this);
-            mCropImageView.setOnGetCroppedImageCompleteListener(this);
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            if (item.getItemId() == R.id.main_action_crop) {
-                mCropImageView.getCroppedImageAsync(mCropImageView.getCropShape());
-            } else if (item.getItemId() == R.id.main_action_rotate) {
-                mCropImageView.rotateImage(90);
-            }
-            return super.onOptionsItemSelected(item);
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            mDemoPreset = CropDemoPreset.valueOf(getArguments().getString("DEMO_PRESET"));
-            ((MainActivity) activity).mCurrentFragment = this;
-        }
-
-        @Override
-        public void onDetach() {
-            super.onDetach();
-            if (mCropImageView != null) {
-                mCropImageView.setOnSetImageUriCompleteListener(null);
-                mCropImageView.setOnGetCroppedImageCompleteListener(null);
-            }
-        }
-
-        @Override
-        public void onSetImageUriComplete(CropImageView view, Uri uri, Exception error) {
-            if (error == null) {
-                Toast.makeText(getActivity(), "Image load successful", Toast.LENGTH_SHORT).show();
-            } else {
-                Log.e("AIC", "Failed to load image by URI", error);
-                Toast.makeText(getActivity(), "Image load failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }
-
-        @Override
-        public void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error) {
-            if (error == null) {
-                CropResultActivity.mImage = bitmap;
-                Intent intent = new Intent(getActivity(), CropResultActivity.class);
-                startActivity(intent);
-            } else {
-                Log.e("AIC", "Failed to crop image", error);
-                Toast.makeText(getActivity(), "Image crop failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-    //endregion
-
-    //region: Inner class: CropPreset
-
-    enum CropDemoPreset {
-        Basic,
-        Oval,
-        MinMax,
-        Custom
-    }
-    //endregion
 }
