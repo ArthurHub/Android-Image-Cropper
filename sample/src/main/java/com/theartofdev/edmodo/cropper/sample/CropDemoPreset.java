@@ -18,7 +18,8 @@ package com.theartofdev.edmodo.cropper.sample;
 enum CropDemoPreset {
     RECT,
     CIRCULAR,
-    MIN_MAX_OVERRIDE,
     CUSTOMIZED_OVERLAY,
+    MIN_MAX_OVERRIDE,
+    SCALE_CENTER_INSIDE,
     CUSTOM
 }

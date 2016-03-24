@@ -21,7 +21,7 @@
         android:layout_gravity="start"
         android:background="#303030"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="12dp">
 
         <TextView
             android:id="@+id/drawer_option_load"
@@ -31,7 +31,7 @@
             android:padding="@dimen/drawer_text_padding"
             android:text="@string/main_drawer_load"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/drawer_text_size"/>
+            android:textSize="18sp"/>
 
         <View
             android:layout_width="match_parent"
@@ -86,6 +86,16 @@
             android:onClick="onDrawerOptionClicked"
             android:padding="@dimen/drawer_text_padding"
             android:text="@string/drawer_option_min_max"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/drawer_text_size"/>
+
+        <TextView
+            android:id="@+id/drawer_option_scale_center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onDrawerOptionClicked"
+            android:padding="@dimen/drawer_text_padding"
+            android:text="@string/drawer_option_scale_center"
             android:textColor="@android:color/white"
             android:textSize="@dimen/drawer_text_size"/>
 

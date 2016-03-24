@@ -21,6 +21,7 @@
     <string name="drawer_option_oval">Circular</string>
     <string name="drawer_option_min_max">Min/Max limits override</string>
     <string name="drawer_option_customized_overlay">Customized Overlay</string>
+    <string name="drawer_option_scale_center">Scale Center Inside</string>
     <string name="drawer_option_title">Crop View Presets</string>
     <string name="drawer_option_title2">Customization</string>
 

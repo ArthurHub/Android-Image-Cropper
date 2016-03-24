@@ -139,6 +139,9 @@ public class MainActivity extends Activity {
             case R.id.drawer_option_min_max_override:
                 setMainFragmentByPreset(CropDemoPreset.MIN_MAX_OVERRIDE);
                 break;
+            case R.id.drawer_option_scale_center:
+                setMainFragmentByPreset(CropDemoPreset.SCALE_CENTER_INSIDE);
+                break;
             default:
                 Toast.makeText(this, "Unknown drawer option clicked", Toast.LENGTH_LONG).show();
         }

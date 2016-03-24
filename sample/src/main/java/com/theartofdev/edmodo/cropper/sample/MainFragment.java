@@ -75,6 +75,9 @@ public final class MainFragment extends Fragment
             case MIN_MAX_OVERRIDE:
                 rootView = inflater.inflate(R.layout.fragment_main_min_max, container, false);
                 break;
+            case SCALE_CENTER_INSIDE:
+                rootView = inflater.inflate(R.layout.fragment_main_scale_center, container, false);
+                break;
             case CUSTOM:
                 rootView = inflater.inflate(R.layout.fragment_main_rect, container, false);
                 break;
@@ -93,7 +96,11 @@ public final class MainFragment extends Fragment
         mCropImageView.setOnGetCroppedImageCompleteListener(this);
 
         if (savedInstanceState == null) {
-            mCropImageView.setImageResource(R.drawable.butterfly);
+            if (mDemoPreset == CropDemoPreset.SCALE_CENTER_INSIDE) {
+                mCropImageView.setImageResource(R.drawable.cat_small);
+            } else {
+                mCropImageView.setImageResource(R.drawable.cat);
+            }
         }
     }
 

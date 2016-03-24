@@ -84,7 +84,7 @@ public class MainActivityOLD extends Activity implements CropImageView.OnSetImag
         final TextView aspectRatioNum = (TextView) findViewById(R.id.aspectRatioNum);
 
         if (savedInstanceState == null) {
-            mCropImageView.setImageResource(R.drawable.butterfly);
+            mCropImageView.setImageResource(R.drawable.cat);
         }
 
         // Sets sliders to be disabled until fixedAspectRatio is set
