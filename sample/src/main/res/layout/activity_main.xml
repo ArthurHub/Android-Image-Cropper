@@ -19,20 +19,92 @@
         android:layout_width="@dimen/navigation_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#ffeeeeee"
-        android:orientation="vertical">
+        android:background="#303030"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/drawer_option_load"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onDrawerOptionClicked"
+            android:padding="@dimen/drawer_text_padding"
+            android:text="@string/main_drawer_load"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/drawer_text_size"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="@dimen/drawer_text_padding"
+            android:layout_marginTop="@dimen/drawer_text_padding"
+            android:background="#5FFF"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="test"
-            android:textColor="@android:color/holo_red_dark"/>
+            android:onClick="onDrawerOptionClicked"
+            android:padding="@dimen/drawer_text_padding"
+            android:text="@string/drawer_option_title"
+            android:textColor="#8FFF"
+            android:textSize="@dimen/drawer_text_size"/>
+
+        <TextView
+            android:id="@+id/drawer_option_oval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onDrawerOptionClicked"
+            android:padding="@dimen/drawer_text_padding"
+            android:text="@string/drawer_option_oval"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/drawer_text_size"/>
+
+        <TextView
+            android:id="@+id/drawer_option_rect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onDrawerOptionClicked"
+            android:padding="@dimen/drawer_text_padding"
+            android:text="@string/drawer_option_basic"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/drawer_text_size"/>
+
+        <TextView
+            android:id="@+id/drawer_option_customized_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onDrawerOptionClicked"
+            android:padding="@dimen/drawer_text_padding"
+            android:text="@string/drawer_option_customized_overlay"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/drawer_text_size"/>
+
+        <TextView
+            android:id="@+id/drawer_option_min_max_override"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onDrawerOptionClicked"
+            android:padding="@dimen/drawer_text_padding"
+            android:text="@string/drawer_option_min_max"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/drawer_text_size"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="@dimen/drawer_text_padding"
+            android:layout_marginTop="@dimen/drawer_text_padding"
+            android:background="#5FFF"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="test 2"
-            android:textColor="@android:color/holo_red_dark"/>
+            android:onClick="onDrawerOptionClicked"
+            android:padding="@dimen/drawer_text_padding"
+            android:text="@string/drawer_option_title2"
+            android:textColor="#8FFF"
+            android:textSize="@dimen/drawer_text_size"/>
+
     </LinearLayout>
 
 

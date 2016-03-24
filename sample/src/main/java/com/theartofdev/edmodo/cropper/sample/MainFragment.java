@@ -63,17 +63,20 @@ public final class MainFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView;
         switch (mDemoPreset) {
-            case Basic:
-                rootView = inflater.inflate(R.layout.fragment_main_basic, container, false);
+            case RECT:
+                rootView = inflater.inflate(R.layout.fragment_main_rect, container, false);
                 break;
-            case Oval:
+            case CIRCULAR:
                 rootView = inflater.inflate(R.layout.fragment_main_oval, container, false);
                 break;
-            case MinMax:
-                rootView = inflater.inflate(R.layout.fragment_main_basic, container, false);
+            case CUSTOMIZED_OVERLAY:
+                rootView = inflater.inflate(R.layout.fragment_main_customized, container, false);
                 break;
-            case Custom:
-                rootView = inflater.inflate(R.layout.fragment_main_basic, container, false);
+            case MIN_MAX_OVERRIDE:
+                rootView = inflater.inflate(R.layout.fragment_main_min_max, container, false);
+                break;
+            case CUSTOM:
+                rootView = inflater.inflate(R.layout.fragment_main_rect, container, false);
                 break;
             default:
                 throw new IllegalStateException("Unknown preset: " + mDemoPreset);

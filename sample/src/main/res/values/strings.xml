@@ -11,11 +11,17 @@
         <item>Guidelines=On</item>
     </string-array>
 
+    <string name="main_drawer_load">Load Image for cropping</string>
     <string name="main_drawer_open">Open navigation drawer</string>
     <string name="main_drawer_close">Close navigation drawer</string>
 
     <string name="main_action_crop">CROP</string>
     <string name="main_action_rotate">Rotate 90 degrees clockwise</string>
-    <string name="main_action_load">Load from Gallery or Camera</string>
+    <string name="drawer_option_basic">Rectangular</string>
+    <string name="drawer_option_oval">Circular</string>
+    <string name="drawer_option_min_max">Min/Max limits override</string>
+    <string name="drawer_option_customized_overlay">Customized Overlay</string>
+    <string name="drawer_option_title">Crop View Presets</string>
+    <string name="drawer_option_title2">Customization</string>
 
 </resources>

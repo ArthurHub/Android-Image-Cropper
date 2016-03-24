@@ -16,8 +16,9 @@ package com.theartofdev.edmodo.cropper.sample;
  * Created by Arthu on 24-03-16.
  */
 enum CropDemoPreset {
-    Basic,
-    Oval,
-    MinMax,
-    Custom
+    RECT,
+    CIRCULAR,
+    MIN_MAX_OVERRIDE,
+    CUSTOMIZED_OVERLAY,
+    CUSTOM
 }

@@ -25,6 +25,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.croppersample.R;
@@ -34,12 +35,13 @@ public class MainActivity extends Activity {
 
     //region: Fields and Consts
 
+    DrawerLayout mDrawerLayout;
+
     private ActionBarDrawerToggle mDrawerToggle;
 
     private MainFragment mCurrentFragment;
 
     private Uri mCropImageUri;
-
     //endregion
 
     public void setCurrentFragment(MainFragment fragment) {
@@ -54,14 +56,14 @@ public class MainActivity extends Activity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
 
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.main_drawer_open, R.string.main_drawer_close);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.main_drawer_open, R.string.main_drawer_close);
         mDrawerToggle.setDrawerIndicatorEnabled(true);
-        drawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         if (savedInstanceState == null) {
-            setMainFragmentByPreset(CropDemoPreset.Basic);
+            setMainFragmentByPreset(CropDemoPreset.RECT);
         }
     }
 
@@ -84,10 +86,6 @@ public class MainActivity extends Activity {
             return true;
         }
         if (mCurrentFragment != null && mCurrentFragment.onOptionsItemSelected(item)) {
-            return true;
-        }
-        if (item.getItemId() == R.id.main_action_load) {
-            CropImageHelper.startPickImageActivity(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -122,6 +120,29 @@ public class MainActivity extends Activity {
         } else {
             Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void onDrawerOptionClicked(View view) {
+        switch (view.getId()) {
+            case R.id.drawer_option_load:
+                CropImageHelper.startPickImageActivity(this);
+                break;
+            case R.id.drawer_option_oval:
+                setMainFragmentByPreset(CropDemoPreset.CIRCULAR);
+                break;
+            case R.id.drawer_option_rect:
+                setMainFragmentByPreset(CropDemoPreset.RECT);
+                break;
+            case R.id.drawer_option_customized_overlay:
+                setMainFragmentByPreset(CropDemoPreset.CUSTOMIZED_OVERLAY);
+                break;
+            case R.id.drawer_option_min_max_override:
+                setMainFragmentByPreset(CropDemoPreset.MIN_MAX_OVERRIDE);
+                break;
+            default:
+                Toast.makeText(this, "Unknown drawer option clicked", Toast.LENGTH_LONG).show();
+        }
+        mDrawerLayout.closeDrawers();
     }
 
     private void setMainFragmentByPreset(CropDemoPreset demoPreset) {
