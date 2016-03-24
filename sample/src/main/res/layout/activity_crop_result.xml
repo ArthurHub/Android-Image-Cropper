@@ -7,7 +7,7 @@
         android:id="@+id/resultImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@string/resultImageDesc"
+        android:contentDescription="@string/result_image_desc"
         android:onClick="onImageViewClicked"/>
 
     <TextView

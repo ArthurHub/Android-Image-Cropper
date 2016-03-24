@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="appName">Image Cropper</string>
-    <string name="resultImageDesc">crop result</string>
+    <string name="app_name">Image Cropper Demo</string>
+    <string name="app_title">Image Cropper</string>
+    <string name="result_image_desc">crop result</string>
 
     <string-array name="showGuidelinesArray">
         <item>Guidelines=Off</item>
         <item>Guidelines=On Touch</item>
         <item>Guidelines=On</item>
     </string-array>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="main_action_crop">Crop</string>
+    <string name="main_action_rotate">Rotate</string>
+    <string name="main_action_load">Load</string>
 
 </resources>
