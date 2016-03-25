@@ -7,34 +7,66 @@ Android Image Cropper
 Image cropping tool, displays a resizable, rectengular/oval crop window on top of image.
 
 [Optimized for cropping image picked from Camera or Gallery](http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/)
-- Support setting cropping image by Android URI loaded by ContentResolver.
-- Auto image roatete by reading Exif data to handle rotation by camera.
-- Using sampling to reduce memory usage and prevent out-of-memory.
-- Support required size and sampling on getting cropped image for memory optimization.
 
 ![Crop](https://github.com/ArthurHub/Android-Image-Cropper/blob/master/crop.jpg?raw=true)
 
-### Features:
-- Set cropping image as Bitmap, Resource or Android URI.
-- Set cropping window shape to Rectengular or Oval (circle by setting fixed aspect ration).
-- Set image Scale type in the cropping image view: center or fit.
-- Control the appearance of guidelines in the crop window.
-- Control cropping window aspect ratio, ability to fix it (squared).
-- Customization for border line, border corner, guidelines and background.
-- Set result image min/max limits in pixels.
+## Usage
+*For a working implementation, please have a look at the Sample Project*
+
+1. Include the library
+
+ ```
+ compile 'com.theartofdev.edmodo:android-image-cropper:1.2.+'
+ ```
+
+2. Add `CropImageView` into your activity
+
+ ```xml
+ <!-- Image Cropper fill the remaining available height -->
+ <com.theartofdev.edmodo.cropper.CropImageView
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cropImageView"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    custom:cropScaleType="fitCenter"/>
+ ```
+
+3. Set image to crop
+
+ ```java
+ cropImageView.setImageBitmap(bitmap);
+ // or
+ cropImageView.setImageUriAsync(uri);
+ ```
+
+4. Get cropped image
+
+ ```java
+ Bitmap cropped = cropImageView.getCroppedImage();
+ // or (must subscribe to async event using cropImageView.setOnGetCroppedImageCompleteListener(listener))
+ cropImageView.getCroppedImageAsync(CropImageView.CropShape.RECTANGLE, 400, 400);
+ ```
+
+## Features
+- Set cropping image as Bitmap, Resource or Android URI (Gallery, Camera, Dropbox, etc.).
+- Set cropping window shape to Rectengular or Oval (cube/circle by fixing aspect ration).
+- Rotate image to allow the user to rotate the image during cropping.
 - Auto rotate bitmap by provided Exif data or loading from Android URI.
-- Rotate image API to allow the user to rotate the image during cropping.
+- Set image Scale type in the cropping image view: center or fit.
+- Set result image min/max limits in pixels.
 - Get cropping rectangle or the cropped bitmap.
+- Using sampling to reduce memory usage and prevent out-of-memory.
+- Support required size and sampling on getting cropped image for memory optimization.
 - Supported on API Level 10 and above.
+ 
+## Customizations
+- Cropping window aspect ratio: Free, 1:1, 4:3, 16:9 or Custom.
+- Guidelines appearance: Off / Always On / Show on Toch.
+- Cropping window Border line, border corner and guidelines thickness and color.
+- Cropping background color.
 
 For more information, see the [linked Github Wiki page](https://github.com/ArthurHub/Android-Image-Cropper/wiki). 
-
-![ScreenShot](https://github.com/ArthurHub/Android-Image-Cropper/blob/master/demo.jpg?raw=true)
-
-## Gradle
-```
-compile 'com.theartofdev.edmodo:android-image-cropper:1.2.+'
-```
 
 ## Posts
  - [Android cropping image from camera or gallery](http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/)
