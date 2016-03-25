@@ -209,46 +209,59 @@ public class CropOverlayView extends View {
     }
 
     /**
-     * Sets the guidelines for the CropOverlayView to be either on, off, or to
-     * show when resizing the application.
-     *
-     * @param guidelines Integer that signals whether the guidelines should be
-     * on, off, or only showing when resizing.
+     * Get the current guidelines option set.
+     */
+    public CropImageView.Guidelines getGuidelines() {
+        return mGuidelines;
+    }
+
+    /**
+     * Sets the guidelines for the CropOverlayView to be either on, off, or to show when resizing the application.
      */
     public void setGuidelines(CropImageView.Guidelines guidelines) {
-        mGuidelines = guidelines;
-        if (initializedCropWindow) {
-            initCropWindow();
-            invalidate();
+        if (mGuidelines != guidelines) {
+            mGuidelines = guidelines;
+            if (initializedCropWindow) {
+                initCropWindow();
+                invalidate();
+            }
         }
     }
 
     /**
-     * Sets whether the aspect ratio is fixed or not; true fixes the aspect
-     * ratio, while false allows it to be changed.
-     *
-     * @param fixAspectRatio Boolean that signals whether the aspect ratio
-     * should be maintained.
+     * whether the aspect ratio is fixed or not; true fixes the aspect ratio, while false allows it to be changed.
+     */
+    public boolean isFixAspectRatio() {
+        return mFixAspectRatio;
+    }
+
+    /**
+     * Sets whether the aspect ratio is fixed or not; true fixes the aspect ratio, while false allows it to be changed.
      */
     public void setFixedAspectRatio(boolean fixAspectRatio) {
-        mFixAspectRatio = fixAspectRatio;
-
-        if (initializedCropWindow) {
-            initCropWindow();
-            invalidate();
+        if (mFixAspectRatio != fixAspectRatio) {
+            mFixAspectRatio = fixAspectRatio;
+            if (initializedCropWindow) {
+                initCropWindow();
+                invalidate();
+            }
         }
+    }
+
+    /**
+     * the X value of the aspect ratio;
+     */
+    public int getAspectRatioX() {
+        return mAspectRatioX;
     }
 
     /**
      * Sets the X value of the aspect ratio; is defaulted to 1.
-     *
-     * @param aspectRatioX int that specifies the new X value of the aspect
-     * ratio
      */
     public void setAspectRatioX(int aspectRatioX) {
-        if (aspectRatioX <= 0)
+        if (aspectRatioX <= 0) {
             throw new IllegalArgumentException("Cannot set aspect ratio value to a number less than or equal to 0.");
-        else {
+        } else if (mAspectRatioX != aspectRatioX) {
             mAspectRatioX = aspectRatioX;
             mTargetAspectRatio = ((float) mAspectRatioX) / mAspectRatioY;
 
@@ -260,6 +273,13 @@ public class CropOverlayView extends View {
     }
 
     /**
+     * the Y value of the aspect ratio;
+     */
+    public int getAspectRatioY() {
+        return mAspectRatioY;
+    }
+
+    /**
      * Sets the Y value of the aspect ratio; is defaulted to 1.
      *
      * @param aspectRatioY int that specifies the new Y value of the aspect
@@ -268,7 +288,7 @@ public class CropOverlayView extends View {
     public void setAspectRatioY(int aspectRatioY) {
         if (aspectRatioY <= 0) {
             throw new IllegalArgumentException("Cannot set aspect ratio value to a number less than or equal to 0.");
-        } else {
+        } else if (mAspectRatioY != aspectRatioY) {
             mAspectRatioY = aspectRatioY;
             mTargetAspectRatio = ((float) mAspectRatioX) / mAspectRatioY;
 

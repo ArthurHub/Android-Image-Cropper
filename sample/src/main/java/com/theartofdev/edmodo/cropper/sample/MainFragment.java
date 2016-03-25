@@ -59,6 +59,19 @@ public final class MainFragment extends Fragment
         mCropImageView.setImageUriAsync(imageUri);
     }
 
+    /**
+     * Set the options of the crop image view to the given values.
+     */
+    public void setCropImageViewOptions(CropImageViewOptions options) {
+        mCropImageView.setScaleType(options.scaleType);
+        mCropImageView.setCropShape(options.cropShape);
+        mCropImageView.setGuidelines(options.guidelines);
+        mCropImageView.setAspectRatio(options.aspectRatio.first, options.aspectRatio.second);
+        mCropImageView.setFixedAspectRatio(options.fixAspectRatio);
+        mCropImageView.setShowCropOverlay(options.showCropOverlay);
+        mCropImageView.setShowProgressBar(options.showProgressBar);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView;
@@ -94,6 +107,16 @@ public final class MainFragment extends Fragment
         mCropImageView = (CropImageView) view.findViewById(R.id.cropImageView);
         mCropImageView.setOnSetImageUriCompleteListener(this);
         mCropImageView.setOnGetCroppedImageCompleteListener(this);
+
+        CropImageViewOptions options = new CropImageViewOptions();
+        options.scaleType = mCropImageView.getScaleType();
+        options.cropShape = mCropImageView.getCropShape();
+        options.guidelines = mCropImageView.getGuidelines();
+        options.aspectRatio = mCropImageView.getAspectRatio();
+        options.fixAspectRatio = mCropImageView.isFixAspectRatio();
+        options.showCropOverlay = mCropImageView.isShowCropOverlay();
+        options.showProgressBar = mCropImageView.isShowProgressBar();
+        ((MainActivity) getActivity()).setCurrentOptions(options);
 
         if (savedInstanceState == null) {
             if (mDemoPreset == CropDemoPreset.SCALE_CENTER_INSIDE) {

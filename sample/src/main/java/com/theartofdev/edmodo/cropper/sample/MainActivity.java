@@ -22,14 +22,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.croppersample.R;
 import com.theartofdev.edmodo.cropper.CropImageHelper;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 public class MainActivity extends Activity {
 
@@ -42,10 +46,17 @@ public class MainActivity extends Activity {
     private MainFragment mCurrentFragment;
 
     private Uri mCropImageUri;
+
+    private CropImageViewOptions mCropImageViewOptions = new CropImageViewOptions();
     //endregion
 
     public void setCurrentFragment(MainFragment fragment) {
         mCurrentFragment = fragment;
+    }
+
+    public void setCurrentOptions(CropImageViewOptions options) {
+        mCropImageViewOptions = options;
+        updateDrawerTogglesByOptions(options);
     }
 
     @Override
@@ -126,26 +137,78 @@ public class MainActivity extends Activity {
         switch (view.getId()) {
             case R.id.drawer_option_load:
                 CropImageHelper.startPickImageActivity(this);
+                mDrawerLayout.closeDrawers();
                 break;
             case R.id.drawer_option_oval:
                 setMainFragmentByPreset(CropDemoPreset.CIRCULAR);
+                mDrawerLayout.closeDrawers();
                 break;
             case R.id.drawer_option_rect:
                 setMainFragmentByPreset(CropDemoPreset.RECT);
+                mDrawerLayout.closeDrawers();
                 break;
             case R.id.drawer_option_customized_overlay:
                 setMainFragmentByPreset(CropDemoPreset.CUSTOMIZED_OVERLAY);
+                mDrawerLayout.closeDrawers();
                 break;
             case R.id.drawer_option_min_max_override:
                 setMainFragmentByPreset(CropDemoPreset.MIN_MAX_OVERRIDE);
+                mDrawerLayout.closeDrawers();
                 break;
             case R.id.drawer_option_scale_center:
                 setMainFragmentByPreset(CropDemoPreset.SCALE_CENTER_INSIDE);
+                mDrawerLayout.closeDrawers();
+                break;
+            case R.id.drawer_option_toggle_scale:
+                mCropImageViewOptions.scaleType = mCropImageViewOptions.scaleType == ImageView.ScaleType.FIT_CENTER
+                        ? ImageView.ScaleType.CENTER_INSIDE : ImageView.ScaleType.FIT_CENTER;
+                mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
+                updateDrawerTogglesByOptions(mCropImageViewOptions);
+                break;
+            case R.id.drawer_option_toggle_shape:
+                mCropImageViewOptions.cropShape = mCropImageViewOptions.cropShape == CropImageView.CropShape.RECTANGLE
+                        ? CropImageView.CropShape.OVAL : CropImageView.CropShape.RECTANGLE;
+                mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
+                updateDrawerTogglesByOptions(mCropImageViewOptions);
+                break;
+            case R.id.drawer_option_toggle_guidelines:
+                mCropImageViewOptions.guidelines = mCropImageViewOptions.guidelines == CropImageView.Guidelines.OFF
+                        ? CropImageView.Guidelines.ON : mCropImageViewOptions.guidelines == CropImageView.Guidelines.ON
+                        ? CropImageView.Guidelines.ON_TOUCH : CropImageView.Guidelines.OFF;
+                mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
+                updateDrawerTogglesByOptions(mCropImageViewOptions);
+                break;
+            case R.id.drawer_option_toggle_aspect_ratio:
+                if (!mCropImageViewOptions.fixAspectRatio) {
+                    mCropImageViewOptions.fixAspectRatio = true;
+                    mCropImageViewOptions.aspectRatio = new Pair<>(1, 1);
+                } else {
+                    if (mCropImageViewOptions.aspectRatio.first == 1 && mCropImageViewOptions.aspectRatio.second == 1) {
+                        mCropImageViewOptions.aspectRatio = new Pair<>(4, 3);
+                    } else if (mCropImageViewOptions.aspectRatio.first == 4 && mCropImageViewOptions.aspectRatio.second == 3) {
+                        mCropImageViewOptions.aspectRatio = new Pair<>(16, 9);
+                    } else if (mCropImageViewOptions.aspectRatio.first == 16 && mCropImageViewOptions.aspectRatio.second == 9) {
+                        mCropImageViewOptions.aspectRatio = new Pair<>(9, 16);
+                    } else {
+                        mCropImageViewOptions.fixAspectRatio = false;
+                    }
+                }
+                mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
+                updateDrawerTogglesByOptions(mCropImageViewOptions);
+                break;
+            case R.id.drawer_option_toggle_show_overlay:
+                mCropImageViewOptions.showCropOverlay = !mCropImageViewOptions.showCropOverlay;
+                mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
+                updateDrawerTogglesByOptions(mCropImageViewOptions);
+                break;
+            case R.id.drawer_option_toggle_show_progress_bar:
+                mCropImageViewOptions.showProgressBar = !mCropImageViewOptions.showProgressBar;
+                mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
+                updateDrawerTogglesByOptions(mCropImageViewOptions);
                 break;
             default:
                 Toast.makeText(this, "Unknown drawer option clicked", Toast.LENGTH_LONG).show();
         }
-        mDrawerLayout.closeDrawers();
     }
 
     private void setMainFragmentByPreset(CropDemoPreset demoPreset) {
@@ -153,5 +216,19 @@ public class MainActivity extends Activity {
         fragmentManager.beginTransaction()
                 .replace(R.id.container, MainFragment.newInstance(demoPreset))
                 .commit();
+    }
+
+    private void updateDrawerTogglesByOptions(CropImageViewOptions options) {
+        ((TextView) findViewById(R.id.drawer_option_toggle_scale)).setText(getResources().getString(R.string.drawer_option_toggle_scale, options.scaleType.name()));
+        ((TextView) findViewById(R.id.drawer_option_toggle_shape)).setText(getResources().getString(R.string.drawer_option_toggle_shape, options.cropShape.name()));
+        ((TextView) findViewById(R.id.drawer_option_toggle_guidelines)).setText(getResources().getString(R.string.drawer_option_toggle_guidelines, options.guidelines.name()));
+        ((TextView) findViewById(R.id.drawer_option_toggle_show_overlay)).setText(getResources().getString(R.string.drawer_option_toggle_show_overlay, Boolean.toString(options.showCropOverlay)));
+        ((TextView) findViewById(R.id.drawer_option_toggle_show_progress_bar)).setText(getResources().getString(R.string.drawer_option_toggle_show_progress_bar, Boolean.toString(options.showProgressBar)));
+
+        String aspectRatio = "FREE";
+        if (options.fixAspectRatio) {
+            aspectRatio = options.aspectRatio.first + ":" + options.aspectRatio.second;
+        }
+        ((TextView) findViewById(R.id.drawer_option_toggle_aspect_ratio)).setText(getResources().getString(R.string.drawer_option_toggle_aspect_ratio, aspectRatio));
     }
 }

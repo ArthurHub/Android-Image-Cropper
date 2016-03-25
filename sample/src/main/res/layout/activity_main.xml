@@ -7,115 +7,180 @@
     android:layout_height="match_parent"
     tools:context="com.theartofdev.edmodo.cropper.sample.MainActivity">
 
-    <!-- As the main content view, the view below consumes the entire
-         space available using match_parent in both dimensions. -->
+    <!-- main content view. -->
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <LinearLayout
+    <!-- drawer view. -->
+    <ScrollView
         android:id="@+id/navigation_drawer"
         android:layout_width="@dimen/navigation_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="#303030"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/drawer_option_load"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="@dimen/navigation_drawer_width"
             android:layout_height="wrap_content"
-            android:onClick="onDrawerOptionClicked"
-            android:padding="@dimen/drawer_text_padding"
-            android:text="@string/main_drawer_load"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"/>
+            android:layout_gravity="start"
+            android:background="#303030"
+            android:orientation="vertical"
+            android:padding="12dp">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/drawer_text_padding"
-            android:layout_marginTop="@dimen/drawer_text_padding"
-            android:background="#5FFF"/>
+            <TextView
+                android:id="@+id/drawer_option_load"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/main_drawer_load"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onDrawerOptionClicked"
-            android:padding="@dimen/drawer_text_padding"
-            android:text="@string/drawer_option_title"
-            android:textColor="#8FFF"
-            android:textSize="@dimen/drawer_text_size"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/drawer_text_padding"
+                android:layout_marginTop="@dimen/drawer_text_padding"
+                android:background="#5FFF"/>
 
-        <TextView
-            android:id="@+id/drawer_option_oval"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onDrawerOptionClicked"
-            android:padding="@dimen/drawer_text_padding"
-            android:text="@string/drawer_option_oval"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/drawer_text_size"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_title"
+                android:textColor="#8FFF"
+                android:textSize="@dimen/drawer_text_size"/>
 
-        <TextView
-            android:id="@+id/drawer_option_rect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onDrawerOptionClicked"
-            android:padding="@dimen/drawer_text_padding"
-            android:text="@string/drawer_option_basic"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/drawer_text_size"/>
+            <TextView
+                android:id="@+id/drawer_option_oval"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_oval"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
 
-        <TextView
-            android:id="@+id/drawer_option_customized_overlay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onDrawerOptionClicked"
-            android:padding="@dimen/drawer_text_padding"
-            android:text="@string/drawer_option_customized_overlay"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/drawer_text_size"/>
+            <TextView
+                android:id="@+id/drawer_option_rect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_rect"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
 
-        <TextView
-            android:id="@+id/drawer_option_min_max_override"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onDrawerOptionClicked"
-            android:padding="@dimen/drawer_text_padding"
-            android:text="@string/drawer_option_min_max"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/drawer_text_size"/>
+            <TextView
+                android:id="@+id/drawer_option_customized_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_customized_overlay"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
 
-        <TextView
-            android:id="@+id/drawer_option_scale_center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onDrawerOptionClicked"
-            android:padding="@dimen/drawer_text_padding"
-            android:text="@string/drawer_option_scale_center"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/drawer_text_size"/>
+            <TextView
+                android:id="@+id/drawer_option_min_max_override"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_min_max"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/drawer_text_padding"
-            android:layout_marginTop="@dimen/drawer_text_padding"
-            android:background="#5FFF"/>
+            <TextView
+                android:id="@+id/drawer_option_scale_center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_scale_center"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onDrawerOptionClicked"
-            android:padding="@dimen/drawer_text_padding"
-            android:text="@string/drawer_option_title2"
-            android:textColor="#8FFF"
-            android:textSize="@dimen/drawer_text_size"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/drawer_text_padding"
+                android:layout_marginTop="@dimen/drawer_text_padding"
+                android:background="#5FFF"/>
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_title2"
+                android:textColor="#8FFF"
+                android:textSize="@dimen/drawer_text_size"/>
 
+            <TextView
+                android:id="@+id/drawer_option_toggle_scale"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_toggle_scale"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
+
+            <TextView
+                android:id="@+id/drawer_option_toggle_shape"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_toggle_shape"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
+
+            <TextView
+                android:id="@+id/drawer_option_toggle_guidelines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_toggle_guidelines"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
+
+            <TextView
+                android:id="@+id/drawer_option_toggle_aspect_ratio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_toggle_aspect_ratio"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
+
+            <TextView
+                android:id="@+id/drawer_option_toggle_show_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_toggle_show_overlay"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
+
+            <TextView
+                android:id="@+id/drawer_option_toggle_show_progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onDrawerOptionClicked"
+                android:padding="@dimen/drawer_text_padding"
+                android:text="@string/drawer_option_toggle_show_progress_bar"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/drawer_text_size"/>
+
+        </LinearLayout>
+    </ScrollView>
 
 </android.support.v4.widget.DrawerLayout>

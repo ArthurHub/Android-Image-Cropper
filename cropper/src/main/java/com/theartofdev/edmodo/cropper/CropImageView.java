@@ -242,25 +242,38 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Sets whether the aspect ratio is fixed or not; true fixes the aspect ratio, while
-     * false allows it to be changed.
-     *
-     * @param fixAspectRatio Boolean that signals whether the aspect ratio should be
-     * maintained.
+     * whether the aspect ratio is fixed or not; true fixes the aspect ratio, while false allows it to be changed.
+     */
+    public boolean isFixAspectRatio() {
+        return mCropOverlayView.isFixAspectRatio();
+    }
+
+    /**
+     * Sets whether the aspect ratio is fixed or not; true fixes the aspect ratio, while false allows it to be changed.
      */
     public void setFixedAspectRatio(boolean fixAspectRatio) {
         mCropOverlayView.setFixedAspectRatio(fixAspectRatio);
     }
 
     /**
-     * Sets the guidelines for the CropOverlayView to be either on, off, or to show when
-     * resizing the application.
-     *
-     * @param guidelines Integer that signals whether the guidelines should be on, off, or
-     * only showing when resizing.
+     * Get the current guidelines option set.
+     */
+    public Guidelines getGuidelines() {
+        return mCropOverlayView.getGuidelines();
+    }
+
+    /**
+     * Sets the guidelines for the CropOverlayView to be either on, off, or to show when resizing the application.
      */
     public void setGuidelines(Guidelines guidelines) {
         mCropOverlayView.setGuidelines(guidelines);
+    }
+
+    /**
+     * both the X and Y values of the aspectRatio.
+     */
+    public Pair<Integer, Integer> getAspectRatio() {
+        return new Pair<>(mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY());
     }
 
     /**
@@ -308,8 +321,10 @@ public class CropImageView extends FrameLayout {
      * default: true, may disable for animation or frame transition.
      */
     public void setShowCropOverlay(boolean showCropOverlay) {
-        mShowCropOverlay = showCropOverlay;
-        setCropOverlayVisibility();
+        if (mShowCropOverlay != showCropOverlay) {
+            mShowCropOverlay = showCropOverlay;
+            setCropOverlayVisibility();
+        }
     }
 
     /**
@@ -317,8 +332,10 @@ public class CropImageView extends FrameLayout {
      * default: true, disable to provide custom progress bar UI.
      */
     public void setShowProgressBar(boolean showProgressBar) {
-        mShowProgressBar = showProgressBar;
-        setProgressBarVisibility();
+        if (mShowProgressBar != showProgressBar) {
+            mShowProgressBar = showProgressBar;
+            setProgressBarVisibility();
+        }
     }
 
     /**
