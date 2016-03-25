@@ -32,153 +32,87 @@
 
             <TextView
                 android:id="@+id/drawer_option_load"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/main_drawer_load"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"/>
+                android:text="@string/main_drawer_load"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="@dimen/drawer_text_padding"
-                android:layout_marginTop="@dimen/drawer_text_padding"
-                android:background="#5FFF"/>
+            <View style="@style/Cropper.Widget.Drawer.Seperator"/>
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_title"
-                android:textColor="#8FFF"
-                android:textSize="@dimen/drawer_text_size"/>
+                style="@style/Cropper.Widget.Drawer.Title.TextView"
+                android:text="@string/drawer_option_title"/>
 
             <TextView
                 android:id="@+id/drawer_option_oval"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_oval"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_oval"/>
 
             <TextView
                 android:id="@+id/drawer_option_rect"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_rect"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_rect"/>
 
             <TextView
                 android:id="@+id/drawer_option_customized_overlay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_customized_overlay"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_customized_overlay"/>
 
             <TextView
                 android:id="@+id/drawer_option_min_max_override"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_min_max"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_min_max"/>
 
             <TextView
                 android:id="@+id/drawer_option_scale_center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_scale_center"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_scale_center"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="@dimen/drawer_text_padding"
-                android:layout_marginTop="@dimen/drawer_text_padding"
-                android:background="#5FFF"/>
+            <View style="@style/Cropper.Widget.Drawer.Seperator"/>
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_title2"
-                android:textColor="#8FFF"
-                android:textSize="@dimen/drawer_text_size"/>
+                style="@style/Cropper.Widget.Drawer.Title.TextView"
+                android:text="@string/drawer_option_title2"/>
 
             <TextView
                 android:id="@+id/drawer_option_toggle_scale"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_toggle_scale"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_toggle_scale"/>
 
             <TextView
                 android:id="@+id/drawer_option_toggle_shape"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_toggle_shape"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_toggle_shape"/>
 
             <TextView
                 android:id="@+id/drawer_option_toggle_guidelines"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_toggle_guidelines"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_toggle_guidelines"/>
 
             <TextView
                 android:id="@+id/drawer_option_toggle_aspect_ratio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_toggle_aspect_ratio"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_toggle_aspect_ratio"/>
 
             <TextView
                 android:id="@+id/drawer_option_toggle_show_overlay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_toggle_show_overlay"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_toggle_show_overlay"/>
 
             <TextView
                 android:id="@+id/drawer_option_toggle_show_progress_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
-                android:padding="@dimen/drawer_text_padding"
-                android:text="@string/drawer_option_toggle_show_progress_bar"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/drawer_text_size"/>
+                android:text="@string/drawer_option_toggle_show_progress_bar"/>
 
         </LinearLayout>
     </ScrollView>
