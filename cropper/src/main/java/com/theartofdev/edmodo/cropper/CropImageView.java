@@ -607,39 +607,6 @@ public class CropImageView extends FrameLayout {
      * Will rotate the image by exif data.<br>
      *
      * @param uri the URI to load the image from
-     * @deprecated Use {@link #setImageUriAsync(Uri)} for better async handling
-     */
-    @Deprecated
-    public void setImageUri(Uri uri) {
-        if (uri != null) {
-
-            mCropOverlayView.setInitialCropWindowRect(null);
-
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            double densityAdj = metrics.density > 1 ? 1 / metrics.density : 1;
-
-            int width = (int) (metrics.widthPixels * densityAdj);
-            int height = (int) (metrics.heightPixels * densityAdj);
-            BitmapUtils.DecodeBitmapResult decodeResult =
-                    BitmapUtils.decodeSampledBitmap(getContext(), uri, width, height);
-
-            BitmapUtils.RotateBitmapResult rotateResult =
-                    BitmapUtils.rotateBitmapByExif(getContext(), decodeResult.bitmap, uri);
-
-            setBitmap(rotateResult.bitmap, true);
-
-            mLoadedImageUri = uri;
-            mLoadedSampleSize = decodeResult.sampleSize;
-            mDegreesRotated = rotateResult.degrees;
-        }
-    }
-
-    /**
-     * Sets a bitmap loaded from the given Android URI as the content of the CropImageView.<br>
-     * Can be used with URI from gallery or camera source.<br>
-     * Will rotate the image by exif data.<br>
-     *
-     * @param uri the URI to load the image from
      */
     public void setImageUriAsync(Uri uri) {
         setImageUriAsync(uri, null);
