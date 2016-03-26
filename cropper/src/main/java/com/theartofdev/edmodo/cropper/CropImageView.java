@@ -55,6 +55,11 @@ public class CropImageView extends FrameLayout {
     private final CropOverlayView mCropOverlayView;
 
     /**
+     * The matrix used to transform the cripping image in the image view
+     */
+    private final Matrix mImageMatrix = new Matrix();
+
+    /**
      * Progress bar widget to show progress bar on async image loading and cropping.
      */
     private final ProgressBar mProgressBar;
@@ -68,6 +73,11 @@ public class CropImageView extends FrameLayout {
     private int mLayoutHeight;
 
     private int mImageResource;
+
+    /**
+     * The initial scale type of the image in the crop image view
+     */
+    private ImageView.ScaleType mScaleType;
 
     /**
      * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
@@ -125,7 +135,6 @@ public class CropImageView extends FrameLayout {
         boolean fixAspectRatio = CropDefaults.DEFAULT_FIXED_ASPECT_RATIO;
         int aspectRatioX = CropDefaults.DEFAULT_ASPECT_RATIO_X;
         int aspectRatioY = CropDefaults.DEFAULT_ASPECT_RATIO_Y;
-        ImageView.ScaleType scaleType = CropDefaults.VALID_SCALE_TYPES[CropDefaults.DEFAULT_SCALE_TYPE_INDEX];
         CropShape cropShape = CropShape.RECTANGLE;
         Guidelines guidelines = CropImageView.Guidelines.ON_TOUCH;
         float snapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CropDefaults.SNAP_RADIUS, dm);
@@ -152,7 +161,7 @@ public class CropImageView extends FrameLayout {
                 fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_cropFixAspectRatio, CropDefaults.DEFAULT_FIXED_ASPECT_RATIO);
                 aspectRatioX = ta.getInteger(R.styleable.CropImageView_cropAspectRatioX, CropDefaults.DEFAULT_ASPECT_RATIO_X);
                 aspectRatioY = ta.getInteger(R.styleable.CropImageView_cropAspectRatioY, CropDefaults.DEFAULT_ASPECT_RATIO_Y);
-                scaleType = CropDefaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_cropScaleType, CropDefaults.DEFAULT_SCALE_TYPE_INDEX)];
+                mScaleType = CropDefaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_cropScaleType, CropDefaults.DEFAULT_SCALE_TYPE_INDEX)];
                 cropShape = CropDefaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
                 guidelines = CropDefaults.VALID_GUIDELINES[ta.getInt(R.styleable.CropImageView_cropGuidelines, CropDefaults.DEFAULT_GUIDELINES_INDEX)];
                 snapRadius = ta.getDimension(R.styleable.CropImageView_cropSnapRadius, snapRadius);
@@ -185,7 +194,7 @@ public class CropImageView extends FrameLayout {
         View v = inflater.inflate(R.layout.crop_image_view, this, true);
 
         mImageView = (ImageView) v.findViewById(R.id.ImageView_image);
-        mImageView.setScaleType(scaleType);
+        mImageView.setScaleType(ImageView.ScaleType.MATRIX);
 
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
         mCropOverlayView.setInitialAttributeValues(
@@ -208,7 +217,7 @@ public class CropImageView extends FrameLayout {
      * Get the scale type of the image in the crop view.
      */
     public ImageView.ScaleType getScaleType() {
-        return mImageView.getScaleType();
+        return mScaleType;
     }
 
     /**
@@ -897,7 +906,37 @@ public class CropImageView extends FrameLayout {
             origParams.width = mLayoutWidth;
             origParams.height = mLayoutHeight;
             setLayoutParams(origParams);
+
+            applyImageMatrix(r - l, b - t);
         }
+    }
+
+    /**
+     * Apply matrix to handle the image inside the image view.
+     *
+     * @param width the width of the image view
+     * @param height the height of the image view
+     */
+    private void applyImageMatrix(float width, float height) {
+
+        mImageMatrix.reset();
+
+        float imgWidth = mBitmap.getWidth();
+        float imgHeight = mBitmap.getHeight();
+        float scale = Math.min(width / imgWidth, height / imgHeight);
+
+        // scale the image to the image view (if fit will 'zoom')
+        if (mScaleType == ImageView.ScaleType.FIT_CENTER || scale < 1) {
+            mImageMatrix.postScale(scale, scale);
+            imgWidth *= scale;
+            imgHeight *= scale;
+        }
+
+        // move the image to the center of the image view
+        mImageMatrix.postTranslate((width - imgWidth) / 2, (height - imgHeight) / 2);
+
+        // set matrix to apply
+        mImageView.setImageMatrix(mImageMatrix);
     }
 
     /**
