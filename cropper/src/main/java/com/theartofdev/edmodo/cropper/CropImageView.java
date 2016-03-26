@@ -224,7 +224,10 @@ public class CropImageView extends FrameLayout {
      * Set the scale type of the image in the crop view
      */
     public void setScaleType(ImageView.ScaleType scaleType) {
-        mImageView.setScaleType(scaleType);
+        if (scaleType != mImageView.getScaleType()) {
+            mImageView.setScaleType(scaleType);
+            mCropOverlayView.resetCropOverlayView();
+        }
     }
 
     /**

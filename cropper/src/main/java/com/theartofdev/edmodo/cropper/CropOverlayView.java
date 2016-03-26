@@ -169,7 +169,6 @@ public class CropOverlayView extends View {
      * Resets the crop overlay view.
      */
     public void resetCropOverlayView() {
-
         if (initializedCropWindow) {
             initCropWindow();
             invalidate();
@@ -222,7 +221,6 @@ public class CropOverlayView extends View {
         if (mGuidelines != guidelines) {
             mGuidelines = guidelines;
             if (initializedCropWindow) {
-                initCropWindow();
                 invalidate();
             }
         }
