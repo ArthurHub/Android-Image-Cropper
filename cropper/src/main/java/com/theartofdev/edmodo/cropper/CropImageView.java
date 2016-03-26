@@ -234,8 +234,9 @@ public class CropImageView extends FrameLayout {
      */
     public void setScaleType(ImageView.ScaleType scaleType) {
         if (scaleType != mImageView.getScaleType()) {
-            mImageView.setScaleType(scaleType);
-            mCropOverlayView.resetCropOverlayView();
+            mScaleType = scaleType;
+            requestLayout();
+            mCropOverlayView.invalidate();
         }
     }
 
@@ -637,13 +638,10 @@ public class CropImageView extends FrameLayout {
      */
     public void rotateImage(int degrees) {
         if (mBitmap != null) {
-            Matrix matrix = new Matrix();
-            matrix.postRotate(degrees);
-            Bitmap bitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
-            setBitmap(bitmap, false);
-
             mDegreesRotated += degrees;
             mDegreesRotated = mDegreesRotated % 360;
+            requestLayout();
+            mCropOverlayView.invalidate();
         }
     }
 
@@ -819,17 +817,6 @@ public class CropImageView extends FrameLayout {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-
-        if (mBitmap != null) {
-            Rect bitmapRect = BitmapUtils.getBitmapRect(mBitmap, this, mImageView.getScaleType());
-            updateBitmapRect(bitmapRect);
-        } else {
-            updateBitmapRect(CropDefaults.EMPTY_RECT);
-        }
-    }
-
-    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
@@ -880,18 +867,15 @@ public class CropImageView extends FrameLayout {
             mLayoutWidth = width;
             mLayoutHeight = height;
 
-            Rect bitmapRect = BitmapUtils.getBitmapRect(mBitmap.getWidth(),
-                    mBitmap.getHeight(),
-                    mLayoutWidth,
-                    mLayoutHeight,
-                    mImageView.getScaleType());
-            updateBitmapRect(bitmapRect);
+            RectF transformedRect = applyImageMatrix(width, height);
+
+            updateBitmapRect(transformedRect);
 
             // MUST CALL THIS
             setMeasuredDimension(mLayoutWidth, mLayoutHeight);
 
         } else {
-            updateBitmapRect(CropDefaults.EMPTY_RECT);
+            updateBitmapRect(CropDefaults.EMPTY_RECT_F);
             setMeasuredDimension(widthSize, heightSize);
         }
     }
@@ -906,8 +890,6 @@ public class CropImageView extends FrameLayout {
             origParams.width = mLayoutWidth;
             origParams.height = mLayoutHeight;
             setLayoutParams(origParams);
-
-            applyImageMatrix(r - l, b - t);
         }
     }
 
@@ -917,26 +899,37 @@ public class CropImageView extends FrameLayout {
      * @param width the width of the image view
      * @param height the height of the image view
      */
-    private void applyImageMatrix(float width, float height) {
+    private RectF applyImageMatrix(float width, float height) {
 
         mImageMatrix.reset();
 
-        float imgWidth = mBitmap.getWidth();
-        float imgHeight = mBitmap.getHeight();
-        float scale = Math.min(width / imgWidth, height / imgHeight);
+        // TODO:a. reuse rect for performance
+        RectF imgRect = new RectF(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
 
-        // scale the image to the image view (if fit will 'zoom')
-        if (mScaleType == ImageView.ScaleType.FIT_CENTER || scale < 1) {
-            mImageMatrix.postScale(scale, scale);
-            imgWidth *= scale;
-            imgHeight *= scale;
+        // move the image to the center of the image view first so we can manipulate it from there
+        mImageMatrix.postTranslate((width - imgRect.width()) / 2, (height - imgRect.height()) / 2);
+        imgRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+        mImageMatrix.mapRect(imgRect);
+
+        // rotate the image the required degrees from center of image
+        if (mDegreesRotated > 0) {
+            mImageMatrix.postRotate(mDegreesRotated, imgRect.centerX(), imgRect.centerY());
+            imgRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+            mImageMatrix.mapRect(imgRect);
         }
 
-        // move the image to the center of the image view
-        mImageMatrix.postTranslate((width - imgWidth) / 2, (height - imgHeight) / 2);
+        // scale the image to the image view, image rect transformed to know new width/height
+        float scale = Math.min(width / imgRect.width(), height / imgRect.height());
+        if (mScaleType == ImageView.ScaleType.FIT_CENTER || scale < 1) {
+            mImageMatrix.postScale(scale, scale, imgRect.centerX(), imgRect.centerY());
+            imgRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+            mImageMatrix.mapRect(imgRect);
+        }
 
         // set matrix to apply
         mImageView.setImageMatrix(mImageMatrix);
+
+        return imgRect;
     }
 
     /**
@@ -987,12 +980,12 @@ public class CropImageView extends FrameLayout {
     /**
      * Update the scale factor between the actual image bitmap and the shown image.<br>
      */
-    private void updateBitmapRect(Rect bitmapRect) {
+    private void updateBitmapRect(RectF bitmapRect) {
         if (mBitmap != null && bitmapRect.width() > 0 && bitmapRect.height() > 0) {
 
             // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width/height.
-            float scaleFactorWidth = mBitmap.getWidth() * mLoadedSampleSize / (float) bitmapRect.width();
-            float scaleFactorHeight = mBitmap.getHeight() * mLoadedSampleSize / (float) bitmapRect.height();
+            float scaleFactorWidth = mBitmap.getWidth() * mLoadedSampleSize / bitmapRect.width();
+            float scaleFactorHeight = mBitmap.getHeight() * mLoadedSampleSize / bitmapRect.height();
             mCropOverlayView.setScaleFactor(scaleFactorWidth, scaleFactorHeight);
         }
 

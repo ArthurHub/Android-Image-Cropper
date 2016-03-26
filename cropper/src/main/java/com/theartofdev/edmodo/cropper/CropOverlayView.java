@@ -60,7 +60,7 @@ public class CropOverlayView extends View {
     /**
      * The bounding box around the Bitmap that we are cropping.
      */
-    private Rect mBitmapRect;
+    private RectF mBitmapRect;
 
     /**
      * The offset to draw the border corener from the border
@@ -158,7 +158,7 @@ public class CropOverlayView extends View {
      *
      * @param bitmapRect the image's bounding box
      */
-    public void setBitmapRect(Rect bitmapRect) {
+    public void setBitmapRect(RectF bitmapRect) {
         if (mBitmapRect == null || !bitmapRect.equals(mBitmapRect)) {
             mBitmapRect = bitmapRect;
             initCropWindow();
@@ -592,7 +592,7 @@ public class CropOverlayView extends View {
     /**
      * Draw shadow background over the image not including the crop area.
      */
-    private void drawBackground(Canvas canvas, Rect bitmapRect) {
+    private void drawBackground(Canvas canvas, RectF bitmapRect) {
 
         RectF rect = mCropWindowHandler.getRect();
 
