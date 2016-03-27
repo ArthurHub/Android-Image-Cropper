@@ -867,15 +867,9 @@ public class CropImageView extends FrameLayout {
             mLayoutWidth = width;
             mLayoutHeight = height;
 
-            RectF transformedRect = applyImageMatrix(width, height);
-
-            updateBitmapRect(transformedRect);
-
-            // MUST CALL THIS
             setMeasuredDimension(mLayoutWidth, mLayoutHeight);
 
         } else {
-            updateBitmapRect(CropDefaults.EMPTY_RECT_F);
             setMeasuredDimension(widthSize, heightSize);
         }
     }
@@ -890,6 +884,12 @@ public class CropImageView extends FrameLayout {
             origParams.width = mLayoutWidth;
             origParams.height = mLayoutHeight;
             setLayoutParams(origParams);
+
+            RectF transformedRect = applyImageMatrix(r - l, b - t);
+            updateBitmapRect(transformedRect);
+
+        } else {
+            updateBitmapRect(CropDefaults.EMPTY_RECT_F);
         }
     }
 
@@ -908,28 +908,34 @@ public class CropImageView extends FrameLayout {
 
         // move the image to the center of the image view first so we can manipulate it from there
         mImageMatrix.postTranslate((width - imgRect.width()) / 2, (height - imgRect.height()) / 2);
-        imgRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
-        mImageMatrix.mapRect(imgRect);
+        mapImageRectangleByImageMatrix(imgRect);
 
         // rotate the image the required degrees from center of image
         if (mDegreesRotated > 0) {
             mImageMatrix.postRotate(mDegreesRotated, imgRect.centerX(), imgRect.centerY());
-            imgRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
-            mImageMatrix.mapRect(imgRect);
+            mapImageRectangleByImageMatrix(imgRect);
         }
 
         // scale the image to the image view, image rect transformed to know new width/height
         float scale = Math.min(width / imgRect.width(), height / imgRect.height());
         if (mScaleType == ImageView.ScaleType.FIT_CENTER || scale < 1) {
             mImageMatrix.postScale(scale, scale, imgRect.centerX(), imgRect.centerY());
-            imgRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
-            mImageMatrix.mapRect(imgRect);
+            mapImageRectangleByImageMatrix(imgRect);
         }
 
         // set matrix to apply
         mImageView.setImageMatrix(mImageMatrix);
 
         return imgRect;
+    }
+
+    /**
+     * Adjust the given image rectangle by image transformation matrix to know the final rectangle of the image.<br>
+     * To get the proper rectangle it must be first reset to orginal image rectangle.
+     */
+    private void mapImageRectangleByImageMatrix(RectF imgRect) {
+        imgRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+        mImageMatrix.mapRect(imgRect);
     }
 
     /**

@@ -428,7 +428,7 @@ public class CropOverlayView extends View {
      */
     private void initCropWindow() {
 
-        if (mBitmapRect.width() == 0 || mBitmapRect.height() == 0) {
+        if (mBitmapRect == null || mBitmapRect.width() == 0 || mBitmapRect.height() == 0) {
             return;
         }
 
@@ -551,14 +551,6 @@ public class CropOverlayView extends View {
                 rect.bottom -= adj;
             }
         }
-    }
-
-    /**
-     * Initialize the crop window here because we need the size of the view to have been determined.
-     */
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        initCropWindow();
     }
 
     /**
