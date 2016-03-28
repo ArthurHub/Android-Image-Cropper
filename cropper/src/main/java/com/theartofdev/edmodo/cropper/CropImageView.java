@@ -367,7 +367,7 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Set the crop window position and size to the given rectangle.<br>
-     * Image to crop must be first set before invoking this, for async after complete callback.
+     * Image to crop must be first set before invoking this, for async - after complete callback.
      *
      * @param rect window rectangle (position and size) relative to source bitmap
      */
@@ -377,32 +377,32 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Gets the crop window's position relative to the source Bitmap (not the image
-     * displayed in the CropImageView).
+     * displayed in the CropImageView) using the original image rotation.
      *
      * @return a Rect instance containing cropped area boundaries of the source Bitmap
      */
-    public Rect getActualCropRect() {
+    public Rect getCropRect() {
         if (mBitmap != null) {
 
-            // Get crop window position relative to the displayed image.
-            RectF cropWindowRect = mCropOverlayView.getCropWindowRect();
+            // get the points of the crop rectangle adjusted to source bitmap
+            float[] points = getCropPoints();
 
-            Matrix invertMatrix = new Matrix();
-            mImageMatrix.invert(invertMatrix);
-            invertMatrix.mapRect(cropWindowRect);
-
-            // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
-            cropWindowRect.left = Math.max(0f, cropWindowRect.left) * mLoadedSampleSize;
-            cropWindowRect.top = Math.max(0f, cropWindowRect.top) * mLoadedSampleSize;
-            cropWindowRect.right = Math.min(mBitmap.getWidth(), cropWindowRect.right) * mLoadedSampleSize;
-            cropWindowRect.bottom = Math.min(mBitmap.getHeight(), cropWindowRect.bottom) * mLoadedSampleSize;
-
-            return new Rect((int) cropWindowRect.left, (int) cropWindowRect.top, (int) cropWindowRect.right, (int) cropWindowRect.bottom);
+            // get the rectangle for the points (it may be larger than original if rotation is not stright)
+            int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
+            int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
+            return BitmapUtils.getRectFromPoints(points, orgWidth, orgHeight);
         } else {
             return null;
         }
     }
 
+    /**
+     * Gets the 4 points of crop window's position relative to the source Bitmap (not the image
+     * displayed in the CropImageView) using the original image rotation.<br>
+     * Note: the 4 points may not be a rectangle if the image was rotates to NOT stright angle (!= 90/180/270).
+     *
+     * @return 4 points (x0,y0,x1,y1,x2,y2,x3,y3) of cropped area boundaries
+     */
     public float[] getCropPoints() {
 
         // Get crop window position relative to the displayed image.
@@ -428,34 +428,6 @@ public class CropImageView extends FrameLayout {
         }
 
         return points;
-    }
-
-    /**
-     * Gets the crop window's position relative to the source Bitmap (not the image
-     * displayed in the CropImageView) using the original image rotation rotation - if the image was rotated after it
-     * was, this rotation is ignored.
-     *
-     * @return a Rect instance containing cropped area boundaries of the source Bitmap
-     */
-    @SuppressWarnings("SuspiciousNameCombination")
-    public Rect getActualCropRectNoRotation() {
-        if (mBitmap != null) {
-            Rect rect = getActualCropRect();
-            int rotateSide = mDegreesRotated / 90;
-            int bitmapWidth = mBitmap.getWidth() * mLoadedSampleSize;
-            int bitmapHeight = mBitmap.getHeight() * mLoadedSampleSize;
-            if (rotateSide == 1) {
-                rect.set(rect.top, bitmapWidth - rect.right, rect.bottom, bitmapWidth - rect.left);
-            } else if (rotateSide == 2) {
-                rect.set(bitmapWidth - rect.right, bitmapHeight - rect.bottom, bitmapWidth - rect.left, bitmapHeight - rect.top);
-            } else if (rotateSide == 3) {
-                rect.set(bitmapHeight - rect.bottom, rect.left, bitmapHeight - rect.top, rect.right);
-            }
-            rect.set(rect.left, rect.top, rect.right, rect.bottom);
-            return rect;
-        } else {
-            return null;
-        }
     }
 
     /**

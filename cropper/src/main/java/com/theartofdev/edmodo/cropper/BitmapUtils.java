@@ -202,19 +202,19 @@ final class BitmapUtils {
         return output;
     }
 
-    //region: Private methods
-
     /**
      * Get a rectangle for the given 4 points (x0,y0,x1,y1,x2,y2,x3,y3) by finding the min/max 2 points that
      * contains the given 4 points and is a stright rectangle.
      */
-    private static Rect getRectFromPoints(float[] points, int imageWidth, int imageHeight) {
+    public static Rect getRectFromPoints(float[] points, int imageWidth, int imageHeight) {
         int left = (int) Math.max(0, Math.min(Math.min(Math.min(points[0], points[2]), points[4]), points[6]));
         int top = (int) Math.max(0, Math.min(Math.min(Math.min(points[1], points[3]), points[5]), points[7]));
         int right = (int) Math.min(imageWidth, Math.max(Math.max(Math.max(points[0], points[2]), points[4]), points[6]));
         int bottom = (int) Math.min(imageHeight, Math.max(Math.max(Math.max(points[1], points[3]), points[5]), points[7]));
         return new Rect(left, top, right, bottom);
     }
+
+    //region: Private methods
 
     /**
      * Decode specific rectangle bitmap from stream using sampling to get bitmap with the requested limit.

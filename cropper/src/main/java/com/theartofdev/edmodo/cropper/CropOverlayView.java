@@ -457,7 +457,7 @@ public class CropOverlayView extends View {
 
             // If the image aspect ratio is wider than the crop aspect ratio,
             // then the image height is the determining initial length. Else, vice-versa.
-            float bitmapAspectRatio = (float) mBitmapRect.width() / (float) mBitmapRect.height();
+            float bitmapAspectRatio = mBitmapRect.width() / mBitmapRect.height();
             if (bitmapAspectRatio > mTargetAspectRatio) {
 
                 rect.top = mBitmapRect.top + verticalPadding;
