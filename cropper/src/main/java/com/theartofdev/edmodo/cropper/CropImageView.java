@@ -383,34 +383,45 @@ public class CropImageView extends FrameLayout {
      */
     public Rect getActualCropRect() {
         if (mBitmap != null) {
-            Rect displayedImageRect = BitmapUtils.getBitmapRect(mBitmap, mImageView, mImageView.getScaleType());
-
-            // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions.
-            Pair<Float, Float> scaleFactor = getScaleFactorWidth(displayedImageRect);
 
             // Get crop window position relative to the displayed image.
             RectF cropWindowRect = mCropOverlayView.getCropWindowRect();
-            float displayedCropLeft = cropWindowRect.left - displayedImageRect.left;
-            float displayedCropTop = cropWindowRect.top - displayedImageRect.top;
-            float displayedCropWidth = cropWindowRect.width();
-            float displayedCropHeight = cropWindowRect.height();
 
-            // Scale the crop window position to the actual size of the Bitmap.
-            float actualCropLeft = displayedCropLeft * scaleFactor.first;
-            float actualCropTop = displayedCropTop * scaleFactor.second;
-            float actualCropRight = actualCropLeft + displayedCropWidth * scaleFactor.first;
-            float actualCropBottom = actualCropTop + displayedCropHeight * scaleFactor.second;
+            Matrix invertMatrix = new Matrix();
+            mImageMatrix.invert(invertMatrix);
+            invertMatrix.mapRect(cropWindowRect);
 
             // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
-            actualCropLeft = Math.max(0f, actualCropLeft) * mLoadedSampleSize;
-            actualCropTop = Math.max(0f, actualCropTop) * mLoadedSampleSize;
-            actualCropRight = Math.min(mBitmap.getWidth(), actualCropRight) * mLoadedSampleSize;
-            actualCropBottom = Math.min(mBitmap.getHeight(), actualCropBottom) * mLoadedSampleSize;
+            cropWindowRect.left = Math.max(0f, cropWindowRect.left) * mLoadedSampleSize;
+            cropWindowRect.top = Math.max(0f, cropWindowRect.top) * mLoadedSampleSize;
+            cropWindowRect.right = Math.min(mBitmap.getWidth(), cropWindowRect.right) * mLoadedSampleSize;
+            cropWindowRect.bottom = Math.min(mBitmap.getHeight(), cropWindowRect.bottom) * mLoadedSampleSize;
 
-            return new Rect((int) actualCropLeft, (int) actualCropTop, (int) actualCropRight, (int) actualCropBottom);
+            return new Rect((int) cropWindowRect.left, (int) cropWindowRect.top, (int) cropWindowRect.right, (int) cropWindowRect.bottom);
         } else {
             return null;
         }
+    }
+
+    public float[] getCropPoints() {
+        // Get crop window position relative to the displayed image.
+        RectF cropWindowRect = mCropOverlayView.getCropWindowRect();
+
+        float[] points = new float[8];
+        points[0] = cropWindowRect.left * mLoadedSampleSize;
+        points[1] = cropWindowRect.top * mLoadedSampleSize;
+        points[2] = cropWindowRect.right * mLoadedSampleSize;
+        points[3] = cropWindowRect.top * mLoadedSampleSize;
+        points[4] = cropWindowRect.right * mLoadedSampleSize;
+        points[5] = cropWindowRect.bottom * mLoadedSampleSize;
+        points[6] = cropWindowRect.left * mLoadedSampleSize;
+        points[7] = cropWindowRect.bottom * mLoadedSampleSize;
+
+        Matrix invertMatrix = new Matrix();
+        mImageMatrix.invert(invertMatrix);
+        invertMatrix.mapPoints(points);
+
+        return points;
     }
 
     /**
@@ -471,7 +482,7 @@ public class CropImageView extends FrameLayout {
                         reqWidth,
                         reqHeight);
             } else {
-                return BitmapUtils.cropBitmap(mBitmap, getActualCropRect());
+                return BitmapUtils.cropBitmap(mBitmap, getCropPoints(), mDegreesRotated);
             }
         } else {
             return null;
@@ -544,7 +555,7 @@ public class CropImageView extends FrameLayout {
 
         mBitmapCroppingWorkerTask = mLoadedImageUri != null && mLoadedSampleSize > 1
                 ? new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getActualCropRectNoRotation(), cropShape, mDegreesRotated, reqWidth, reqHeight))
-                : new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getActualCropRect(), cropShape));
+                : new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getActualCropRect(), cropShape, mDegreesRotated));
         mBitmapCroppingWorkerTask.get().execute();
         setProgressBarVisibility();
     }

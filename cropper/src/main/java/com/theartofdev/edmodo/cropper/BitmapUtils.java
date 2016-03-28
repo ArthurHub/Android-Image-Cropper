@@ -195,8 +195,52 @@ final class BitmapUtils {
     /**
      * Crop image bitmap from given bitmap.
      */
-    public static Bitmap cropBitmap(Bitmap bitmap, Rect rect) {
-        return Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
+    public static Bitmap cropBitmap(Bitmap bitmap, Rect rect, int degreesRotated) {
+        if (degreesRotated == 0) {
+            return Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
+        } else {
+            Matrix matrix = new Matrix();
+            matrix.setRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
+            return Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height(), matrix, true);
+        }
+    }
+
+    /**
+     * Crop image bitmap from given bitmap using the given points in the original bitmap and the given rotation.<br>
+     * if the rotation is not 0,90,180 or 270 degrees then we must first crop a larger area of the image that
+     * contains the requires rectangle, rotate and then crop again a sub rectangle.
+     */
+    public static Bitmap cropBitmap(Bitmap bitmap, float[] points, int degreesRotated) {
+
+        int left = (int) Math.max(0, Math.min(Math.min(Math.min(points[0], points[2]), points[4]), points[6]));
+        int top = (int) Math.max(0, Math.min(Math.min(Math.min(points[1], points[3]), points[5]), points[7]));
+        int right = (int) Math.min(bitmap.getWidth(), Math.max(Math.max(Math.max(points[0], points[2]), points[4]), points[6]));
+        int bottom = (int) Math.min(bitmap.getHeight(), Math.max(Math.max(Math.max(points[1], points[3]), points[5]), points[7]));
+
+        Matrix matrix = new Matrix();
+        matrix.setRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
+        Bitmap result = Bitmap.createBitmap(bitmap, left, top, right - left, bottom - top, matrix, true);
+
+        // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
+        if (degreesRotated % 90 != 0) {
+            int adjLeft = 0, adjTop = 0, width = 0, height = 0;
+            double rads = Math.toRadians(degreesRotated);
+            int compareTo = degreesRotated < 90 || (degreesRotated > 180 && degreesRotated < 270) ? left : right;
+            for (int i = 0; i < points.length; i += 2)
+                if (((int) points[i]) == compareTo) {
+                    adjLeft = (int) Math.abs(Math.sin(rads) * (bottom - points[i + 1]));
+                    adjTop = (int) Math.abs(Math.cos(rads) * (points[i + 1] - top));
+                    width = (int) Math.abs((points[i + 1] - top) / Math.sin(rads));
+                    height = (int) Math.abs((bottom - points[i + 1]) / Math.cos(rads));
+                    break;
+                }
+
+            Bitmap bitmapTmp = result;
+            result = Bitmap.createBitmap(result, adjLeft, adjTop, width, height);
+            bitmapTmp.recycle();
+        }
+
+        return result;
     }
 
     /**
