@@ -555,7 +555,7 @@ public class CropImageView extends FrameLayout {
 
         mBitmapCroppingWorkerTask = mLoadedImageUri != null && mLoadedSampleSize > 1
                 ? new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getActualCropRectNoRotation(), cropShape, mDegreesRotated, reqWidth, reqHeight))
-                : new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getActualCropRect(), cropShape, mDegreesRotated));
+                : new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), cropShape, mDegreesRotated));
         mBitmapCroppingWorkerTask.get().execute();
         setProgressBarVisibility();
     }

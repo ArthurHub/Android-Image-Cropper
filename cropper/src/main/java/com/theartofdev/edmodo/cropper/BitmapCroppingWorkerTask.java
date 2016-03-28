@@ -53,6 +53,11 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
     private final Rect mRect;
 
     /**
+     * Required cropping 4 points (x0,y0,x1,y1,x2,y2,x3,y3)
+     */
+    private final float[] mCropPoints;
+
+    /**
      * The shape to crop the image
      */
     private final CropImageView.CropShape mCropShape;
@@ -73,11 +78,12 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
     private final int mReqHeight;
     //endregion
 
-    public BitmapCroppingWorkerTask(CropImageView cropImageView, Bitmap bitmap, Rect rect, CropImageView.CropShape cropShape, int degreesRotated) {
+    public BitmapCroppingWorkerTask(CropImageView cropImageView, Bitmap bitmap, float[] cropPoints, CropImageView.CropShape cropShape, int degreesRotated) {
         mCropImageViewReference = new WeakReference<>(cropImageView);
         mContext = cropImageView.getContext();
         mBitmap = bitmap;
-        mRect = rect;
+        mRect = null;
+        mCropPoints = cropPoints;
         mCropShape = cropShape;
         mUri = null;
         mDegreesRotated = degreesRotated;
@@ -95,6 +101,7 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
         mReqWidth = reqWidth;
         mReqHeight = reqHeight;
         mBitmap = null;
+        mCropPoints = null;
     }
 
     /**
@@ -125,7 +132,7 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
                             mReqWidth,
                             mReqHeight);
                 } else if (mBitmap != null) {
-                    bitmap = BitmapUtils.cropBitmap(mBitmap, mRect, mDegreesRotated);
+                    bitmap = BitmapUtils.cropBitmap(mBitmap, mCropPoints, mDegreesRotated);
                 }
                 if (bitmap != null && mCropShape == CropImageView.CropShape.OVAL) {
                     bitmap = BitmapUtils.toOvalBitmap(bitmap);

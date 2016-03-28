@@ -28,8 +28,6 @@ import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.view.View;
-import android.widget.ImageView;
 
 import java.io.Closeable;
 import java.io.File;
@@ -40,46 +38,6 @@ import java.io.InputStream;
  * Utility class that deals with operations with an ImageView.
  */
 final class BitmapUtils {
-
-    /**
-     * Gets the rectangular position of a Bitmap if it were placed inside a View.
-     *
-     * @param bitmap the Bitmap
-     * @param view the parent View of the Bitmap
-     * @param scaleType the desired scale type
-     * @return the rectangular position of the Bitmap
-     */
-    public static Rect getBitmapRect(Bitmap bitmap, View view, ImageView.ScaleType scaleType) {
-
-        final int bitmapWidth = bitmap.getWidth();
-        final int bitmapHeight = bitmap.getHeight();
-        final int viewWidth = view.getWidth();
-        final int viewHeight = view.getHeight();
-
-        switch (scaleType) {
-            case FIT_CENTER:
-                return getBitmapRectFitCenterHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
-            case CENTER_INSIDE:
-            default:
-                return getBitmapRectCenterInsideHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
-        }
-    }
-
-    /**
-     * Gets the rectangular position of a Bitmap if it were placed inside a View.
-     *
-     * @param bitmapWidth the Bitmap's width
-     * @param bitmapHeight the Bitmap's height
-     * @param viewWidth the parent View's width
-     * @param viewHeight the parent View's height
-     * @param scaleType the desired scale type
-     * @return the rectangular position of the Bitmap
-     */
-    public static Rect getBitmapRect(int bitmapWidth, int bitmapHeight, int viewWidth, int viewHeight, ImageView.ScaleType scaleType) {
-        return scaleType == ImageView.ScaleType.FIT_CENTER
-                ? getBitmapRectFitCenterHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight)
-                : getBitmapRectCenterInsideHelper(bitmapWidth, bitmapHeight, viewWidth, viewHeight);
-    }
 
     /**
      * Rotate the given image by reading the Exif value of the image (uri).<br>
@@ -187,22 +145,8 @@ final class BitmapUtils {
     public static Bitmap cropBitmap(Context context, Uri loadedImageUri, Rect rect, int degreesRotated, int reqWidth, int reqHeight) {
         int width = reqWidth > 0 ? reqWidth : rect.width();
         int height = reqHeight > 0 ? reqHeight : rect.height();
-        BitmapUtils.DecodeBitmapResult result =
-                BitmapUtils.decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
+        BitmapUtils.DecodeBitmapResult result = BitmapUtils.decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
         return BitmapUtils.rotateBitmap(result.bitmap, degreesRotated);
-    }
-
-    /**
-     * Crop image bitmap from given bitmap.
-     */
-    public static Bitmap cropBitmap(Bitmap bitmap, Rect rect, int degreesRotated) {
-        if (degreesRotated == 0) {
-            return Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
-        } else {
-            Matrix matrix = new Matrix();
-            matrix.setRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
-            return Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height(), matrix, true);
-        }
     }
 
     /**
@@ -274,7 +218,7 @@ final class BitmapUtils {
      * Calculate the largest inSampleSize value that is a power of 2 and keeps both
      * height and width larger than the requested height and width.
      */
-    public static int calculateInSampleSize(int width, int height, int reqWidth, int reqHeight) {
+    private static int calculateInSampleSize(int width, int height, int reqWidth, int reqHeight) {
         int inSampleSize = 1;
         if (height > reqHeight || width > reqWidth) {
             final int halfHeight = height / 2;
@@ -290,7 +234,7 @@ final class BitmapUtils {
      * Get {@link java.io.File} object for the given Android URI.<br>
      * Use content resolver to get real path if direct path doesn't return valid file.
      */
-    public static File getFileFromUri(Context context, Uri uri) {
+    private static File getFileFromUri(Context context, Uri uri) {
 
         // first try by direct path
         File file = new File(uri.getPath());
@@ -329,7 +273,7 @@ final class BitmapUtils {
      * Rotate the given bitmap by the given degrees.<br>
      * New bitmap is created and the old one is recycled.
      */
-    public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
+    private static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
         if (degrees > 0) {
             Matrix matrix = new Matrix();
             matrix.setRotate(degrees);
@@ -347,121 +291,13 @@ final class BitmapUtils {
      *
      * @param closeable the closable object to close
      */
-    public static void closeSafe(Closeable closeable) {
+    private static void closeSafe(Closeable closeable) {
         if (closeable != null) {
             try {
                 closeable.close();
             } catch (IOException ignored) {
             }
         }
-    }
-
-    /**
-     * Helper that does the work of the above functions. Gets the rectangular
-     * position of a Bitmap if it were placed inside a View with scale type set
-     * to {@link android.widget.ImageView.ScaleType #CENTER_INSIDE}.
-     *
-     * @param bitmapWidth the Bitmap's width
-     * @param bitmapHeight the Bitmap's height
-     * @param viewWidth the parent View's width
-     * @param viewHeight the parent View's height
-     * @return the rectangular position of the Bitmap
-     */
-    private static Rect getBitmapRectCenterInsideHelper(int bitmapWidth, int bitmapHeight, int viewWidth, int viewHeight) {
-        double resultWidth;
-        double resultHeight;
-        int resultX;
-        int resultY;
-
-        double viewToBitmapWidthRatio = Double.POSITIVE_INFINITY;
-        double viewToBitmapHeightRatio = Double.POSITIVE_INFINITY;
-
-        // Checks if either width or height needs to be fixed
-        if (viewWidth < bitmapWidth) {
-            viewToBitmapWidthRatio = (double) viewWidth / (double) bitmapWidth;
-        }
-        if (viewHeight < bitmapHeight) {
-            viewToBitmapHeightRatio = (double) viewHeight / (double) bitmapHeight;
-        }
-
-        // If either needs to be fixed, choose smallest ratio and calculate from there
-        if (viewToBitmapWidthRatio != Double.POSITIVE_INFINITY || viewToBitmapHeightRatio != Double.POSITIVE_INFINITY) {
-            if (viewToBitmapWidthRatio <= viewToBitmapHeightRatio) {
-                resultWidth = viewWidth;
-                resultHeight = bitmapHeight * resultWidth / bitmapWidth;
-            } else {
-                resultHeight = viewHeight;
-                resultWidth = bitmapWidth * resultHeight / bitmapHeight;
-            }
-        } else {
-            // Otherwise, the picture is within frame layout bounds. Desired width is simply picture size
-            resultHeight = bitmapHeight;
-            resultWidth = bitmapWidth;
-        }
-
-        // Calculate the position of the bitmap inside the ImageView.
-        if (resultWidth == viewWidth) {
-            resultX = 0;
-            resultY = (int) Math.round((viewHeight - resultHeight) / 2);
-        } else if (resultHeight == viewHeight) {
-            resultX = (int) Math.round((viewWidth - resultWidth) / 2);
-            resultY = 0;
-        } else {
-            resultX = (int) Math.round((viewWidth - resultWidth) / 2);
-            resultY = (int) Math.round((viewHeight - resultHeight) / 2);
-        }
-
-        return new Rect(resultX, resultY, resultX + (int) Math.ceil(resultWidth), resultY + (int) Math.ceil(resultHeight));
-    }
-
-    /**
-     * Helper that does the work of the above functions. Gets the rectangular
-     * position of a Bitmap if it were placed inside a View with scale type set
-     * to {@link ImageView.ScaleType#FIT_CENTER}.
-     *
-     * @param bitmapWidth the Bitmap's width
-     * @param bitmapHeight the Bitmap's height
-     * @param viewWidth the parent View's width
-     * @param viewHeight the parent View's height
-     * @return the rectangular position of the Bitmap
-     */
-    private static Rect getBitmapRectFitCenterHelper(int bitmapWidth, int bitmapHeight, int viewWidth, int viewHeight) {
-        double resultWidth;
-        double resultHeight;
-        int resultX;
-        int resultY;
-
-        double viewToBitmapWidthRatio = (double) viewWidth / bitmapWidth;
-        double viewToBitmapHeightRatio = (double) viewHeight / bitmapHeight;
-
-        // If either needs to be fixed, choose smallest ratio and calculate from
-        // there
-        if (viewToBitmapWidthRatio <= viewToBitmapHeightRatio) {
-            resultWidth = viewWidth;
-            resultHeight = bitmapHeight * resultWidth / bitmapWidth;
-        } else {
-            resultHeight = viewHeight;
-            resultWidth = bitmapWidth * resultHeight / bitmapHeight;
-        }
-
-        // Calculate the position of the bitmap inside the ImageView.
-        if (resultWidth == viewWidth) {
-            resultX = 0;
-            resultY = (int) Math.round((viewHeight - resultHeight) / 2);
-        } else if (resultHeight == viewHeight) {
-            resultX = (int) Math.round((viewWidth - resultWidth) / 2);
-            resultY = 0;
-        } else {
-            resultX = (int) Math.round((viewWidth - resultWidth) / 2);
-            resultY = (int) Math.round((viewHeight - resultHeight) / 2);
-        }
-
-        final Rect result = new Rect(resultX,
-                resultY,
-                resultX + (int) Math.ceil(resultWidth),
-                resultY + (int) Math.ceil(resultHeight));
-
-        return result;
     }
 
     //region: Inner class: DecodeBitmapResult
