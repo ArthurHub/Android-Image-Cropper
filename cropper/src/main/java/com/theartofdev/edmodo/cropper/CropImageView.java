@@ -404,22 +404,28 @@ public class CropImageView extends FrameLayout {
     }
 
     public float[] getCropPoints() {
+
         // Get crop window position relative to the displayed image.
         RectF cropWindowRect = mCropOverlayView.getCropWindowRect();
 
-        float[] points = new float[8];
-        points[0] = cropWindowRect.left * mLoadedSampleSize;
-        points[1] = cropWindowRect.top * mLoadedSampleSize;
-        points[2] = cropWindowRect.right * mLoadedSampleSize;
-        points[3] = cropWindowRect.top * mLoadedSampleSize;
-        points[4] = cropWindowRect.right * mLoadedSampleSize;
-        points[5] = cropWindowRect.bottom * mLoadedSampleSize;
-        points[6] = cropWindowRect.left * mLoadedSampleSize;
-        points[7] = cropWindowRect.bottom * mLoadedSampleSize;
+        float[] points = new float[]{
+                cropWindowRect.left,
+                cropWindowRect.top,
+                cropWindowRect.right,
+                cropWindowRect.top,
+                cropWindowRect.right,
+                cropWindowRect.bottom,
+                cropWindowRect.left,
+                cropWindowRect.bottom
+        };
 
         Matrix invertMatrix = new Matrix();
         mImageMatrix.invert(invertMatrix);
         invertMatrix.mapPoints(points);
+
+        for (int i = 0; i < points.length; i++) {
+            points[i] *= mLoadedSampleSize;
+        }
 
         return points;
     }
@@ -474,13 +480,9 @@ public class CropImageView extends FrameLayout {
     public Bitmap getCroppedImage(int reqWidth, int reqHeight) {
         if (mBitmap != null) {
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
-                return BitmapUtils.cropBitmap(
-                        getContext(),
-                        mLoadedImageUri,
-                        getActualCropRectNoRotation(),
-                        mDegreesRotated,
-                        reqWidth,
-                        reqHeight);
+                int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
+                int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
+                return BitmapUtils.cropBitmap(getContext(), mLoadedImageUri, getCropPoints(), mDegreesRotated, orgWidth, orgHeight, reqWidth, reqHeight);
             } else {
                 return BitmapUtils.cropBitmap(mBitmap, getCropPoints(), mDegreesRotated);
             }
@@ -547,14 +549,17 @@ public class CropImageView extends FrameLayout {
         if (mOnGetCroppedImageCompleteListener == null) {
             throw new IllegalArgumentException("OnGetCroppedImageCompleteListener is not set");
         }
+
         BitmapCroppingWorkerTask currentTask = mBitmapCroppingWorkerTask != null ? mBitmapCroppingWorkerTask.get() : null;
         if (currentTask != null) {
             // cancel previous cropping
             currentTask.cancel(true);
         }
 
+        int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
+        int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
         mBitmapCroppingWorkerTask = mLoadedImageUri != null && mLoadedSampleSize > 1
-                ? new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getActualCropRectNoRotation(), cropShape, mDegreesRotated, reqWidth, reqHeight))
+                ? new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(), cropShape, mDegreesRotated, orgWidth, orgHeight, reqWidth, reqHeight))
                 : new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), cropShape, mDegreesRotated));
         mBitmapCroppingWorkerTask.get().execute();
         setProgressBarVisibility();
@@ -896,9 +901,12 @@ public class CropImageView extends FrameLayout {
             origParams.height = mLayoutHeight;
             setLayoutParams(origParams);
 
-            RectF transformedRect = applyImageMatrix(r - l, b - t);
-            updateBitmapRect(transformedRect);
-
+            if (mBitmap != null) {
+                RectF transformedRect = applyImageMatrix(r - l, b - t);
+                updateBitmapRect(transformedRect);
+            } else {
+                updateBitmapRect(CropDefaults.EMPTY_RECT_F);
+            }
         } else {
             updateBitmapRect(CropDefaults.EMPTY_RECT_F);
         }

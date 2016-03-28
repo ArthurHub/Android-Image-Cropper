@@ -95,8 +95,8 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
                 if (!isCancelled()) {
 
                     BitmapUtils.RotateBitmapResult rotateResult = mPreSetRotation != null
-                            ? BitmapUtils.rotateBitmapResult(decodeResult.bitmap, mPreSetRotation)
-                            : BitmapUtils.rotateBitmapByExif(mContext, decodeResult.bitmap, mUri);
+                            ? BitmapUtils.rotateBitmap(decodeResult.bitmap, mPreSetRotation)
+                            : BitmapUtils.rotateBitmapByExif(decodeResult.bitmap, mContext, mUri);
 
                     return new Result(mUri, rotateResult.bitmap, decodeResult.sampleSize, rotateResult.degrees);
                 }

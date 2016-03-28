@@ -14,7 +14,6 @@ package com.theartofdev.edmodo.cropper;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 
@@ -48,11 +47,6 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
     private final Context mContext;
 
     /**
-     * Required cropping rectangle
-     */
-    private final Rect mRect;
-
-    /**
      * Required cropping 4 points (x0,y0,x1,y1,x2,y2,x3,y3)
      */
     private final float[] mCropPoints;
@@ -66,6 +60,16 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
      * Degrees the image was rotated after loading
      */
     private final int mDegreesRotated;
+
+    /**
+     * the original width of the image to be cropped (for image loaded from URI)
+     */
+    private final int mOrgWidth;
+
+    /**
+     * the original height of the image to be cropped (for image loaded from URI)
+     */
+    private final int mOrgHeight;
 
     /**
      * required width of the cropping image
@@ -82,26 +86,28 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
         mCropImageViewReference = new WeakReference<>(cropImageView);
         mContext = cropImageView.getContext();
         mBitmap = bitmap;
-        mRect = null;
         mCropPoints = cropPoints;
         mCropShape = cropShape;
         mUri = null;
         mDegreesRotated = degreesRotated;
+        mOrgWidth = 0;
+        mOrgHeight = 0;
         mReqWidth = 0;
         mReqHeight = 0;
     }
 
-    public BitmapCroppingWorkerTask(CropImageView cropImageView, Uri uri, Rect rect, CropImageView.CropShape cropShape, int degreesRotated, int reqWidth, int reqHeight) {
+    public BitmapCroppingWorkerTask(CropImageView cropImageView, Uri uri, float[] cropPoints, CropImageView.CropShape cropShape, int degreesRotated, int orgWidth, int orgHeight, int reqWidth, int reqHeight) {
         mCropImageViewReference = new WeakReference<>(cropImageView);
         mContext = cropImageView.getContext();
         mUri = uri;
-        mRect = rect;
+        mCropPoints = cropPoints;
         mCropShape = cropShape;
         mDegreesRotated = degreesRotated;
+        mOrgWidth = orgWidth;
+        mOrgHeight = orgHeight;
         mReqWidth = reqWidth;
         mReqHeight = reqHeight;
         mBitmap = null;
-        mCropPoints = null;
     }
 
     /**
@@ -124,13 +130,7 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
 
                 Bitmap bitmap = null;
                 if (mUri != null) {
-                    bitmap = BitmapUtils.cropBitmap(
-                            mContext,
-                            mUri,
-                            mRect,
-                            mDegreesRotated,
-                            mReqWidth,
-                            mReqHeight);
+                    bitmap = BitmapUtils.cropBitmap(mContext, mUri, mCropPoints, mDegreesRotated, mOrgWidth, mOrgHeight, mReqWidth, mReqHeight);
                 } else if (mBitmap != null) {
                     bitmap = BitmapUtils.cropBitmap(mBitmap, mCropPoints, mDegreesRotated);
                 }

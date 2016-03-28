@@ -40,11 +40,19 @@ import java.io.InputStream;
 final class BitmapUtils {
 
     /**
+     * Rotate the given bitmap by the given degrees.<br>
+     * New bitmap is created and the old one is recycled.
+     */
+    public static RotateBitmapResult rotateBitmap(Bitmap bitmap, int degrees) {
+        return new RotateBitmapResult(rotateBitmapInt(bitmap, degrees), degrees);
+    }
+
+    /**
      * Rotate the given image by reading the Exif value of the image (uri).<br>
      * If no rotation is required the image will not be rotated.<br>
      * New bitmap is created and the old one is recycled.
      */
-    public static RotateBitmapResult rotateBitmapByExif(Context context, Bitmap bitmap, Uri uri) {
+    public static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, Context context, Uri uri) {
         try {
             File file = getFileFromUri(context, uri);
             if (file.exists()) {
@@ -78,7 +86,7 @@ final class BitmapUtils {
                 degrees = 0;
                 break;
         }
-        Bitmap rotatedBitmap = rotateBitmap(bitmap, degrees);
+        Bitmap rotatedBitmap = rotateBitmapInt(bitmap, degrees);
         return new RotateBitmapResult(rotatedBitmap, degrees);
     }
 
@@ -95,7 +103,7 @@ final class BitmapUtils {
             // First decode with inJustDecodeBounds=true to check dimensions
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(stream, new Rect(0, 0, 0, 0), options);
+            BitmapFactory.decodeStream(stream, CropDefaults.EMPTY_RECT, options);
             options.inJustDecodeBounds = false;
 
             // Calculate inSampleSize
@@ -104,7 +112,7 @@ final class BitmapUtils {
             // Decode bitmap with inSampleSize set
             closeSafe(stream);
             stream = resolver.openInputStream(uri);
-            Bitmap bitmap = BitmapFactory.decodeStream(stream, new Rect(0, 0, 0, 0), options);
+            Bitmap bitmap = BitmapFactory.decodeStream(stream, CropDefaults.EMPTY_RECT, options);
 
             return new DecodeBitmapResult(bitmap, options.inSampleSize);
 
@@ -113,40 +121,6 @@ final class BitmapUtils {
         } finally {
             closeSafe(stream);
         }
-    }
-
-    /**
-     * Decode specific rectangle bitmap from stream using sampling to get bitmap with the requested limit.
-     */
-    public static DecodeBitmapResult decodeSampledBitmapRegion(Context context, Uri uri, Rect rect, int reqWidth, int reqHeight) {
-        InputStream stream = null;
-        try {
-            ContentResolver resolver = context.getContentResolver();
-            stream = resolver.openInputStream(uri);
-
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = calculateInSampleSize(rect.width(), rect.height(), reqWidth, reqHeight);
-
-            BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(stream, false);
-            Bitmap bitmap = decoder.decodeRegion(rect, options);
-
-            return new DecodeBitmapResult(bitmap, options.inSampleSize);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load sampled bitmap", e);
-        } finally {
-            closeSafe(stream);
-        }
-    }
-
-    /**
-     * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.
-     */
-    public static Bitmap cropBitmap(Context context, Uri loadedImageUri, Rect rect, int degreesRotated, int reqWidth, int reqHeight) {
-        int width = reqWidth > 0 ? reqWidth : rect.width();
-        int height = reqHeight > 0 ? reqHeight : rect.height();
-        BitmapUtils.DecodeBitmapResult result = BitmapUtils.decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
-        return BitmapUtils.rotateBitmap(result.bitmap, degreesRotated);
     }
 
     /**
@@ -156,32 +130,46 @@ final class BitmapUtils {
      */
     public static Bitmap cropBitmap(Bitmap bitmap, float[] points, int degreesRotated) {
 
-        int left = (int) Math.max(0, Math.min(Math.min(Math.min(points[0], points[2]), points[4]), points[6]));
-        int top = (int) Math.max(0, Math.min(Math.min(Math.min(points[1], points[3]), points[5]), points[7]));
-        int right = (int) Math.min(bitmap.getWidth(), Math.max(Math.max(Math.max(points[0], points[2]), points[4]), points[6]));
-        int bottom = (int) Math.min(bitmap.getHeight(), Math.max(Math.max(Math.max(points[1], points[3]), points[5]), points[7]));
+        // get the rectangle in original image that contains the required cropped area (larger for non rectengular crop)
+        Rect rect = getRectFromPoints(points, bitmap.getWidth(), bitmap.getHeight());
 
+        // crop and rotate the cropped image in one operation
         Matrix matrix = new Matrix();
         matrix.setRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
-        Bitmap result = Bitmap.createBitmap(bitmap, left, top, right - left, bottom - top, matrix, true);
+        Bitmap result = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height(), matrix, true);
 
         // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
         if (degreesRotated % 90 != 0) {
-            int adjLeft = 0, adjTop = 0, width = 0, height = 0;
-            double rads = Math.toRadians(degreesRotated);
-            int compareTo = degreesRotated < 90 || (degreesRotated > 180 && degreesRotated < 270) ? left : right;
-            for (int i = 0; i < points.length; i += 2)
-                if (((int) points[i]) == compareTo) {
-                    adjLeft = (int) Math.abs(Math.sin(rads) * (bottom - points[i + 1]));
-                    adjTop = (int) Math.abs(Math.cos(rads) * (points[i + 1] - top));
-                    width = (int) Math.abs((points[i + 1] - top) / Math.sin(rads));
-                    height = (int) Math.abs((bottom - points[i + 1]) / Math.cos(rads));
-                    break;
-                }
 
-            Bitmap bitmapTmp = result;
-            result = Bitmap.createBitmap(result, adjLeft, adjTop, width, height);
-            bitmapTmp.recycle();
+            // extra crop because non rectengular crop cannot be done directly on the image without rotating first
+            result = cropForRotatedImage(result, points, rect, degreesRotated);
+        }
+
+        return result;
+    }
+
+    /**
+     * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.
+     */
+    public static Bitmap cropBitmap(Context context, Uri loadedImageUri, float[] points, int degreesRotated, int orgWidth, int orgHeight, int reqWidth, int reqHeight) {
+
+        // get the rectangle in original image that contains the required cropped area (larger for non rectengular crop)
+        Rect rect = getRectFromPoints(points, orgWidth, orgHeight);
+
+        int width = reqWidth > 0 ? reqWidth : rect.width();
+        int height = reqHeight > 0 ? reqHeight : rect.height();
+
+        // decode only the required image from URI, optionally sub-sampling if reqWidth/reqHeight is given.
+        Bitmap result = decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
+
+        // rotate the decoded region by the required amount
+        result = rotateBitmapInt(result, degreesRotated);
+
+        // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
+        if (degreesRotated % 90 != 0) {
+
+            // extra crop because non rectengular crop cannot be done directly on the image without rotating first
+            result = cropForRotatedImage(result, points, rect, degreesRotated);
         }
 
         return result;
@@ -214,6 +202,73 @@ final class BitmapUtils {
         return output;
     }
 
+    //region: Private methods
+
+    /**
+     * Get a rectangle for the given 4 points (x0,y0,x1,y1,x2,y2,x3,y3) by finding the min/max 2 points that
+     * contains the given 4 points and is a stright rectangle.
+     */
+    private static Rect getRectFromPoints(float[] points, int imageWidth, int imageHeight) {
+        int left = (int) Math.max(0, Math.min(Math.min(Math.min(points[0], points[2]), points[4]), points[6]));
+        int top = (int) Math.max(0, Math.min(Math.min(Math.min(points[1], points[3]), points[5]), points[7]));
+        int right = (int) Math.min(imageWidth, Math.max(Math.max(Math.max(points[0], points[2]), points[4]), points[6]));
+        int bottom = (int) Math.min(imageHeight, Math.max(Math.max(Math.max(points[1], points[3]), points[5]), points[7]));
+        return new Rect(left, top, right, bottom);
+    }
+
+    /**
+     * Decode specific rectangle bitmap from stream using sampling to get bitmap with the requested limit.
+     */
+    private static Bitmap decodeSampledBitmapRegion(Context context, Uri uri, Rect rect, int reqWidth, int reqHeight) {
+        InputStream stream = null;
+        try {
+            ContentResolver resolver = context.getContentResolver();
+            stream = resolver.openInputStream(uri);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = calculateInSampleSize(rect.width(), rect.height(), reqWidth, reqHeight);
+
+            BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(stream, false);
+            Bitmap bitmap = decoder.decodeRegion(rect, options);
+            decoder.recycle();
+
+            return bitmap;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load sampled bitmap", e);
+        } finally {
+            closeSafe(stream);
+        }
+    }
+
+    /**
+     * Special crop of bitmap rotated by not stright angle, in this case the original crop bitmap contains parts
+     * beyond the required crop area, this method crops the already cropped and rotated bitmap to the final
+     * rectangle.<br>
+     * Note: rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping.
+     */
+    private static Bitmap cropForRotatedImage(Bitmap bitmap, float[] points, Rect rect, int degreesRotated) {
+        if (degreesRotated % 90 != 0) {
+
+            int adjLeft = 0, adjTop = 0, width = 0, height = 0;
+            double rads = Math.toRadians(degreesRotated);
+            int compareTo = degreesRotated < 90 || (degreesRotated > 180 && degreesRotated < 270) ? rect.left : rect.right;
+            for (int i = 0; i < points.length; i += 2)
+                if (((int) points[i]) == compareTo) {
+                    adjLeft = (int) Math.abs(Math.sin(rads) * (rect.bottom - points[i + 1]));
+                    adjTop = (int) Math.abs(Math.cos(rads) * (points[i + 1] - rect.top));
+                    width = (int) Math.abs((points[i + 1] - rect.top) / Math.sin(rads));
+                    height = (int) Math.abs((rect.bottom - points[i + 1]) / Math.cos(rads));
+                    break;
+                }
+
+            Bitmap bitmapTmp = bitmap;
+            bitmap = Bitmap.createBitmap(bitmap, adjLeft, adjTop, width, height);
+            bitmapTmp.recycle();
+        }
+        return bitmap;
+    }
+
     /**
      * Calculate the largest inSampleSize value that is a power of 2 and keeps both
      * height and width larger than the requested height and width.
@@ -231,7 +286,7 @@ final class BitmapUtils {
     }
 
     /**
-     * Get {@link java.io.File} object for the given Android URI.<br>
+     * Get {@link File} object for the given Android URI.<br>
      * Use content resolver to get real path if direct path doesn't return valid file.
      */
     private static File getFileFromUri(Context context, Uri uri) {
@@ -265,15 +320,7 @@ final class BitmapUtils {
      * Rotate the given bitmap by the given degrees.<br>
      * New bitmap is created and the old one is recycled.
      */
-    public static RotateBitmapResult rotateBitmapResult(Bitmap bitmap, int degrees) {
-        return new RotateBitmapResult(rotateBitmap(bitmap, degrees), degrees);
-    }
-
-    /**
-     * Rotate the given bitmap by the given degrees.<br>
-     * New bitmap is created and the old one is recycled.
-     */
-    private static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
+    private static Bitmap rotateBitmapInt(Bitmap bitmap, int degrees) {
         if (degrees > 0) {
             Matrix matrix = new Matrix();
             matrix.setRotate(degrees);
@@ -299,6 +346,7 @@ final class BitmapUtils {
             }
         }
     }
+    //endregion
 
     //region: Inner class: DecodeBitmapResult
 
