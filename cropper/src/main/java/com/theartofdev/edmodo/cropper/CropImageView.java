@@ -436,7 +436,16 @@ public class CropImageView extends FrameLayout {
      * @return a new Bitmap representing the cropped image
      */
     public Bitmap getCroppedImage() {
-        return getCroppedImage(0, 0);
+        return getCroppedImage(CropShape.RECTANGLE, 0, 0);
+    }
+
+    /**
+     * Gets the cropped image based on the current crop window.
+     *
+     * @return a new Bitmap representing the cropped image
+     */
+    public Bitmap getCroppedImage(CropShape cropShape) {
+        return getCroppedImage(cropShape, 0, 0);
     }
 
     /**
@@ -449,34 +458,23 @@ public class CropImageView extends FrameLayout {
      *
      * @return a new Bitmap representing the cropped image
      */
-    public Bitmap getCroppedImage(int reqWidth, int reqHeight) {
+    public Bitmap getCroppedImage(CropShape cropShape, int reqWidth, int reqHeight) {
+        Bitmap croppedBitmap = null;
         if (mBitmap != null) {
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
                 int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
                 int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
-                return BitmapUtils.cropBitmap(getContext(), mLoadedImageUri, getCropPoints(), mDegreesRotated, orgWidth, orgHeight, reqWidth, reqHeight);
+                croppedBitmap = BitmapUtils.cropBitmap(getContext(), mLoadedImageUri, getCropPoints(), mDegreesRotated, orgWidth, orgHeight, reqWidth, reqHeight);
             } else {
-                return BitmapUtils.cropBitmap(mBitmap, getCropPoints(), mDegreesRotated);
+                croppedBitmap = BitmapUtils.cropBitmap(mBitmap, getCropPoints(), mDegreesRotated);
             }
-        } else {
-            return null;
         }
-    }
 
-    /**
-     * Gets the cropped circle image based on the current crop selection.<br>
-     * Same as {@link #getCroppedImage()} (as the bitmap is rectangular by nature) but the pixels beyond the
-     * oval crop will be transparent.
-     *
-     * @return a new Circular Bitmap representing the cropped image
-     */
-    public Bitmap getCroppedOvalImage() {
-        if (mBitmap != null) {
-            Bitmap cropped = getCroppedImage();
-            return BitmapUtils.toOvalBitmap(cropped);
-        } else {
-            return null;
+        if (cropShape == CropShape.OVAL) {
+            croppedBitmap = BitmapUtils.toOvalBitmap(croppedBitmap);
         }
+
+        return croppedBitmap;
     }
 
     /**
