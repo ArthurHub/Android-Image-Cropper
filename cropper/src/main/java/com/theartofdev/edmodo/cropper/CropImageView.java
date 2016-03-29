@@ -1,15 +1,14 @@
-/*
- * Copyright 2013, Edmodo, Inc. 
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the License.
- * You may obtain a copy of the License in the LICENSE file, or at:
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" 
- * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
- * governing permissions and limitations under the License. 
- */
+// "Therefore those skilled at the unorthodox
+// are infinite as heaven and earth,
+// inexhaustible as the great rivers.
+// When they come to an end,
+// they begin again,
+// like the days and months;
+// they die and are reborn,
+// like the four seasons."
+//
+// - Sun Tsu,
+// "The Art of War"
 
 package com.theartofdev.edmodo.cropper;
 
@@ -40,7 +39,7 @@ import java.lang.ref.WeakReference;
 /**
  * Custom view that provides cropping capabilities to an image.
  */
-public class CropImageView extends FrameLayout {
+public class CropImageView extends FrameLayout implements CropOverlayView.CropWindowChangeListener {
 
     //region: Fields and Consts
 
@@ -111,6 +110,11 @@ public class CropImageView extends FrameLayout {
      * The sample size the image was loaded by if was loaded by URI
      */
     private int mLoadedSampleSize = 1;
+
+    /**
+     * The current zoom level to to scale the cropping image
+     */
+    private float mZoom = 1;
 
     /**
      * Task used to load bitmap async from UI thread
@@ -197,6 +201,7 @@ public class CropImageView extends FrameLayout {
         mImageView.setScaleType(ImageView.ScaleType.MATRIX);
 
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
+        mCropOverlayView.setCropWindowChangeListener(this);
         mCropOverlayView.setInitialAttributeValues(
                 cropShape, snapRadius, touchRadius, guidelines,
                 fixAspectRatio, aspectRatioX, aspectRatioY,
@@ -860,6 +865,7 @@ public class CropImageView extends FrameLayout {
         }
     }
 
+    @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
 
         super.onLayout(changed, l, t, r, b);
@@ -879,6 +885,35 @@ public class CropImageView extends FrameLayout {
             }
         } else {
             updateBitmapRect(CropDefaults.EMPTY_RECT_F);
+        }
+    }
+
+    @Override
+    public void onCropWindowChanged(boolean inProgress) {
+        if (!inProgress) {
+            int width = mImageView.getWidth();
+            int height = mImageView.getHeight();
+            RectF cropRect = mCropOverlayView.getCropWindowRect();
+
+            float newZoom = mZoom;
+            if (mZoom < 2.6 && cropRect.width() < width * 0.4 && cropRect.height() < height * 0.4) {
+                newZoom = Math.min(3.5f, newZoom + .6f);
+            } else if (mZoom > 1 && cropRect.width() > width * 0.7 || cropRect.height() > height * 0.7) {
+                newZoom = Math.max(1, newZoom - .6f);
+            }
+
+            if (mZoom != newZoom) {
+                float zoomChange = newZoom / mZoom;
+                float xCenterOffset = width / 2 - cropRect.centerX();
+                float yCenterOffset = height / 2 - cropRect.centerY();
+                cropRect.offset(xCenterOffset - xCenterOffset * zoomChange,
+                        yCenterOffset - yCenterOffset * zoomChange);
+                cropRect.inset((cropRect.width() - cropRect.width() * zoomChange) / 2f,
+                        (cropRect.height() - cropRect.height() * zoomChange) / 2f);
+                mCropOverlayView.setCropWindowRect(cropRect);
+                mZoom = newZoom;
+                requestLayout();
+            }
         }
     }
 
@@ -910,6 +945,15 @@ public class CropImageView extends FrameLayout {
         if (mScaleType == ImageView.ScaleType.FIT_CENTER || scale < 1) {
             mImageMatrix.postScale(scale, scale, imgRect.centerX(), imgRect.centerY());
             mapImageRectangleByImageMatrix(imgRect);
+        }
+
+        if (mZoom > 1) {
+            RectF cropRect = mCropOverlayView.getCropWindowRect();
+            mImageMatrix.postScale(mZoom, mZoom, imgRect.centerX(), imgRect.centerY());
+            mapImageRectangleByImageMatrix(imgRect);
+
+            //            mImageMatrix.postTranslate((width - imgRect.width()) / 2, (height - imgRect.height()) / 2);
+            //            mapImageRectangleByImageMatrix(imgRect);
         }
 
         // set matrix to apply
@@ -1002,7 +1046,6 @@ public class CropImageView extends FrameLayout {
 
         return Pair.create(scaleFactorWidth, scaleFactorHeight);
     }
-
     //endregion
 
     //region: Inner class: CropShape

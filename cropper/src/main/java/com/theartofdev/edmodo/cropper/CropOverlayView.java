@@ -1,15 +1,14 @@
-/*
- * Copyright 2013, Edmodo, Inc. 
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the License.
- * You may obtain a copy of the License in the LICENSE file, or at:
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" 
- * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
- * governing permissions and limitations under the License. 
- */
+// "Therefore those skilled at the unorthodox
+// are infinite as heaven and earth,
+// inexhaustible as the great rivers.
+// When they come to an end,
+// they begin again,
+// like the days and months;
+// they die and are reborn,
+// like the four seasons."
+//
+// - Sun Tsu,
+// "The Art of War"
 
 package com.theartofdev.edmodo.cropper;
 
@@ -36,6 +35,11 @@ public class CropOverlayView extends View {
      * Handler from crop window stuff, moving and knowing possition.
      */
     private final CropWindowHandler mCropWindowHandler = new CropWindowHandler();
+
+    /**
+     * Listener to publicj crop window changes
+     */
+    private CropWindowChangeListener mCropWindowChangeListener;
 
     /**
      * The Paint used to draw the white rectangle around the crop area.
@@ -146,10 +150,24 @@ public class CropOverlayView extends View {
     }
 
     /**
+     * Set the crop window change listener.
+     */
+    public void setCropWindowChangeListener(CropWindowChangeListener listener) {
+        mCropWindowChangeListener = listener;
+    }
+
+    /**
      * Get the left/top/right/bottom coordinates of the crop window.
      */
     public RectF getCropWindowRect() {
         return mCropWindowHandler.getRect();
+    }
+
+    /**
+     * Set the left/top/right/bottom coordinates of the crop window.
+     */
+    public void setCropWindowRect(RectF rect) {
+        mCropWindowHandler.setRect(rect);
     }
 
     /**
@@ -161,7 +179,10 @@ public class CropOverlayView extends View {
     public void setBitmapRect(RectF bitmapRect) {
         if (mBitmapRect == null || !bitmapRect.equals(mBitmapRect)) {
             mBitmapRect = bitmapRect;
-            initCropWindow();
+            RectF cropRect = mCropWindowHandler.getRect();
+            if (cropRect.width() == 0 || cropRect.height() == 0) {
+                initCropWindow();
+            }
         }
     }
 
@@ -774,6 +795,9 @@ public class CropOverlayView extends View {
     private void onActionUp() {
         if (mMoveHandler != null) {
             mMoveHandler = null;
+            if (mCropWindowChangeListener != null) {
+                mCropWindowChangeListener.onCropWindowChanged(false);
+            }
             invalidate();
         }
     }
@@ -785,8 +809,27 @@ public class CropOverlayView extends View {
     private void onActionMove(float x, float y) {
         if (mMoveHandler != null) {
             mMoveHandler.move(x, y, mBitmapRect, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
+            if (mCropWindowChangeListener != null) {
+                mCropWindowChangeListener.onCropWindowChanged(true);
+            }
             invalidate();
         }
+    }
+    //endregion
+
+    //region: Inner class: CropWindowChangeListener
+
+    /**
+     * Interface definition for a callback to be invoked when crop window rectangle is changing.
+     */
+    interface CropWindowChangeListener {
+
+        /**
+         * Called after a change in crop window rectangle.
+         *
+         * @param finished is the crop window change operation finished or still in progress
+         */
+        void onCropWindowChanged(boolean inProgress);
     }
     //endregion
 }
