@@ -328,10 +328,11 @@ public class CropOverlayView extends View {
     }
 
     /**
-     * set the scale factor of the showen image to original image to scale the limits appropriately.
+     * set the max width/height and scale factor of the showen image to original image to scale the limits
+     * appropriately.
      */
-    public void setScaleFactor(float scaleFactorWidth, float scaleFactorHeight) {
-        mCropWindowHandler.setScaleFactor(scaleFactorWidth, scaleFactorHeight);
+    public void setCropWindowLimits(float maxWidth, float maxHeight, float scaleFactorWidth, float scaleFactorHeight) {
+        mCropWindowHandler.setCropWindowLimits(maxWidth, maxHeight, scaleFactorWidth, scaleFactorHeight);
     }
 
     /**

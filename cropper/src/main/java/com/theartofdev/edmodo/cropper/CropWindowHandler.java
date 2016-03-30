@@ -42,6 +42,16 @@ final class CropWindowHandler {
     private float mMinCropWindowHeight;
 
     /**
+     * Maximum width in pixels that the crop window can CURRENTLY get.
+     */
+    private float mMaxCropWindowWidth;
+
+    /**
+     * Maximum height in pixels that the crop window can CURRENTLY get.
+     */
+    private float mMaxCropWindowHeight;
+
+    /**
      * Minimum width in pixels that the result of cropping an image can get,
      * affects crop window width adjusted by width scale factor.
      */
@@ -102,14 +112,14 @@ final class CropWindowHandler {
      * Maximum height in pixels that the crop window can get.
      */
     public float getMaxCropWidth() {
-        return mMaxCropResultWidth / mScaleFactorWidth;
+        return Math.min(mMaxCropWindowWidth, mMaxCropResultWidth / mScaleFactorWidth);
     }
 
     /**
      * Maximum width in pixels that the crop window can get.
      */
     public float getMaxCropHeight() {
-        return mMaxCropResultHeight / mScaleFactorHeight;
+        return Math.min(mMaxCropWindowHeight, mMaxCropResultHeight / mScaleFactorHeight);
     }
 
     /**
@@ -127,9 +137,12 @@ final class CropWindowHandler {
     }
 
     /**
-     * set the scale factor of the showen image to original image to scale the limits appropriately.
+     * set the max width/height and scale factor of the showen image to original image to scale the limits
+     * appropriately.
      */
-    public void setScaleFactor(float scaleFactorWidth, float scaleFactorHeight) {
+    public void setCropWindowLimits(float maxWidth, float maxHeight, float scaleFactorWidth, float scaleFactorHeight) {
+        mMaxCropWindowWidth = maxWidth;
+        mMaxCropWindowHeight = maxHeight;
         mScaleFactorWidth = scaleFactorWidth;
         mScaleFactorHeight = scaleFactorHeight;
     }

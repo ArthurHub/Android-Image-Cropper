@@ -1106,7 +1106,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width/height.
             float scaleFactorWidth = mBitmap.getWidth() * mLoadedSampleSize / bitmapRect.width();
             float scaleFactorHeight = mBitmap.getHeight() * mLoadedSampleSize / bitmapRect.height();
-            mCropOverlayView.setScaleFactor(scaleFactorWidth, scaleFactorHeight);
+            mCropOverlayView.setCropWindowLimits(mImageView.getWidth(), mImageView.getHeight(), scaleFactorWidth, scaleFactorHeight);
         }
 
         // set the bitmap rectangle and update the crop window after scale factor is set
