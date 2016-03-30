@@ -97,6 +97,12 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     private boolean mShowProgressBar = true;
 
     /**
+     * if auto-zoom functionality is enabled.<br>
+     * default: true.
+     */
+    private boolean mZoomEnabled = true;
+
+    /**
      * callback to be invoked when image async loading is complete
      */
     private WeakReference<OnSetImageUriCompleteListener> mOnSetImageUriCompleteListener;
@@ -996,7 +1002,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
 
         // scale the image to the image view, image rect transformed to know new width/height
         float scale = Math.min(width / mImageRect.width(), height / mImageRect.height());
-        if (mScaleType == ImageView.ScaleType.FIT_CENTER || scale < 1) {
+        if (mScaleType == ImageView.ScaleType.FIT_CENTER || (scale > 1 && mZoomEnabled) || scale < 1) {
             mImageMatrix.postScale(scale, scale, mImageRect.centerX(), mImageRect.centerY());
             mapImageRectangleByImageMatrix(mImageRect);
         }
@@ -1014,8 +1020,10 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
 
             if (center) {
                 // set the zoomed area to be as to the center of cropping window as possible
-                mZoomOffsetX = Math.max(Math.min(width / 2 - cropRect.centerX(), -mImageRect.left), mImageView.getWidth() - mImageRect.right) / mZoom;
-                mZoomOffsetY = Math.max(Math.min(height / 2 - cropRect.centerY(), -mImageRect.top), mImageView.getHeight() - mImageRect.bottom) / mZoom;
+                mZoomOffsetX = width > mImageRect.width() ? 0
+                        : Math.max(Math.min(width / 2 - cropRect.centerX(), -mImageRect.left), mImageView.getWidth() - mImageRect.right) / mZoom;
+                mZoomOffsetY = height > mImageRect.height() ? 0
+                        : Math.max(Math.min(height / 2 - cropRect.centerY(), -mImageRect.top), mImageView.getHeight() - mImageRect.bottom) / mZoom;
             } else {
                 // adjust the zoomed area so the crop window rectangle will be inside the area in case it was moved outside
                 mZoomOffsetX = Math.min(Math.max(mZoomOffsetX * mZoom, -cropRect.left), -cropRect.right + width) / mZoom;
