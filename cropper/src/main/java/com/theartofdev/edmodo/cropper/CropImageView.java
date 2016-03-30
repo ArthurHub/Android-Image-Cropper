@@ -1009,43 +1009,32 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             mapImageRectangleByImageMatrix(mImageRect);
         }
 
-        if (mZoom > 1) {
+        // scale by the current zoom level
+        mImageMatrix.postScale(mZoom, mZoom, mImageRect.centerX(), mImageRect.centerY());
+        mapImageRectangleByImageMatrix(mImageRect);
 
-            // scale by the current zoom level
-            mImageMatrix.postScale(mZoom, mZoom, mImageRect.centerX(), mImageRect.centerY());
-            mapImageRectangleByImageMatrix(mImageRect);
+        RectF cropRect = mCropOverlayView.getCropWindowRect();
 
-            RectF cropRect = mCropOverlayView.getCropWindowRect();
+        // reset the crop window offset so we can update it to required value
+        cropRect.offset(-mZoomOffsetX * mZoom, -mZoomOffsetY * mZoom);
 
-            // reset the crop window offset so we can update it to required value
-            cropRect.offset(-mZoomOffsetX * mZoom, -mZoomOffsetY * mZoom);
-
-            if (center) {
-                // set the zoomed area to be as to the center of cropping window as possible
-                mZoomOffsetX = width > mImageRect.width() ? 0
-                        : Math.max(Math.min(width / 2 - cropRect.centerX(), -mImageRect.left), mImageView.getWidth() - mImageRect.right) / mZoom;
-                mZoomOffsetY = height > mImageRect.height() ? 0
-                        : Math.max(Math.min(height / 2 - cropRect.centerY(), -mImageRect.top), mImageView.getHeight() - mImageRect.bottom) / mZoom;
-            } else {
-                // adjust the zoomed area so the crop window rectangle will be inside the area in case it was moved outside
-                mZoomOffsetX = Math.min(Math.max(mZoomOffsetX * mZoom, -cropRect.left), -cropRect.right + width) / mZoom;
-                mZoomOffsetY = Math.min(Math.max(mZoomOffsetY * mZoom, -cropRect.top), -cropRect.bottom + height) / mZoom;
-            }
-
-            // apply to zoom offset translate and update the crop rectangle to offset correctly
-            mImageMatrix.postTranslate(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
-            cropRect.offset(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
-            mCropOverlayView.setCropWindowRect(cropRect);
-            mapImageRectangleByImageMatrix(mImageRect);
-
-        } else if (mZoomOffsetX != 0 || mZoomOffsetY != 0) {
-
-            // if fully zoomed out, need to clear the zoom offset
-            RectF cropRect = mCropOverlayView.getCropWindowRect();
-            cropRect.offset(-mZoomOffsetX * mZoom, -mZoomOffsetY * mZoom);
-            mCropOverlayView.setCropWindowRect(cropRect);
-            mZoomOffsetX = mZoomOffsetY = 0;
+        if (center) {
+            // set the zoomed area to be as to the center of cropping window as possible
+            mZoomOffsetX = width > mImageRect.width() ? 0
+                    : Math.max(Math.min(width / 2 - cropRect.centerX(), -mImageRect.left), mImageView.getWidth() - mImageRect.right) / mZoom;
+            mZoomOffsetY = height > mImageRect.height() ? 0
+                    : Math.max(Math.min(height / 2 - cropRect.centerY(), -mImageRect.top), mImageView.getHeight() - mImageRect.bottom) / mZoom;
+        } else {
+            // adjust the zoomed area so the crop window rectangle will be inside the area in case it was moved outside
+            mZoomOffsetX = Math.min(Math.max(mZoomOffsetX * mZoom, -cropRect.left), -cropRect.right + width) / mZoom;
+            mZoomOffsetY = Math.min(Math.max(mZoomOffsetY * mZoom, -cropRect.top), -cropRect.bottom + height) / mZoom;
         }
+
+        // apply to zoom offset translate and update the crop rectangle to offset correctly
+        mImageMatrix.postTranslate(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
+        cropRect.offset(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
+        mCropOverlayView.setCropWindowRect(cropRect);
+        mapImageRectangleByImageMatrix(mImageRect);
 
         // set matrix to apply
         mImageView.setImageMatrix(mImageMatrix);
