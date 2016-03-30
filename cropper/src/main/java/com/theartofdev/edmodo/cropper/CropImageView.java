@@ -664,9 +664,11 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         if (mBitmap != null) {
             mDegreesRotated += degrees;
             mDegreesRotated = mDegreesRotated % 360;
-            // TODO:a. handle apply matrix directly
-            requestLayout();
-            mCropOverlayView.invalidate();
+
+            mZoom = 1;
+            mZoomOffsetX = mZoomOffsetY = 0;
+            mCropOverlayView.resetCropOverlayView();
+            applyImageMatrix(getWidth(), getHeight(), true);
         }
     }
 
@@ -912,8 +914,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             setLayoutParams(origParams);
 
             if (mBitmap != null) {
-                RectF transformedRect = applyImageMatrix(r - l, b - t, false);
-                updateBitmapRect(transformedRect);
+                applyImageMatrix(r - l, b - t, false);
             } else {
                 updateBitmapRect(CropDefaults.EMPTY_RECT_F);
             }
@@ -931,8 +932,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
 
         if (inProgress) {
             if (cropRect.left < 0 || cropRect.top < 0 || cropRect.right > width || cropRect.bottom > height) {
-                RectF transformedRect = applyImageMatrix(width, height, false);
-                updateBitmapRect(transformedRect);
+                applyImageMatrix(width, height, false);
             }
         } else {
 
@@ -957,15 +957,13 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
                 }
 
                 if (newZoom > 0) {
-                    updateCropRectByZoomChange(cropRect, width, height, newZoom / mZoom);
+                    updateCropRectByZoomChange(width, height, newZoom / mZoom);
                     mZoom = newZoom;
                 }
             }
 
             if (mZoom != oldZoom) {
-                mCropOverlayView.setCropWindowRect(cropRect);
-                RectF transformedRect = applyImageMatrix(width, height, true);
-                updateBitmapRect(transformedRect);
+                applyImageMatrix(width, height, true);
             }
         }
     }
@@ -974,11 +972,13 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * Adjust the given crop window rectangle by the change in zoom, need to update the location and size
      * of the crop rectangle to cover the same area in new zoom level.
      */
-    private void updateCropRectByZoomChange(RectF cropRect, int width, int height, float zoomChange) {
+    private void updateCropRectByZoomChange(int width, int height, float zoomChange) {
+        RectF cropRect = mCropOverlayView.getCropWindowRect();
         float xCenterOffset = width / 2 - cropRect.centerX();
         float yCenterOffset = height / 2 - cropRect.centerY();
         cropRect.offset(xCenterOffset - xCenterOffset * zoomChange, yCenterOffset - yCenterOffset * zoomChange);
         cropRect.inset((cropRect.width() - cropRect.width() * zoomChange) / 2f, (cropRect.height() - cropRect.height() * zoomChange) / 2f);
+        mCropOverlayView.setCropWindowRect(cropRect);
     }
 
     /**
@@ -987,7 +987,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * @param width the width of the image view
      * @param height the height of the image view
      */
-    private RectF applyImageMatrix(float width, float height, boolean center) {
+    private void applyImageMatrix(float width, float height, boolean center) {
 
         mImageMatrix.reset();
         mImageRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
@@ -1039,7 +1039,8 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         // set matrix to apply
         mImageView.setImageMatrix(mImageMatrix);
 
-        return mImageRect;
+        // update the image rectangle in the crop overlay
+        updateBitmapRect(mImageRect);
     }
 
     /**
