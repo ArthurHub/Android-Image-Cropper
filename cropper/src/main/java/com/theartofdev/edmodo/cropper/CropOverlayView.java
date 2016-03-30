@@ -461,21 +461,25 @@ public class CropOverlayView extends View {
         // Tells the attribute functions the crop window has already been initialized
         initializedCropWindow = true;
 
+        float leftLimit = Math.max(mBitmapRect.left, 0);
+        float topLimit = Math.max(mBitmapRect.top, 0);
+        float rightLimit = Math.min(mBitmapRect.right, getWidth());
+        float bottomLimit = Math.min(mBitmapRect.bottom, getHeight());
         float horizontalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.width();
         float verticalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.height();
 
         if (mInitialCropWindowRect != null && mInitialCropWindowRect.width() > 0 && mInitialCropWindowRect.height() > 0) {
             // Get crop window position relative to the displayed image.
-            rect.left = mBitmapRect.left + mInitialCropWindowRect.left / mCropWindowHandler.getScaleFactorWidth();
-            rect.top = mBitmapRect.top + mInitialCropWindowRect.top / mCropWindowHandler.getScaleFactorHeight();
+            rect.left = leftLimit + mInitialCropWindowRect.left / mCropWindowHandler.getScaleFactorWidth();
+            rect.top = topLimit + mInitialCropWindowRect.top / mCropWindowHandler.getScaleFactorHeight();
             rect.right = rect.left + mInitialCropWindowRect.width() / mCropWindowHandler.getScaleFactorWidth();
             rect.bottom = rect.top + mInitialCropWindowRect.height() / mCropWindowHandler.getScaleFactorHeight();
 
             // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
-            rect.left = Math.max(mBitmapRect.left, rect.left);
-            rect.top = Math.max(mBitmapRect.top, rect.top);
-            rect.right = Math.min(mBitmapRect.right, rect.right);
-            rect.bottom = Math.min(mBitmapRect.bottom, rect.bottom);
+            rect.left = Math.max(leftLimit, rect.left);
+            rect.top = Math.max(topLimit, rect.top);
+            rect.right = Math.min(rightLimit, rect.right);
+            rect.bottom = Math.min(bottomLimit, rect.bottom);
 
         } else if (mFixAspectRatio && !mBitmapRect.isEmpty()) {
 
@@ -484,8 +488,8 @@ public class CropOverlayView extends View {
             float bitmapAspectRatio = mBitmapRect.width() / mBitmapRect.height();
             if (bitmapAspectRatio > mTargetAspectRatio) {
 
-                rect.top = mBitmapRect.top + verticalPadding;
-                rect.bottom = mBitmapRect.bottom - verticalPadding;
+                rect.top = topLimit + verticalPadding;
+                rect.bottom = bottomLimit - verticalPadding;
 
                 float centerX = getWidth() / 2f;
 
@@ -501,8 +505,8 @@ public class CropOverlayView extends View {
 
             } else {
 
-                rect.left = mBitmapRect.left + horizontalPadding;
-                rect.right = mBitmapRect.right - horizontalPadding;
+                rect.left = leftLimit + horizontalPadding;
+                rect.right = rightLimit - horizontalPadding;
 
                 float centerY = getHeight() / 2f;
 
@@ -515,10 +519,10 @@ public class CropOverlayView extends View {
             }
         } else {
             // Initialize crop window to have 10% padding w/ respect to image.
-            rect.left = mBitmapRect.left + horizontalPadding;
-            rect.top = mBitmapRect.top + verticalPadding;
-            rect.right = mBitmapRect.right - horizontalPadding;
-            rect.bottom = mBitmapRect.bottom - verticalPadding;
+            rect.left = leftLimit + horizontalPadding;
+            rect.top = topLimit + verticalPadding;
+            rect.right = rightLimit - horizontalPadding;
+            rect.bottom = bottomLimit - verticalPadding;
         }
 
         fixCropWindowRectByRules(rect);
@@ -551,17 +555,21 @@ public class CropOverlayView extends View {
             rect.bottom -= adj;
         }
         if (mBitmapRect != null && mBitmapRect.width() > 0 && mBitmapRect.height() > 0) {
-            if (rect.left < mBitmapRect.left) {
-                rect.left = mBitmapRect.left;
+            float leftLimit = Math.max(mBitmapRect.left, 0);
+            float topLimit = Math.max(mBitmapRect.top, 0);
+            float rightLimit = Math.min(mBitmapRect.right, getWidth());
+            float bottomLimit = Math.min(mBitmapRect.bottom, getHeight());
+            if (rect.left < leftLimit) {
+                rect.left = leftLimit;
             }
-            if (rect.top < mBitmapRect.top) {
-                rect.top = mBitmapRect.top;
+            if (rect.top < topLimit) {
+                rect.top = topLimit;
             }
-            if (rect.right > mBitmapRect.right) {
-                rect.right = mBitmapRect.right;
+            if (rect.right > rightLimit) {
+                rect.right = rightLimit;
             }
-            if (rect.bottom > mBitmapRect.bottom) {
-                rect.bottom = mBitmapRect.bottom;
+            if (rect.bottom > bottomLimit) {
+                rect.bottom = bottomLimit;
             }
         }
         if (mFixAspectRatio && Math.abs(rect.width() - rect.height() * mTargetAspectRatio) > 0.1) {
