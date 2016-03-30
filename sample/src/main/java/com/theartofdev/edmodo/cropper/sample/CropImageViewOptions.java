@@ -13,7 +13,6 @@
 package com.theartofdev.edmodo.cropper.sample;
 
 import android.util.Pair;
-import android.widget.ImageView;
 
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -22,7 +21,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
  */
 final class CropImageViewOptions {
 
-    public ImageView.ScaleType scaleType = ImageView.ScaleType.CENTER_INSIDE;
+    public CropImageView.ScaleType scaleType = CropImageView.ScaleType.CENTER_INSIDE;
 
     public CropImageView.CropShape cropShape = CropImageView.CropShape.RECTANGLE;
 

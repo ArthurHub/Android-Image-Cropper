@@ -191,6 +191,8 @@ public class CropOverlayView extends View {
      */
     public void resetCropOverlayView() {
         if (initializedCropWindow) {
+            setBitmapRect(CropDefaults.EMPTY_RECT_F);
+            setCropWindowRect(CropDefaults.EMPTY_RECT_F);
             initCropWindow();
             invalidate();
         }

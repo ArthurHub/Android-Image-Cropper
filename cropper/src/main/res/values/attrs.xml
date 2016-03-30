@@ -2,13 +2,15 @@
 
     <declare-styleable name="CropImageView">
         <attr name="cropGuidelines">
-            <enum name="on" value="2"/>
-            <enum name="onTouch" value="1"/>
             <enum name="off" value="0"/>
+            <enum name="onTouch" value="1"/>
+            <enum name="on" value="2"/>
         </attr>
         <attr name="cropScaleType">
-            <enum name="centerInside" value="0"/>
-            <enum name="fitCenter" value="1"/>
+            <enum name="fitCenter" value="0"/>
+            <enum name="center" value="1"/>
+            <enum name="centerCrop" value="2"/>
+            <enum name="centerInside" value="3"/>
         </attr>
         <attr name="cropShape">
             <enum name="rectangle" value="0"/>

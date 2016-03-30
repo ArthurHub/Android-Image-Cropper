@@ -81,7 +81,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     /**
      * The initial scale type of the image in the crop image view
      */
-    private ImageView.ScaleType mScaleType;
+    private ScaleType mScaleType;
 
     /**
      * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
@@ -196,9 +196,9 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
                 fixAspectRatio = ta.getBoolean(R.styleable.CropImageView_cropFixAspectRatio, CropDefaults.DEFAULT_FIXED_ASPECT_RATIO);
                 aspectRatioX = ta.getInteger(R.styleable.CropImageView_cropAspectRatioX, CropDefaults.DEFAULT_ASPECT_RATIO_X);
                 aspectRatioY = ta.getInteger(R.styleable.CropImageView_cropAspectRatioY, CropDefaults.DEFAULT_ASPECT_RATIO_Y);
-                mScaleType = CropDefaults.VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_cropScaleType, CropDefaults.DEFAULT_SCALE_TYPE_INDEX)];
-                cropShape = CropDefaults.VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
-                guidelines = CropDefaults.VALID_GUIDELINES[ta.getInt(R.styleable.CropImageView_cropGuidelines, CropDefaults.DEFAULT_GUIDELINES_INDEX)];
+                mScaleType = ScaleType.values()[ta.getInt(R.styleable.CropImageView_cropScaleType, CropDefaults.DEFAULT_SCALE_TYPE_INDEX)];
+                cropShape = CropShape.values()[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
+                guidelines = Guidelines.values()[ta.getInt(R.styleable.CropImageView_cropGuidelines, CropDefaults.DEFAULT_GUIDELINES_INDEX)];
                 snapRadius = ta.getDimension(R.styleable.CropImageView_cropSnapRadius, snapRadius);
                 touchRadius = ta.getDimension(R.styleable.CropImageView_cropTouchRadius, touchRadius);
                 initialCropWindowPaddingRatio = ta.getFloat(R.styleable.CropImageView_cropInitialCropWindowPaddingRatio, initialCropWindowPaddingRatio);
@@ -252,27 +252,20 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     /**
      * Get the scale type of the image in the crop view.
      */
-    public ImageView.ScaleType getScaleType() {
+    public ScaleType getScaleType() {
         return mScaleType;
-    }
-
-    /**
-     * Get the amount of degrees the cropping image is rotated cloackwise.<br>
-     *
-     * @return 0-360
-     */
-    public int getRotatedDegrees() {
-        return mDegreesRotated;
     }
 
     /**
      * Set the scale type of the image in the crop view
      */
-    public void setScaleType(ImageView.ScaleType scaleType) {
-        if (scaleType != mImageView.getScaleType()) {
+    public void setScaleType(ScaleType scaleType) {
+        if (scaleType != mScaleType) {
             mScaleType = scaleType;
+            mZoom = 1;
+            mZoomOffsetX = mZoomOffsetY = 0;
+            mCropOverlayView.resetCropOverlayView();
             requestLayout();
-            mCropOverlayView.invalidate();
         }
     }
 
@@ -288,6 +281,15 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      */
     public void setCropShape(CropShape cropShape) {
         mCropOverlayView.setCropShape(cropShape);
+    }
+
+    /**
+     * Get the amount of degrees the cropping image is rotated cloackwise.<br>
+     *
+     * @return 0-360
+     */
+    public int getRotatedDegrees() {
+        return mDegreesRotated;
     }
 
     /**
@@ -356,6 +358,17 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     }
 
     /**
+     * if to show progress bar when image async loading/cropping is in progress.<br>
+     * default: true, disable to provide custom progress bar UI.
+     */
+    public void setShowProgressBar(boolean showProgressBar) {
+        if (mShowProgressBar != showProgressBar) {
+            mShowProgressBar = showProgressBar;
+            setProgressBarVisibility();
+        }
+    }
+
+    /**
      * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
      * image.<br>
      * default: true, may disable for animation or frame transition.
@@ -377,17 +390,6 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     }
 
     /**
-     * if to show progress bar when image async loading/cropping is in progress.<br>
-     * default: true, disable to provide custom progress bar UI.
-     */
-    public void setShowProgressBar(boolean showProgressBar) {
-        if (mShowProgressBar != showProgressBar) {
-            mShowProgressBar = showProgressBar;
-            setProgressBarVisibility();
-        }
-    }
-
-    /**
      * Returns the integer of the imageResource
      */
     public int getImageResource() {
@@ -399,16 +401,6 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      */
     public Uri getImageUri() {
         return mLoadedImageUri;
-    }
-
-    /**
-     * Set the crop window position and size to the given rectangle.<br>
-     * Image to crop must be first set before invoking this, for async - after complete callback.
-     *
-     * @param rect window rectangle (position and size) relative to source bitmap
-     */
-    public void setCropRect(Rect rect) {
-        mCropOverlayView.setInitialCropWindowRect(rect);
     }
 
     /**
@@ -464,6 +456,16 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         }
 
         return points;
+    }
+
+    /**
+     * Set the crop window position and size to the given rectangle.<br>
+     * Image to crop must be first set before invoking this, for async - after complete callback.
+     *
+     * @param rect window rectangle (position and size) relative to source bitmap
+     */
+    public void setCropRect(Rect rect) {
+        mCropOverlayView.setInitialCropWindowRect(rect);
     }
 
     /**
@@ -1002,7 +1004,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
 
         // scale the image to the image view, image rect transformed to know new width/height
         float scale = Math.min(width / mImageRect.width(), height / mImageRect.height());
-        if (mScaleType == ImageView.ScaleType.FIT_CENTER || (scale > 1 && mZoomEnabled) || scale < 1) {
+        if (mScaleType == ScaleType.FIT_CENTER || (mScaleType == ScaleType.CENTER_INSIDE && scale < 1) || (scale > 1 && mZoomEnabled)) {
             mImageMatrix.postScale(scale, scale, mImageRect.centerX(), mImageRect.centerY());
             mapImageRectangleByImageMatrix(mImageRect);
         }
@@ -1145,6 +1147,47 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     public enum CropShape {
         RECTANGLE,
         OVAL
+    }
+    //endregion
+
+    //region: Inner class: ScaleType
+
+    /**
+     * Options for scaling the bounds of cropping image to the bounds of Crop Image View.<br>
+     * Note: Some options are affected by auto-zoom, if enabled.
+     */
+    public enum ScaleType {
+
+        /**
+         * Scale the image uniformly (maintain the image's aspect ratio) to fit in crop image view.<br>
+         * The largest dimension will be equals to crop image viee and the second dimension will be smaller.
+         */
+        FIT_CENTER,
+
+        /**
+         * Center the image in the view, but perform no scaling.<br>
+         * Note: If auto-zoom is enabled and the source image is smaller than crop image view then it will be
+         * scaled uniformly to fit the crop image view.
+         */
+        CENTER,
+
+        /**
+         * Scale the image uniformly (maintain the image's aspect ratio) so that both
+         * dimensions (width and height) of the image will be equal to or <b>larger</b> than the
+         * corresponding dimension of the view (minus padding).<br>
+         * The image is then centered in the view.
+         */
+        CENTER_CROP,
+
+        /**
+         * Scale the image uniformly (maintain the image's aspect ratio) so that both
+         * dimensions (width and height) of the image will be equal to or <b>less</b> than the
+         * corresponding dimension of the view (minus padding).<br>
+         * The image is then centered in the view.<br>
+         * Note: If auto-zoom is enabled and the source image is smaller than crop image view then it will be
+         * scaled uniformly to fit the crop image view.
+         */
+        CENTER_INSIDE
     }
     //endregion
 

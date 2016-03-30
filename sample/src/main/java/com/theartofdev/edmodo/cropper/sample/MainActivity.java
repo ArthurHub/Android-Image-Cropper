@@ -27,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -160,8 +159,10 @@ public class MainActivity extends Activity {
                 mDrawerLayout.closeDrawers();
                 break;
             case R.id.drawer_option_toggle_scale:
-                mCropImageViewOptions.scaleType = mCropImageViewOptions.scaleType == ImageView.ScaleType.FIT_CENTER
-                        ? ImageView.ScaleType.CENTER_INSIDE : ImageView.ScaleType.FIT_CENTER;
+                mCropImageViewOptions.scaleType = mCropImageViewOptions.scaleType == CropImageView.ScaleType.FIT_CENTER
+                        ? CropImageView.ScaleType.CENTER_INSIDE : mCropImageViewOptions.scaleType == CropImageView.ScaleType.CENTER_INSIDE
+                        ? CropImageView.ScaleType.CENTER : mCropImageViewOptions.scaleType == CropImageView.ScaleType.CENTER
+                        ? CropImageView.ScaleType.CENTER_CROP : CropImageView.ScaleType.FIT_CENTER;
                 mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
                 updateDrawerTogglesByOptions(mCropImageViewOptions);
                 break;

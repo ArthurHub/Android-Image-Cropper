@@ -15,7 +15,6 @@ package com.theartofdev.edmodo.cropper;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.widget.ImageView;
 
 /**
  * Defaults used in the library.
@@ -47,12 +46,6 @@ final class CropDefaults {
     public static final float SNAP_RADIUS = 3;
 
     public static final float DEFAULT_SHOW_GUIDELINES_LIMIT = 100;
-
-    public static final ImageView.ScaleType[] VALID_SCALE_TYPES = new ImageView.ScaleType[]{ImageView.ScaleType.CENTER_INSIDE, ImageView.ScaleType.FIT_CENTER};
-
-    public static final CropImageView.CropShape[] VALID_CROP_SHAPES = new CropImageView.CropShape[]{CropImageView.CropShape.RECTANGLE, CropImageView.CropShape.OVAL};
-
-    public static final CropImageView.Guidelines[] VALID_GUIDELINES = new CropImageView.Guidelines[]{CropImageView.Guidelines.OFF, CropImageView.Guidelines.ON_TOUCH, CropImageView.Guidelines.ON};
 
     // The radius (in dp) of the touchable area around the handle. We are basing
     // this value off of the recommended 48dp Rhythm. See:
