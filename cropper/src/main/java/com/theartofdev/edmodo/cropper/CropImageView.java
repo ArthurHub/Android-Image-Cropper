@@ -59,6 +59,11 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     private final Matrix mImageMatrix = new Matrix();
 
     /**
+     * Reusing matrix instance for reverse matrix calculations.
+     */
+    private final Matrix mImageInverseMatrix = new Matrix();
+
+    /**
      * Progress bar widget to show progress bar on async image loading and cropping.
      */
     private final ProgressBar mProgressBar;
@@ -67,6 +72,11 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * Rectengale used in image matrix transformation calculation (reusing rect instance)
      */
     private final RectF mImageRect = new RectF();
+
+    /**
+     * Rectengale used in image rotation calculation (reusing rect instance)
+     */
+    private final RectF mRotationRect = new RectF();
 
     private Bitmap mBitmap;
 
@@ -447,9 +457,8 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
                 cropWindowRect.bottom
         };
 
-        Matrix invertMatrix = new Matrix();
-        mImageMatrix.invert(invertMatrix);
-        invertMatrix.mapPoints(points);
+        mImageMatrix.invert(mImageInverseMatrix);
+        mImageInverseMatrix.mapPoints(points);
 
         for (int i = 0; i < points.length; i++) {
             points[i] *= mLoadedSampleSize;
@@ -662,13 +671,33 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      */
     public void rotateImage(int degrees) {
         if (mBitmap != null) {
-            mDegreesRotated += degrees;
-            mDegreesRotated = mDegreesRotated % 360;
+            if (degrees % 90 == 0) {
 
-            mZoom = 1;
-            mZoomOffsetX = mZoomOffsetY = 0;
-            mCropOverlayView.resetCropOverlayView();
-            applyImageMatrix(getWidth(), getHeight(), true);
+                mRotationRect.set(mCropOverlayView.getCropWindowRect());
+
+                mImageMatrix.invert(mImageInverseMatrix);
+                mImageInverseMatrix.mapRect(mRotationRect);
+
+                mDegreesRotated += degrees;
+                mDegreesRotated = mDegreesRotated % 360;
+
+                applyImageMatrix(getWidth(), getHeight(), false);
+
+                mImageMatrix.mapRect(mRotationRect);
+
+                mCropOverlayView.resetCropOverlayView();
+                mCropOverlayView.setCropWindowRect(mRotationRect);
+                applyImageMatrix(getWidth(), getHeight(), true);
+            } else {
+
+                mDegreesRotated += degrees;
+                mDegreesRotated = mDegreesRotated % 360;
+
+                mZoom = 1;
+                mZoomOffsetX = mZoomOffsetY = 0;
+                mCropOverlayView.resetCropOverlayView();
+                applyImageMatrix(getWidth(), getHeight(), true);
+            }
         }
     }
 

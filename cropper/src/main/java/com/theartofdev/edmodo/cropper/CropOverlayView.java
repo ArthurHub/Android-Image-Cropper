@@ -64,7 +64,7 @@ public class CropOverlayView extends View {
     /**
      * The bounding box around the Bitmap that we are cropping.
      */
-    private RectF mBitmapRect;
+    private RectF mBitmapRect = new RectF();
 
     /**
      * The offset to draw the border corener from the border
@@ -128,7 +128,7 @@ public class CropOverlayView extends View {
     /**
      * the initial crop window rectangle to set
      */
-    private Rect mInitialCropWindowRect;
+    private Rect mInitialCropWindowRect = new Rect();
 
     /**
      * Whether the Crop View has been initialized for the first time
@@ -178,7 +178,7 @@ public class CropOverlayView extends View {
      */
     public void setBitmapRect(RectF bitmapRect) {
         if (mBitmapRect == null || !bitmapRect.equals(mBitmapRect)) {
-            mBitmapRect = bitmapRect;
+            mBitmapRect.set(bitmapRect);
             RectF cropRect = mCropWindowHandler.getRect();
             if (cropRect.width() == 0 || cropRect.height() == 0) {
                 initCropWindow();
@@ -348,7 +348,7 @@ public class CropOverlayView extends View {
      * Set crop window initial rectangle to be used instead of default.
      */
     public void setInitialCropWindowRect(Rect rect) {
-        mInitialCropWindowRect = rect;
+        mInitialCropWindowRect.set(rect != null ? rect : CropDefaults.EMPTY_RECT);
         if (initializedCropWindow) {
             initCropWindow();
             invalidate();
@@ -468,7 +468,7 @@ public class CropOverlayView extends View {
         float horizontalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.width();
         float verticalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.height();
 
-        if (mInitialCropWindowRect != null && mInitialCropWindowRect.width() > 0 && mInitialCropWindowRect.height() > 0) {
+        if (mInitialCropWindowRect.width() > 0 && mInitialCropWindowRect.height() > 0) {
             // Get crop window position relative to the displayed image.
             rect.left = leftLimit + mInitialCropWindowRect.left / mCropWindowHandler.getScaleFactorWidth();
             rect.top = topLimit + mInitialCropWindowRect.top / mCropWindowHandler.getScaleFactorHeight();
