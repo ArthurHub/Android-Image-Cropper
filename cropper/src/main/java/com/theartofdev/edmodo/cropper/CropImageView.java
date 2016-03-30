@@ -112,6 +112,16 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     private int mLoadedSampleSize = 1;
 
     /**
+     * The max zoom allowed during cropping
+     */
+    private float mMaxZoom = 4;
+
+    /**
+     * the zoom step to do for every zoom required
+     */
+    private float mZoomStep = 0.4f;
+
+    /**
      * The current zoom level to to scale the cropping image
      */
     private float mZoom = 1;
@@ -641,6 +651,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         if (mBitmap != null) {
             mDegreesRotated += degrees;
             mDegreesRotated = mDegreesRotated % 360;
+            // TODO:a. handle apply matrix directly
             requestLayout();
             mCropOverlayView.invalidate();
         }
@@ -900,37 +911,58 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
 
     @Override
     public void onCropWindowChanged(boolean inProgress) {
-        if (!inProgress) {
-            int width = mImageView.getWidth();
-            int height = mImageView.getHeight();
-            RectF cropRect = mCropOverlayView.getCropWindowRect();
 
-            float newZoom = mZoom;
-            if (mZoom < 2.6 && cropRect.width() < width * 0.4 && cropRect.height() < height * 0.4) {
-                newZoom = Math.min(3.5f, newZoom + .6f);
-            } else if (mZoom > 1 && cropRect.width() > width * 0.7 || cropRect.height() > height * 0.7) {
-                newZoom = Math.max(1, newZoom - 1f);
+        int width = mImageView.getWidth();
+        int height = mImageView.getHeight();
+        RectF cropRect = mCropOverlayView.getCropWindowRect();
+
+        if (inProgress) {
+
+        } else {
+
+            float oldZoom = mZoom;
+            for (int i = 0; i < 8; i++) {
+
+                float newZoom = 0;
+                if (mZoom < mMaxZoom && cropRect.width() < width * 0.5 && cropRect.height() < height * 0.5f) {
+                    newZoom = Math.min(mMaxZoom, mZoom + mZoomStep);
+                } else if (mZoom > 1 && (cropRect.width() > width * 0.8 || cropRect.height() > height * 0.8f)) {
+                    newZoom = Math.max(1, mZoom - mZoomStep * 1.8f);
+                } else if (mZoom > 1 && (cropRect.width() > width * 0.7 || cropRect.height() > height * 0.7f)) {
+                    newZoom = Math.max(1, mZoom - mZoomStep * 1.2f);
+                } else {
+                    break;
+                }
+
+                if (newZoom > mMaxZoom - .25f) {
+                    newZoom = mMaxZoom;
+                } else if (newZoom < 1.3f) {
+                    newZoom = 1;
+                }
+
+                if (newZoom > 0) {
+                    updateCropRectByZoomChange(cropRect, width, height, newZoom / mZoom);
+                    mZoom = newZoom;
+                }
             }
 
-            if (mZoom != newZoom) {
-                float zoomChange = newZoom / mZoom;
-                mZoom = newZoom;
-
-                mZoomOffsetX *= zoomChange;
-                mZoomOffsetY *= zoomChange;
-
-                float xCenterOffset = width / 2 - cropRect.centerX();
-                float yCenterOffset = height / 2 - cropRect.centerY();
-                cropRect.offset(xCenterOffset - xCenterOffset * zoomChange,
-                        yCenterOffset - yCenterOffset * zoomChange);
-                cropRect.inset((cropRect.width() - cropRect.width() * zoomChange) / 2f,
-                        (cropRect.height() - cropRect.height() * zoomChange) / 2f);
+            if (mZoom != oldZoom) {
                 mCropOverlayView.setCropWindowRect(cropRect);
-
                 RectF transformedRect = applyImageMatrix(width, height);
                 updateBitmapRect(transformedRect);
             }
         }
+    }
+
+    /**
+     * Adjust the given crop window rectangle by the change in zoom, need to update the location and size
+     * of the crop rectangle to cover the same area in new zoom level.
+     */
+    private void updateCropRectByZoomChange(RectF cropRect, int width, int height, float zoomChange) {
+        float xCenterOffset = width / 2 - cropRect.centerX();
+        float yCenterOffset = height / 2 - cropRect.centerY();
+        cropRect.offset(xCenterOffset - xCenterOffset * zoomChange, yCenterOffset - yCenterOffset * zoomChange);
+        cropRect.inset((cropRect.width() - cropRect.width() * zoomChange) / 2f, (cropRect.height() - cropRect.height() * zoomChange) / 2f);
     }
 
     /**
@@ -969,19 +1001,20 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             mapImageRectangleByImageMatrix(imgRect);
 
             RectF cropRect = mCropOverlayView.getCropWindowRect();
-            cropRect.offset(-mZoomOffsetX, -mZoomOffsetY);
 
-            mZoomOffsetX = Math.max(Math.min(width / 2 - cropRect.centerX(), -imgRect.left), mImageView.getWidth() - imgRect.right);
-            mZoomOffsetY = Math.max(Math.min(height / 2 - cropRect.centerY(), -imgRect.top), mImageView.getHeight() - imgRect.bottom);
+            cropRect.offset(-mZoomOffsetX * mZoom, -mZoomOffsetY * mZoom);
 
-            mImageMatrix.postTranslate(mZoomOffsetX, mZoomOffsetY);
-            cropRect.offset(mZoomOffsetX, mZoomOffsetY);
+            mZoomOffsetX = Math.max(Math.min(width / 2 - cropRect.centerX(), -imgRect.left), mImageView.getWidth() - imgRect.right) / mZoom;
+            mZoomOffsetY = Math.max(Math.min(height / 2 - cropRect.centerY(), -imgRect.top), mImageView.getHeight() - imgRect.bottom) / mZoom;
+
+            mImageMatrix.postTranslate(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
+            cropRect.offset(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
             mCropOverlayView.setCropWindowRect(cropRect);
             mapImageRectangleByImageMatrix(imgRect);
 
         } else if (mZoomOffsetX != 0 || mZoomOffsetY != 0) {
             RectF cropRect = mCropOverlayView.getCropWindowRect();
-            cropRect.offset(-mZoomOffsetX, -mZoomOffsetY);
+            cropRect.offset(-mZoomOffsetX * mZoom, -mZoomOffsetY * mZoom);
             mCropOverlayView.setCropWindowRect(cropRect);
             mZoomOffsetX = mZoomOffsetY = 0;
         }
