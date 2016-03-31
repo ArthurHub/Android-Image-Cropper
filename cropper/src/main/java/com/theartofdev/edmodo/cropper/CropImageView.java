@@ -826,7 +826,18 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             }
         }
         bundle.putInt("DEGREES_ROTATED", mDegreesRotated);
+        bundle.putFloat("ZOOM", mZoom);
+        bundle.putFloat("ZOOM_OFFSET_X", mZoomOffsetX);
+        bundle.putFloat("ZOOM_OFFSET_Y", mZoomOffsetY);
         bundle.putParcelable("INITIAL_CROP_RECT", mCropOverlayView.getInitialCropWindowRect());
+
+        mRotationRect.set(mCropOverlayView.getCropWindowRect());
+
+        mImageMatrix.invert(mImageInverseMatrix);
+        mImageInverseMatrix.mapRect(mRotationRect);
+
+        bundle.putParcelable("CROP_WINDOW_RECT", mRotationRect);
+
         return bundle;
     }
 
@@ -857,14 +868,13 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             }
 
             mDegreesRotated = bundle.getInt("DEGREES_ROTATED");
-            if (mBitmap != null && bitmap == null) {
-                // Fixes the rotation of the image when we reloaded it.
-                int tmpRotated = mDegreesRotated;
-                rotateImage(mDegreesRotated);
-                mDegreesRotated = tmpRotated;
-            }
+            mZoom = bundle.getFloat("ZOOM");
+            mZoomOffsetX = bundle.getFloat("ZOOM_OFFSET_X");
+            mZoomOffsetY = bundle.getFloat("ZOOM_OFFSET_Y");
 
             mCropOverlayView.setInitialCropWindowRect((Rect) bundle.getParcelable("INITIAL_CROP_RECT"));
+
+            mRotationRect.set((RectF) bundle.getParcelable("CROP_WINDOW_RECT"));
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
         } else {
@@ -1017,59 +1027,61 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * @param height the height of the image view
      */
     private void applyImageMatrix(float width, float height, boolean center) {
+        if (width > 0 && height > 0) {
 
-        mImageMatrix.reset();
-        mImageRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+            mImageMatrix.reset();
+            mImageRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
 
-        // move the image to the center of the image view first so we can manipulate it from there
-        mImageMatrix.postTranslate((width - mImageRect.width()) / 2, (height - mImageRect.height()) / 2);
-        mapImageRectangleByImageMatrix(mImageRect);
-
-        // rotate the image the required degrees from center of image
-        if (mDegreesRotated > 0) {
-            mImageMatrix.postRotate(mDegreesRotated, mImageRect.centerX(), mImageRect.centerY());
+            // move the image to the center of the image view first so we can manipulate it from there
+            mImageMatrix.postTranslate((width - mImageRect.width()) / 2, (height - mImageRect.height()) / 2);
             mapImageRectangleByImageMatrix(mImageRect);
-        }
 
-        // scale the image to the image view, image rect transformed to know new width/height
-        float scale = Math.min(width / mImageRect.width(), height / mImageRect.height());
-        if (mScaleType == ScaleType.FIT_CENTER || (mScaleType == ScaleType.CENTER_INSIDE && scale < 1) || (scale > 1 && mZoomEnabled)) {
-            mImageMatrix.postScale(scale, scale, mImageRect.centerX(), mImageRect.centerY());
+            // rotate the image the required degrees from center of image
+            if (mDegreesRotated > 0) {
+                mImageMatrix.postRotate(mDegreesRotated, mImageRect.centerX(), mImageRect.centerY());
+                mapImageRectangleByImageMatrix(mImageRect);
+            }
+
+            // scale the image to the image view, image rect transformed to know new width/height
+            float scale = Math.min(width / mImageRect.width(), height / mImageRect.height());
+            if (mScaleType == ScaleType.FIT_CENTER || (mScaleType == ScaleType.CENTER_INSIDE && scale < 1) || (scale > 1 && mZoomEnabled)) {
+                mImageMatrix.postScale(scale, scale, mImageRect.centerX(), mImageRect.centerY());
+                mapImageRectangleByImageMatrix(mImageRect);
+            }
+
+            // scale by the current zoom level
+            mImageMatrix.postScale(mZoom, mZoom, mImageRect.centerX(), mImageRect.centerY());
             mapImageRectangleByImageMatrix(mImageRect);
+
+            RectF cropRect = mCropOverlayView.getCropWindowRect();
+
+            // reset the crop window offset so we can update it to required value
+            cropRect.offset(-mZoomOffsetX * mZoom, -mZoomOffsetY * mZoom);
+
+            if (center) {
+                // set the zoomed area to be as to the center of cropping window as possible
+                mZoomOffsetX = width > mImageRect.width() ? 0
+                        : Math.max(Math.min(width / 2 - cropRect.centerX(), -mImageRect.left), mImageView.getWidth() - mImageRect.right) / mZoom;
+                mZoomOffsetY = height > mImageRect.height() ? 0
+                        : Math.max(Math.min(height / 2 - cropRect.centerY(), -mImageRect.top), mImageView.getHeight() - mImageRect.bottom) / mZoom;
+            } else {
+                // adjust the zoomed area so the crop window rectangle will be inside the area in case it was moved outside
+                mZoomOffsetX = Math.min(Math.max(mZoomOffsetX * mZoom, -cropRect.left), -cropRect.right + width) / mZoom;
+                mZoomOffsetY = Math.min(Math.max(mZoomOffsetY * mZoom, -cropRect.top), -cropRect.bottom + height) / mZoom;
+            }
+
+            // apply to zoom offset translate and update the crop rectangle to offset correctly
+            mImageMatrix.postTranslate(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
+            cropRect.offset(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
+            mCropOverlayView.setCropWindowRect(cropRect);
+            mapImageRectangleByImageMatrix(mImageRect);
+
+            // set matrix to apply
+            mImageView.setImageMatrix(mImageMatrix);
+
+            // update the image rectangle in the crop overlay
+            updateBitmapRect(mImageRect);
         }
-
-        // scale by the current zoom level
-        mImageMatrix.postScale(mZoom, mZoom, mImageRect.centerX(), mImageRect.centerY());
-        mapImageRectangleByImageMatrix(mImageRect);
-
-        RectF cropRect = mCropOverlayView.getCropWindowRect();
-
-        // reset the crop window offset so we can update it to required value
-        cropRect.offset(-mZoomOffsetX * mZoom, -mZoomOffsetY * mZoom);
-
-        if (center) {
-            // set the zoomed area to be as to the center of cropping window as possible
-            mZoomOffsetX = width > mImageRect.width() ? 0
-                    : Math.max(Math.min(width / 2 - cropRect.centerX(), -mImageRect.left), mImageView.getWidth() - mImageRect.right) / mZoom;
-            mZoomOffsetY = height > mImageRect.height() ? 0
-                    : Math.max(Math.min(height / 2 - cropRect.centerY(), -mImageRect.top), mImageView.getHeight() - mImageRect.bottom) / mZoom;
-        } else {
-            // adjust the zoomed area so the crop window rectangle will be inside the area in case it was moved outside
-            mZoomOffsetX = Math.min(Math.max(mZoomOffsetX * mZoom, -cropRect.left), -cropRect.right + width) / mZoom;
-            mZoomOffsetY = Math.min(Math.max(mZoomOffsetY * mZoom, -cropRect.top), -cropRect.bottom + height) / mZoom;
-        }
-
-        // apply to zoom offset translate and update the crop rectangle to offset correctly
-        mImageMatrix.postTranslate(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
-        cropRect.offset(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
-        mCropOverlayView.setCropWindowRect(cropRect);
-        mapImageRectangleByImageMatrix(mImageRect);
-
-        // set matrix to apply
-        mImageView.setImageMatrix(mImageMatrix);
-
-        // update the image rectangle in the crop overlay
-        updateBitmapRect(mImageRect);
     }
 
     /**
