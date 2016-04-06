@@ -9,6 +9,7 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
         jcenter()
         mavenCentral()
     }
