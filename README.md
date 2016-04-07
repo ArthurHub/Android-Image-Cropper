@@ -73,6 +73,9 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
  - [Android Image Cropper async support and custom progress UI](http://theartofdev.com/2016/01/15/android-image-cropper-async-support-and-custom-progress-ui/)
 
 ## Change log
+*1.2.4*
+ * add fallback in crop to use `BitmapFactory` when `BitmapRegionDecoder` fails
+
 *1.2.3*
  * Fix `getActualCropRect` to adjust by sampling size for images loaded from URI.
  * Fix crop window size bounded with fixed aspect ratio and move of a single edge.
