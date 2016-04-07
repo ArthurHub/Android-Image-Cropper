@@ -137,7 +137,7 @@ final class BitmapUtils {
             // First decode with inJustDecodeBounds=true to check dimensions
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(stream, new Rect(0, 0, 0, 0), options);
+            BitmapFactory.decodeStream(stream, CropDefaults.EMPTY_RECT, options);
             options.inJustDecodeBounds = false;
 
             // Calculate inSampleSize
@@ -146,12 +146,12 @@ final class BitmapUtils {
             // Decode bitmap with inSampleSize set
             closeSafe(stream);
             stream = resolver.openInputStream(uri);
-            Bitmap bitmap = BitmapFactory.decodeStream(stream, new Rect(0, 0, 0, 0), options);
+            Bitmap bitmap = BitmapFactory.decodeStream(stream, CropDefaults.EMPTY_RECT, options);
 
             return new DecodeBitmapResult(bitmap, options.inSampleSize);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load sampled bitmap", e);
+            throw new RuntimeException("Failed to load sampled bitmap: " + uri, e);
         } finally {
             closeSafe(stream);
         }
@@ -169,13 +169,34 @@ final class BitmapUtils {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = calculateInSampleSize(rect.width(), rect.height(), reqWidth, reqHeight);
 
-            BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(stream, false);
-            Bitmap bitmap = decoder.decodeRegion(rect, options);
+            Bitmap bitmap = null;
+            try {
+                BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(stream, false);
+                bitmap = decoder.decodeRegion(rect, options);
+                decoder.recycle();
+            } catch (Exception e) {
+            }
+
+            if (bitmap == null) {
+                // failed to decode region, may be skia issue, try full decode and then crop
+                InputStream stream2 = null;
+                try {
+                    stream2 = resolver.openInputStream(uri);
+
+                    Bitmap fullBitmap = BitmapFactory.decodeStream(stream2, CropDefaults.EMPTY_RECT, options);
+                    if (fullBitmap != null) {
+                        bitmap = cropBitmap(fullBitmap, rect);
+                        fullBitmap.recycle();
+                    }
+                } finally {
+                    closeSafe(stream2);
+                }
+            }
 
             return new DecodeBitmapResult(bitmap, options.inSampleSize);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load sampled bitmap", e);
+            throw new RuntimeException("Failed to load sampled bitmap: " + uri, e);
         } finally {
             closeSafe(stream);
         }
