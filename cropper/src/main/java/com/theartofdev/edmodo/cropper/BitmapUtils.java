@@ -117,7 +117,7 @@ final class BitmapUtils {
             return new DecodeBitmapResult(bitmap, options.inSampleSize);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load sampled bitmap", e);
+            throw new RuntimeException("Failed to load sampled bitmap: " + uri, e);
         } finally {
             closeSafe(stream);
         }
@@ -159,17 +159,43 @@ final class BitmapUtils {
         int width = reqWidth > 0 ? reqWidth : rect.width();
         int height = reqHeight > 0 ? reqHeight : rect.height();
 
-        // decode only the required image from URI, optionally sub-sampling if reqWidth/reqHeight is given.
-        Bitmap result = decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
+        Bitmap result = null;
+        try {
+            // decode only the required image from URI, optionally sub-sampling if reqWidth/reqHeight is given.
+            result = decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
+        } catch (Exception e) {
+        }
 
-        // rotate the decoded region by the required amount
-        result = rotateBitmapInt(result, degreesRotated);
+        if (result != null) {
+            // rotate the decoded region by the required amount
+            result = rotateBitmapInt(result, degreesRotated);
 
-        // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
-        if (degreesRotated % 90 != 0) {
+            // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
+            if (degreesRotated % 90 != 0) {
 
-            // extra crop because non rectengular crop cannot be done directly on the image without rotating first
-            result = cropForRotatedImage(result, points, rect, degreesRotated);
+                // extra crop because non rectengular crop cannot be done directly on the image without rotating first
+                result = cropForRotatedImage(result, points, rect, degreesRotated);
+            }
+        } else {
+
+            // failed to decode region, may be skia issue, try full decode and then crop
+            InputStream stream = null;
+            try {
+                stream = context.getContentResolver().openInputStream(loadedImageUri);
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = calculateInSampleSize(rect.width(), rect.height(), reqWidth, reqHeight);
+
+                Bitmap fullBitmap = BitmapFactory.decodeStream(stream, CropDefaults.EMPTY_RECT, options);
+                if (fullBitmap != null) {
+                    result = cropBitmap(fullBitmap, points, degreesRotated);
+                    fullBitmap.recycle();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to load sampled bitmap: " + loadedImageUri, e);
+            } finally {
+                closeSafe(stream);
+            }
         }
 
         return result;
@@ -235,7 +261,7 @@ final class BitmapUtils {
             return bitmap;
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load sampled bitmap", e);
+            throw new RuntimeException("Failed to load sampled bitmap: " + uri, e);
         } finally {
             closeSafe(stream);
         }
