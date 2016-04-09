@@ -392,10 +392,21 @@ public class CropImageView extends FrameLayout {
             float actualCropBottom = actualCropTop + displayedCropHeight * scaleFactor.second;
 
             // Correct for floating point errors. Crop rect boundaries should not exceed the source Bitmap bounds.
-            actualCropLeft = Math.max(0f, actualCropLeft) * mLoadedSampleSize;
-            actualCropTop = Math.max(0f, actualCropTop) * mLoadedSampleSize;
-            actualCropRight = Math.min(mBitmap.getWidth(), actualCropRight) * mLoadedSampleSize;
-            actualCropBottom = Math.min(mBitmap.getHeight(), actualCropBottom) * mLoadedSampleSize;
+            actualCropLeft = Math.round(Math.max(0f, actualCropLeft) * mLoadedSampleSize);
+            actualCropTop = Math.round(Math.max(0f, actualCropTop) * mLoadedSampleSize);
+            actualCropRight = Math.round(Math.min(mBitmap.getWidth(), actualCropRight) * mLoadedSampleSize);
+            actualCropBottom = Math.round(Math.min(mBitmap.getHeight(), actualCropBottom) * mLoadedSampleSize);
+
+            // extra cehck to be sure that width and height are equal if 1:1 fixed aspect ratio is requested
+            if (mCropOverlayView.isFixAspectRatio()
+                    && mCropOverlayView.getAspectRatioX() == mCropOverlayView.getAspectRatioY()
+                    && actualCropBottom - actualCropTop != actualCropRight - actualCropLeft) {
+                if (actualCropBottom - actualCropTop > actualCropRight - actualCropLeft) {
+                    actualCropBottom--;
+                } else {
+                    actualCropRight--;
+                }
+            }
 
             return new Rect((int) actualCropLeft, (int) actualCropTop, (int) actualCropRight, (int) actualCropBottom);
         } else {
