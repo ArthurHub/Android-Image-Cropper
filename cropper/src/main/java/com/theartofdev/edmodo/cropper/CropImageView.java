@@ -402,9 +402,9 @@ public class CropImageView extends FrameLayout {
                     && mCropOverlayView.getAspectRatioX() == mCropOverlayView.getAspectRatioY()
                     && actualCropBottom - actualCropTop != actualCropRight - actualCropLeft) {
                 if (actualCropBottom - actualCropTop > actualCropRight - actualCropLeft) {
-                    actualCropBottom--;
+                    actualCropBottom -= actualCropBottom - actualCropTop - (actualCropRight - actualCropLeft);
                 } else {
-                    actualCropRight--;
+                    actualCropRight -= actualCropRight - actualCropLeft - (actualCropBottom - actualCropTop);
                 }
             }
 
