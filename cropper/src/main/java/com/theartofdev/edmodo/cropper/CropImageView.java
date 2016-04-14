@@ -73,11 +73,6 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      */
     private final RectF mImageRect = new RectF();
 
-    /**
-     * Rectengale used in image rotation calculation (reusing rect instance)
-     */
-    private final RectF mRotationRect = new RectF();
-
     private Bitmap mBitmap;
 
     private int mDegreesRotated;
@@ -156,6 +151,11 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * The Y offset that the cropping image was translated after zooming
      */
     private float mZoomOffsetY;
+
+    /**
+     * Used to restore the cropping windows rectangle after state restore
+     */
+    private RectF mRestoreCropWindowRect;
 
     /**
      * Task used to load bitmap async from UI thread
@@ -673,21 +673,26 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         if (mBitmap != null) {
             if (degrees % 90 == 0) {
 
-                mRotationRect.set(mCropOverlayView.getCropWindowRect());
+                BitmapUtils.RECT.set(mCropOverlayView.getCropWindowRect());
 
                 mImageMatrix.invert(mImageInverseMatrix);
-                mImageInverseMatrix.mapRect(mRotationRect);
+                mImageInverseMatrix.mapRect(BitmapUtils.RECT);
 
+                mZoom = 1;
+                mZoomOffsetX = 0;
+                mZoomOffsetY = 0;
                 mDegreesRotated += degrees;
                 mDegreesRotated = mDegreesRotated % 360;
 
-                applyImageMatrix(getWidth(), getHeight(), false);
+                applyImageMatrix(getWidth(), getHeight(), true);
 
-                mImageMatrix.mapRect(mRotationRect);
+                mImageMatrix.mapRect(BitmapUtils.RECT);
 
                 mCropOverlayView.resetCropOverlayView();
-                mCropOverlayView.setCropWindowRect(mRotationRect);
+                mCropOverlayView.setCropWindowRect(BitmapUtils.RECT);
                 applyImageMatrix(getWidth(), getHeight(), true);
+                onCropWindowChanged(false);
+
             } else {
 
                 mDegreesRotated += degrees;
@@ -826,17 +831,14 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             }
         }
         bundle.putInt("DEGREES_ROTATED", mDegreesRotated);
-        bundle.putFloat("ZOOM", mZoom);
-        bundle.putFloat("ZOOM_OFFSET_X", mZoomOffsetX);
-        bundle.putFloat("ZOOM_OFFSET_Y", mZoomOffsetY);
         bundle.putParcelable("INITIAL_CROP_RECT", mCropOverlayView.getInitialCropWindowRect());
 
-        mRotationRect.set(mCropOverlayView.getCropWindowRect());
+        BitmapUtils.RECT.set(mCropOverlayView.getCropWindowRect());
 
         mImageMatrix.invert(mImageInverseMatrix);
-        mImageInverseMatrix.mapRect(mRotationRect);
+        mImageInverseMatrix.mapRect(BitmapUtils.RECT);
 
-        bundle.putParcelable("CROP_WINDOW_RECT", mRotationRect);
+        bundle.putParcelable("CROP_WINDOW_RECT", BitmapUtils.RECT);
 
         return bundle;
     }
@@ -868,13 +870,10 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             }
 
             mDegreesRotated = bundle.getInt("DEGREES_ROTATED");
-            mZoom = bundle.getFloat("ZOOM");
-            mZoomOffsetX = bundle.getFloat("ZOOM_OFFSET_X");
-            mZoomOffsetY = bundle.getFloat("ZOOM_OFFSET_Y");
 
             mCropOverlayView.setInitialCropWindowRect((Rect) bundle.getParcelable("INITIAL_CROP_RECT"));
 
-            mRotationRect.set((RectF) bundle.getParcelable("CROP_WINDOW_RECT"));
+            mRestoreCropWindowRect = bundle.getParcelable("CROP_WINDOW_RECT");
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
         } else {
@@ -954,6 +953,14 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
 
             if (mBitmap != null) {
                 applyImageMatrix(r - l, b - t, false);
+
+                // after state restore we want to restore the window crop, possible only after widget size is known
+                if (mRestoreCropWindowRect != null) {
+                    mImageMatrix.mapRect(mRestoreCropWindowRect);
+                    mCropOverlayView.setCropWindowRect(mRestoreCropWindowRect);
+                    mRestoreCropWindowRect = null;
+                    onCropWindowChanged(false);
+                }
             } else {
                 updateBitmapRect(CropDefaults.EMPTY_RECT_F);
             }
@@ -973,7 +980,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             if (cropRect.left < 0 || cropRect.top < 0 || cropRect.right > width || cropRect.bottom > height) {
                 applyImageMatrix(width, height, false);
             }
-        } else {
+        } else if (mZoomEnabled) {
 
             float oldZoom = mZoom;
             for (int i = 0; i < 8; i++) {

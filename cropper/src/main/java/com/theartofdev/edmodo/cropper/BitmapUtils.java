@@ -40,6 +40,11 @@ import java.io.InputStream;
 final class BitmapUtils {
 
     /**
+     * Reusable rectengale for general internal usage
+     */
+    static final RectF RECT = new RectF();
+
+    /**
      * Rotate the given bitmap by the given degrees.<br>
      * New bitmap is created and the old one is recycled.
      */
