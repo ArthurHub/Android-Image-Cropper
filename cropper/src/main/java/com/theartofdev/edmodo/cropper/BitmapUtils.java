@@ -133,10 +133,11 @@ final class BitmapUtils {
      * if the rotation is not 0,90,180 or 270 degrees then we must first crop a larger area of the image that
      * contains the requires rectangle, rotate and then crop again a sub rectangle.
      */
-    public static Bitmap cropBitmap(Bitmap bitmap, float[] points, int degreesRotated) {
+    public static Bitmap cropBitmap(Bitmap bitmap, float[] points,
+                                    int degreesRotated, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
 
         // get the rectangle in original image that contains the required cropped area (larger for non rectengular crop)
-        Rect rect = getRectFromPoints(points, bitmap.getWidth(), bitmap.getHeight());
+        Rect rect = getRectFromPoints(points, bitmap.getWidth(), bitmap.getHeight(), fixAspectRatio, aspectRatioX, aspectRatioY);
 
         // crop and rotate the cropped image in one operation
         Matrix matrix = new Matrix();
@@ -147,7 +148,7 @@ final class BitmapUtils {
         if (degreesRotated % 90 != 0) {
 
             // extra crop because non rectengular crop cannot be done directly on the image without rotating first
-            result = cropForRotatedImage(result, points, rect, degreesRotated);
+            result = cropForRotatedImage(result, points, rect, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
         }
 
         return result;
@@ -156,10 +157,12 @@ final class BitmapUtils {
     /**
      * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.
      */
-    public static Bitmap cropBitmap(Context context, Uri loadedImageUri, float[] points, int degreesRotated, int orgWidth, int orgHeight, int reqWidth, int reqHeight) {
+    public static Bitmap cropBitmap(Context context, Uri loadedImageUri, float[] points,
+                                    int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
+                                    int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight) {
 
         // get the rectangle in original image that contains the required cropped area (larger for non rectengular crop)
-        Rect rect = getRectFromPoints(points, orgWidth, orgHeight);
+        Rect rect = getRectFromPoints(points, orgWidth, orgHeight, fixAspectRatio, aspectRatioX, aspectRatioY);
 
         int width = reqWidth > 0 ? reqWidth : rect.width();
         int height = reqHeight > 0 ? reqHeight : rect.height();
@@ -179,7 +182,7 @@ final class BitmapUtils {
             if (degreesRotated % 90 != 0) {
 
                 // extra crop because non rectengular crop cannot be done directly on the image without rotating first
-                result = cropForRotatedImage(result, points, rect, degreesRotated);
+                result = cropForRotatedImage(result, points, rect, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
             }
         } else {
 
@@ -193,7 +196,7 @@ final class BitmapUtils {
 
                 Bitmap fullBitmap = BitmapFactory.decodeStream(stream, CropDefaults.EMPTY_RECT, options);
                 if (fullBitmap != null) {
-                    result = cropBitmap(fullBitmap, points, degreesRotated);
+                    result = cropBitmap(fullBitmap, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
                     fullBitmap.recycle();
                 }
             } catch (Exception e) {
@@ -237,12 +240,32 @@ final class BitmapUtils {
      * Get a rectangle for the given 4 points (x0,y0,x1,y1,x2,y2,x3,y3) by finding the min/max 2 points that
      * contains the given 4 points and is a stright rectangle.
      */
-    public static Rect getRectFromPoints(float[] points, int imageWidth, int imageHeight) {
-        int left = (int) Math.max(0, Math.min(Math.min(Math.min(points[0], points[2]), points[4]), points[6]));
-        int top = (int) Math.max(0, Math.min(Math.min(Math.min(points[1], points[3]), points[5]), points[7]));
-        int right = (int) Math.min(imageWidth, Math.max(Math.max(Math.max(points[0], points[2]), points[4]), points[6]));
-        int bottom = (int) Math.min(imageHeight, Math.max(Math.max(Math.max(points[1], points[3]), points[5]), points[7]));
-        return new Rect(left, top, right, bottom);
+    public static Rect getRectFromPoints(float[] points, int imageWidth, int imageHeight, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
+        int left = Math.round(Math.max(0, Math.min(Math.min(Math.min(points[0], points[2]), points[4]), points[6])));
+        int top = Math.round(Math.max(0, Math.min(Math.min(Math.min(points[1], points[3]), points[5]), points[7])));
+        int right = Math.round(Math.min(imageWidth, Math.max(Math.max(Math.max(points[0], points[2]), points[4]), points[6])));
+        int bottom = Math.round(Math.min(imageHeight, Math.max(Math.max(Math.max(points[1], points[3]), points[5]), points[7])));
+
+        Rect rect = new Rect(left, top, right, bottom);
+        if (fixAspectRatio) {
+            fixRectForAspectRatio(rect, aspectRatioX, aspectRatioY);
+        }
+
+        return rect;
+    }
+
+    /**
+     * Fix the given rectangle if it doesn't confirm to aspect ration rule.<br>
+     * Make sure that width and height are equal if 1:1 fixed aspect ratio is requested.
+     */
+    public static void fixRectForAspectRatio(Rect rect, int aspectRatioX, int aspectRatioY) {
+        if (aspectRatioX == aspectRatioY && rect.width() != rect.height()) {
+            if (rect.height() > rect.width()) {
+                rect.bottom -= rect.height() - rect.width();
+            } else {
+                rect.right -= rect.width() - rect.height();
+            }
+        }
     }
 
     //region: Private methods
@@ -278,13 +301,14 @@ final class BitmapUtils {
      * rectangle.<br>
      * Note: rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping.
      */
-    private static Bitmap cropForRotatedImage(Bitmap bitmap, float[] points, Rect rect, int degreesRotated) {
+    private static Bitmap cropForRotatedImage(Bitmap bitmap, float[] points, Rect rect, int degreesRotated,
+                                              boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
         if (degreesRotated % 90 != 0) {
 
             int adjLeft = 0, adjTop = 0, width = 0, height = 0;
             double rads = Math.toRadians(degreesRotated);
             int compareTo = degreesRotated < 90 || (degreesRotated > 180 && degreesRotated < 270) ? rect.left : rect.right;
-            for (int i = 0; i < points.length; i += 2)
+            for (int i = 0; i < points.length; i += 2) {
                 if (((int) points[i]) == compareTo) {
                     adjLeft = (int) Math.abs(Math.sin(rads) * (rect.bottom - points[i + 1]));
                     adjTop = (int) Math.abs(Math.cos(rads) * (points[i + 1] - rect.top));
@@ -292,9 +316,15 @@ final class BitmapUtils {
                     height = (int) Math.abs((rect.bottom - points[i + 1]) / Math.cos(rads));
                     break;
                 }
+            }
+
+            rect.set(adjLeft, adjTop, width, height);
+            if (fixAspectRatio) {
+                fixRectForAspectRatio(rect, aspectRatioX, aspectRatioY);
+            }
 
             Bitmap bitmapTmp = bitmap;
-            bitmap = Bitmap.createBitmap(bitmap, adjLeft, adjTop, width, height);
+            bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
             bitmapTmp.recycle();
         }
         return bitmap;
