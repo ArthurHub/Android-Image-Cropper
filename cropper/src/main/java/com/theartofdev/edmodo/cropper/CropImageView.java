@@ -1158,7 +1158,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         }
 
         // set the bitmap rectangle and update the crop window after scale factor is set
-        mCropOverlayView.setBitmapRect(bitmapRect);
+        mCropOverlayView.setBitmapRect(bitmapRect, mImageView.getWidth(), mImageView.getHeight());
     }
 
     /**

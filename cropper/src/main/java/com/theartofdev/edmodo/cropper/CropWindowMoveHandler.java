@@ -68,12 +68,14 @@ final class CropWindowMoveHandler {
      * @param x the new x-coordinate of this handle
      * @param y the new y-coordinate of this handle
      * @param bounds the bounding rectangle of the image
+     * @param viewWidth The bounding image view width used to know the crop overlay is at view edges.
+     * @param viewHeight The bounding image view height used to know the crop overlay is at view edges.
      * @param parentView the parent View containing the image
      * @param snapMargin the maximum distance (in pixels) at which the crop window should snap to the image
      * @param fixedAspectRatio is the aspect ration fixed and 'targetAspectRatio' should be used
      * @param aspectRatio the aspect ratio to maintain
      */
-    public void move(float x, float y, RectF bounds, float snapMargin, boolean fixedAspectRatio, float aspectRatio) {
+    public void move(float x, float y, RectF bounds, int viewWidth, int viewHeight, float snapMargin, boolean fixedAspectRatio, float aspectRatio) {
 
         // Adjust the coordinates for the finger position's offset (i.e. the
         // distance from the initial touch to the precise handle location).
@@ -83,12 +85,12 @@ final class CropWindowMoveHandler {
         float adjY = y + mTouchOffset.y;
 
         if (mType == Type.CENTER) {
-            moveCenter(adjX, adjY, bounds, snapMargin);
+            moveCenter(adjX, adjY, bounds, viewWidth, viewHeight, snapMargin);
         } else {
             if (fixedAspectRatio) {
-                moveSizeWithFixedAspectRatio(adjX, adjY, bounds, snapMargin, aspectRatio);
+                moveSizeWithFixedAspectRatio(adjX, adjY, bounds, viewWidth, viewHeight, snapMargin, aspectRatio);
             } else {
-                moveSizeWithFreeAspectRatio(adjX, adjY, bounds, snapMargin);
+                moveSizeWithFreeAspectRatio(adjX, adjY, bounds, viewWidth, viewHeight, snapMargin);
             }
         }
     }
@@ -155,10 +157,20 @@ final class CropWindowMoveHandler {
     /**
      * Center move only changes the position of the crop window without changing the size.
      */
-    private void moveCenter(float x, float y, RectF imageRect, float snapRadius) {
+    private void moveCenter(float x, float y, RectF bounds, int viewWidth, int viewHeight, float snapRadius) {
         RectF rect = mCropWindowHandler.getRect();
-        rect.offset(x - rect.centerX(), y - rect.centerY());
-        snapEdgesToBounds(rect, imageRect, snapRadius);
+        float dx = x - rect.centerX();
+        float dy = y - rect.centerY();
+        if (rect.left + dx < 0 || rect.right + dx > viewWidth) {
+            dx /= 1.05f;
+            mTouchOffset.x -= dx / 2;
+        }
+        if (rect.top + dy < 0 || rect.bottom + dy > viewHeight) {
+            dy /= 1.05f;
+            mTouchOffset.y -= dy / 2;
+        }
+        rect.offset(dx, dy);
+        snapEdgesToBounds(rect, bounds, snapRadius);
         mCropWindowHandler.setRect(rect);
     }
 
@@ -167,7 +179,7 @@ final class CropWindowMoveHandler {
      * affecting "secondary" edges.<br>
      * Only the primary edge(s) are fixed to stay within limits.
      */
-    private void moveSizeWithFreeAspectRatio(float x, float y, RectF bounds, float snapMargin) {
+    private void moveSizeWithFreeAspectRatio(float x, float y, RectF bounds, int viewWidth, int viewHeight, float snapMargin) {
         switch (mType) {
             case TOP_LEFT:
                 adjustTop(y, bounds, snapMargin, 0, false, false);
@@ -175,15 +187,15 @@ final class CropWindowMoveHandler {
                 break;
             case TOP_RIGHT:
                 adjustTop(y, bounds, snapMargin, 0, false, false);
-                adjustRight(x, bounds, snapMargin, 0, false, false);
+                adjustRight(x, bounds, viewWidth, snapMargin, 0, false, false);
                 break;
             case BOTTOM_LEFT:
-                adjustBottom(y, bounds, snapMargin, 0, false, false);
+                adjustBottom(y, bounds, viewHeight, snapMargin, 0, false, false);
                 adjustLeft(x, bounds, snapMargin, 0, false, false);
                 break;
             case BOTTOM_RIGHT:
-                adjustBottom(y, bounds, snapMargin, 0, false, false);
-                adjustRight(x, bounds, snapMargin, 0, false, false);
+                adjustBottom(y, bounds, viewHeight, snapMargin, 0, false, false);
+                adjustRight(x, bounds, viewWidth, snapMargin, 0, false, false);
                 break;
             case LEFT:
                 adjustLeft(x, bounds, snapMargin, 0, false, false);
@@ -192,10 +204,10 @@ final class CropWindowMoveHandler {
                 adjustTop(y, bounds, snapMargin, 0, false, false);
                 break;
             case RIGHT:
-                adjustRight(x, bounds, snapMargin, 0, false, false);
+                adjustRight(x, bounds, viewWidth, snapMargin, 0, false, false);
                 break;
             case BOTTOM:
-                adjustBottom(y, bounds, snapMargin, 0, false, false);
+                adjustBottom(y, bounds, viewHeight, snapMargin, 0, false, false);
                 break;
             default:
                 break;
@@ -208,7 +220,7 @@ final class CropWindowMoveHandler {
      * Example: change in the left edge (primary) will affect top and bottom edges (secondary) to preserve the
      * given aspect ratio.
      */
-    private void moveSizeWithFixedAspectRatio(float x, float y, RectF bounds, float snapMargin, float aspectRatio) {
+    private void moveSizeWithFixedAspectRatio(float x, float y, RectF bounds, int viewWidth, int viewHeight, float snapMargin, float aspectRatio) {
         RectF rect = mCropWindowHandler.getRect();
         switch (mType) {
             case TOP_LEFT:
@@ -225,13 +237,13 @@ final class CropWindowMoveHandler {
                     adjustTop(y, bounds, snapMargin, aspectRatio, false, true);
                     adjustRightByAspectRatio(aspectRatio);
                 } else {
-                    adjustRight(x, bounds, snapMargin, aspectRatio, true, false);
+                    adjustRight(x, bounds, viewWidth, snapMargin, aspectRatio, true, false);
                     adjustTopByAspectRatio(aspectRatio);
                 }
                 break;
             case BOTTOM_LEFT:
                 if (calculateAspectRatio(x, rect.top, rect.right, y) < aspectRatio) {
-                    adjustBottom(y, bounds, snapMargin, aspectRatio, true, false);
+                    adjustBottom(y, bounds, viewHeight, snapMargin, aspectRatio, true, false);
                     adjustLeftByAspectRatio(aspectRatio);
                 } else {
                     adjustLeft(x, bounds, snapMargin, aspectRatio, false, true);
@@ -240,10 +252,10 @@ final class CropWindowMoveHandler {
                 break;
             case BOTTOM_RIGHT:
                 if (calculateAspectRatio(rect.left, rect.top, x, y) < aspectRatio) {
-                    adjustBottom(y, bounds, snapMargin, aspectRatio, false, true);
+                    adjustBottom(y, bounds, viewHeight, snapMargin, aspectRatio, false, true);
                     adjustRightByAspectRatio(aspectRatio);
                 } else {
-                    adjustRight(x, bounds, snapMargin, aspectRatio, false, true);
+                    adjustRight(x, bounds, viewWidth, snapMargin, aspectRatio, false, true);
                     adjustBottomByAspectRatio(aspectRatio);
                 }
                 break;
@@ -256,11 +268,11 @@ final class CropWindowMoveHandler {
                 adjustLeftRightByAspectRatio(bounds, aspectRatio);
                 break;
             case RIGHT:
-                adjustRight(x, bounds, snapMargin, aspectRatio, true, true);
+                adjustRight(x, bounds, viewWidth, snapMargin, aspectRatio, true, true);
                 adjustTopBottomByAspectRatio(bounds, aspectRatio);
                 break;
             case BOTTOM:
-                adjustBottom(y, bounds, snapMargin, aspectRatio, true, true);
+                adjustBottom(y, bounds, viewHeight, snapMargin, aspectRatio, true, true);
                 adjustLeftRightByAspectRatio(bounds, aspectRatio);
                 break;
             default:
@@ -299,6 +311,11 @@ final class CropWindowMoveHandler {
         RectF rect = mCropWindowHandler.getRect();
 
         float newLeft = left;
+
+        if (newLeft < 0) {
+            newLeft /= 1.05f;
+            mTouchOffset.x -= newLeft / 1.1f;
+        }
 
         if (newLeft - bounds.left < snapMargin) {
             newLeft = bounds.left;
@@ -361,13 +378,19 @@ final class CropWindowMoveHandler {
      *
      * @param right the position that the right edge is dragged to
      * @param bounds the bounding box of the image that is being cropped
+     * @param viewWidth
      * @param snapMargin the snap distance to the image edge (in pixels)
      */
-    private void adjustRight(float right, RectF bounds, float snapMargin, float aspectRatio, boolean topMoves, boolean bottomMoves) {
+    private void adjustRight(float right, RectF bounds, int viewWidth, float snapMargin, float aspectRatio, boolean topMoves, boolean bottomMoves) {
 
         RectF rect = mCropWindowHandler.getRect();
 
         float newRight = right;
+
+        if (newRight > viewWidth) {
+            newRight = viewWidth + (newRight - viewWidth) / 1.05f;
+            mTouchOffset.x -= (newRight - viewWidth) / 1.1f;
+        }
 
         // If close to the edge
         if (bounds.right - newRight < snapMargin) {
@@ -440,6 +463,11 @@ final class CropWindowMoveHandler {
 
         float newTop = top;
 
+        if (newTop < 0) {
+            newTop /= 1.05f;
+            mTouchOffset.y -= newTop / 1.1f;
+        }
+
         if (newTop - bounds.top < snapMargin) {
             newTop = bounds.top;
         }
@@ -498,16 +526,21 @@ final class CropWindowMoveHandler {
     /**
      * Get the resulting y-position of the bottom edge of the crop window given
      * the handle's position and the image's bounding box and snap radius.
-     *
-     * @param bottom the position that the bottom edge is dragged to
+     *  @param bottom the position that the bottom edge is dragged to
      * @param bounds the bounding box of the image that is being cropped
+     * @param viewHeight
      * @param snapMargin the snap distance to the image edge (in pixels)
      */
-    private void adjustBottom(float bottom, RectF bounds, float snapMargin, float aspectRatio, boolean leftMoves, boolean rightMoves) {
+    private void adjustBottom(float bottom, RectF bounds, int viewHeight, float snapMargin, float aspectRatio, boolean leftMoves, boolean rightMoves) {
 
         RectF rect = mCropWindowHandler.getRect();
 
         float newBottom = bottom;
+
+        if (newBottom > viewHeight) {
+            newBottom = viewHeight + (newBottom - viewHeight) / 1.05f;
+            mTouchOffset.y -= (newBottom - viewHeight) / 1.1f;
+        }
 
         if (bounds.bottom - newBottom < snapMargin) {
             newBottom = bounds.bottom;

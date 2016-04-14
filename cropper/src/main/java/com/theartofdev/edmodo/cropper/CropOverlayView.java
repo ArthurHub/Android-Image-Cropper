@@ -67,6 +67,16 @@ public class CropOverlayView extends View {
     private RectF mBitmapRect = new RectF();
 
     /**
+     * The bounding image view width used to know the crop overlay is at view edges.
+     */
+    private int mViewWidth;
+
+    /**
+     * The bounding image view height used to know the crop overlay is at view edges.
+     */
+    private int mViewHeight;
+
+    /**
      * The offset to draw the border corener from the border
      */
     private float mBorderCornerOffset;
@@ -175,10 +185,14 @@ public class CropOverlayView extends View {
      * ImageView. This is necessary to call in order to draw the crop window.
      *
      * @param bitmapRect the image's bounding box
+     * @param viewWidth The bounding image view width.
+     * @param viewHeight The bounding image view height.
      */
-    public void setBitmapRect(RectF bitmapRect) {
+    public void setBitmapRect(RectF bitmapRect, int viewWidth, int viewHeight) {
         if (mBitmapRect == null || !bitmapRect.equals(mBitmapRect)) {
             mBitmapRect.set(bitmapRect);
+            mViewWidth = viewWidth;
+            mViewHeight = viewHeight;
             RectF cropRect = mCropWindowHandler.getRect();
             if (cropRect.width() == 0 || cropRect.height() == 0) {
                 initCropWindow();
@@ -191,7 +205,7 @@ public class CropOverlayView extends View {
      */
     public void resetCropOverlayView() {
         if (initializedCropWindow) {
-            setBitmapRect(CropDefaults.EMPTY_RECT_F);
+            setBitmapRect(CropDefaults.EMPTY_RECT_F, 0, 0);
             setCropWindowRect(CropDefaults.EMPTY_RECT_F);
             initCropWindow();
             invalidate();
@@ -819,7 +833,7 @@ public class CropOverlayView extends View {
      */
     private void onActionMove(float x, float y) {
         if (mMoveHandler != null) {
-            mMoveHandler.move(x, y, mBitmapRect, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
+            mMoveHandler.move(x, y, mBitmapRect, mViewWidth, mViewHeight, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
             if (mCropWindowChangeListener != null) {
                 mCropWindowChangeListener.onCropWindowChanged(true);
             }
