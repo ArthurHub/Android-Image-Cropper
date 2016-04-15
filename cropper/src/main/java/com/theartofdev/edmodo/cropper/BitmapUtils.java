@@ -24,11 +24,13 @@ import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Pair;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 
 /**
  * Utility class that deals with operations with an ImageView.
@@ -39,6 +41,11 @@ final class BitmapUtils {
      * Reusable rectengale for general internal usage
      */
     static final RectF RECT = new RectF();
+
+    /**
+     * used to save bitmaps during state save and restore so not to reload them.
+     */
+    static Pair<String, WeakReference<Bitmap>> mStateBitmap;
 
     /**
      * Rotate the given bitmap by the given degrees.<br>

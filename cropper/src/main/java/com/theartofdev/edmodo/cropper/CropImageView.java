@@ -35,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import java.lang.ref.WeakReference;
+import java.util.UUID;
 
 /**
  * Custom view that provides cropping capabilities to an image.
@@ -810,12 +811,18 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         if (mLoadedImageUri == null && mImageResource < 1) {
             bundle.putParcelable("SET_BITMAP", mBitmap);
         }
+        if (mLoadedImageUri != null && mBitmap != null) {
+            String key = UUID.randomUUID().toString();
+            BitmapUtils.mStateBitmap = new Pair<>(key, new WeakReference<>(mBitmap));
+            bundle.putString("LOADED_IMAGE_STATE_BITMAP_KEY", key);
+        }
         if (mBitmapLoadingWorkerTask != null) {
             BitmapLoadingWorkerTask task = mBitmapLoadingWorkerTask.get();
             if (task != null) {
                 bundle.putParcelable("LOADING_IMAGE_URI", task.getUri());
             }
         }
+        bundle.putInt("LOADED_SAMPLE_SIZE", mLoadedSampleSize);
         bundle.putInt("DEGREES_ROTATED", mDegreesRotated);
         bundle.putParcelable("INITIAL_CROP_RECT", mCropOverlayView.getInitialCropWindowRect());
 
@@ -837,7 +844,21 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             Bitmap bitmap = null;
             Uri uri = bundle.getParcelable("LOADED_IMAGE_URI");
             if (uri != null) {
-                setImageUriAsync(uri, bundle.getInt("DEGREES_ROTATED"));
+                String key = bundle.getString("LOADED_IMAGE_STATE_BITMAP_KEY");
+                if (key != null) {
+                    Bitmap stateBitmap = BitmapUtils.mStateBitmap != null && BitmapUtils.mStateBitmap.first.equals(key)
+                            ? BitmapUtils.mStateBitmap.second.get() : null;
+                    if (stateBitmap != null && !stateBitmap.isRecycled()) {
+                        BitmapUtils.mStateBitmap = null;
+                        setBitmap(stateBitmap, true);
+                        mLoadedImageUri = uri;
+                        mLoadedSampleSize = bundle.getInt("LOADED_SAMPLE_SIZE");
+                    }
+                }
+                if (mLoadedImageUri == null) {
+                    setImageUriAsync(uri, bundle.getInt("DEGREES_ROTATED"));
+                }
+
             } else {
                 int resId = bundle.getInt("LOADED_IMAGE_RESOURCE");
                 if (resId > 0) {
