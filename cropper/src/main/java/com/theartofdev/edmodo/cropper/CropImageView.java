@@ -429,15 +429,8 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
 
             // get the rectangle for the points (it may be larger than original if rotation is not stright)
-            Rect rect = BitmapUtils.getRectFromPoints(points, orgWidth,
-                    orgHeight, mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY());
-
-            if (mCropOverlayView.isFixAspectRatio()) {
-                // rounding errors may result in violating aspect ratio rule
-                BitmapUtils.fixRectForAspectRatio(rect, mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY());
-            }
-
-            return rect;
+            return BitmapUtils.getRectFromPoints(points, orgWidth, orgHeight,
+                    mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY());
         } else {
             return null;
         }
