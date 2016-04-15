@@ -318,7 +318,7 @@ final class BitmapUtils {
                 }
             }
 
-            rect.set(adjLeft, adjTop, width, height);
+            rect.set(adjLeft, adjTop, adjLeft + width, adjTop + height);
             if (fixAspectRatio) {
                 fixRectForAspectRatio(rect, aspectRatioX, aspectRatioY);
             }
