@@ -94,7 +94,7 @@ See [full change log](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Ch
 ## License
 Forked from [edmodo/cropper](https://github.com/edmodo/cropper) fixing some bugs and adding some features.
 
-Copyright 2013, Edmodo, Inc. 
+Copyright 2016, Arthur Teplitzki 2013, Edmodo, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the   License.
 You may obtain a copy of the License in the LICENSE file, or at:
