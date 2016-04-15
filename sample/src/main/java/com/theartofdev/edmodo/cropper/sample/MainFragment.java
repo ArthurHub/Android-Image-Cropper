@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.croppersample.R;
+import com.theartofdev.edmodo.cropper.CropImageHelper;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 /**
@@ -130,7 +131,7 @@ public final class MainFragment extends Fragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.main_action_crop) {
-            mCropImageView.getCroppedImageAsync(mCropImageView.getCropShape());
+            mCropImageView.getCroppedImageAsync();
             return true;
         } else if (item.getItemId() == R.id.main_action_rotate) {
             mCropImageView.rotateImage(90);
@@ -168,7 +169,9 @@ public final class MainFragment extends Fragment
     @Override
     public void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error) {
         if (error == null) {
-            CropResultActivity.mImage = bitmap;
+            CropResultActivity.mImage = mCropImageView.getCropShape() == CropImageView.CropShape.OVAL
+                    ? CropImageHelper.toOvalBitmap(bitmap)
+                    : bitmap;
             Intent intent = new Intent(getActivity(), CropResultActivity.class);
             startActivity(intent);
         } else {

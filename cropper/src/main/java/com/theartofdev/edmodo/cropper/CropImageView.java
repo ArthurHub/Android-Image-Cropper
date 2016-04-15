@@ -485,16 +485,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * @return a new Bitmap representing the cropped image
      */
     public Bitmap getCroppedImage() {
-        return getCroppedImage(CropShape.RECTANGLE, 0, 0);
-    }
-
-    /**
-     * Gets the cropped image based on the current crop window.
-     *
-     * @return a new Bitmap representing the cropped image
-     */
-    public Bitmap getCroppedImage(CropShape cropShape) {
-        return getCroppedImage(cropShape, 0, 0);
+        return getCroppedImage(0, 0);
     }
 
     /**
@@ -505,9 +496,11 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
      * Bitmaps Efficiently</a>
      *
+     * @param reqWidth the width to downsample the cropped image to
+     * @param reqHeight the height to downsample the cropped image to
      * @return a new Bitmap representing the cropped image
      */
-    public Bitmap getCroppedImage(CropShape cropShape, int reqWidth, int reqHeight) {
+    public Bitmap getCroppedImage(int reqWidth, int reqHeight) {
         Bitmap croppedBitmap = null;
         if (mBitmap != null) {
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
@@ -523,10 +516,6 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             }
         }
 
-        if (cropShape == CropShape.OVAL) {
-            croppedBitmap = BitmapUtils.toOvalBitmap(croppedBitmap);
-        }
-
         return croppedBitmap;
     }
 
@@ -536,20 +525,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      */
     public void getCroppedImageAsync() {
-        getCroppedImageAsync(CropShape.RECTANGLE, 0, 0);
-    }
-
-    /**
-     * Gets the cropped image based on the current crop window.<br>
-     * Use the given cropShape to "fix" resulting crop image for {@link CropShape#OVAL} by setting pixels
-     * outside the oval (circular) shape to transparent.<br>
-     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
-     *
-     * @param cropShape the shape to crop the image: {@link CropShape#RECTANGLE} will get the raw crop rectangle from
-     * the image, {@link CropShape#OVAL} will "fix" rectangle to oval by setting outside pixels to transparent.
-     */
-    public void getCroppedImageAsync(CropShape cropShape) {
-        getCroppedImageAsync(cropShape, 0, 0);
+        getCroppedImageAsync(0, 0);
     }
 
     /**
@@ -563,12 +539,10 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * Bitmaps Efficiently</a><br>
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      *
-     * @param cropShape the shape to crop the image: {@link CropShape#RECTANGLE} will get the raw crop rectangle from
-     * the image, {@link CropShape#OVAL} will "fix" rectangle to oval by setting outside pixels to transparent.
      * @param reqWidth the width to downsample the cropped image to
      * @param reqHeight the height to downsample the cropped image to
      */
-    public void getCroppedImageAsync(CropShape cropShape, int reqWidth, int reqHeight) {
+    public void getCroppedImageAsync(int reqWidth, int reqHeight) {
         if (mOnGetCroppedImageCompleteListener == null) {
             throw new IllegalArgumentException("OnGetCroppedImageCompleteListener is not set");
         }
@@ -582,12 +556,12 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
         int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
         if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
-            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(), cropShape,
+            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
                     mDegreesRotated, orgWidth, orgHeight,
                     mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
                     reqWidth, reqHeight));
         } else {
-            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), cropShape, mDegreesRotated,
+            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), mDegreesRotated,
                     mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY()));
         }
         mBitmapCroppingWorkerTask.get().execute();

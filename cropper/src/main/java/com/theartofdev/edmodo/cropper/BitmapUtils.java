@@ -18,11 +18,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.ExifInterface;
@@ -207,33 +203,6 @@ final class BitmapUtils {
         }
 
         return result;
-    }
-
-    /**
-     * Create a new bitmap that has all pixels beyond the oval shape transparent.
-     */
-    public static Bitmap toOvalBitmap(Bitmap bitmap) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(output);
-
-        int color = 0xff424242;
-        Paint paint = new Paint();
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-
-        RectF rect = new RectF(0, 0, width, height);
-        canvas.drawOval(rect, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-
-        bitmap.recycle();
-
-        return output;
     }
 
     /**

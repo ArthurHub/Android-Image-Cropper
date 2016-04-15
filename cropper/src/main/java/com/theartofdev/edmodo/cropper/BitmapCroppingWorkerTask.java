@@ -52,11 +52,6 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
     private final float[] mCropPoints;
 
     /**
-     * The shape to crop the image
-     */
-    private final CropImageView.CropShape mCropShape;
-
-    /**
      * Degrees the image was rotated after loading
      */
     private final int mDegreesRotated;
@@ -97,14 +92,13 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
     private final int mReqHeight;
     //endregion
 
-    public BitmapCroppingWorkerTask(CropImageView cropImageView, Bitmap bitmap, float[] cropPoints, CropImageView.CropShape cropShape,
+    public BitmapCroppingWorkerTask(CropImageView cropImageView, Bitmap bitmap, float[] cropPoints,
                                     int degreesRotated, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
 
         mCropImageViewReference = new WeakReference<>(cropImageView);
         mContext = cropImageView.getContext();
         mBitmap = bitmap;
         mCropPoints = cropPoints;
-        mCropShape = cropShape;
         mUri = null;
         mDegreesRotated = degreesRotated;
         mFixAspectRatio = fixAspectRatio;
@@ -116,7 +110,7 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
         mReqHeight = 0;
     }
 
-    public BitmapCroppingWorkerTask(CropImageView cropImageView, Uri uri, float[] cropPoints, CropImageView.CropShape cropShape,
+    public BitmapCroppingWorkerTask(CropImageView cropImageView, Uri uri, float[] cropPoints,
                                     int degreesRotated, int orgWidth, int orgHeight,
                                     boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
                                     int reqWidth, int reqHeight) {
@@ -125,7 +119,6 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
         mContext = cropImageView.getContext();
         mUri = uri;
         mCropPoints = cropPoints;
-        mCropShape = cropShape;
         mDegreesRotated = degreesRotated;
         mFixAspectRatio = fixAspectRatio;
         mAspectRatioX = aspectRatioX;
@@ -161,9 +154,6 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
                             mFixAspectRatio, mAspectRatioX, mAspectRatioY, mReqWidth, mReqHeight);
                 } else if (mBitmap != null) {
                     bitmap = BitmapUtils.cropBitmap(mBitmap, mCropPoints, mDegreesRotated, mFixAspectRatio, mAspectRatioX, mAspectRatioY);
-                }
-                if (bitmap != null && mCropShape == CropImageView.CropShape.OVAL) {
-                    bitmap = BitmapUtils.toOvalBitmap(bitmap);
                 }
                 return new Result(bitmap);
             }
