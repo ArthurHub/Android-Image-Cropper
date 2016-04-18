@@ -639,7 +639,20 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * @param uri the URI to load the image from
      */
     public void setImageUriAsync(Uri uri) {
-        setImageUriAsync(uri, null);
+        if (uri != null) {
+            BitmapLoadingWorkerTask currentTask = mBitmapLoadingWorkerTask != null ? mBitmapLoadingWorkerTask.get() : null;
+            if (currentTask != null) {
+                // cancel previous loading (no check if the same URI because camera URI can be the same for different images)
+                currentTask.cancel(true);
+            }
+
+            // either no existing task is working or we canceled it, need to load new URI
+            clearImage(true);
+            mCropOverlayView.setInitialCropWindowRect(null);
+            mBitmapLoadingWorkerTask = new WeakReference<>(new BitmapLoadingWorkerTask(this, uri));
+            mBitmapLoadingWorkerTask.get().execute();
+            setProgressBarVisibility();
+        }
     }
 
     /**
@@ -694,27 +707,6 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     }
 
     //region: Private methods
-
-    /**
-     * Load image from given URI async using {@link BitmapLoadingWorkerTask}<br>
-     * optionally rotate the loaded image given degrees, used for restore state.
-     */
-    private void setImageUriAsync(Uri uri, Integer preSetRotation) {
-        if (uri != null) {
-            BitmapLoadingWorkerTask currentTask = mBitmapLoadingWorkerTask != null ? mBitmapLoadingWorkerTask.get() : null;
-            if (currentTask != null) {
-                // cancel previous loading (no check if the same URI because camera URI can be the same for different images)
-                currentTask.cancel(true);
-            }
-
-            // either no existing task is working or we canceled it, need to load new URI
-            clearImage(true);
-            mCropOverlayView.setInitialCropWindowRect(null);
-            mBitmapLoadingWorkerTask = new WeakReference<>(new BitmapLoadingWorkerTask(this, uri, preSetRotation));
-            mBitmapLoadingWorkerTask.get().execute();
-            setProgressBarVisibility();
-        }
-    }
 
     /**
      * On complete of the async bitmap loading by {@link #setImageUriAsync(Uri)} set the result
@@ -795,6 +787,9 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             mLoadedImageUri = null;
             mLoadedSampleSize = 1;
             mDegreesRotated = 0;
+            mZoom = 1;
+            mZoomOffsetX = 0;
+            mZoomOffsetY = 0;
 
             mImageView.setImageBitmap(null);
 
@@ -856,7 +851,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
                     }
                 }
                 if (mLoadedImageUri == null) {
-                    setImageUriAsync(uri, bundle.getInt("DEGREES_ROTATED"));
+                    setImageUriAsync(uri);
                 }
 
             } else {
@@ -962,7 +957,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
                 applyImageMatrix(r - l, b - t, false);
 
                 // after state restore we want to restore the window crop, possible only after widget size is known
-                if (mRestoreCropWindowRect != null) {
+                if (mBitmap != null && mRestoreCropWindowRect != null) {
                     mImageMatrix.mapRect(mRestoreCropWindowRect);
                     mCropOverlayView.setCropWindowRect(mRestoreCropWindowRect);
                     mRestoreCropWindowRect = null;

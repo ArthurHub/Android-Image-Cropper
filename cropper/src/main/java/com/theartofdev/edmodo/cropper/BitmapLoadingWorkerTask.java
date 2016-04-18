@@ -38,11 +38,6 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
     private final Uri mUri;
 
     /**
-     * Optional: if given use this rotation and not by exif
-     */
-    private final Integer mPreSetRotation;
-
-    /**
      * The context of the crop image view widget used for loading of bitmap by Android URI
      */
     private final Context mContext;
@@ -58,9 +53,8 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
     private final int mHeight;
     //endregion
 
-    public BitmapLoadingWorkerTask(CropImageView cropImageView, Uri uri, Integer preSetRotation) {
+    public BitmapLoadingWorkerTask(CropImageView cropImageView, Uri uri) {
         mUri = uri;
-        mPreSetRotation = preSetRotation;
         mCropImageViewReference = new WeakReference<>(cropImageView);
 
         mContext = cropImageView.getContext();
@@ -94,9 +88,8 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
 
                 if (!isCancelled()) {
 
-                    BitmapUtils.RotateBitmapResult rotateResult = mPreSetRotation != null
-                            ? BitmapUtils.rotateBitmap(decodeResult.bitmap, mPreSetRotation)
-                            : BitmapUtils.rotateBitmapByExif(decodeResult.bitmap, mContext, mUri);
+                    BitmapUtils.RotateBitmapResult rotateResult =
+                            BitmapUtils.rotateBitmapByExif(decodeResult.bitmap, mContext, mUri);
 
                     return new Result(mUri, rotateResult.bitmap, decodeResult.sampleSize, rotateResult.degrees);
                 }
