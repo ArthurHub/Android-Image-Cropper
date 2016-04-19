@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.system.ErrnoException;
+import android.system.OsConstants;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -183,9 +184,11 @@ public final class CropImageHelper {
             stream.close();
             return false;
         } catch (FileNotFoundException e) {
-            if (e.getCause() instanceof ErrnoException) {
+            if (e.getCause() instanceof ErrnoException && ((ErrnoException) e.getCause()).errno == OsConstants.EACCES) {
                 return true;
             }
+        } catch (SecurityException e) {
+            return true;
         } catch (Exception e) {
         }
         return false;
