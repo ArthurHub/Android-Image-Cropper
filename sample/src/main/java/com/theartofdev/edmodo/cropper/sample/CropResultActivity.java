@@ -29,6 +29,7 @@ public final class CropResultActivity extends Activity {
      * The image to show in the activity.
      */
     static Bitmap mImage;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,9 @@ public final class CropResultActivity extends Activity {
         setContentView(R.layout.activity_crop_result);
 
         if (mImage != null) {
-            ((ImageView) findViewById(R.id.resultImageView)).setImageBitmap(mImage);
+            imageView = ((ImageView) findViewById(R.id.resultImageView));
+            imageView.setBackgroundResource(com.theartofdev.edmodo.cropper.R.drawable.backdrop);
+            imageView.setImageBitmap(mImage);
             double ratio = ((int) (10 * mImage.getWidth() / (double) mImage.getHeight())) / 10d;
             int byteCount = 0;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB_MR1) {
