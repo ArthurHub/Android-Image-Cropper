@@ -103,6 +103,18 @@
                 android:text="@string/drawer_option_toggle_aspect_ratio"/>
 
             <TextView
+                android:id="@+id/drawer_option_set_initial_crop_rect"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
+                android:onClick="onDrawerOptionClicked"
+                android:text="@string/drawer_option_set_initial_crop_rect"/>
+
+            <TextView
+                android:id="@+id/drawer_option_reset_crop_rect"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
+                android:onClick="onDrawerOptionClicked"
+                android:text="@string/drawer_option_reset_crop_rect"/>
+
+            <TextView
                 android:id="@+id/drawer_option_toggle_show_overlay"
                 style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"

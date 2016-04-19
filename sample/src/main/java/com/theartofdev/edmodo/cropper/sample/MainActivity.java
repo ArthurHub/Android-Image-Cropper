@@ -197,6 +197,14 @@ public class MainActivity extends Activity {
                 mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
                 updateDrawerTogglesByOptions(mCropImageViewOptions);
                 break;
+            case R.id.drawer_option_set_initial_crop_rect:
+                mCurrentFragment.setInitialCropRect();
+                mDrawerLayout.closeDrawers();
+                break;
+            case R.id.drawer_option_reset_crop_rect:
+                mCurrentFragment.resetCropRect();
+                mDrawerLayout.closeDrawers();
+                break;
             case R.id.drawer_option_toggle_show_overlay:
                 mCropImageViewOptions.showCropOverlay = !mCropImageViewOptions.showCropOverlay;
                 mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);

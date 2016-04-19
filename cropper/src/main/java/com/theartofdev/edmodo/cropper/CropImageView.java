@@ -481,6 +481,18 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     }
 
     /**
+     * Reset crop window to initial rectangle.
+     */
+    public void resetCropRect() {
+        mZoom = 1;
+        mZoomOffsetX = 0;
+        mZoomOffsetY = 0;
+        mDegreesRotated = 0;
+        applyImageMatrix(getWidth(), getHeight(), false);
+        mCropOverlayView.resetCropWindowRect();
+    }
+
+    /**
      * Gets the cropped image based on the current crop window.
      *
      * @return a new Bitmap representing the cropped image

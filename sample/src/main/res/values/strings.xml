@@ -22,6 +22,8 @@
     <string name="drawer_option_toggle_shape">Crop Shape: %1s</string>
     <string name="drawer_option_toggle_guidelines">Guidelines: %1s</string>
     <string name="drawer_option_toggle_aspect_ratio">Aspect Ratio: %1s</string>
+    <string name="drawer_option_set_initial_crop_rect">Set initial crop rectangle</string>
+    <string name="drawer_option_reset_crop_rect">Reset crop rectangle to initial</string>
     <string name="drawer_option_toggle_show_overlay">Show Overlay: %1s</string>
     <string name="drawer_option_toggle_show_progress_bar">Show Progress Bar: %1s</string>
 

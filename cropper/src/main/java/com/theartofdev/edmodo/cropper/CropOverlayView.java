@@ -366,6 +366,18 @@ public class CropOverlayView extends View {
         if (initializedCropWindow) {
             initCropWindow();
             invalidate();
+            callOnCropWindowChanged(false);
+        }
+    }
+
+    /**
+     * Reset crop window to initial rectangle.
+     */
+    public void resetCropWindowRect() {
+        if (initializedCropWindow) {
+            initCropWindow();
+            invalidate();
+            callOnCropWindowChanged(false);
         }
     }
 
@@ -820,9 +832,7 @@ public class CropOverlayView extends View {
     private void onActionUp() {
         if (mMoveHandler != null) {
             mMoveHandler = null;
-            if (mCropWindowChangeListener != null) {
-                mCropWindowChangeListener.onCropWindowChanged(false);
-            }
+            callOnCropWindowChanged(false);
             invalidate();
         }
     }
@@ -834,10 +844,14 @@ public class CropOverlayView extends View {
     private void onActionMove(float x, float y) {
         if (mMoveHandler != null) {
             mMoveHandler.move(x, y, mBitmapRect, mViewWidth, mViewHeight, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
-            if (mCropWindowChangeListener != null) {
-                mCropWindowChangeListener.onCropWindowChanged(true);
-            }
+            callOnCropWindowChanged(true);
             invalidate();
+        }
+    }
+
+    private void callOnCropWindowChanged(boolean inProgress) {
+        if (mCropWindowChangeListener != null) {
+            mCropWindowChangeListener.onCropWindowChanged(inProgress);
         }
     }
     //endregion

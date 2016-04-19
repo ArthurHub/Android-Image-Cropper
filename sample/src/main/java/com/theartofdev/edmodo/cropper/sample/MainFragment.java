@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -71,6 +72,20 @@ public final class MainFragment extends Fragment
         mCropImageView.setFixedAspectRatio(options.fixAspectRatio);
         mCropImageView.setShowCropOverlay(options.showCropOverlay);
         mCropImageView.setShowProgressBar(options.showProgressBar);
+    }
+
+    /**
+     * Set the initial rectangle to use.
+     */
+    public void setInitialCropRect() {
+        mCropImageView.setCropRect(new Rect(100, 300, 500, 1200));
+    }
+
+    /**
+     * Reset crop window to initial rectangle.
+     */
+    public void resetCropRect() {
+        mCropImageView.resetCropRect();
     }
 
     @Override
