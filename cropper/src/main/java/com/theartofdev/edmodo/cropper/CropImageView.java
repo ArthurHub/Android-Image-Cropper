@@ -516,6 +516,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     public Bitmap getCroppedImage(int reqWidth, int reqHeight) {
         Bitmap croppedBitmap = null;
         if (mBitmap != null) {
+            mImageView.clearAnimation();
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
                 int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
                 int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
@@ -559,6 +560,8 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         if (mOnGetCroppedImageCompleteListener == null) {
             throw new IllegalArgumentException("OnGetCroppedImageCompleteListener is not set");
         }
+
+        mImageView.clearAnimation();
 
         BitmapCroppingWorkerTask currentTask = mBitmapCroppingWorkerTask != null ? mBitmapCroppingWorkerTask.get() : null;
         if (currentTask != null) {
@@ -769,6 +772,8 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
     private void setBitmap(Bitmap bitmap, boolean clearFull) {
         if (mBitmap == null || !mBitmap.equals(bitmap)) {
 
+            mImageView.clearAnimation();
+            
             clearImage(clearFull);
 
             mBitmap = bitmap;
