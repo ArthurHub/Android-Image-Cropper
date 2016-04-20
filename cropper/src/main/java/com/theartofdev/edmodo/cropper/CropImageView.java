@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -138,11 +137,6 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * The max zoom allowed during cropping
      */
     private float mMaxZoom = 4;
-
-    /**
-     * the zoom step to do for every zoom required
-     */
-    private float mZoomStep = 0.4f;
 
     /**
      * The current zoom level to to scale the cropping image
@@ -1003,42 +997,27 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             }
         } else if (mZoomEnabled) {
 
+            float newZoom = 0;
             float oldZoom = mZoom;
-            boolean animationSetBefore = false;
-            for (int i = 0; i < 6; i++) {
 
-                float newZoom = 0;
-                if (mZoom < mMaxZoom && cropRect.width() < width * 0.5f && cropRect.height() < height * 0.5f) {
-                    newZoom = Math.min(mMaxZoom, mZoom + mZoomStep);
-                } else if (mZoom > 1 && (cropRect.width() > width * 0.65f || cropRect.height() > height * 0.65f)) {
-                    newZoom = Math.max(1, mZoom - mZoomStep * 1.4f);
-                } else {
-                    break;
-                }
-
-                Log.w("aaaaa", ":::: " + i);
-
-                if (newZoom > mMaxZoom - .25f) {
-                    newZoom = mMaxZoom;
-                } else if (newZoom < 1.3f) {
-                    newZoom = 1;
-                }
-
-                if (newZoom > 0) {
-                    if (mAnimation == null) {
-                        mAnimation = new CropImageAnimation(mImageView, mCropOverlayView);
-                    }
-                    if (!animationSetBefore) {
-                        animationSetBefore = true;
-                        mAnimation.setBefore(mImageRect, mImageMatrix);
-                    }
-
-                    updateCropRectByZoomChange(width, height, newZoom / mZoom);
-                    mZoom = newZoom;
-                }
+            float w = mImageRect.width();
+            float h = mImageRect.height();
+            if (mZoom < mMaxZoom && cropRect.width() < w / mZoom * 0.54f && cropRect.height() < h / mZoom * 0.54f) {
+                newZoom = Math.min(mMaxZoom, Math.min(w / (cropRect.width() / 0.63f), h / (cropRect.height() / 0.63f)));
+            }
+            if (mZoom > 1 && (cropRect.width() > w / mZoom * 0.65f || cropRect.height() > h / mZoom * 0.65f)) {
+                newZoom = Math.max(1, Math.min(w / (cropRect.width() / 0.56f), h / (cropRect.height() / 0.56f)));
             }
 
-            if (mZoom != oldZoom) {
+            if (newZoom > 0) {
+                if (mAnimation == null) {
+                    mAnimation = new CropImageAnimation(mImageView, mCropOverlayView);
+                }
+                mAnimation.setBefore(mImageRect, mImageMatrix);
+
+                updateCropRectByZoomChange(width, height, newZoom / mZoom);
+                mZoom = newZoom;
+
                 applyImageMatrix(width, height, true, true);
             }
         }
