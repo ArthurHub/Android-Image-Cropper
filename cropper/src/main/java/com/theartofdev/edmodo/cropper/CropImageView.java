@@ -30,6 +30,9 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -73,6 +76,8 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * Rectengale used in image matrix transformation calculation (reusing rect instance)
      */
     private final RectF mImageRect = new RectF();
+
+    private MyAnimation mAnimation = new MyAnimation();
 
     private Bitmap mBitmap;
 
@@ -488,7 +493,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         mZoomOffsetX = 0;
         mZoomOffsetY = 0;
         mDegreesRotated = 0;
-        applyImageMatrix(getWidth(), getHeight(), false);
+        applyImageMatrix(getWidth(), getHeight(), false, false);
         mCropOverlayView.resetCropWindowRect();
     }
 
@@ -696,13 +701,13 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
                 mDegreesRotated += degrees;
                 mDegreesRotated = mDegreesRotated % 360;
 
-                applyImageMatrix(getWidth(), getHeight(), true);
+                applyImageMatrix(getWidth(), getHeight(), true, false);
 
                 mImageMatrix.mapRect(BitmapUtils.RECT);
 
                 mCropOverlayView.resetCropOverlayView();
                 mCropOverlayView.setCropWindowRect(BitmapUtils.RECT);
-                applyImageMatrix(getWidth(), getHeight(), true);
+                applyImageMatrix(getWidth(), getHeight(), true, false);
                 onCropWindowChanged(false);
 
             } else {
@@ -713,7 +718,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
                 mZoom = 1;
                 mZoomOffsetX = mZoomOffsetY = 0;
                 mCropOverlayView.resetCropOverlayView();
-                applyImageMatrix(getWidth(), getHeight(), true);
+                applyImageMatrix(getWidth(), getHeight(), true, false);
             }
         }
     }
@@ -802,6 +807,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             mZoom = 1;
             mZoomOffsetX = 0;
             mZoomOffsetY = 0;
+            mImageMatrix.reset();
 
             mImageView.setImageBitmap(null);
 
@@ -966,7 +972,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             setLayoutParams(origParams);
 
             if (mBitmap != null) {
-                applyImageMatrix(r - l, b - t, false);
+                applyImageMatrix(r - l, b - t, false, false);
 
                 // after state restore we want to restore the window crop, possible only after widget size is known
                 if (mBitmap != null && mRestoreCropWindowRect != null) {
@@ -992,9 +998,11 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
 
         if (inProgress) {
             if (cropRect.left < 0 || cropRect.top < 0 || cropRect.right > width || cropRect.bottom > height) {
-                applyImageMatrix(width, height, false);
+                applyImageMatrix(width, height, false, false);
             }
         } else if (mZoomEnabled) {
+
+            mAnimation.setBefore();
 
             float oldZoom = mZoom;
             for (int i = 0; i < 8; i++) {
@@ -1023,7 +1031,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             }
 
             if (mZoom != oldZoom) {
-                applyImageMatrix(width, height, true);
+                applyImageMatrix(width, height, true, true);
             }
         }
     }
@@ -1047,7 +1055,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * @param width the width of the image view
      * @param height the height of the image view
      */
-    private void applyImageMatrix(float width, float height, boolean center) {
+    private void applyImageMatrix(float width, float height, boolean center, boolean animate) {
         if (width > 0 && height > 0) {
 
             mImageMatrix.reset();
@@ -1098,10 +1106,79 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             mapImageRectangleByImageMatrix(mImageRect);
 
             // set matrix to apply
-            mImageView.setImageMatrix(mImageMatrix);
+            if (animate) {
+                mAnimation.setAfter();
+                mImageView.startAnimation(mAnimation);
+            } else {
+                mImageView.setImageMatrix(mImageMatrix);
+            }
 
             // update the image rectangle in the crop overlay
             updateBitmapRect(mImageRect);
+        }
+    }
+
+    public class MyAnimation extends Animation {
+
+        private final RectF mBeforeImageRect = new RectF();
+
+        private final RectF mAfterImageRect = new RectF();
+
+        private final RectF mBeforeCropWindowRect = new RectF();
+
+        private final RectF mAfterCropWindowRect = new RectF();
+
+        private final float[] mBeforeImageMatrix = new float[9];
+
+        private final float[] mAfterImageMatrix = new float[9];
+
+        private final RectF mAnimRect = new RectF();
+
+        private final float[] mAnimMatrix = new float[9];
+
+        public MyAnimation() {
+            setDuration(300);
+            setFillAfter(true);
+            setInterpolator(new AccelerateDecelerateInterpolator());
+        }
+
+        public void setBefore() {
+            reset();
+            mBeforeImageRect.set(mImageRect);
+            mBeforeCropWindowRect.set(mCropOverlayView.getCropWindowRect());
+            mImageMatrix.getValues(mBeforeImageMatrix);
+        }
+
+        public void setAfter() {
+            mAfterImageRect.set(mImageRect);
+            mAfterCropWindowRect.set(mCropOverlayView.getCropWindowRect());
+            mImageMatrix.getValues(mAfterImageMatrix);
+        }
+
+        @Override
+        protected void applyTransformation(float interpolatedTime, Transformation t) {
+
+            mAnimRect.left = mBeforeCropWindowRect.left + (mAfterCropWindowRect.left - mBeforeCropWindowRect.left) * interpolatedTime;
+            mAnimRect.top = mBeforeCropWindowRect.top + (mAfterCropWindowRect.top - mBeforeCropWindowRect.top) * interpolatedTime;
+            mAnimRect.right = mBeforeCropWindowRect.right + (mAfterCropWindowRect.right - mBeforeCropWindowRect.right) * interpolatedTime;
+            mAnimRect.bottom = mBeforeCropWindowRect.bottom + (mAfterCropWindowRect.bottom - mBeforeCropWindowRect.bottom) * interpolatedTime;
+            mCropOverlayView.setCropWindowRect(mAnimRect);
+
+            mAnimRect.left = mBeforeImageRect.left + (mAfterImageRect.left - mBeforeImageRect.left) * interpolatedTime;
+            mAnimRect.top = mBeforeImageRect.top + (mAfterImageRect.top - mBeforeImageRect.top) * interpolatedTime;
+            mAnimRect.right = mBeforeImageRect.right + (mAfterImageRect.right - mBeforeImageRect.right) * interpolatedTime;
+            mAnimRect.bottom = mBeforeImageRect.bottom + (mAfterImageRect.bottom - mBeforeImageRect.bottom) * interpolatedTime;
+            mCropOverlayView.setBitmapRect(mAnimRect, getWidth(), getHeight());
+
+            for (int i = 0; i < mAnimMatrix.length; i++) {
+                mAnimMatrix[i] = mBeforeImageMatrix[i] + (mAfterImageMatrix[i] - mBeforeImageMatrix[i]) * interpolatedTime;
+            }
+            Matrix m = mImageView.getImageMatrix();
+            m.setValues(mAnimMatrix);
+            mImageView.setImageMatrix(m);
+
+            mImageView.invalidate();
+            mCropOverlayView.invalidate();
         }
     }
 
@@ -1172,7 +1249,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         }
 
         // set the bitmap rectangle and update the crop window after scale factor is set
-        mCropOverlayView.setBitmapRect(bitmapRect, mImageView.getWidth(), mImageView.getHeight());
+        mCropOverlayView.setBitmapRect(bitmapRect, getWidth(), getHeight());
     }
 
     /**
