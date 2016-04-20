@@ -147,6 +147,11 @@ final class BitmapUtils {
         matrix.setRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
         Bitmap result = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height(), matrix, true);
 
+        if (result == bitmap) {
+            // corner case when all bitmap is selected, no worth optimizing for it
+            result = bitmap.copy(bitmap.getConfig(), false);
+        }
+
         // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
         if (degreesRotated % 90 != 0) {
 
@@ -362,7 +367,9 @@ final class BitmapUtils {
             Matrix matrix = new Matrix();
             matrix.setRotate(degrees);
             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
-            bitmap.recycle();
+            if (newBitmap != bitmap) {
+                bitmap.recycle();
+            }
             return newBitmap;
         } else {
             return bitmap;
