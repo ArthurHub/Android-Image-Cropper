@@ -25,14 +25,12 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -77,7 +75,10 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      */
     private final RectF mImageRect = new RectF();
 
-    private MyAnimation mAnimation = new MyAnimation();
+    /**
+     * Animation class to smooth animate zoom-in/out
+     */
+    private CropImageAnimation mAnimation;
 
     private Bitmap mBitmap;
 
@@ -1002,21 +1003,20 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             }
         } else if (mZoomEnabled) {
 
-            mAnimation.setBefore();
-
             float oldZoom = mZoom;
-            for (int i = 0; i < 8; i++) {
+            boolean animationSetBefore = false;
+            for (int i = 0; i < 6; i++) {
 
                 float newZoom = 0;
-                if (mZoom < mMaxZoom && cropRect.width() < width * 0.5 && cropRect.height() < height * 0.5f) {
+                if (mZoom < mMaxZoom && cropRect.width() < width * 0.5f && cropRect.height() < height * 0.5f) {
                     newZoom = Math.min(mMaxZoom, mZoom + mZoomStep);
-                } else if (mZoom > 1 && (cropRect.width() > width * 0.8 || cropRect.height() > height * 0.8f)) {
-                    newZoom = Math.max(1, mZoom - mZoomStep * 1.8f);
-                } else if (mZoom > 1 && (cropRect.width() > width * 0.7 || cropRect.height() > height * 0.7f)) {
-                    newZoom = Math.max(1, mZoom - mZoomStep * 1.2f);
+                } else if (mZoom > 1 && (cropRect.width() > width * 0.65f || cropRect.height() > height * 0.65f)) {
+                    newZoom = Math.max(1, mZoom - mZoomStep * 1.4f);
                 } else {
                     break;
                 }
+
+                Log.w("aaaaa", ":::: " + i);
 
                 if (newZoom > mMaxZoom - .25f) {
                     newZoom = mMaxZoom;
@@ -1025,6 +1025,14 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
                 }
 
                 if (newZoom > 0) {
+                    if (mAnimation == null) {
+                        mAnimation = new CropImageAnimation(mImageView, mCropOverlayView);
+                    }
+                    if (!animationSetBefore) {
+                        animationSetBefore = true;
+                        mAnimation.setBefore(mImageRect, mImageMatrix);
+                    }
+
                     updateCropRectByZoomChange(width, height, newZoom / mZoom);
                     mZoom = newZoom;
                 }
@@ -1107,7 +1115,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
 
             // set matrix to apply
             if (animate) {
-                mAnimation.setAfter();
+                mAnimation.setAfter(mImageRect, mImageMatrix);
                 mImageView.startAnimation(mAnimation);
             } else {
                 mImageView.setImageMatrix(mImageMatrix);
@@ -1115,70 +1123,6 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
 
             // update the image rectangle in the crop overlay
             updateBitmapRect(mImageRect);
-        }
-    }
-
-    public class MyAnimation extends Animation {
-
-        private final RectF mBeforeImageRect = new RectF();
-
-        private final RectF mAfterImageRect = new RectF();
-
-        private final RectF mBeforeCropWindowRect = new RectF();
-
-        private final RectF mAfterCropWindowRect = new RectF();
-
-        private final float[] mBeforeImageMatrix = new float[9];
-
-        private final float[] mAfterImageMatrix = new float[9];
-
-        private final RectF mAnimRect = new RectF();
-
-        private final float[] mAnimMatrix = new float[9];
-
-        public MyAnimation() {
-            setDuration(300);
-            setFillAfter(true);
-            setInterpolator(new AccelerateDecelerateInterpolator());
-        }
-
-        public void setBefore() {
-            reset();
-            mBeforeImageRect.set(mImageRect);
-            mBeforeCropWindowRect.set(mCropOverlayView.getCropWindowRect());
-            mImageMatrix.getValues(mBeforeImageMatrix);
-        }
-
-        public void setAfter() {
-            mAfterImageRect.set(mImageRect);
-            mAfterCropWindowRect.set(mCropOverlayView.getCropWindowRect());
-            mImageMatrix.getValues(mAfterImageMatrix);
-        }
-
-        @Override
-        protected void applyTransformation(float interpolatedTime, Transformation t) {
-
-            mAnimRect.left = mBeforeCropWindowRect.left + (mAfterCropWindowRect.left - mBeforeCropWindowRect.left) * interpolatedTime;
-            mAnimRect.top = mBeforeCropWindowRect.top + (mAfterCropWindowRect.top - mBeforeCropWindowRect.top) * interpolatedTime;
-            mAnimRect.right = mBeforeCropWindowRect.right + (mAfterCropWindowRect.right - mBeforeCropWindowRect.right) * interpolatedTime;
-            mAnimRect.bottom = mBeforeCropWindowRect.bottom + (mAfterCropWindowRect.bottom - mBeforeCropWindowRect.bottom) * interpolatedTime;
-            mCropOverlayView.setCropWindowRect(mAnimRect);
-
-            mAnimRect.left = mBeforeImageRect.left + (mAfterImageRect.left - mBeforeImageRect.left) * interpolatedTime;
-            mAnimRect.top = mBeforeImageRect.top + (mAfterImageRect.top - mBeforeImageRect.top) * interpolatedTime;
-            mAnimRect.right = mBeforeImageRect.right + (mAfterImageRect.right - mBeforeImageRect.right) * interpolatedTime;
-            mAnimRect.bottom = mBeforeImageRect.bottom + (mAfterImageRect.bottom - mBeforeImageRect.bottom) * interpolatedTime;
-            mCropOverlayView.setBitmapRect(mAnimRect, getWidth(), getHeight());
-
-            for (int i = 0; i < mAnimMatrix.length; i++) {
-                mAnimMatrix[i] = mBeforeImageMatrix[i] + (mAfterImageMatrix[i] - mBeforeImageMatrix[i]) * interpolatedTime;
-            }
-            Matrix m = mImageView.getImageMatrix();
-            m.setValues(mAnimMatrix);
-            mImageView.setImageMatrix(m);
-
-            mImageView.invalidate();
-            mCropOverlayView.invalidate();
         }
     }
 
