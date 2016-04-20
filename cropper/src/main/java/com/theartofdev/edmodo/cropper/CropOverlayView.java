@@ -21,6 +21,7 @@ import android.graphics.RectF;
 import android.graphics.Region;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -391,12 +392,16 @@ public class CropOverlayView extends View {
      * @param fixAspectRatio Boolean that signals whether the aspect ratio should be maintained.
      * @param aspectRatioX float that specifies the new X value of the aspect ratio
      * @param aspectRatioY float that specifies the new Y value of the aspect
-     * @param guidelinesThickness
-     * @param guidelinesColor
-     * @param minCropResultWidth
-     * @param minCropResultHeight
-     * @param maxCropResultWidth
-     * @param maxCropResultHeight
+     * @param guidelinesThickness the thickness of the guidelines lines in pixels
+     * @param guidelinesColor the color of the guidelines lines
+     * @param minCropResultWidth the min width the resulting cropping image is allowed to be, affects the cropping
+     * window limits.
+     * @param minCropResultHeight the min height the resulting cropping image is allowed to be, affects the cropping
+     * window limits.
+     * @param maxCropResultWidth the max width the resulting cropping image is allowed to be, affects the cropping
+     * window limits.
+     * @param maxCropResultHeight the max height the resulting cropping image is allowed to be, affects the cropping
+     * window limits.
      */
     public void setInitialAttributeValues(CropImageView.CropShape cropShape,
                                           float snapRadius,
@@ -849,9 +854,16 @@ public class CropOverlayView extends View {
         }
     }
 
+    /**
+     * Invoke on crop change listener safe, don't let the app crash on exception.
+     */
     private void callOnCropWindowChanged(boolean inProgress) {
-        if (mCropWindowChangeListener != null) {
-            mCropWindowChangeListener.onCropWindowChanged(inProgress);
+        try {
+            if (mCropWindowChangeListener != null) {
+                mCropWindowChangeListener.onCropWindowChanged(inProgress);
+            }
+        } catch (Exception e) {
+            Log.e("AIC", "Exception in crop window changed", e);
         }
     }
     //endregion
@@ -861,14 +873,14 @@ public class CropOverlayView extends View {
     /**
      * Interface definition for a callback to be invoked when crop window rectangle is changing.
      */
-    interface CropWindowChangeListener {
+    public interface CropWindowChangeListener {
 
         /**
          * Called after a change in crop window rectangle.
          *
-         * @param finished is the crop window change operation finished or still in progress
+         * @param inProgress is the crop window change operation is still in progress by user touch
          */
-        void onCropWindowChanged(boolean inProgress);
+        public void onCropWindowChanged(boolean inProgress);
     }
     //endregion
 }

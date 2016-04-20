@@ -40,7 +40,7 @@ import java.util.UUID;
 /**
  * Custom view that provides cropping capabilities to an image.
  */
-public class CropImageView extends FrameLayout implements CropOverlayView.CropWindowChangeListener {
+public class CropImageView extends FrameLayout {
 
     //region: Fields and Consts
 
@@ -243,7 +243,12 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         mImageView.setScaleType(ImageView.ScaleType.MATRIX);
 
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
-        mCropOverlayView.setCropWindowChangeListener(this);
+        mCropOverlayView.setCropWindowChangeListener(new CropOverlayView.CropWindowChangeListener() {
+            @Override
+            public void onCropWindowChanged(boolean inProgress) {
+                handleCropWindowChanged(inProgress, true);
+            }
+        });
         mCropOverlayView.setInitialAttributeValues(
                 cropShape, snapRadius, touchRadius, guidelines,
                 fixAspectRatio, aspectRatioX, aspectRatioY,
@@ -773,7 +778,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         if (mBitmap == null || !mBitmap.equals(bitmap)) {
 
             mImageView.clearAnimation();
-            
+
             clearImage(clearFull);
 
             mBitmap = bitmap;
@@ -989,41 +994,45 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
         }
     }
 
-    @Override
-    public void onCropWindowChanged(boolean inProgress) {
-        handleCropWindowChanged(inProgress, true);
-    }
-
+    /**
+     * Handle crop window change to:<br>
+     * 1. Execute auto-zoom-in/out depending on the area covered of cropping window relative to the
+     * available view area.<br>
+     * 2. Slide the zoomed sub-area if the cropping window is outside of the visible view sub-area.<br>
+     *
+     * @param inProgress is the crop window change is still in progress by the user
+     * @param animate if to animate the change to the image matrix, or set it directly
+     */
     private void handleCropWindowChanged(boolean inProgress, boolean animate) {
-        RectF cropRect = mCropOverlayView.getCropWindowRect();
-        if (inProgress) {
-            if (cropRect.left < 0 || cropRect.top < 0 || cropRect.right > getWidth() || cropRect.bottom > getHeight()) {
-                applyImageMatrix(getWidth(), getHeight(), false, false);
-            }
-        } else if (mZoomEnabled) {
+        int width = getWidth();
+        int height = getHeight();
+        if (mZoomEnabled && mBitmap != null && width > 0 && height > 0) {
 
-            float newZoom = 0;
-            float oldZoom = mZoom;
-
-            float w = mImageRect.width();
-            float h = mImageRect.height();
-            if (mZoom < mMaxZoom && cropRect.width() < w / mZoom * 0.5f && cropRect.height() < h / mZoom * 0.5f) {
-                newZoom = Math.min(mMaxZoom, Math.min(w / (cropRect.width() / 0.64f), h / (cropRect.height() / 0.64f)));
-            }
-            if (mZoom > 1 && (cropRect.width() > w / mZoom * 0.65f || cropRect.height() > h / mZoom * 0.65f)) {
-                newZoom = Math.max(1, Math.min(w / (cropRect.width() / 0.51f), h / (cropRect.height() / 0.51f)));
-            }
-
-            if (newZoom > 0) {
-                if (mAnimation == null) {
-                    mAnimation = new CropImageAnimation(mImageView, mCropOverlayView);
+            RectF cropRect = mCropOverlayView.getCropWindowRect();
+            if (inProgress) {
+                if (cropRect.left < 0 || cropRect.top < 0 || cropRect.right > width || cropRect.bottom > height) {
+                    applyImageMatrix(width, height, false, false);
                 }
-                mAnimation.setBefore(mImageRect, mImageMatrix);
+            } else {
+                float newZoom = 0;
+                if (mZoom < mMaxZoom && cropRect.width() < width * 0.5f && cropRect.height() < height * 0.5f) {
+                    newZoom = Math.min(mMaxZoom, Math.min(width / (cropRect.width() / mZoom / 0.64f), height / (cropRect.height() / mZoom / 0.64f)));
+                }
+                if (mZoom > 1 && (cropRect.width() > width * 0.65f || cropRect.height() > height * 0.65f)) {
+                    newZoom = Math.max(1, Math.min(width / (cropRect.width() / mZoom / 0.51f), height / (cropRect.height() / mZoom / 0.51f)));
+                }
 
-                updateCropRectByZoomChange(newZoom / mZoom);
-                mZoom = newZoom;
+                if (newZoom > 0) {
+                    if (mAnimation == null) {
+                        mAnimation = new CropImageAnimation(mImageView, mCropOverlayView);
+                    }
+                    mAnimation.setBefore(mImageRect, mImageMatrix);
 
-                applyImageMatrix(getWidth(), getHeight(), true, animate);
+                    updateCropRectByZoomChange(newZoom / mZoom);
+                    mZoom = newZoom;
+
+                    applyImageMatrix(width, height, true, animate);
+                }
             }
         }
     }
@@ -1048,7 +1057,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
      * @param height the height of the image view
      */
     private void applyImageMatrix(float width, float height, boolean center, boolean animate) {
-        if (width > 0 && height > 0) {
+        if (mBitmap != null && width > 0 && height > 0) {
 
             mImageMatrix.reset();
             mImageRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
@@ -1082,9 +1091,9 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             if (center) {
                 // set the zoomed area to be as to the center of cropping window as possible
                 mZoomOffsetX = width > mImageRect.width() ? 0
-                        : Math.max(Math.min(width / 2 - cropRect.centerX(), -mImageRect.left), mImageView.getWidth() - mImageRect.right) / mZoom;
+                        : Math.max(Math.min(width / 2 - cropRect.centerX(), -mImageRect.left), getWidth() - mImageRect.right) / mZoom;
                 mZoomOffsetY = height > mImageRect.height() ? 0
-                        : Math.max(Math.min(height / 2 - cropRect.centerY(), -mImageRect.top), mImageView.getHeight() - mImageRect.bottom) / mZoom;
+                        : Math.max(Math.min(height / 2 - cropRect.centerY(), -mImageRect.top), getHeight() - mImageRect.bottom) / mZoom;
             } else {
                 // adjust the zoomed area so the crop window rectangle will be inside the area in case it was moved outside
                 mZoomOffsetX = Math.min(Math.max(mZoomOffsetX * mZoom, -cropRect.left), -cropRect.right + width) / mZoom;
@@ -1173,7 +1182,7 @@ public class CropImageView extends FrameLayout implements CropOverlayView.CropWi
             // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width/height.
             float scaleFactorWidth = mBitmap.getWidth() * mLoadedSampleSize / bitmapRect.width();
             float scaleFactorHeight = mBitmap.getHeight() * mLoadedSampleSize / bitmapRect.height();
-            mCropOverlayView.setCropWindowLimits(mImageView.getWidth(), mImageView.getHeight(), scaleFactorWidth, scaleFactorHeight);
+            mCropOverlayView.setCropWindowLimits(getWidth(), getHeight(), scaleFactorWidth, scaleFactorHeight);
         }
 
         // set the bitmap rectangle and update the crop window after scale factor is set
