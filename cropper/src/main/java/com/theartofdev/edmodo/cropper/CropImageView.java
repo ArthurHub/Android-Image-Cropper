@@ -850,6 +850,7 @@ public class CropImageView extends FrameLayout {
         mImageInverseMatrix.mapRect(BitmapUtils.RECT);
 
         bundle.putParcelable("CROP_WINDOW_RECT", BitmapUtils.RECT);
+        bundle.putString("CROP_SHAPE", mCropOverlayView.getCropShape().name());
 
         return bundle;
     }
@@ -899,6 +900,8 @@ public class CropImageView extends FrameLayout {
             mCropOverlayView.setInitialCropWindowRect((Rect) bundle.getParcelable("INITIAL_CROP_RECT"));
 
             mRestoreCropWindowRect = bundle.getParcelable("CROP_WINDOW_RECT");
+
+            mCropOverlayView.setCropShape(CropShape.valueOf(bundle.getString("CROP_SHAPE")));
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
         } else {
