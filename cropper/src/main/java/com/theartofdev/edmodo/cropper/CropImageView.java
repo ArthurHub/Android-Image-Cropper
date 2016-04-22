@@ -1015,6 +1015,7 @@ public class CropImageView extends FrameLayout {
                 }
             } else {
                 float newZoom = 0;
+                // keep the cropping window covered area to 50%-65% of zoomed sub-area
                 if (mZoom < mMaxZoom && cropRect.width() < width * 0.5f && cropRect.height() < height * 0.5f) {
                     newZoom = Math.min(mMaxZoom, Math.min(width / (cropRect.width() / mZoom / 0.64f), height / (cropRect.height() / mZoom / 0.64f)));
                 }
@@ -1023,10 +1024,14 @@ public class CropImageView extends FrameLayout {
                 }
 
                 if (newZoom > 0) {
-                    if (mAnimation == null) {
-                        mAnimation = new CropImageAnimation(mImageView, mCropOverlayView);
+                    if (animate) {
+                        if (mAnimation == null) {
+                            // lazy create animation single instance
+                            mAnimation = new CropImageAnimation(mImageView, mCropOverlayView);
+                        }
+                        // set the state for animation to start from
+                        mAnimation.setStartState(mImageRect, mImageMatrix);
                     }
-                    mAnimation.setBefore(mImageRect, mImageMatrix);
 
                     updateCropRectByZoomChange(newZoom / mZoom);
                     mZoom = newZoom;
@@ -1108,7 +1113,8 @@ public class CropImageView extends FrameLayout {
 
             // set matrix to apply
             if (animate) {
-                mAnimation.setAfter(mImageRect, mImageMatrix);
+                // set the state for animation to end in, start animation now
+                mAnimation.setEndState(mImageRect, mImageMatrix);
                 mImageView.startAnimation(mAnimation);
             } else {
                 mImageView.setImageMatrix(mImageMatrix);
