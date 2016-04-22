@@ -107,7 +107,6 @@ public final class MainFragment extends Fragment
         mCropImageView = (CropImageView) view.findViewById(R.id.cropImageView);
         mCropImageView.setOnSetImageUriCompleteListener(this);
         mCropImageView.setOnGetCroppedImageCompleteListener(this);
-        mCropImageView.useCheckerboardBackdrop();
 
         CropImageViewOptions options = new CropImageViewOptions();
         options.scaleType = mCropImageView.getScaleType();

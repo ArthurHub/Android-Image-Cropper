@@ -204,10 +204,6 @@ public class CropImageView extends FrameLayout {
         setProgressBarVisibility();
     }
 
-    public void useCheckerboardBackdrop(){
-        setBackgroundResource(R.drawable.backdrop);
-    }
-
     /**
      * Get the scale type of the image in the crop view.
      */
