@@ -78,6 +78,7 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
 - **Auto-zoom**: zoom-in when crop window takes less than 50% of the image, zoom-out when more than 65%.
 - Handle cropping of non-straight angles rotations for URI loaded images.
 - Improve performance for image rotation.
+- Improve performance for rotation due to exif orientation data.
 - Improve performance for orientation change.
 - Preserve crop window on rotations for straight angles - 90/180/270.
 - Preserve crop window on orientation change.

@@ -58,14 +58,6 @@ final class BitmapUtils {
     static Pair<String, WeakReference<Bitmap>> mStateBitmap;
 
     /**
-     * Rotate the given bitmap by the given degrees.<br>
-     * New bitmap is created and the old one is recycled.
-     */
-    public static RotateBitmapResult rotateBitmap(Bitmap bitmap, int degrees) {
-        return new RotateBitmapResult(rotateBitmapInt(bitmap, degrees), degrees);
-    }
-
-    /**
      * Rotate the given image by reading the Exif value of the image (uri).<br>
      * If no rotation is required the image will not be rotated.<br>
      * New bitmap is created and the old one is recycled.
@@ -104,8 +96,7 @@ final class BitmapUtils {
                 degrees = 0;
                 break;
         }
-        Bitmap rotatedBitmap = rotateBitmapInt(bitmap, degrees);
-        return new RotateBitmapResult(rotatedBitmap, degrees);
+        return new RotateBitmapResult(bitmap, degrees);
     }
 
     /**
