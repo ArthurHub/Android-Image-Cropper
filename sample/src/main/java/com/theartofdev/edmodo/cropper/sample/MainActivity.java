@@ -31,7 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.croppersample.R;
-import com.theartofdev.edmodo.cropper.CropImageHelper;
+import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 public class MainActivity extends Activity {
@@ -104,13 +104,13 @@ public class MainActivity extends Activity {
     @Override
     @SuppressLint("NewApi")
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CropImageHelper.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Uri imageUri = CropImageHelper.getPickImageResultUri(this, data);
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = CropImage.getPickImageResultUri(this, data);
 
             // For API >= 23 we need to check specifically that we have permissions to read external storage,
             // but we don't know if we need to for the URI so the simplest is to try open the stream and see if we get error.
             boolean requirePermissions = false;
-            if (CropImageHelper.isReadExternalStoragePermissionsRequired(this, imageUri)) {
+            if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {
 
                 // request permissions and handle the result in onRequestPermissionsResult()
                 requirePermissions = true;
@@ -135,7 +135,7 @@ public class MainActivity extends Activity {
     public void onDrawerOptionClicked(View view) {
         switch (view.getId()) {
             case R.id.drawer_option_load:
-                CropImageHelper.startPickImageActivity(this);
+                CropImage.startPickImageActivity(this);
                 mDrawerLayout.closeDrawers();
                 break;
             case R.id.drawer_option_oval:

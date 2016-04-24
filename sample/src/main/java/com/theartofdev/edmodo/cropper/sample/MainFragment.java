@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.croppersample.R;
-import com.theartofdev.edmodo.cropper.CropImageHelper;
+import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 /**
@@ -185,7 +185,7 @@ public final class MainFragment extends Fragment
     public void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error) {
         if (error == null) {
             CropResultActivity.mImage = mCropImageView.getCropShape() == CropImageView.CropShape.OVAL
-                    ? CropImageHelper.toOvalBitmap(bitmap)
+                    ? CropImage.toOvalBitmap(bitmap)
                     : bitmap;
             Intent intent = new Intent(getActivity(), CropResultActivity.class);
             startActivity(intent);

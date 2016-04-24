@@ -47,7 +47,7 @@ import java.util.List;
  * Added value you get out-of-the-box is some edge case handling that you may miss otherwise, like the
  * stupid-ass Android camera result URI that may differ from version to version and from device to device.
  */
-public final class CropImageHelper {
+public final class CropImage {
 
     /**
      * The request code used to start pick image activity to be used on result to identify the this specific request.
@@ -59,7 +59,7 @@ public final class CropImageHelper {
      */
     public static final int PICK_IMAGE_PERMISSIONS_REQUEST_CODE = 201;
 
-    private CropImageHelper() {
+    private CropImage() {
     }
 
     /**
@@ -201,7 +201,7 @@ public final class CropImageHelper {
     public static boolean isReadExternalStoragePermissionsRequired(Context context, Uri uri) {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                 context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
-                CropImageHelper.isUriRequiresPermissions(context, uri);
+                isUriRequiresPermissions(context, uri);
     }
 
     /**
