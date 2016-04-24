@@ -5,7 +5,7 @@ Android Image Cropper
 [ ![Download](https://api.bintray.com/packages/arthurhub/maven/Android-Image-Cropper/images/download.svg) ](https://bintray.com/arthurhub/maven/Android-Image-Cropper/_latestVersion)
 
 
-**Powerfull** (Zoom,Rotation,Multi-Source), **customizable** (Shape,Limits,Style), **optimized** (Async,Sampling,Matrix) and **simple** image cropping library for Android.
+**Powerful** (Zoom, Rotation, Multi-Source), **customizable** (Shape, Limits, Style), **optimized** (Async, Sampling, Matrix) and **simple** image cropping library for Android.
 
 ![Crop](https://github.com/ArthurHub/Android-Image-Cropper/blob/master/art/zoom%20sample.gif?raw=true)
 
@@ -59,7 +59,7 @@ Android Image Cropper
 - More.
  
 ## Customizations
-- Cropping window shape: Rectengular or Oval (cube/circle by fixing aspect ratio).
+- Cropping window shape: Rectangular or Oval (cube/circle by fixing aspect ratio).
 - Cropping window aspect ratio: Free, 1:1, 4:3, 16:9 or Custom.
 - Guidelines appearance: Off / Always On / Show on Toch.
 - Cropping window Border line, border corner and guidelines thickness and color.
@@ -76,7 +76,6 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
 *2.0.0* (Beta)
 
 - **Auto-zoom**: zoom-in when crop window takes less than 50% of the image, zoom-out when more than 65%.
-- Better handling of image exif orientation data.
 - Handle cropping of non-straight angles rotations for URI loaded images.
 - Improve performance for image rotation.
 - Improve performance for orientation change.
@@ -96,7 +95,7 @@ See [full change log](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Ch
 ## License
 Originally forked from [edmodo/cropper](https://github.com/edmodo/cropper).
 
-Copyright 2016, Arthur Teplitzki 2013, Edmodo, Inc.
+Copyright 2016, Arthur Teplitzki, 2013, Edmodo, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the   License.
 You may obtain a copy of the License in the LICENSE file, or at:
