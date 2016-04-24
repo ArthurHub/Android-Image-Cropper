@@ -9,5 +9,4 @@
     app:cropMaxCropResultHeightPX="1200"
     app:cropMaxCropResultWidthPX="1600"
     app:cropMinCropResultHeightPX="800"
-    app:cropMinCropResultWidthPX="400"
-    app:cropScaleType="fitCenter"/>
+    app:cropMinCropResultWidthPX="400"/>

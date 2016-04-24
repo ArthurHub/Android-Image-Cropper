@@ -35,6 +35,10 @@ final class CropDefaults {
 
     public static final int DEFAULT_CROP_SHAPE_INDEX = 0;
 
+    public static final boolean DEFAULT_AUTO_ZOOM_ENABLED = true;
+
+    public static final int DEFAULT_MAX_ZOOM = 4;
+
     public static final int DEFAULT_GUIDELINES_INDEX = 1;
 
     public static final float MIN_CROP_WINDOW_SIZE = 42;

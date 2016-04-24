@@ -14,5 +14,5 @@
     app:cropBorderLineThickness="1dp"
     app:cropGuidelines="on"
     app:cropGuidelinesColor="@android:color/holo_red_dark"
-    app:cropScaleType="fitCenter"
+    app:cropInitialCropWindowPaddingRatio="0"
     app:cropSnapRadius="0dp"/>

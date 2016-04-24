@@ -16,6 +16,8 @@
             <enum name="rectangle" value="0"/>
             <enum name="oval" value="1"/>
         </attr>
+        <attr name="cropAutoZoomEnabled" format="boolean"/>
+        <attr name="cropMaxZoom" format="integer"/>
         <attr name="cropFixAspectRatio" format="boolean"/>
         <attr name="cropAspectRatioX" format="integer"/>
         <attr name="cropAspectRatioY" format="integer"/>

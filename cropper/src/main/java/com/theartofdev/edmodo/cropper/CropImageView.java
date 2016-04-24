@@ -111,7 +111,12 @@ public class CropImageView extends FrameLayout {
      * if auto-zoom functionality is enabled.<br>
      * default: true.
      */
-    private boolean mZoomEnabled = true;
+    private boolean mAutoZoomEnabled = true;
+
+    /**
+     * The max zoom allowed during cropping
+     */
+    private int mMaxZoom;
 
     /**
      * callback to be invoked when image async loading is complete
@@ -132,11 +137,6 @@ public class CropImageView extends FrameLayout {
      * The sample size the image was loaded by if was loaded by URI
      */
     private int mLoadedSampleSize = 1;
-
-    /**
-     * The max zoom allowed during cropping
-     */
-    private float mMaxZoom = 4;
 
     /**
      * The current zoom level to to scale the cropping image
@@ -208,6 +208,8 @@ public class CropImageView extends FrameLayout {
                 aspectRatioX = ta.getInteger(R.styleable.CropImageView_cropAspectRatioX, CropDefaults.DEFAULT_ASPECT_RATIO_X);
                 aspectRatioY = ta.getInteger(R.styleable.CropImageView_cropAspectRatioY, CropDefaults.DEFAULT_ASPECT_RATIO_Y);
                 mScaleType = ScaleType.values()[ta.getInt(R.styleable.CropImageView_cropScaleType, CropDefaults.DEFAULT_SCALE_TYPE_INDEX)];
+                mAutoZoomEnabled = ta.getBoolean(R.styleable.CropImageView_cropAutoZoomEnabled, CropDefaults.DEFAULT_AUTO_ZOOM_ENABLED);
+                mMaxZoom = ta.getInteger(R.styleable.CropImageView_cropMaxZoom, CropDefaults.DEFAULT_MAX_ZOOM);
                 cropShape = CropShape.values()[ta.getInt(R.styleable.CropImageView_cropShape, CropDefaults.DEFAULT_CROP_SHAPE_INDEX)];
                 guidelines = Guidelines.values()[ta.getInt(R.styleable.CropImageView_cropGuidelines, CropDefaults.DEFAULT_GUIDELINES_INDEX)];
                 snapRadius = ta.getDimension(R.styleable.CropImageView_cropSnapRadius, snapRadius);
@@ -234,6 +236,10 @@ public class CropImageView extends FrameLayout {
             } finally {
                 ta.recycle();
             }
+        }
+
+        if (mMaxZoom < 0) {
+            throw new IllegalArgumentException("Cannot set max zoom to a number < 1");
         }
 
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -297,6 +303,40 @@ public class CropImageView extends FrameLayout {
      */
     public void setCropShape(CropShape cropShape) {
         mCropOverlayView.setCropShape(cropShape);
+    }
+
+    /**
+     * if auto-zoom functionality is enabled. default: true.
+     */
+    public boolean isAutoZoomEnabled() {
+        return mAutoZoomEnabled;
+    }
+
+    /**
+     * Set auto-zoom functionality to enabled/disabled.
+     */
+    public void setAutoZoomEnabled(boolean autoZoomEnabled) {
+        if (mAutoZoomEnabled != autoZoomEnabled) {
+            mAutoZoomEnabled = autoZoomEnabled;
+            handleCropWindowChanged(false, false);
+        }
+    }
+
+    /**
+     * The max zoom allowed during cropping.
+     */
+    public int getMaxZoom() {
+        return mMaxZoom;
+    }
+
+    /**
+     * The max zoom allowed during cropping.
+     */
+    public void setMaxZoom(int maxZoom) {
+        if (mMaxZoom != maxZoom && maxZoom > 0) {
+            mMaxZoom = maxZoom;
+            handleCropWindowChanged(false, false);
+        }
     }
 
     /**
@@ -1009,7 +1049,7 @@ public class CropImageView extends FrameLayout {
     private void handleCropWindowChanged(boolean inProgress, boolean animate) {
         int width = getWidth();
         int height = getHeight();
-        if (mZoomEnabled && mBitmap != null && width > 0 && height > 0) {
+        if (mAutoZoomEnabled && mBitmap != null && width > 0 && height > 0) {
 
             RectF cropRect = mCropOverlayView.getCropWindowRect();
             if (inProgress) {
@@ -1082,7 +1122,7 @@ public class CropImageView extends FrameLayout {
 
             // scale the image to the image view, image rect transformed to know new width/height
             float scale = Math.min(width / mImageRect.width(), height / mImageRect.height());
-            if (mScaleType == ScaleType.FIT_CENTER || (mScaleType == ScaleType.CENTER_INSIDE && scale < 1) || (scale > 1 && mZoomEnabled)) {
+            if (mScaleType == ScaleType.FIT_CENTER || (mScaleType == ScaleType.CENTER_INSIDE && scale < 1) || (scale > 1 && mAutoZoomEnabled)) {
                 mImageMatrix.postScale(scale, scale, mImageRect.centerX(), mImageRect.centerY());
                 mapImageRectangleByImageMatrix(mImageRect);
             }

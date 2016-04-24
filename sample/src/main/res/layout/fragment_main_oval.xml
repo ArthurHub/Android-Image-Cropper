@@ -7,5 +7,4 @@
     app:cropAspectRatioX="5"
     app:cropAspectRatioY="5"
     app:cropFixAspectRatio="true"
-    app:cropScaleType="fitCenter"
     app:cropShape="oval"/>
