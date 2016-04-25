@@ -29,6 +29,10 @@ final class CropImageViewOptions {
 
     public Pair<Integer, Integer> aspectRatio = new Pair<>(1, 1);
 
+    public boolean autoZoomEnabled;
+
+    public int maxZoomLevel;
+
     public boolean fixAspectRatio;
 
     public boolean showCropOverlay;

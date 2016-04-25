@@ -81,6 +81,7 @@ public class MainActivity extends Activity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+        mCurrentFragment.updateCurrentCropViewOptions();
     }
 
     @Override
@@ -197,6 +198,17 @@ public class MainActivity extends Activity {
                 mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
                 updateDrawerTogglesByOptions(mCropImageViewOptions);
                 break;
+            case R.id.drawer_option_toggle_auto_zoom:
+                mCropImageViewOptions.autoZoomEnabled = !mCropImageViewOptions.autoZoomEnabled;
+                mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
+                updateDrawerTogglesByOptions(mCropImageViewOptions);
+                break;
+            case R.id.drawer_option_toggle_max_zoom:
+                mCropImageViewOptions.maxZoomLevel = mCropImageViewOptions.maxZoomLevel == 4 ? 8
+                        : mCropImageViewOptions.maxZoomLevel == 8 ? 2 : 4;
+                mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
+                updateDrawerTogglesByOptions(mCropImageViewOptions);
+                break;
             case R.id.drawer_option_set_initial_crop_rect:
                 mCurrentFragment.setInitialCropRect();
                 mDrawerLayout.closeDrawers();
@@ -239,5 +251,8 @@ public class MainActivity extends Activity {
             aspectRatio = options.aspectRatio.first + ":" + options.aspectRatio.second;
         }
         ((TextView) findViewById(R.id.drawer_option_toggle_aspect_ratio)).setText(getResources().getString(R.string.drawer_option_toggle_aspect_ratio, aspectRatio));
+
+        ((TextView) findViewById(R.id.drawer_option_toggle_auto_zoom)).setText(getResources().getString(R.string.drawer_option_toggle_auto_zoom, options.autoZoomEnabled ? "Enabled" : "Disabled"));
+        ((TextView) findViewById(R.id.drawer_option_toggle_max_zoom)).setText(getResources().getString(R.string.drawer_option_toggle_max_zoom, options.maxZoomLevel));
     }
 }

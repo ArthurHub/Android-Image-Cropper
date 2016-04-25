@@ -319,6 +319,7 @@ public class CropImageView extends FrameLayout {
         if (mAutoZoomEnabled != autoZoomEnabled) {
             mAutoZoomEnabled = autoZoomEnabled;
             handleCropWindowChanged(false, false);
+            mCropOverlayView.invalidate();
         }
     }
 
@@ -336,6 +337,7 @@ public class CropImageView extends FrameLayout {
         if (mMaxZoom != maxZoom && maxZoom > 0) {
             mMaxZoom = maxZoom;
             handleCropWindowChanged(false, false);
+            mCropOverlayView.invalidate();
         }
     }
 
@@ -891,6 +893,8 @@ public class CropImageView extends FrameLayout {
 
         bundle.putParcelable("CROP_WINDOW_RECT", BitmapUtils.RECT);
         bundle.putString("CROP_SHAPE", mCropOverlayView.getCropShape().name());
+        bundle.putBoolean("CROP_AUTO_ZOOM_ENABLED", mAutoZoomEnabled);
+        bundle.putInt("CROP_MAX_ZOOM", mMaxZoom);
 
         return bundle;
     }
@@ -942,6 +946,9 @@ public class CropImageView extends FrameLayout {
             mRestoreCropWindowRect = bundle.getParcelable("CROP_WINDOW_RECT");
 
             mCropOverlayView.setCropShape(CropShape.valueOf(bundle.getString("CROP_SHAPE")));
+
+            mAutoZoomEnabled = bundle.getBoolean("CROP_AUTO_ZOOM_ENABLED");
+            mMaxZoom = bundle.getInt("CROP_MAX_ZOOM");
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
         } else {
@@ -1049,14 +1056,14 @@ public class CropImageView extends FrameLayout {
     private void handleCropWindowChanged(boolean inProgress, boolean animate) {
         int width = getWidth();
         int height = getHeight();
-        if (mAutoZoomEnabled && mBitmap != null && width > 0 && height > 0) {
+        if (mBitmap != null && width > 0 && height > 0) {
 
             RectF cropRect = mCropOverlayView.getCropWindowRect();
             if (inProgress) {
                 if (cropRect.left < 0 || cropRect.top < 0 || cropRect.right > width || cropRect.bottom > height) {
                     applyImageMatrix(width, height, false, false);
                 }
-            } else {
+            } else if (mAutoZoomEnabled || mZoom > 1) {
                 float newZoom = 0;
                 // keep the cropping window covered area to 50%-65% of zoomed sub-area
                 if (mZoom < mMaxZoom && cropRect.width() < width * 0.5f && cropRect.height() < height * 0.5f) {
@@ -1065,8 +1072,11 @@ public class CropImageView extends FrameLayout {
                 if (mZoom > 1 && (cropRect.width() > width * 0.65f || cropRect.height() > height * 0.65f)) {
                     newZoom = Math.max(1, Math.min(width / (cropRect.width() / mZoom / 0.51f), height / (cropRect.height() / mZoom / 0.51f)));
                 }
+                if (!mAutoZoomEnabled) {
+                    newZoom = 1;
+                }
 
-                if (newZoom > 0) {
+                if (newZoom > 0 && newZoom != mZoom) {
                     if (animate) {
                         if (mAnimation == null) {
                             // lazy create animation single instance

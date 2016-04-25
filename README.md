@@ -70,7 +70,7 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
 ## Posts
  - [Android cropping image from camera or gallery](http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/)
  - [Android Image Cropper async support and custom progress UI](http://theartofdev.com/2016/01/15/android-image-cropper-async-support-and-custom-progress-ui/)
- - [Adding auto-zoom feature to Android-Image-Cropper]()
+ - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
 *2.0.0* (Beta)

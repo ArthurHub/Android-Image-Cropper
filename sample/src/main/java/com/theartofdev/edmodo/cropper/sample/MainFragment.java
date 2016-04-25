@@ -72,6 +72,8 @@ public final class MainFragment extends Fragment
         mCropImageView.setFixedAspectRatio(options.fixAspectRatio);
         mCropImageView.setShowCropOverlay(options.showCropOverlay);
         mCropImageView.setShowProgressBar(options.showProgressBar);
+        mCropImageView.setAutoZoomEnabled(options.autoZoomEnabled);
+        mCropImageView.setMaxZoom(options.maxZoomLevel);
     }
 
     /**
@@ -86,6 +88,20 @@ public final class MainFragment extends Fragment
      */
     public void resetCropRect() {
         mCropImageView.resetCropRect();
+    }
+
+    public void updateCurrentCropViewOptions() {
+        CropImageViewOptions options = new CropImageViewOptions();
+        options.scaleType = mCropImageView.getScaleType();
+        options.cropShape = mCropImageView.getCropShape();
+        options.guidelines = mCropImageView.getGuidelines();
+        options.aspectRatio = mCropImageView.getAspectRatio();
+        options.fixAspectRatio = mCropImageView.isFixAspectRatio();
+        options.showCropOverlay = mCropImageView.isShowCropOverlay();
+        options.showProgressBar = mCropImageView.isShowProgressBar();
+        options.autoZoomEnabled = mCropImageView.isAutoZoomEnabled();
+        options.maxZoomLevel = mCropImageView.getMaxZoom();
+        ((MainActivity) getActivity()).setCurrentOptions(options);
     }
 
     @Override
@@ -124,15 +140,7 @@ public final class MainFragment extends Fragment
         mCropImageView.setOnSetImageUriCompleteListener(this);
         mCropImageView.setOnGetCroppedImageCompleteListener(this);
 
-        CropImageViewOptions options = new CropImageViewOptions();
-        options.scaleType = mCropImageView.getScaleType();
-        options.cropShape = mCropImageView.getCropShape();
-        options.guidelines = mCropImageView.getGuidelines();
-        options.aspectRatio = mCropImageView.getAspectRatio();
-        options.fixAspectRatio = mCropImageView.isFixAspectRatio();
-        options.showCropOverlay = mCropImageView.isShowCropOverlay();
-        options.showProgressBar = mCropImageView.isShowProgressBar();
-        ((MainActivity) getActivity()).setCurrentOptions(options);
+        updateCurrentCropViewOptions();
 
         if (savedInstanceState == null) {
             if (mDemoPreset == CropDemoPreset.SCALE_CENTER_INSIDE) {
