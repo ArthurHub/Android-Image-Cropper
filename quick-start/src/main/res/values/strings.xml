@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Image Cropper Quick Start</string>
+    <string name="result_image_desc">crop result</string>
+    <string name="button_select_image">Select Image</string>
+
+</resources>
