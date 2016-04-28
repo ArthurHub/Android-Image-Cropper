@@ -150,38 +150,13 @@ final class CropWindowHandler {
     /**
      * Set the variables to be used during crop window handling.
      */
-    public void setInitialAttributeValues(float minCropWindowWidth, float minCropWindowHeight,
-                                          float minCropResultWidth, float minCropResultHeight,
-                                          float maxCropResultWidth, float maxCropResultHeight) {
-        if (minCropWindowWidth < 0) {
-            throw new IllegalArgumentException("Cannot set min crop window width value to a number < 0 ");
-        }
-        mMinCropWindowWidth = minCropWindowWidth;
-
-        if (minCropWindowHeight < 0) {
-            throw new IllegalArgumentException("Cannot set min crop window height value to a number < 0 ");
-        }
-        mMinCropWindowHeight = minCropWindowHeight;
-
-        if (minCropResultWidth < 0) {
-            throw new IllegalArgumentException("Cannot set min crop result width value to a number < 0 ");
-        }
-        mMinCropResultWidth = minCropResultWidth;
-
-        if (minCropResultHeight < 0) {
-            throw new IllegalArgumentException("Cannot set min crop result height value to a number < 0 ");
-        }
-        mMinCropResultHeight = minCropResultHeight;
-
-        if (maxCropResultWidth < minCropResultWidth) {
-            throw new IllegalArgumentException("Cannot set max crop result width to smaller value than min crop result width");
-        }
-        mMaxCropResultWidth = maxCropResultWidth;
-
-        if (maxCropResultHeight < minCropResultHeight) {
-            throw new IllegalArgumentException("Cannot set max crop result height to smaller value than min crop result height");
-        }
-        mMaxCropResultHeight = maxCropResultHeight;
+    public void setInitialAttributeValues(CropImageOptions options) {
+        mMinCropWindowWidth = options.minCropWindowWidth;
+        mMinCropWindowHeight = options.minCropWindowHeight;
+        mMinCropResultWidth = options.minCropResultWidth;
+        mMinCropResultHeight = options.minCropResultHeight;
+        mMaxCropResultWidth = options.maxCropResultWidth;
+        mMaxCropResultHeight = options.maxCropResultHeight;
     }
 
     /**
@@ -199,8 +174,7 @@ final class CropWindowHandler {
      * @return boolean Whether the guidelines should be shown or not
      */
     public boolean showGuidelines() {
-        return !(mEdges.width() < CropDefaults.DEFAULT_SHOW_GUIDELINES_LIMIT
-                || mEdges.height() < CropDefaults.DEFAULT_SHOW_GUIDELINES_LIMIT);
+        return !(mEdges.width() < 100 || mEdges.height() < 100);
     }
 
     /**

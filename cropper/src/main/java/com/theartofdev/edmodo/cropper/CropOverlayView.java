@@ -111,14 +111,17 @@ public class CropOverlayView extends View {
     /**
      * Flag indicating if the crop area should always be a certain aspect ratio (indicated by mTargetAspectRatio).
      */
-    private boolean mFixAspectRatio = CropDefaults.DEFAULT_FIXED_ASPECT_RATIO;
+    private boolean mFixAspectRatio;
 
     /**
-     * Floats to save the current aspect ratio of the image
+     * save the current aspect ratio of the image
      */
-    private int mAspectRatioX = CropDefaults.DEFAULT_ASPECT_RATIO_X;
+    private int mAspectRatioX;
 
-    private int mAspectRatioY = CropDefaults.DEFAULT_ASPECT_RATIO_Y;
+    /**
+     * save the current aspect ratio of the image
+     */
+    private int mAspectRatioY;
 
     /**
      * The aspect ratio that the crop area should maintain;
@@ -206,8 +209,8 @@ public class CropOverlayView extends View {
      */
     public void resetCropOverlayView() {
         if (initializedCropWindow) {
-            setBitmapRect(CropDefaults.EMPTY_RECT_F, 0, 0);
-            setCropWindowRect(CropDefaults.EMPTY_RECT_F);
+            setBitmapRect(BitmapUtils.EMPTY_RECT_F, 0, 0);
+            setCropWindowRect(BitmapUtils.EMPTY_RECT_F);
             initCropWindow();
             invalidate();
         }
@@ -363,7 +366,7 @@ public class CropOverlayView extends View {
      * Set crop window initial rectangle to be used instead of default.
      */
     public void setInitialCropWindowRect(Rect rect) {
-        mInitialCropWindowRect.set(rect != null ? rect : CropDefaults.EMPTY_RECT);
+        mInitialCropWindowRect.set(rect != null ? rect : BitmapUtils.EMPTY_RECT);
         if (initializedCropWindow) {
             initCropWindow();
             invalidate();
@@ -383,94 +386,38 @@ public class CropOverlayView extends View {
     }
 
     /**
-     * Sets all initial values, but does not call initCropWindow to reset the
-     * views. Used once at the very start to initialize the attributes.
-     *
-     * @param cropShape
-     * @param snapRadius
-     * @param guidelines Integer that signals whether the guidelines should be on, off, or only showing when resizing.
-     * @param fixAspectRatio Boolean that signals whether the aspect ratio should be maintained.
-     * @param aspectRatioX float that specifies the new X value of the aspect ratio
-     * @param aspectRatioY float that specifies the new Y value of the aspect
-     * @param guidelinesThickness the thickness of the guidelines lines in pixels
-     * @param guidelinesColor the color of the guidelines lines
-     * @param minCropResultWidth the min width the resulting cropping image is allowed to be, affects the cropping
-     * window limits.
-     * @param minCropResultHeight the min height the resulting cropping image is allowed to be, affects the cropping
-     * window limits.
-     * @param maxCropResultWidth the max width the resulting cropping image is allowed to be, affects the cropping
-     * window limits.
-     * @param maxCropResultHeight the max height the resulting cropping image is allowed to be, affects the cropping
-     * window limits.
+     * Sets all initial values, but does not call initCropWindow to reset the views.<br>
+     * Used once at the very start to initialize the attributes.
      */
-    public void setInitialAttributeValues(CropImageView.CropShape cropShape,
-                                          float snapRadius,
-                                          float touchRadius,
-                                          CropImageView.Guidelines guidelines,
-                                          boolean fixAspectRatio,
-                                          int aspectRatioX,
-                                          int aspectRatioY,
-                                          float initialCropWindowPaddingRatio,
-                                          float borderLineThickness,
-                                          int borderLineColor,
-                                          float borderCornerThickness,
-                                          float borderCornerOffset,
-                                          float borderCornerLength,
-                                          int borderCornerColor,
-                                          float guidelinesThickness,
-                                          int guidelinesColor,
-                                          int backgroundColor,
-                                          float minCropWindowWidth,
-                                          float minCropWindowHeight,
-                                          float minCropResultWidth,
-                                          float minCropResultHeight,
-                                          float maxCropResultWidth,
-                                          float maxCropResultHeight) {
+    public void setInitialAttributeValues(CropImageOptions options) {
 
-        mCropWindowHandler.setInitialAttributeValues(minCropWindowWidth, minCropWindowHeight,
-                minCropResultWidth, minCropResultHeight,
-                maxCropResultWidth, maxCropResultHeight);
+        mCropWindowHandler.setInitialAttributeValues(options);
 
-        setCropShape(cropShape);
+        setCropShape(options.cropShape);
 
-        setSnapRadius(snapRadius);
+        setSnapRadius(options.snapRadius);
 
-        setGuidelines(guidelines);
+        setGuidelines(options.guidelines);
 
-        setFixedAspectRatio(fixAspectRatio);
+        setFixedAspectRatio(options.fixAspectRatio);
 
-        setAspectRatioX(aspectRatioX);
+        setAspectRatioX(options.aspectRatioX);
 
-        setAspectRatioY(aspectRatioY);
+        setAspectRatioY(options.aspectRatioY);
 
-        if (touchRadius < 0) {
-            throw new IllegalArgumentException("Cannot set touch radius value to a number <= 0 ");
-        }
-        mTouchRadius = touchRadius;
+        mTouchRadius = options.touchRadius;
 
-        if (initialCropWindowPaddingRatio < 0 || initialCropWindowPaddingRatio >= 0.5) {
-            throw new IllegalArgumentException("Cannot set initial crop window padding value to a number < 0 or >= 0.5");
-        }
-        mInitialCropWindowPaddingRatio = initialCropWindowPaddingRatio;
+        mInitialCropWindowPaddingRatio = options.initialCropWindowPaddingRatio;
 
-        if (borderLineThickness < 0) {
-            throw new IllegalArgumentException("Cannot set line thickness value to a number less than 0.");
-        }
-        mBorderPaint = getNewPaintOrNull(borderLineThickness, borderLineColor);
+        mBorderPaint = getNewPaintOrNull(options.borderLineThickness, options.borderLineColor);
 
-        if (borderCornerThickness < 0) {
-            throw new IllegalArgumentException("Cannot set corner thickness value to a number less than 0.");
-        }
-        mBorderCornerOffset = borderCornerOffset;
-        mBorderCornerLength = borderCornerLength;
-        mBorderCornerPaint = getNewPaintOrNull(borderCornerThickness, borderCornerColor);
+        mBorderCornerOffset = options.borderCornerOffset;
+        mBorderCornerLength = options.borderCornerLength;
+        mBorderCornerPaint = getNewPaintOrNull(options.borderCornerThickness, options.borderCornerColor);
 
-        if (guidelinesThickness < 0) {
-            throw new IllegalArgumentException("Cannot set guidelines thickness value to a number less than 0.");
-        }
-        mGuidelinePaint = getNewPaintOrNull(guidelinesThickness, guidelinesColor);
+        mGuidelinePaint = getNewPaintOrNull(options.guidelinesThickness, options.guidelinesColor);
 
-        mBackgroundPaint = getNewPaint(backgroundColor);
+        mBackgroundPaint = getNewPaint(options.backgroundColor);
     }
 
     //region: Private methods
@@ -659,11 +606,11 @@ public class CropOverlayView extends View {
         } else {
             Path circleSelectionPath = new Path();
             if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17 && mCropShape == CropImageView.CropShape.OVAL) {
-                CropDefaults.EMPTY_RECT_F.set(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2);
+                BitmapUtils.EMPTY_RECT_F.set(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2);
             } else {
-                CropDefaults.EMPTY_RECT_F.set(rect.left, rect.top, rect.right, rect.bottom);
+                BitmapUtils.EMPTY_RECT_F.set(rect.left, rect.top, rect.right, rect.bottom);
             }
-            circleSelectionPath.addOval(CropDefaults.EMPTY_RECT_F, Path.Direction.CW);
+            circleSelectionPath.addOval(BitmapUtils.EMPTY_RECT_F, Path.Direction.CW);
             canvas.save();
             canvas.clipPath(circleSelectionPath, Region.Op.XOR);
             canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);

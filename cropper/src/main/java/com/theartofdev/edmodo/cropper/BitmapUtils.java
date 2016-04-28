@@ -42,6 +42,10 @@ import javax.microedition.khronos.egl.EGLDisplay;
  */
 final class BitmapUtils {
 
+    static final Rect EMPTY_RECT = new Rect();
+
+    static final RectF EMPTY_RECT_F = new RectF();
+
     /**
      * Reusable rectengale for general internal usage
      */
@@ -112,7 +116,7 @@ final class BitmapUtils {
             // First decode with inJustDecodeBounds=true to check dimensions
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(stream, CropDefaults.EMPTY_RECT, options);
+            BitmapFactory.decodeStream(stream, EMPTY_RECT, options);
             options.inJustDecodeBounds = false;
 
             // Calculate inSampleSize
@@ -121,7 +125,7 @@ final class BitmapUtils {
             // Decode bitmap with inSampleSize set
             closeSafe(stream);
             stream = resolver.openInputStream(uri);
-            Bitmap bitmap = BitmapFactory.decodeStream(stream, CropDefaults.EMPTY_RECT, options);
+            Bitmap bitmap = BitmapFactory.decodeStream(stream, EMPTY_RECT, options);
 
             return new DecodeBitmapResult(bitmap, options.inSampleSize);
 
@@ -203,7 +207,7 @@ final class BitmapUtils {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inSampleSize = calculateInSampleSize(rect.width(), rect.height(), reqWidth, reqHeight);
 
-                Bitmap fullBitmap = BitmapFactory.decodeStream(stream, CropDefaults.EMPTY_RECT, options);
+                Bitmap fullBitmap = BitmapFactory.decodeStream(stream, EMPTY_RECT, options);
                 if (fullBitmap != null) {
                     result = cropBitmap(fullBitmap, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
                     fullBitmap.recycle();
