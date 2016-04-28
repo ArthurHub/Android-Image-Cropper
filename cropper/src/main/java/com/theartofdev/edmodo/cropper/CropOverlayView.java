@@ -65,7 +65,7 @@ public class CropOverlayView extends View {
     /**
      * The bounding box around the Bitmap that we are cropping.
      */
-    private RectF mBitmapRect = new RectF();
+    private final RectF mBitmapRect = new RectF();
 
     /**
      * The bounding image view width used to know the crop overlay is at view edges.
@@ -142,7 +142,7 @@ public class CropOverlayView extends View {
     /**
      * the initial crop window rectangle to set
      */
-    private Rect mInitialCropWindowRect = new Rect();
+    private final Rect mInitialCropWindowRect = new Rect();
 
     /**
      * Whether the Crop View has been initialized for the first time
@@ -827,7 +827,7 @@ public class CropOverlayView extends View {
          *
          * @param inProgress is the crop window change operation is still in progress by user touch
          */
-        public void onCropWindowChanged(boolean inProgress);
+        void onCropWindowChanged(boolean inProgress);
     }
     //endregion
 }
