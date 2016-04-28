@@ -5,26 +5,26 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/resultImageText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#7000"
         android:padding="12dp"
-        android:text="hello world 2"/>
+        android:text="@string/main_activity_desciption"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="12dp"
-        android:text="@string/button_select_image"
-        android:onClick="onSelectImageClick"/>
+        android:onClick="onSelectImageClick"
+        android:text="@string/main_button_select_image"/>
 
     <ImageView
-        android:id="@+id/resultImageView"
+        android:id="@+id/main_cropped_image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:contentDescription="@string/result_image_desc"/>
+        android:contentDescription="@string/result_image_desc"
+        android:src="@drawable/placeholder"/>
 
 </LinearLayout>
