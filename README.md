@@ -2,6 +2,7 @@ Android Image Cropper
 =======
 [![build status](https://travis-ci.org/ArthurHub/Android-Image-Cropper.svg)](https://travis-ci.org/ArthurHub/Android-Image-Cropper) 
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/4d3781df0cce40959881a8d91365407a)](https://www.codacy.com/app/tep-arthur/Android-Image-Cropper)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android--Image--Cropper-green.svg?style=true)](https://android-arsenal.com/details/1/3487)
 [ ![Download](https://api.bintray.com/packages/arthurhub/maven/Android-Image-Cropper/images/download.svg) ](https://bintray.com/arthurhub/maven/Android-Image-Cropper/_latestVersion)
 
 
@@ -27,8 +28,7 @@ Android Image Cropper
     android:id="@+id/cropImageView"
     android:layout_width="match_parent"
     android:layout_height="0dp"
-    android:layout_weight="1"
-    custom:cropScaleType="fitCenter"/>
+    android:layout_weight="1"/>
  ```
 
 3. Set image to crop
@@ -73,6 +73,10 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.0.1* (Beta)
+
+- Fix counter clockwise rotation resulting in negative degrees (#54). 
+
 *2.0.0* (Beta)
 
 - **Auto-zoom**: zoom-in when crop window takes less than 50% of the image, zoom-out when more than 65%.

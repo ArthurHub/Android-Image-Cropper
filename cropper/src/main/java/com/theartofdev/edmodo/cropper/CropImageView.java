@@ -744,7 +744,7 @@ public class CropImageView extends FrameLayout {
                 mZoomOffsetX = 0;
                 mZoomOffsetY = 0;
                 mDegreesRotated += degrees;
-                mDegreesRotated = mDegreesRotated % 360;
+                mDegreesRotated = mDegreesRotated >= 0 ? mDegreesRotated % 360 : mDegreesRotated % 360 + 360;
 
                 applyImageMatrix(getWidth(), getHeight(), true, false);
 
@@ -758,7 +758,7 @@ public class CropImageView extends FrameLayout {
             } else {
 
                 mDegreesRotated += degrees;
-                mDegreesRotated = mDegreesRotated % 360;
+                mDegreesRotated = mDegreesRotated >= 0 ? mDegreesRotated % 360 : mDegreesRotated % 360 + 360;
 
                 mZoom = 1;
                 mZoomOffsetX = mZoomOffsetY = 0;
