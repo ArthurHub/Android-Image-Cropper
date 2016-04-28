@@ -73,6 +73,10 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.0.1* (Beta)
+
+- Fix counter clockwise rotation resulting in negative degrees (#54). 
+
 *2.0.0* (Beta)
 
 - **Auto-zoom**: zoom-in when crop window takes less than 50% of the image, zoom-out when more than 65%.
