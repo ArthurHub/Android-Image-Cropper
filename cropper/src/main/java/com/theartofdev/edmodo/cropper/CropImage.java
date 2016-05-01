@@ -14,6 +14,7 @@ package com.theartofdev.edmodo.cropper;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -58,6 +59,12 @@ public final class CropImage {
      * The request code used to start pick image activity to be used on result to identify the this specific request.
      */
     public static final int PICK_IMAGE_PERMISSIONS_REQUEST_CODE = 201;
+
+    /**
+     * The request code used to start {@link CropImageActivity} to be used on result to identify the this specific
+     * request.
+     */
+    public static final int CROP_IMAGE_ACTIVITY_REQUEST_CODE = 203;
 
     private CropImage() {
     }
@@ -227,4 +234,250 @@ public final class CropImage {
         }
         return false;
     }
+
+    /**
+     * Create builder for {@link CropImageActivity} intent to be used for cropping the given image.
+     *
+     * @param context Android Context
+     * @param uri Android URI to source image to crop
+     * @return builder for Crop Image Activity
+     */
+
+    public static ActivityBuilder activity(Context context, Uri uri) {
+        return new ActivityBuilder(context, uri);
+    }
+
+    //region: Inner class: ActivityBuilder
+
+    /**
+     * Builder used for creating Image Crop Activity by user request.
+     */
+    public static final class ActivityBuilder {
+
+        /**
+         * The context to build the activity intent in.
+         */
+        private Context mContext;
+
+        /**
+         * The intent for Crop Image Activity.
+         */
+        private final Intent mIntent;
+
+        /**
+         * Options for image crop UX
+         */
+        private final CropImageOptions mOptions;
+
+        private ActivityBuilder(Context context, Uri source) {
+            mContext = context;
+
+            mIntent = new Intent();
+            mIntent.setClass(context, CropImageActivity.class);
+            mIntent.putExtra("CROP_IMAGE_EXTRA_SOURCE", source);
+
+            mOptions = new CropImageOptions(context.getResources().getDisplayMetrics());
+        }
+
+        /**
+         * Get {@link CropImageActivity} intent to start the activity.
+         */
+        public Intent getIntent() {
+            mOptions.validate();
+            mIntent.putExtra("CROP_IMAGE_EXTRA_OPTIONS", mOptions);
+            return mIntent;
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param activity activity to receive result
+         */
+        public void start(Activity activity) {
+            mOptions.validate();
+            activity.startActivityForResult(getIntent(), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param fragment fragment to receive result
+         */
+        public void start(Fragment fragment) {
+            fragment.startActivityForResult(getIntent(), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+        /**
+         * The shape of the cropping window.
+         */
+        public void setCropShape(CropImageView.CropShape cropShape) {
+            mOptions.cropShape = cropShape;
+        }
+
+        /**
+         * An edge of the crop window will snap to the corresponding edge of a specified bounding box
+         * when the crop window edge is less than or equal to this distance (in pixels) away from the bounding box
+         * edge.
+         */
+        public void setSnapRadius(float snapRadius) {
+            mOptions.snapRadius = snapRadius;
+        }
+
+        /**
+         * The radius of the touchable area around the handle.<br>
+         * We are basing this value off of the recommended 48dp Rhythm.<br>
+         * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
+         */
+        public void setTouchRadius(float touchRadius) {
+            mOptions.touchRadius = touchRadius;
+        }
+
+        /**
+         * whether the guidelines should be on, off, or only showing when resizing.
+         */
+        public void setGuidelines(CropImageView.Guidelines guidelines) {
+            mOptions.guidelines = guidelines;
+        }
+
+        /**
+         * The initial scale type of the image in the crop image view
+         */
+        public void setScaleType(CropImageView.ScaleType scaleType) {
+            mOptions.scaleType = scaleType;
+        }
+
+        /**
+         * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
+         * image.<br>
+         * default: true, may disable for animation or frame transition.
+         */
+        public void setShowCropOverlay(boolean showCropOverlay) {
+            mOptions.showCropOverlay = showCropOverlay;
+        }
+
+        /**
+         * if auto-zoom functionality is enabled.<br>
+         * default: true.
+         */
+        public void setAutoZoomEnabled(boolean autoZoomEnabled) {
+            mOptions.autoZoomEnabled = autoZoomEnabled;
+        }
+
+        /**
+         * The max zoom allowed during cropping
+         */
+        public void setMaxZoom(int maxZoom) {
+            mOptions.maxZoom = maxZoom;
+        }
+
+        /**
+         * The initial crop window padding from image borders in percentage of the cropping image dimensions.
+         */
+        public void setInitialCropWindowPaddingRatio(float initialCropWindowPaddingRatio) {
+            mOptions.initialCropWindowPaddingRatio = initialCropWindowPaddingRatio;
+        }
+
+        /**
+         * whether the width to height aspect ratio should be maintained or free to change.
+         */
+        public void setFixAspectRatio(boolean fixAspectRatio) {
+            mOptions.fixAspectRatio = fixAspectRatio;
+        }
+
+        /**
+         * the X,Y value of the aspect ratio
+         */
+        public void setAspectRatio(int aspectRatioX, int aspectRatioY) {
+            mOptions.aspectRatioX = aspectRatioX;
+            mOptions.aspectRatioY = aspectRatioY;
+        }
+
+        /**
+         * the thickness of the guidelines lines in pixels
+         */
+        public void setBorderLineThickness(float borderLineThickness) {
+            mOptions.borderLineThickness = borderLineThickness;
+        }
+
+        /**
+         * the color of the guidelines lines
+         */
+        public void setBorderLineColor(int borderLineColor) {
+            mOptions.borderLineColor = borderLineColor;
+        }
+
+        /**
+         * thickness of the corner line
+         */
+        public void setBorderCornerThickness(float borderCornerThickness) {
+            mOptions.borderCornerThickness = borderCornerThickness;
+        }
+
+        /**
+         * the offset of corner line from crop window border
+         */
+        public void setBorderCornerOffset(float borderCornerOffset) {
+            mOptions.borderCornerOffset = borderCornerOffset;
+        }
+
+        /**
+         * the length of the corner line away from the corner
+         */
+        public void setBorderCornerLength(float borderCornerLength) {
+            mOptions.borderCornerLength = borderCornerLength;
+        }
+
+        /**
+         * the color of the corner line
+         */
+        public void setBorderCornerColor(int borderCornerColor) {
+            mOptions.borderCornerColor = borderCornerColor;
+        }
+
+        /**
+         * the thickness of the guidelines lines
+         */
+        public void setGuidelinesThickness(float guidelinesThickness) {
+            mOptions.guidelinesThickness = guidelinesThickness;
+        }
+
+        /**
+         * the color of the guidelines lines
+         */
+        public void setGuidelinesColor(int guidelinesColor) {
+            mOptions.guidelinesColor = guidelinesColor;
+        }
+
+        /**
+         * the color of the overlay background around the crop window cover the image parts not in the crop window.
+         */
+        public void setBackgroundColor(int backgroundColor) {
+            mOptions.backgroundColor = backgroundColor;
+        }
+
+        /**
+         * the min size the crop window is allowed to be.
+         */
+        public void setMinCropWindowSize(float minCropWindowWidth, float minCropWindowHeight) {
+            mOptions.minCropWindowWidth = minCropWindowWidth;
+            mOptions.minCropWindowHeight = minCropWindowHeight;
+        }
+
+        /**
+         * the min size the resulting cropping image is allowed to be, affects the cropping window limits.
+         */
+        public void setMinCropResultSize(float minCropResultWidth, float minCropResultHeight) {
+            mOptions.minCropResultWidth = minCropResultWidth;
+            mOptions.minCropResultHeight = minCropResultHeight;
+        }
+
+        /**
+         * the max size the resulting cropping image is allowed to be, affects the cropping window limits.
+         */
+        public void setMaxCropResultSize(float maxCropResultWidth, float maxCropResultHeight) {
+            mOptions.maxCropResultWidth = maxCropResultWidth;
+            mOptions.maxCropResultHeight = maxCropResultHeight;
+        }
+    }
+    //endregion
 }

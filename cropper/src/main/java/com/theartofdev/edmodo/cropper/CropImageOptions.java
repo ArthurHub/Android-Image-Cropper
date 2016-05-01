@@ -13,6 +13,8 @@
 package com.theartofdev.edmodo.cropper;
 
 import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
@@ -20,7 +22,19 @@ import android.util.TypedValue;
  * All the possible options that can be set to customize crop image.<br>
  * Initialized with default values.
  */
-final class CropImageOptions {
+final class CropImageOptions implements Parcelable {
+
+    public static final Creator<CropImageOptions> CREATOR = new Creator<CropImageOptions>() {
+        @Override
+        public CropImageOptions createFromParcel(Parcel in) {
+            return new CropImageOptions(in);
+        }
+
+        @Override
+        public CropImageOptions[] newArray(int size) {
+            return new CropImageOptions[size];
+        }
+    };
 
     /**
      * The shape of the cropping window.
@@ -205,6 +219,71 @@ final class CropImageOptions {
         minCropResultHeight = 40;
         maxCropResultWidth = 99999;
         maxCropResultHeight = 99999;
+    }
+
+    /**
+     * Create object from parcel.
+     */
+    protected CropImageOptions(Parcel in) {
+        snapRadius = in.readFloat();
+        touchRadius = in.readFloat();
+        showCropOverlay = in.readByte() != 0;
+        showProgressBar = in.readByte() != 0;
+        autoZoomEnabled = in.readByte() != 0;
+        maxZoom = in.readInt();
+        initialCropWindowPaddingRatio = in.readFloat();
+        fixAspectRatio = in.readByte() != 0;
+        aspectRatioX = in.readInt();
+        aspectRatioY = in.readInt();
+        borderLineThickness = in.readFloat();
+        borderLineColor = in.readInt();
+        borderCornerThickness = in.readFloat();
+        borderCornerOffset = in.readFloat();
+        borderCornerLength = in.readFloat();
+        borderCornerColor = in.readInt();
+        guidelinesThickness = in.readFloat();
+        guidelinesColor = in.readInt();
+        backgroundColor = in.readInt();
+        minCropWindowWidth = in.readFloat();
+        minCropWindowHeight = in.readFloat();
+        minCropResultWidth = in.readFloat();
+        minCropResultHeight = in.readFloat();
+        maxCropResultWidth = in.readFloat();
+        maxCropResultHeight = in.readFloat();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeFloat(snapRadius);
+        dest.writeFloat(touchRadius);
+        dest.writeByte((byte) (showCropOverlay ? 1 : 0));
+        dest.writeByte((byte) (showProgressBar ? 1 : 0));
+        dest.writeByte((byte) (autoZoomEnabled ? 1 : 0));
+        dest.writeInt(maxZoom);
+        dest.writeFloat(initialCropWindowPaddingRatio);
+        dest.writeByte((byte) (fixAspectRatio ? 1 : 0));
+        dest.writeInt(aspectRatioX);
+        dest.writeInt(aspectRatioY);
+        dest.writeFloat(borderLineThickness);
+        dest.writeInt(borderLineColor);
+        dest.writeFloat(borderCornerThickness);
+        dest.writeFloat(borderCornerOffset);
+        dest.writeFloat(borderCornerLength);
+        dest.writeInt(borderCornerColor);
+        dest.writeFloat(guidelinesThickness);
+        dest.writeInt(guidelinesColor);
+        dest.writeInt(backgroundColor);
+        dest.writeFloat(minCropWindowWidth);
+        dest.writeFloat(minCropWindowHeight);
+        dest.writeFloat(minCropResultWidth);
+        dest.writeFloat(minCropResultHeight);
+        dest.writeFloat(maxCropResultWidth);
+        dest.writeFloat(maxCropResultHeight);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     /**
