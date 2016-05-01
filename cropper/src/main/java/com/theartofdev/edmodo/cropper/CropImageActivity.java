@@ -15,6 +15,7 @@ package com.theartofdev.edmodo.cropper;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,12 +35,21 @@ public class CropImageActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.crop_image_activity);
 
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        mCropImageView = (CropImageView) findViewById(R.id.cropImageView);
 
         Intent intent = getIntent();
+        Uri source = intent.getParcelableExtra(CropImage.CROP_IMAGE_EXTRA_SOURCE);
+        CropImageOptions options = intent.getParcelableExtra(CropImage.CROP_IMAGE_EXTRA_OPTIONS);
+
+        if (savedInstanceState == null) {
+            mCropImageView.setImageUriAsync(source);
+        }
+
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle("");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override

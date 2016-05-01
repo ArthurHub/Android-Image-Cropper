@@ -51,6 +51,16 @@ import java.util.List;
 public final class CropImage {
 
     /**
+     * The key used to pass crop image source URI to {@link CropImageActivity}.
+     */
+    static final String CROP_IMAGE_EXTRA_SOURCE = "CROP_IMAGE_EXTRA_SOURCE";
+
+    /**
+     * The key used to pass crop image options to {@link CropImageActivity}.
+     */
+    static final String CROP_IMAGE_EXTRA_OPTIONS = "CROP_IMAGE_EXTRA_OPTIONS";
+
+    /**
      * The request code used to start pick image activity to be used on result to identify the this specific request.
      */
     public static final int PICK_IMAGE_CHOOSER_REQUEST_CODE = 200;
@@ -274,7 +284,7 @@ public final class CropImage {
 
             mIntent = new Intent();
             mIntent.setClass(context, CropImageActivity.class);
-            mIntent.putExtra("CROP_IMAGE_EXTRA_SOURCE", source);
+            mIntent.putExtra(CROP_IMAGE_EXTRA_SOURCE, source);
 
             mOptions = new CropImageOptions(context.getResources().getDisplayMetrics());
         }
@@ -284,7 +294,7 @@ public final class CropImage {
          */
         public Intent getIntent() {
             mOptions.validate();
-            mIntent.putExtra("CROP_IMAGE_EXTRA_OPTIONS", mOptions);
+            mIntent.putExtra(CROP_IMAGE_EXTRA_OPTIONS, mOptions);
             return mIntent;
         }
 

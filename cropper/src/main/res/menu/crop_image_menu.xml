@@ -2,16 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/crop_image_menu_rotate"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:showAsAction="ifRoom"
+        android:title="@string/crop_image_menu_rotate"/>
+    <item
         android:id="@+id/crop_image_menu_crop"
         android:icon="@android:drawable/ic_menu_crop"
         android:showAsAction="ifRoom"
         android:title="@string/crop_image_menu_crop"/>
-
-    <item
-        android:id="@+id/crop_image_menu_rotate"
-        android:enabled="false"
-        android:icon="@android:drawable/ic_menu_rotate"
-        android:showAsAction="ifRoom"
-        android:title="@string/crop_image_menu_rotate"/>
 
 </menu>

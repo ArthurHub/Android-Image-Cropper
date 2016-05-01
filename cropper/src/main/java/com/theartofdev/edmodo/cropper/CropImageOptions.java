@@ -225,8 +225,11 @@ final class CropImageOptions implements Parcelable {
      * Create object from parcel.
      */
     protected CropImageOptions(Parcel in) {
+        cropShape = CropImageView.CropShape.values()[in.readInt()];
         snapRadius = in.readFloat();
         touchRadius = in.readFloat();
+        guidelines = CropImageView.Guidelines.values()[in.readInt()];
+        scaleType = CropImageView.ScaleType.values()[in.readInt()];
         showCropOverlay = in.readByte() != 0;
         showProgressBar = in.readByte() != 0;
         autoZoomEnabled = in.readByte() != 0;
@@ -254,8 +257,11 @@ final class CropImageOptions implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(cropShape.ordinal());
         dest.writeFloat(snapRadius);
         dest.writeFloat(touchRadius);
+        dest.writeInt(guidelines.ordinal());
+        dest.writeInt(scaleType.ordinal());
         dest.writeByte((byte) (showCropOverlay ? 1 : 0));
         dest.writeByte((byte) (showProgressBar ? 1 : 0));
         dest.writeByte((byte) (autoZoomEnabled ? 1 : 0));
