@@ -124,9 +124,14 @@ public class CropImageView extends FrameLayout {
     private WeakReference<OnSetImageUriCompleteListener> mOnSetImageUriCompleteListener;
 
     /**
-     * callback to be invoked when image async cropping is complete
+     * callback to be invoked when image async cropping is complete (get bitmap)
      */
     private WeakReference<OnGetCroppedImageCompleteListener> mOnGetCroppedImageCompleteListener;
+
+    /**
+     * callback to be invoked when image async cropping is complete (save to uri)
+     */
+    private WeakReference<OnSaveCroppedImageCompleteListener> mOnSaveCroppedImageCompleteListener;
 
     /**
      * The URI that the image was loaded from (if loaded from URI)
@@ -562,7 +567,6 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Gets the cropped image based on the current crop window.<br>
-     * Get rectangle crop shape matching exactly the visual crop window pixel-to-pixel.<br>
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      */
     public void getCroppedImageAsync() {
@@ -571,8 +575,6 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Gets the cropped image based on the current crop window.<br>
-     * Use the given cropShape to "fix" resulting crop image for {@link CropShape#OVAL} by setting pixels
-     * outside the oval (circular) shape to transparent.<br>
      * If (reqWidth,reqHeight) is given AND image is loaded from URI cropping will try to use sample size to fit in
      * the requested width and height down-sampling if possible - optimization to get best size to quality.<br>
      * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
@@ -587,28 +589,52 @@ public class CropImageView extends FrameLayout {
         if (mOnGetCroppedImageCompleteListener == null) {
             throw new IllegalArgumentException("OnGetCroppedImageCompleteListener is not set");
         }
+        startCropWorkerTask(reqWidth, reqHeight, null, null, 0);
+    }
 
-        mImageView.clearAnimation();
+    /**
+     * Save the cropped image based on the current crop window to the given uri.<br>
+     * Use {@link Bitmap.CompressFormat.JPEG} with 90 compression quality.<br>
+     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     *
+     * @param saveUri the Android Uri to save the cropped image to
+     */
+    public void saveCroppedImageAsync(Uri saveUri) {
+        saveCroppedImageAsync(saveUri, Bitmap.CompressFormat.JPEG, 90, 0, 0);
+    }
 
-        BitmapCroppingWorkerTask currentTask = mBitmapCroppingWorkerTask != null ? mBitmapCroppingWorkerTask.get() : null;
-        if (currentTask != null) {
-            // cancel previous cropping
-            currentTask.cancel(true);
+    /**
+     * Save the cropped image based on the current crop window to the given uri.<br>
+     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     *
+     * @param saveUri the Android Uri to save the cropped image to
+     * @param saveCompressFormat the compression format to use when writting the image
+     * @param saveCompressQuality the quility (if applicable) to use when writting the image (0 - 100)
+     */
+    public void saveCroppedImageAsync(Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
+        saveCroppedImageAsync(saveUri, saveCompressFormat, saveCompressQuality, 0, 0);
+    }
+
+    /**
+     * Save the cropped image based on the current crop window to the given uri.<br>
+     * If (reqWidth,reqHeight) is given AND image is loaded from URI cropping will try to use sample size to fit in
+     * the requested width and height down-sampling if possible - optimization to get best size to quality.<br>
+     * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
+     * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
+     * Bitmaps Efficiently</a><br>
+     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     *
+     * @param saveUri the Android Uri to save the cropped image to
+     * @param saveCompressFormat the compression format to use when writting the image
+     * @param saveCompressQuality the quility (if applicable) to use when writting the image (0 - 100)
+     * @param reqWidth the width to downsample the cropped image to
+     * @param reqHeight the height to downsample the cropped image to
+     */
+    public void saveCroppedImageAsync(Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality, int reqWidth, int reqHeight) {
+        if (mOnSaveCroppedImageCompleteListener == null) {
+            throw new IllegalArgumentException("mOnSaveCroppedImageCompleteListener is not set");
         }
-
-        int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
-        int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
-        if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
-            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
-                    mDegreesRotated, orgWidth, orgHeight,
-                    mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                    reqWidth, reqHeight));
-        } else {
-            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), mDegreesRotated,
-                    mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY()));
-        }
-        mBitmapCroppingWorkerTask.get().execute();
-        setProgressBarVisibility();
+        startCropWorkerTask(reqWidth, reqHeight, saveUri, saveCompressFormat, saveCompressQuality);
     }
 
     /**
@@ -620,11 +646,19 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Set the callback to be invoked when image async cropping ({@link #getCroppedImageAsync()})
+     * Set the callback to be invoked when image async get cropping image ({@link #getCroppedImageAsync()})
      * is complete (successful or failed).
      */
     public void setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener listener) {
         mOnGetCroppedImageCompleteListener = listener != null ? new WeakReference<>(listener) : null;
+    }
+
+    /**
+     * Set the callback to be invoked when image async save cropping image ({@link #saveCroppedImageAsync(Uri)})
+     * is complete (successful or failed).
+     */
+    public void setOnSaveCroppedImageCompleteListener(OnSaveCroppedImageCompleteListener listener) {
+        mOnSaveCroppedImageCompleteListener = listener != null ? new WeakReference<>(listener) : null;
     }
 
     /**
@@ -780,15 +814,23 @@ public class CropImageView extends FrameLayout {
      *
      * @param result the result of bitmap cropping
      */
-    void onGetImageCroppingAsyncComplete(BitmapCroppingWorkerTask.Result result) {
+    void onImageCroppingAsyncComplete(BitmapCroppingWorkerTask.Result result) {
 
         mBitmapCroppingWorkerTask = null;
         setProgressBarVisibility();
 
-        OnGetCroppedImageCompleteListener listener = mOnGetCroppedImageCompleteListener != null
-                ? mOnGetCroppedImageCompleteListener.get() : null;
-        if (listener != null) {
-            listener.onGetCroppedImageComplete(this, result.bitmap, result.error);
+        if (result.isSave) {
+            OnSaveCroppedImageCompleteListener listener = mOnSaveCroppedImageCompleteListener != null
+                    ? mOnSaveCroppedImageCompleteListener.get() : null;
+            if (listener != null) {
+                listener.onGetCroppedImageComplete(this, result.uri, result.error);
+            }
+        } else {
+            OnGetCroppedImageCompleteListener listener = mOnGetCroppedImageCompleteListener != null
+                    ? mOnGetCroppedImageCompleteListener.get() : null;
+            if (listener != null) {
+                listener.onGetCroppedImageComplete(this, result.bitmap, result.error);
+            }
         }
     }
 
@@ -840,6 +882,43 @@ public class CropImageView extends FrameLayout {
 
             setCropOverlayVisibility();
         }
+    }
+
+    /**
+     * Gets the cropped image based on the current crop window.<br>
+     * If (reqWidth,reqHeight) is given AND image is loaded from URI cropping will try to use sample size to fit in
+     * the requested width and height down-sampling if possible - optimization to get best size to quality.<br>
+     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     *
+     * @param reqWidth optional: the width to downsample the cropped image to
+     * @param reqHeight optional: the height to downsample the cropped image to
+     * @param saveUri optional: to save the cropped image to
+     * @param saveCompressFormat if saveUri is given, the given compression will be used for saving the image
+     * @param saveCompressQuality if saveUri is given, the given quiality will be used for the compression.
+     */
+    public void startCropWorkerTask(int reqWidth, int reqHeight, Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
+
+        mImageView.clearAnimation();
+
+        BitmapCroppingWorkerTask currentTask = mBitmapCroppingWorkerTask != null ? mBitmapCroppingWorkerTask.get() : null;
+        if (currentTask != null) {
+            // cancel previous cropping
+            currentTask.cancel(true);
+        }
+
+        int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
+        int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
+        if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
+            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
+                    mDegreesRotated, orgWidth, orgHeight,
+                    mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
+                    reqWidth, reqHeight, saveUri, saveCompressFormat, saveCompressQuality));
+        } else {
+            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), mDegreesRotated,
+                    mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(), saveUri, saveCompressFormat, saveCompressQuality));
+        }
+        mBitmapCroppingWorkerTask.get().execute();
+        setProgressBarVisibility();
     }
 
     @Override
@@ -1331,14 +1410,33 @@ public class CropImageView extends FrameLayout {
     public interface OnGetCroppedImageCompleteListener {
 
         /**
-         * Called when a crop image view has completed loading image for cropping.<br>
-         * If loading failed error parameter will contain the error.
+         * Called when a crop image view has completed cropping image.<br>
+         * If cropping failed error parameter will contain the error.
          *
          * @param view The crop image view that cropping of image was complete.
          * @param bitmap the cropped image bitmap (null if failed)
          * @param error if error occurred during cropping will contain the error, otherwise null.
          */
         void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error);
+    }
+    //endregion
+
+    //region: Inner class: OnSaveCroppedImageCompleteListener
+
+    /**
+     * Interface definition for a callback to be invoked when image async cropping is complete.
+     */
+    public interface OnSaveCroppedImageCompleteListener {
+
+        /**
+         * Called when a crop image view has completed cropping image.<br>
+         * If cropping failed error parameter will contain the error.
+         *
+         * @param view The crop image view that cropping of image was complete.
+         * @param uri the cropped image uri (null if failed)
+         * @param error if error occurred during cropping will contain the error, otherwise null.
+         */
+        void onGetCroppedImageComplete(CropImageView view, Uri uri, Exception error);
     }
     //endregion
 }

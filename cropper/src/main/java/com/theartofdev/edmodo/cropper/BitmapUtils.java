@@ -28,8 +28,10 @@ import android.util.Pair;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -251,6 +253,19 @@ final class BitmapUtils {
             } else {
                 rect.right -= rect.width() - rect.height();
             }
+        }
+    }
+
+    /**
+     * Write the given bitmap to the given uri using the given compression.
+     */
+    public static void writeBitmapToUri(Context context, Bitmap bitmap, Uri uri, Bitmap.CompressFormat compressFormat, int compressQuality) throws FileNotFoundException {
+        OutputStream outputStream = null;
+        try {
+            outputStream = context.getContentResolver().openOutputStream(uri);
+            bitmap.compress(compressFormat, compressQuality, outputStream);
+        } finally {
+            closeSafe(outputStream);
         }
     }
 
