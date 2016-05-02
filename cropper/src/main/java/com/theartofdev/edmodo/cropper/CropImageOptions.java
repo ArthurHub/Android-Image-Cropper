@@ -13,7 +13,9 @@
 package com.theartofdev.edmodo.cropper;
 
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.DisplayMetrics;
@@ -185,6 +187,36 @@ final class CropImageOptions implements Parcelable {
     public int maxCropResultHeight;
 
     /**
+     * the title of the {@link CropImageActivity}
+     */
+    public String activityTitle;
+
+    /**
+     * the Android Uri to save the cropped image to
+     */
+    public Uri outputUri;
+
+    /**
+     * the compression format to use when writting the image
+     */
+    public Bitmap.CompressFormat outputCompressFormat;
+
+    /**
+     * the quility (if applicable) to use when writting the image (0 - 100)
+     */
+    public int outputCompressQuality;
+
+    /**
+     * the width to downsample the cropped image to
+     */
+    public int reqWidth;
+
+    /**
+     * the height to downsample the cropped image to
+     */
+    public int reqHeight;
+
+    /**
      * Init options with defaults.
      */
     public CropImageOptions() {
@@ -223,6 +255,13 @@ final class CropImageOptions implements Parcelable {
         minCropResultHeight = 40;
         maxCropResultWidth = 99999;
         maxCropResultHeight = 99999;
+
+        activityTitle = "";
+        outputUri = Uri.EMPTY;
+        outputCompressFormat = Bitmap.CompressFormat.JPEG;
+        outputCompressQuality = 90;
+        reqWidth = 0;
+        reqHeight = 0;
     }
 
     /**
@@ -257,6 +296,12 @@ final class CropImageOptions implements Parcelable {
         minCropResultHeight = in.readInt();
         maxCropResultWidth = in.readInt();
         maxCropResultHeight = in.readInt();
+        activityTitle = in.readString();
+        outputUri = in.readParcelable(Uri.class.getClassLoader());
+        outputCompressFormat = Bitmap.CompressFormat.valueOf(in.readString());
+        outputCompressQuality = in.readInt();
+        reqWidth = in.readInt();
+        reqHeight = in.readInt();
     }
 
     @Override
@@ -289,6 +334,12 @@ final class CropImageOptions implements Parcelable {
         dest.writeInt(minCropResultHeight);
         dest.writeInt(maxCropResultWidth);
         dest.writeInt(maxCropResultHeight);
+        dest.writeString(activityTitle);
+        dest.writeParcelable(outputUri, flags);
+        dest.writeString(outputCompressFormat.name());
+        dest.writeInt(outputCompressQuality);
+        dest.writeInt(reqWidth);
+        dest.writeInt(reqHeight);
     }
 
     @Override
@@ -340,6 +391,12 @@ final class CropImageOptions implements Parcelable {
         }
         if (maxCropResultHeight < minCropResultHeight) {
             throw new IllegalArgumentException("Cannot set max crop result height to smaller value than min crop result height");
+        }
+        if (reqWidth < 0) {
+            throw new IllegalArgumentException("Cannot set request width value to a number < 0 ");
+        }
+        if (reqHeight < 0) {
+            throw new IllegalArgumentException("Cannot set request height value to a number < 0 ");
         }
     }
 }

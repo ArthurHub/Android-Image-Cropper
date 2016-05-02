@@ -482,6 +482,45 @@ public final class CropImage {
             mOptions.maxCropResultWidth = maxCropResultWidth;
             mOptions.maxCropResultHeight = maxCropResultHeight;
         }
+
+        /**
+         * the title of the {@link CropImageActivity}
+         */
+        public void setActivityTitle(String activityTitle) {
+            mOptions.activityTitle = activityTitle;
+        }
+
+        /**
+         * the Android Uri to save the cropped image to
+         */
+        public void setOutputUri(Uri outputUri) {
+            mOptions.outputUri = outputUri;
+        }
+
+        /**
+         * the compression format to use when writting the image
+         */
+        public void setOutputCompressFormat(Bitmap.CompressFormat outputCompressFormat) {
+            mOptions.outputCompressFormat = outputCompressFormat;
+        }
+
+        /**
+         * the quility (if applicable) to use when writting the image (0 - 100)
+         */
+        public void setOutputCompressQuality(int outputCompressQuality) {
+            mOptions.outputCompressQuality = outputCompressQuality;
+        }
+
+        /**
+         * the size to downsample the cropped image to.<br>
+         * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
+         * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
+         * Bitmaps Efficiently</a><br>
+         */
+        public void setRequestedSize(int reqWidth, int reqHeight) {
+            mOptions.reqWidth = reqWidth;
+            mOptions.reqHeight = reqHeight;
+        }
     }
     //endregion
 }
