@@ -253,8 +253,8 @@ public final class CropImage {
      * @return builder for Crop Image Activity
      */
 
-    public static ActivityBuilder activity(Context context, Uri uri) {
-        return new ActivityBuilder(context, uri);
+    public static ActivityBuilder activity(Uri uri) {
+        return new ActivityBuilder(uri);
     }
 
     //region: Inner class: ActivityBuilder
@@ -265,37 +265,31 @@ public final class CropImage {
     public static final class ActivityBuilder {
 
         /**
-         * The context to build the activity intent in.
+         * The image to crop source Android uri.
          */
-        private Context mContext;
-
-        /**
-         * The intent for Crop Image Activity.
-         */
-        private final Intent mIntent;
+        private final Uri mSource;
 
         /**
          * Options for image crop UX
          */
         private final CropImageOptions mOptions;
 
-        private ActivityBuilder(Context context, Uri source) {
-            mContext = context;
-
-            mIntent = new Intent();
-            mIntent.setClass(context, CropImageActivity.class);
-            mIntent.putExtra(CROP_IMAGE_EXTRA_SOURCE, source);
-
-            mOptions = new CropImageOptions(context.getResources().getDisplayMetrics());
+        private ActivityBuilder(Uri source) {
+            mSource = source;
+            mOptions = new CropImageOptions();
         }
 
         /**
          * Get {@link CropImageActivity} intent to start the activity.
          */
-        public Intent getIntent() {
+        public Intent getIntent(Context context) {
             mOptions.validate();
-            mIntent.putExtra(CROP_IMAGE_EXTRA_OPTIONS, mOptions);
-            return mIntent;
+
+            Intent intent = new Intent();
+            intent.setClass(context, CropImageActivity.class);
+            intent.putExtra(CROP_IMAGE_EXTRA_SOURCE, mSource);
+            intent.putExtra(CROP_IMAGE_EXTRA_OPTIONS, mOptions);
+            return intent;
         }
 
         /**
@@ -305,7 +299,7 @@ public final class CropImage {
          */
         public void start(Activity activity) {
             mOptions.validate();
-            activity.startActivityForResult(getIntent(), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+            activity.startActivityForResult(getIntent(activity), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
         }
 
         /**
@@ -313,8 +307,8 @@ public final class CropImage {
          *
          * @param fragment fragment to receive result
          */
-        public void start(Fragment fragment) {
-            fragment.startActivityForResult(getIntent(), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        public void start(Context context, Fragment fragment) {
+            fragment.startActivityForResult(getIntent(context), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
         }
 
         /**
@@ -327,14 +321,14 @@ public final class CropImage {
         /**
          * An edge of the crop window will snap to the corresponding edge of a specified bounding box
          * when the crop window edge is less than or equal to this distance (in pixels) away from the bounding box
-         * edge.
+         * edge. (in pixels)
          */
         public void setSnapRadius(float snapRadius) {
             mOptions.snapRadius = snapRadius;
         }
 
         /**
-         * The radius of the touchable area around the handle.<br>
+         * The radius of the touchable area around the handle. (in pixels)<br>
          * We are basing this value off of the recommended 48dp Rhythm.<br>
          * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
          */
@@ -374,7 +368,7 @@ public final class CropImage {
         }
 
         /**
-         * The max zoom allowed during cropping
+         * The max zoom allowed during cropping.
          */
         public void setMaxZoom(int maxZoom) {
             mOptions.maxZoom = maxZoom;
@@ -403,56 +397,56 @@ public final class CropImage {
         }
 
         /**
-         * the thickness of the guidelines lines in pixels
+         * the thickness of the guidelines lines. (in pixels)
          */
         public void setBorderLineThickness(float borderLineThickness) {
             mOptions.borderLineThickness = borderLineThickness;
         }
 
         /**
-         * the color of the guidelines lines
+         * the color of the guidelines lines.
          */
         public void setBorderLineColor(int borderLineColor) {
             mOptions.borderLineColor = borderLineColor;
         }
 
         /**
-         * thickness of the corner line
+         * thickness of the corner line. (in pixels)
          */
         public void setBorderCornerThickness(float borderCornerThickness) {
             mOptions.borderCornerThickness = borderCornerThickness;
         }
 
         /**
-         * the offset of corner line from crop window border
+         * the offset of corner line from crop window border. (in pixels)
          */
         public void setBorderCornerOffset(float borderCornerOffset) {
             mOptions.borderCornerOffset = borderCornerOffset;
         }
 
         /**
-         * the length of the corner line away from the corner
+         * the length of the corner line away from the corner. (in pixels)
          */
         public void setBorderCornerLength(float borderCornerLength) {
             mOptions.borderCornerLength = borderCornerLength;
         }
 
         /**
-         * the color of the corner line
+         * the color of the corner line.
          */
         public void setBorderCornerColor(int borderCornerColor) {
             mOptions.borderCornerColor = borderCornerColor;
         }
 
         /**
-         * the thickness of the guidelines lines
+         * the thickness of the guidelines lines. (in pixels)
          */
         public void setGuidelinesThickness(float guidelinesThickness) {
             mOptions.guidelinesThickness = guidelinesThickness;
         }
 
         /**
-         * the color of the guidelines lines
+         * the color of the guidelines lines.
          */
         public void setGuidelinesColor(int guidelinesColor) {
             mOptions.guidelinesColor = guidelinesColor;
@@ -466,25 +460,25 @@ public final class CropImage {
         }
 
         /**
-         * the min size the crop window is allowed to be.
+         * the min size the crop window is allowed to be. (in pixels)
          */
-        public void setMinCropWindowSize(float minCropWindowWidth, float minCropWindowHeight) {
+        public void setMinCropWindowSize(int minCropWindowWidth, int minCropWindowHeight) {
             mOptions.minCropWindowWidth = minCropWindowWidth;
             mOptions.minCropWindowHeight = minCropWindowHeight;
         }
 
         /**
-         * the min size the resulting cropping image is allowed to be, affects the cropping window limits.
+         * the min size the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
          */
-        public void setMinCropResultSize(float minCropResultWidth, float minCropResultHeight) {
+        public void setMinCropResultSize(int minCropResultWidth, int minCropResultHeight) {
             mOptions.minCropResultWidth = minCropResultWidth;
             mOptions.minCropResultHeight = minCropResultHeight;
         }
 
         /**
-         * the max size the resulting cropping image is allowed to be, affects the cropping window limits.
+         * the max size the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
          */
-        public void setMaxCropResultSize(float maxCropResultWidth, float maxCropResultHeight) {
+        public void setMaxCropResultSize(int maxCropResultWidth, int maxCropResultHeight) {
             mOptions.maxCropResultWidth = maxCropResultWidth;
             mOptions.maxCropResultHeight = maxCropResultHeight;
         }

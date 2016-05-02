@@ -12,6 +12,7 @@
 
 package com.theartofdev.edmodo.cropper;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -42,13 +43,13 @@ final class CropImageOptions implements Parcelable {
     public CropImageView.CropShape cropShape;
 
     /**
-     * An edge of the crop window will snap to the corresponding edge of a specified bounding box
-     * when the crop window edge is less than or equal to this distance (in pixels) away from the bounding box edge.
+     * An edge of the crop window will snap to the corresponding edge of a specified bounding box when the crop
+     * window edge is less than or equal to this distance (in pixels) away from the bounding box edge. (in pixels)
      */
     public float snapRadius;
 
     /**
-     * The radius of the touchable area around the handle.<br>
+     * The radius of the touchable area around the handle. (in pixels)<br>
      * We are basing this value off of the recommended 48dp Rhythm.<br>
      * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
      */
@@ -84,7 +85,7 @@ final class CropImageOptions implements Parcelable {
     public boolean autoZoomEnabled;
 
     /**
-     * The max zoom allowed during cropping
+     * The max zoom allowed during cropping.
      */
     public int maxZoom;
 
@@ -99,17 +100,17 @@ final class CropImageOptions implements Parcelable {
     public boolean fixAspectRatio;
 
     /**
-     * the X value of the aspect ratio
+     * the X value of the aspect ratio.
      */
     public int aspectRatioX;
 
     /**
-     * the Y value of the aspect ratio
+     * the Y value of the aspect ratio.
      */
     public int aspectRatioY;
 
     /**
-     * the thickness of the guidelines lines in pixels
+     * the thickness of the guidelines lines in pixels. (in pixels)
      */
     public float borderLineThickness;
 
@@ -119,17 +120,17 @@ final class CropImageOptions implements Parcelable {
     public int borderLineColor;
 
     /**
-     * thickness of the corner line
+     * thickness of the corner line. (in pixels)
      */
     public float borderCornerThickness;
 
     /**
-     * the offset of corner line from crop window border
+     * the offset of corner line from crop window border. (in pixels)
      */
     public float borderCornerOffset;
 
     /**
-     * the length of the corner line away from the corner
+     * the length of the corner line away from the corner. (in pixels)
      */
     public float borderCornerLength;
 
@@ -139,7 +140,7 @@ final class CropImageOptions implements Parcelable {
     public int borderCornerColor;
 
     /**
-     * the thickness of the guidelines lines
+     * the thickness of the guidelines lines. (in pixels)
      */
     public float guidelinesThickness;
 
@@ -154,39 +155,42 @@ final class CropImageOptions implements Parcelable {
     public int backgroundColor;
 
     /**
-     * the min width the crop window is allowed to be.
+     * the min width the crop window is allowed to be. (in pixels)
      */
-    public float minCropWindowWidth;
+    public int minCropWindowWidth;
 
     /**
-     * the min height the crop window is allowed to be.
+     * the min height the crop window is allowed to be. (in pixels)
      */
-    public float minCropWindowHeight;
+    public int minCropWindowHeight;
 
     /**
-     * the min width the resulting cropping image is allowed to be, affects the cropping window limits.
+     * the min width the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
      */
-    public float minCropResultWidth;
+    public int minCropResultWidth;
 
     /**
-     * the min height the resulting cropping image is allowed to be, affects the cropping window limits.
+     * the min height the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
      */
-    public float minCropResultHeight;
+    public int minCropResultHeight;
 
     /**
-     * the max width the resulting cropping image is allowed to be, affects the cropping window limits.
+     * the max width the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
      */
-    public float maxCropResultWidth;
+    public int maxCropResultWidth;
 
     /**
-     * the max height the resulting cropping image is allowed to be, affects the cropping window limits.
+     * the max height the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
      */
-    public float maxCropResultHeight;
+    public int maxCropResultHeight;
 
     /**
      * Init options with defaults.
      */
-    public CropImageOptions(DisplayMetrics dm) {
+    public CropImageOptions() {
+
+        DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();
+
         cropShape = CropImageView.CropShape.RECTANGLE;
         snapRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, dm);
         touchRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, dm);
@@ -213,8 +217,8 @@ final class CropImageOptions implements Parcelable {
         guidelinesColor = Color.argb(170, 255, 255, 255);
         backgroundColor = Color.argb(119, 0, 0, 0);
 
-        minCropWindowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 42, dm);
-        minCropWindowHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 42, dm);
+        minCropWindowWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 42, dm);
+        minCropWindowHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 42, dm);
         minCropResultWidth = 40;
         minCropResultHeight = 40;
         maxCropResultWidth = 99999;
@@ -247,12 +251,12 @@ final class CropImageOptions implements Parcelable {
         guidelinesThickness = in.readFloat();
         guidelinesColor = in.readInt();
         backgroundColor = in.readInt();
-        minCropWindowWidth = in.readFloat();
-        minCropWindowHeight = in.readFloat();
-        minCropResultWidth = in.readFloat();
-        minCropResultHeight = in.readFloat();
-        maxCropResultWidth = in.readFloat();
-        maxCropResultHeight = in.readFloat();
+        minCropWindowWidth = in.readInt();
+        minCropWindowHeight = in.readInt();
+        minCropResultWidth = in.readInt();
+        minCropResultHeight = in.readInt();
+        maxCropResultWidth = in.readInt();
+        maxCropResultHeight = in.readInt();
     }
 
     @Override
@@ -279,12 +283,12 @@ final class CropImageOptions implements Parcelable {
         dest.writeFloat(guidelinesThickness);
         dest.writeInt(guidelinesColor);
         dest.writeInt(backgroundColor);
-        dest.writeFloat(minCropWindowWidth);
-        dest.writeFloat(minCropWindowHeight);
-        dest.writeFloat(minCropResultWidth);
-        dest.writeFloat(minCropResultHeight);
-        dest.writeFloat(maxCropResultWidth);
-        dest.writeFloat(maxCropResultHeight);
+        dest.writeInt(minCropWindowWidth);
+        dest.writeInt(minCropWindowHeight);
+        dest.writeInt(minCropResultWidth);
+        dest.writeInt(minCropResultHeight);
+        dest.writeInt(maxCropResultWidth);
+        dest.writeInt(maxCropResultHeight);
     }
 
     @Override

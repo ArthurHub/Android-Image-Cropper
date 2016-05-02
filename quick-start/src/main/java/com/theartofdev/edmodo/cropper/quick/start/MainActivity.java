@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
     }
 
     private void startCropImageActivity(Uri imageUri) {
-        CropImage.activity(this, imageUri)
+        CropImage.activity(imageUri)
                 .start(this);
     }
 }
