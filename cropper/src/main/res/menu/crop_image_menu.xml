@@ -3,13 +3,12 @@
 
     <item
         android:id="@+id/crop_image_menu_rotate"
-        android:icon="@android:drawable/ic_menu_rotate"
+        android:icon="@drawable/crop_image_menu_rotate_right"
         android:showAsAction="ifRoom"
-        android:title="@string/crop_image_menu_rotate"/>
+        android:title="@string/crop_image_menu_rotate_right"/>
     <item
         android:id="@+id/crop_image_menu_crop"
-        android:icon="@android:drawable/ic_menu_crop"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:title="@string/crop_image_menu_crop"/>
 
 </menu>
