@@ -106,7 +106,14 @@ public class CropImageActivity extends Activity implements CropImageView.OnSetIm
 
     @Override
     public void onSetImageUriComplete(CropImageView view, Uri uri, Exception error) {
-        if (error != null) {
+        if (error == null) {
+            if (mOptions.initialCropWindowRectangle != null) {
+                mCropImageView.setCropRect(mOptions.initialCropWindowRectangle);
+            }
+            if (mOptions.initialRotation >= 0) {
+                mCropImageView.setRotatedDegrees(mOptions.initialRotation);
+            }
+        } else {
             setResult(null, error);
         }
     }
@@ -126,8 +133,8 @@ public class CropImageActivity extends Activity implements CropImageView.OnSetIm
         mCropImageView.saveCroppedImageAsync(outputUri,
                 mOptions.outputCompressFormat,
                 mOptions.outputCompressQuality,
-                mOptions.reqWidth,
-                mOptions.reqHeight);
+                mOptions.outputRequestWidth,
+                mOptions.outputRequestHeight);
     }
 
     /**

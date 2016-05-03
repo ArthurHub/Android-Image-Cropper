@@ -573,8 +573,24 @@ public final class CropImage {
          * Bitmaps Efficiently</a><br>
          */
         public ActivityBuilder setRequestedSize(int reqWidth, int reqHeight) {
-            mOptions.reqWidth = reqWidth;
-            mOptions.reqHeight = reqHeight;
+            mOptions.outputRequestWidth = reqWidth;
+            mOptions.outputRequestHeight = reqHeight;
+            return this;
+        }
+
+        /**
+         * the initial rectangle to set on the cropping image after loading
+         */
+        public ActivityBuilder setInitialCropWindowRectangle(Rect initialCropWindowRectangle) {
+            mOptions.initialCropWindowRectangle = initialCropWindowRectangle;
+            return this;
+        }
+
+        /**
+         * the initial rotation to set on the cropping image after loading (0-360 degrees clockwise)
+         */
+        public ActivityBuilder setInitialRotation(int initialRotation) {
+            mOptions.initialRotation = initialRotation;
             return this;
         }
     }

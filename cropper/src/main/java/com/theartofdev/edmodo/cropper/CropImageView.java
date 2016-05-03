@@ -336,6 +336,17 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * Set the amount of degrees the cropping image is rotated cloackwise.<br>
+     *
+     * @param degrees 0-360
+     */
+    public void setRotatedDegrees(int degrees) {
+        if (mDegreesRotated != degrees) {
+            rotateImage(degrees - mDegreesRotated);
+        }
+    }
+
+    /**
      * whether the aspect ratio is fixed or not; true fixes the aspect ratio, while false allows it to be changed.
      */
     public boolean isFixAspectRatio() {
