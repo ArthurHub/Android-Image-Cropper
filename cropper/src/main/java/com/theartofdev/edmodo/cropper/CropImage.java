@@ -556,6 +556,14 @@ public final class CropImage {
         }
 
         /**
+         * the color to use for action bar items icons
+         */
+        public ActivityBuilder setActivityMenuIconColor(int activityMenuIconColor) {
+            mOptions.activityMenuIconColor = activityMenuIconColor;
+            return this;
+        }
+
+        /**
          * the Android Uri to save the cropped image to
          */
         public ActivityBuilder setOutputUri(Uri outputUri) {
@@ -604,6 +612,14 @@ public final class CropImage {
          */
         public ActivityBuilder setInitialRotation(int initialRotation) {
             mOptions.initialRotation = initialRotation;
+            return this;
+        }
+
+        /**
+         * if to allow rotation during cropping
+         */
+        public ActivityBuilder setAllowRotation(boolean allowRotation) {
+            mOptions.allowRotation = allowRotation;
             return this;
         }
     }

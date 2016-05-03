@@ -193,6 +193,11 @@ final class CropImageOptions implements Parcelable {
     public String activityTitle;
 
     /**
+     * the color to use for action bar items icons
+     */
+    public int activityMenuIconColor;
+
+    /**
      * the Android Uri to save the cropped image to
      */
     public Uri outputUri;
@@ -226,6 +231,11 @@ final class CropImageOptions implements Parcelable {
      * the initial rotation to set on the cropping image after loading (0-360 degrees clockwise)
      */
     public int initialRotation;
+
+    /**
+     * if to allow rotation during cropping
+     */
+    public boolean allowRotation;
 
     /**
      * Init options with defaults.
@@ -268,6 +278,8 @@ final class CropImageOptions implements Parcelable {
         maxCropResultHeight = 99999;
 
         activityTitle = "";
+        activityMenuIconColor = 0;
+
         outputUri = Uri.EMPTY;
         outputCompressFormat = Bitmap.CompressFormat.JPEG;
         outputCompressQuality = 90;
@@ -276,6 +288,7 @@ final class CropImageOptions implements Parcelable {
 
         initialCropWindowRectangle = null;
         initialRotation = -1;
+        allowRotation = true;
     }
 
     /**
@@ -311,6 +324,7 @@ final class CropImageOptions implements Parcelable {
         maxCropResultWidth = in.readInt();
         maxCropResultHeight = in.readInt();
         activityTitle = in.readString();
+        activityMenuIconColor = in.readInt();
         outputUri = in.readParcelable(Uri.class.getClassLoader());
         outputCompressFormat = Bitmap.CompressFormat.valueOf(in.readString());
         outputCompressQuality = in.readInt();
@@ -318,6 +332,7 @@ final class CropImageOptions implements Parcelable {
         outputRequestHeight = in.readInt();
         initialCropWindowRectangle = in.readParcelable(Rect.class.getClassLoader());
         initialRotation = in.readInt();
+        allowRotation = in.readByte() != 0;
     }
 
     @Override
@@ -351,6 +366,7 @@ final class CropImageOptions implements Parcelable {
         dest.writeInt(maxCropResultWidth);
         dest.writeInt(maxCropResultHeight);
         dest.writeString(activityTitle);
+        dest.writeInt(activityMenuIconColor);
         dest.writeParcelable(outputUri, flags);
         dest.writeString(outputCompressFormat.name());
         dest.writeInt(outputCompressQuality);
@@ -358,6 +374,7 @@ final class CropImageOptions implements Parcelable {
         dest.writeInt(outputRequestHeight);
         dest.writeParcelable(initialCropWindowRectangle, flags);
         dest.writeInt(initialRotation);
+        dest.writeByte((byte) (allowRotation ? 1 : 0));
     }
 
     @Override
