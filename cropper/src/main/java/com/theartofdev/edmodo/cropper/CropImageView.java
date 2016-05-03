@@ -823,7 +823,7 @@ public class CropImageView extends FrameLayout {
             OnSaveCroppedImageCompleteListener listener = mOnSaveCroppedImageCompleteListener != null
                     ? mOnSaveCroppedImageCompleteListener.get() : null;
             if (listener != null) {
-                listener.onGetCroppedImageComplete(this, result.uri, result.error);
+                listener.onSaveCroppedImageComplete(this, result.uri, result.error);
             }
         } else {
             OnGetCroppedImageCompleteListener listener = mOnGetCroppedImageCompleteListener != null
@@ -1436,7 +1436,7 @@ public class CropImageView extends FrameLayout {
          * @param uri the cropped image uri (null if failed)
          * @param error if error occurred during cropping will contain the error, otherwise null.
          */
-        void onGetCroppedImageComplete(CropImageView view, Uri uri, Exception error);
+        void onSaveCroppedImageComplete(CropImageView view, Uri uri, Exception error);
     }
     //endregion
 }

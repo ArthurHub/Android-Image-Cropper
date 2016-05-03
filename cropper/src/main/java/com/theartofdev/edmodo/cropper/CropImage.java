@@ -26,9 +26,11 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.system.ErrnoException;
@@ -50,6 +52,8 @@ import java.util.List;
  */
 public final class CropImage {
 
+    //region: Fields and Consts
+
     /**
      * The key used to pass crop image source URI to {@link CropImageActivity}.
      */
@@ -61,6 +65,11 @@ public final class CropImage {
     static final String CROP_IMAGE_EXTRA_OPTIONS = "CROP_IMAGE_EXTRA_OPTIONS";
 
     /**
+     * The key used to pass crop image result data back from {@link CropImageActivity}.
+     */
+    static final String CROP_IMAGE_EXTRA_RESULT = "CROP_IMAGE_EXTRA_RESULT";
+
+    /**
      * The request code used to start pick image activity to be used on result to identify the this specific request.
      */
     public static final int PICK_IMAGE_CHOOSER_REQUEST_CODE = 200;
@@ -69,12 +78,18 @@ public final class CropImage {
      * The request code used to start pick image activity to be used on result to identify the this specific request.
      */
     public static final int PICK_IMAGE_PERMISSIONS_REQUEST_CODE = 201;
+    //endregion
 
     /**
      * The request code used to start {@link CropImageActivity} to be used on result to identify the this specific
      * request.
      */
     public static final int CROP_IMAGE_ACTIVITY_REQUEST_CODE = 203;
+
+    /**
+     * The result code used to return error from {@link CropImageActivity}.
+     */
+    public static final int CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE = 204;
 
     private CropImage() {
     }
@@ -246,15 +261,28 @@ public final class CropImage {
     }
 
     /**
-     * Create builder for {@link CropImageActivity} intent to be used for cropping the given image.
+     * Create {@link ActivityBuilder} instance to start {@link CropImageActivity} to crop the given image.<br>
+     * Result will be recieved in {@link Activity#onActivityResult(int, int, Intent)} and can be retrieved
+     * using {@link #getActivityResult(Intent)}.
      *
-     * @param context Android Context
-     * @param uri Android URI to source image to crop
+     * @param uri the image Android uri source to crop
      * @return builder for Crop Image Activity
      */
-
     public static ActivityBuilder activity(Uri uri) {
+        if (uri == null || uri.equals(Uri.EMPTY)) {
+            throw new IllegalArgumentException("Uri must be non null or empty");
+        }
         return new ActivityBuilder(uri);
+    }
+
+    /**
+     * Get {@link CropImageActivity} result data object for crop image activity started using {@link #activity(Uri)}.
+     *
+     * @param data result data intent as received in {@link Activity#onActivityResult(int, int, Intent)}.
+     * @return Crop Image Activity Result object or null if none exists
+     */
+    public static ActivityResult getActivityResult(Intent data) {
+        return data != null ? (ActivityResult) data.getParcelableExtra(CROP_IMAGE_EXTRA_RESULT) : null;
     }
 
     //region: Inner class: ActivityBuilder
@@ -314,8 +342,9 @@ public final class CropImage {
         /**
          * The shape of the cropping window.
          */
-        public void setCropShape(CropImageView.CropShape cropShape) {
+        public ActivityBuilder setCropShape(CropImageView.CropShape cropShape) {
             mOptions.cropShape = cropShape;
+            return this;
         }
 
         /**
@@ -323,8 +352,9 @@ public final class CropImage {
          * when the crop window edge is less than or equal to this distance (in pixels) away from the bounding box
          * edge. (in pixels)
          */
-        public void setSnapRadius(float snapRadius) {
+        public ActivityBuilder setSnapRadius(float snapRadius) {
             mOptions.snapRadius = snapRadius;
+            return this;
         }
 
         /**
@@ -332,22 +362,25 @@ public final class CropImage {
          * We are basing this value off of the recommended 48dp Rhythm.<br>
          * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
          */
-        public void setTouchRadius(float touchRadius) {
+        public ActivityBuilder setTouchRadius(float touchRadius) {
             mOptions.touchRadius = touchRadius;
+            return this;
         }
 
         /**
          * whether the guidelines should be on, off, or only showing when resizing.
          */
-        public void setGuidelines(CropImageView.Guidelines guidelines) {
+        public ActivityBuilder setGuidelines(CropImageView.Guidelines guidelines) {
             mOptions.guidelines = guidelines;
+            return this;
         }
 
         /**
          * The initial scale type of the image in the crop image view
          */
-        public void setScaleType(CropImageView.ScaleType scaleType) {
+        public ActivityBuilder setScaleType(CropImageView.ScaleType scaleType) {
             mOptions.scaleType = scaleType;
+            return this;
         }
 
         /**
@@ -355,160 +388,182 @@ public final class CropImage {
          * image.<br>
          * default: true, may disable for animation or frame transition.
          */
-        public void setShowCropOverlay(boolean showCropOverlay) {
+        public ActivityBuilder setShowCropOverlay(boolean showCropOverlay) {
             mOptions.showCropOverlay = showCropOverlay;
+            return this;
         }
 
         /**
          * if auto-zoom functionality is enabled.<br>
          * default: true.
          */
-        public void setAutoZoomEnabled(boolean autoZoomEnabled) {
+        public ActivityBuilder setAutoZoomEnabled(boolean autoZoomEnabled) {
             mOptions.autoZoomEnabled = autoZoomEnabled;
+            return this;
         }
 
         /**
          * The max zoom allowed during cropping.
          */
-        public void setMaxZoom(int maxZoom) {
+        public ActivityBuilder setMaxZoom(int maxZoom) {
             mOptions.maxZoom = maxZoom;
+            return this;
         }
 
         /**
          * The initial crop window padding from image borders in percentage of the cropping image dimensions.
          */
-        public void setInitialCropWindowPaddingRatio(float initialCropWindowPaddingRatio) {
+        public ActivityBuilder setInitialCropWindowPaddingRatio(float initialCropWindowPaddingRatio) {
             mOptions.initialCropWindowPaddingRatio = initialCropWindowPaddingRatio;
+            return this;
         }
 
         /**
          * whether the width to height aspect ratio should be maintained or free to change.
          */
-        public void setFixAspectRatio(boolean fixAspectRatio) {
+        public ActivityBuilder setFixAspectRatio(boolean fixAspectRatio) {
             mOptions.fixAspectRatio = fixAspectRatio;
+            return this;
         }
 
         /**
          * the X,Y value of the aspect ratio
          */
-        public void setAspectRatio(int aspectRatioX, int aspectRatioY) {
+        public ActivityBuilder setAspectRatio(int aspectRatioX, int aspectRatioY) {
             mOptions.aspectRatioX = aspectRatioX;
             mOptions.aspectRatioY = aspectRatioY;
+            return this;
         }
 
         /**
          * the thickness of the guidelines lines. (in pixels)
          */
-        public void setBorderLineThickness(float borderLineThickness) {
+        public ActivityBuilder setBorderLineThickness(float borderLineThickness) {
             mOptions.borderLineThickness = borderLineThickness;
+            return this;
         }
 
         /**
          * the color of the guidelines lines.
          */
-        public void setBorderLineColor(int borderLineColor) {
+        public ActivityBuilder setBorderLineColor(int borderLineColor) {
             mOptions.borderLineColor = borderLineColor;
+            return this;
         }
 
         /**
          * thickness of the corner line. (in pixels)
          */
-        public void setBorderCornerThickness(float borderCornerThickness) {
+        public ActivityBuilder setBorderCornerThickness(float borderCornerThickness) {
             mOptions.borderCornerThickness = borderCornerThickness;
+            return this;
         }
 
         /**
          * the offset of corner line from crop window border. (in pixels)
          */
-        public void setBorderCornerOffset(float borderCornerOffset) {
+        public ActivityBuilder setBorderCornerOffset(float borderCornerOffset) {
             mOptions.borderCornerOffset = borderCornerOffset;
+            return this;
         }
 
         /**
          * the length of the corner line away from the corner. (in pixels)
          */
-        public void setBorderCornerLength(float borderCornerLength) {
+        public ActivityBuilder setBorderCornerLength(float borderCornerLength) {
             mOptions.borderCornerLength = borderCornerLength;
+            return this;
         }
 
         /**
          * the color of the corner line.
          */
-        public void setBorderCornerColor(int borderCornerColor) {
+        public ActivityBuilder setBorderCornerColor(int borderCornerColor) {
             mOptions.borderCornerColor = borderCornerColor;
+            return this;
         }
 
         /**
          * the thickness of the guidelines lines. (in pixels)
          */
-        public void setGuidelinesThickness(float guidelinesThickness) {
+        public ActivityBuilder setGuidelinesThickness(float guidelinesThickness) {
             mOptions.guidelinesThickness = guidelinesThickness;
+            return this;
         }
 
         /**
          * the color of the guidelines lines.
          */
-        public void setGuidelinesColor(int guidelinesColor) {
+        public ActivityBuilder setGuidelinesColor(int guidelinesColor) {
             mOptions.guidelinesColor = guidelinesColor;
+            return this;
         }
 
         /**
          * the color of the overlay background around the crop window cover the image parts not in the crop window.
          */
-        public void setBackgroundColor(int backgroundColor) {
+        public ActivityBuilder setBackgroundColor(int backgroundColor) {
             mOptions.backgroundColor = backgroundColor;
+            return this;
         }
 
         /**
          * the min size the crop window is allowed to be. (in pixels)
          */
-        public void setMinCropWindowSize(int minCropWindowWidth, int minCropWindowHeight) {
+        public ActivityBuilder setMinCropWindowSize(int minCropWindowWidth, int minCropWindowHeight) {
             mOptions.minCropWindowWidth = minCropWindowWidth;
             mOptions.minCropWindowHeight = minCropWindowHeight;
+            return this;
         }
 
         /**
          * the min size the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
          */
-        public void setMinCropResultSize(int minCropResultWidth, int minCropResultHeight) {
+        public ActivityBuilder setMinCropResultSize(int minCropResultWidth, int minCropResultHeight) {
             mOptions.minCropResultWidth = minCropResultWidth;
             mOptions.minCropResultHeight = minCropResultHeight;
+            return this;
         }
 
         /**
          * the max size the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
          */
-        public void setMaxCropResultSize(int maxCropResultWidth, int maxCropResultHeight) {
+        public ActivityBuilder setMaxCropResultSize(int maxCropResultWidth, int maxCropResultHeight) {
             mOptions.maxCropResultWidth = maxCropResultWidth;
             mOptions.maxCropResultHeight = maxCropResultHeight;
+            return this;
         }
 
         /**
          * the title of the {@link CropImageActivity}
          */
-        public void setActivityTitle(String activityTitle) {
+        public ActivityBuilder setActivityTitle(String activityTitle) {
             mOptions.activityTitle = activityTitle;
+            return this;
         }
 
         /**
          * the Android Uri to save the cropped image to
          */
-        public void setOutputUri(Uri outputUri) {
+        public ActivityBuilder setOutputUri(Uri outputUri) {
             mOptions.outputUri = outputUri;
+            return this;
         }
 
         /**
          * the compression format to use when writting the image
          */
-        public void setOutputCompressFormat(Bitmap.CompressFormat outputCompressFormat) {
+        public ActivityBuilder setOutputCompressFormat(Bitmap.CompressFormat outputCompressFormat) {
             mOptions.outputCompressFormat = outputCompressFormat;
+            return this;
         }
 
         /**
          * the quility (if applicable) to use when writting the image (0 - 100)
          */
-        public void setOutputCompressQuality(int outputCompressQuality) {
+        public ActivityBuilder setOutputCompressQuality(int outputCompressQuality) {
             mOptions.outputCompressQuality = outputCompressQuality;
+            return this;
         }
 
         /**
@@ -517,9 +572,128 @@ public final class CropImage {
          * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
          * Bitmaps Efficiently</a><br>
          */
-        public void setRequestedSize(int reqWidth, int reqHeight) {
+        public ActivityBuilder setRequestedSize(int reqWidth, int reqHeight) {
             mOptions.reqWidth = reqWidth;
             mOptions.reqHeight = reqHeight;
+            return this;
+        }
+    }
+    //endregion
+
+    //region: Inner class: ActivityResult
+
+    /**
+     * Result data of Crop Image Activity.
+     */
+    public static final class ActivityResult implements Parcelable {
+
+        public static final Creator<ActivityResult> CREATOR = new Creator<ActivityResult>() {
+            @Override
+            public ActivityResult createFromParcel(Parcel in) {
+                return new ActivityResult(in);
+            }
+
+            @Override
+            public ActivityResult[] newArray(int size) {
+                return new ActivityResult[size];
+            }
+        };
+
+        /**
+         * The Android uri of the saved cropped image result
+         */
+        private final Uri mUri;
+
+        /**
+         * The error that failed the loading/cropping (null if successful)
+         */
+        private final Exception mError;
+
+        /**
+         * The 4 points of the cropping window in the source image
+         */
+        private final float[] mCropPoints;
+
+        /**
+         * The rectangle of the cropping window in the source image
+         */
+        private final Rect mCropRect;
+
+        /**
+         * The final rotation of the cropped image relative to source
+         */
+        private final int mRotation;
+
+        ActivityResult(Uri uri, Exception error, float[] cropPoints, Rect cropRect, int rotation) {
+            mUri = uri;
+            mError = error;
+            mCropPoints = cropPoints;
+            mCropRect = cropRect;
+            mRotation = rotation;
+        }
+
+        protected ActivityResult(Parcel in) {
+            mUri = in.readParcelable(Uri.class.getClassLoader());
+            mError = (Exception) in.readSerializable();
+            mCropPoints = in.createFloatArray();
+            mCropRect = in.readParcelable(Rect.class.getClassLoader());
+            mRotation = in.readInt();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeParcelable(mUri, flags);
+            dest.writeSerializable(mError);
+            dest.writeFloatArray(mCropPoints);
+            dest.writeParcelable(mCropRect, flags);
+            dest.writeInt(mRotation);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        /**
+         * Is the result is success or error.
+         */
+        public boolean isSuccessful() {
+            return mError == null;
+        }
+
+        /**
+         * The Android uri of the saved cropped image result
+         */
+        public Uri getUri() {
+            return mUri;
+        }
+
+        /**
+         * The error that failed the loading/cropping (null if successful)
+         */
+        public Exception getError() {
+            return mError;
+        }
+
+        /**
+         * The 4 points of the cropping window in the source image
+         */
+        public float[] getCropPoints() {
+            return mCropPoints;
+        }
+
+        /**
+         * The rectangle of the cropping window in the source image
+         */
+        public Rect getCropRect() {
+            return mCropRect;
+        }
+
+        /**
+         * The final rotation of the cropped image relative to source
+         */
+        public int getRotation() {
+            return mRotation;
         }
     }
     //endregion

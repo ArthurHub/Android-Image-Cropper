@@ -27,7 +27,7 @@ import java.io.IOException;
 /**
  * TODO:a add doc
  */
-public class CropImageActivity extends Activity implements CropImageView.OnSaveCroppedImageCompleteListener {
+public class CropImageActivity extends Activity implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnSaveCroppedImageCompleteListener {
 
     /**
      * The crop image view library widget used in the activity
@@ -45,7 +45,6 @@ public class CropImageActivity extends Activity implements CropImageView.OnSaveC
         setContentView(R.layout.crop_image_activity);
 
         mCropImageView = (CropImageView) findViewById(R.id.cropImageView);
-        mCropImageView.setOnSaveCroppedImageCompleteListener(this);
 
         Intent intent = getIntent();
         Uri source = intent.getParcelableExtra(CropImage.CROP_IMAGE_EXTRA_SOURCE);
@@ -63,6 +62,20 @@ public class CropImageActivity extends Activity implements CropImageView.OnSaveC
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mCropImageView.setOnSetImageUriCompleteListener(this);
+        mCropImageView.setOnSaveCroppedImageCompleteListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mCropImageView.setOnSetImageUriCompleteListener(null);
+        mCropImageView.setOnSaveCroppedImageCompleteListener(null);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.crop_image_menu, menu);
         return true;
@@ -71,29 +84,15 @@ public class CropImageActivity extends Activity implements CropImageView.OnSaveC
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.crop_image_menu_crop) {
-            Uri outputUri = mOptions.outputUri;
-            if (outputUri.equals(Uri.EMPTY)) {
-                try {
-                    String ext = mOptions.outputCompressFormat == Bitmap.CompressFormat.JPEG ? ".jpg" :
-                            mOptions.outputCompressFormat == Bitmap.CompressFormat.PNG ? ".png" : ".wepb";
-                    outputUri = Uri.fromFile(File.createTempFile("cropped", ext, getCacheDir()));
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to create temp file for output image", e);
-                }
-            }
-            mCropImageView.saveCroppedImageAsync(outputUri,
-                    mOptions.outputCompressFormat,
-                    mOptions.outputCompressQuality,
-                    mOptions.reqWidth,
-                    mOptions.reqHeight);
+            cropImage();
             return true;
         }
         if (item.getItemId() == R.id.crop_image_menu_rotate) {
-            mCropImageView.rotateImage(90);
+            rotateImage();
             return true;
         }
         if (item.getItemId() == android.R.id.home) {
-            cancel();
+            setResultCancel();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -102,17 +101,90 @@ public class CropImageActivity extends Activity implements CropImageView.OnSaveC
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cancel();
+        setResultCancel();
     }
 
     @Override
-    public void onGetCroppedImageComplete(CropImageView view, Uri uri, Exception error) {
-        //setResult();
+    public void onSetImageUriComplete(CropImageView view, Uri uri, Exception error) {
+        if (error != null) {
+            setResult(null, error);
+        }
+    }
+
+    @Override
+    public void onSaveCroppedImageComplete(CropImageView view, Uri uri, Exception error) {
+        setResult(uri, error);
+    }
+
+    //region: Private methods
+
+    /**
+     * Execute crop image and save the result tou output uri.
+     */
+    protected void cropImage() {
+        Uri outputUri = getOutputUri();
+        mCropImageView.saveCroppedImageAsync(outputUri,
+                mOptions.outputCompressFormat,
+                mOptions.outputCompressQuality,
+                mOptions.reqWidth,
+                mOptions.reqHeight);
+    }
+
+    /**
+     * Rotate the image in the crop image view.
+     */
+    protected void rotateImage() {
+        mCropImageView.rotateImage(90);
+    }
+
+    /**
+     * Get Android uri to save the cropped image into.<br>
+     * Use the given in options or create a temp file.
+     */
+    protected Uri getOutputUri() {
+        Uri outputUri = mOptions.outputUri;
+        if (outputUri.equals(Uri.EMPTY)) {
+            try {
+                String ext = mOptions.outputCompressFormat == Bitmap.CompressFormat.JPEG ? ".jpg" :
+                        mOptions.outputCompressFormat == Bitmap.CompressFormat.PNG ? ".png" : ".wepb";
+                outputUri = Uri.fromFile(File.createTempFile("cropped", ext, getCacheDir()));
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create temp file for output image", e);
+            }
+        }
+        return outputUri;
+    }
+
+    /**
+     * Result with cropped image data or error if failed.
+     */
+    protected void setResult(Uri uri, Exception error) {
+        int resultCode = error == null ? RESULT_OK : CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
+        setResult(resultCode, getResultIntent(uri, error));
         finish();
     }
 
-    private void cancel() {
+    /**
+     * Cancel of cropping activity.
+     */
+    protected void setResultCancel() {
+        setResult(RESULT_CANCELED);
         finish();
     }
+
+    /**
+     * Get intent instance to be used for the result of this activity.
+     */
+    protected Intent getResultIntent(Uri uri, Exception error) {
+        CropImage.ActivityResult result = new CropImage.ActivityResult(uri,
+                error,
+                mCropImageView.getCropPoints(),
+                mCropImageView.getCropRect(),
+                mCropImageView.getRotatedDegrees());
+        Intent intent = new Intent();
+        intent.putExtra(CropImage.CROP_IMAGE_EXTRA_RESULT, result);
+        return intent;
+    }
+    //endregion
 }
 
