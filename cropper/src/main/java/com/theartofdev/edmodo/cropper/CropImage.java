@@ -140,6 +140,19 @@ public final class CropImage {
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      */
     public static Intent getPickImageChooserIntent(Context context) {
+        return getPickImageChooserIntent(context, "Select source", false);
+    }
+
+    /**
+     * Create a chooser intent to select the  source to get image from.<br>
+     * The source can be camera's  (ACTION_IMAGE_CAPTURE) or gallery's (ACTION_GET_CONTENT).<br>
+     * All possible sources are added to the intent chooser.
+     *
+     * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
+     * @param title the title to use for the chooser UI
+     * @param includeDocuments if to include KitKat documents activity containing all sources
+     */
+    public static Intent getPickImageChooserIntent(Context context, CharSequence title, boolean includeDocuments) {
 
         // Determine Uri of camera image to  save.
         Uri outputFileUri = getCaptureImageOutputUri(context);
@@ -171,18 +184,18 @@ public final class CropImage {
             allIntents.add(intent);
         }
 
-        // the main intent is the last in the  list (fucking android) so pickup the useless one
-        Intent mainIntent = allIntents.get(allIntents.size() - 1);
-        for (Intent intent : allIntents) {
-            if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
-                mainIntent = intent;
-                break;
+        // remove documents intent
+        if (!includeDocuments) {
+            for (Intent intent : allIntents) {
+                if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
+                    allIntents.remove(intent);
+                    break;
+                }
             }
         }
-        allIntents.remove(mainIntent);
 
         // Create a chooser from the main  intent
-        Intent chooserIntent = Intent.createChooser(mainIntent, "Select source");
+        Intent chooserIntent = Intent.createChooser(new Intent(), title);
 
         // Add all other intents
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, allIntents.toArray(new Parcelable[allIntents.size()]));
