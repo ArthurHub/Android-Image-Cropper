@@ -858,6 +858,9 @@ public class CropImageView extends FrameLayout {
 
             mBitmap = bitmap;
             mImageView.setImageBitmap(mBitmap);
+
+            applyImageMatrix(getWidth(), getHeight(), true, false);
+
             if (mCropOverlayView != null) {
                 mCropOverlayView.resetCropOverlayView();
                 setCropOverlayVisibility();

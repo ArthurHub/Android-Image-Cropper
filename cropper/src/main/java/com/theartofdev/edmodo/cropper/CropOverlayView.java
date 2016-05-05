@@ -43,6 +43,11 @@ public class CropOverlayView extends View {
     private CropWindowChangeListener mCropWindowChangeListener;
 
     /**
+     * Rectangle used for drawing
+     */
+    private final RectF mDrawRect = new RectF();
+
+    /**
      * The Paint used to draw the white rectangle around the crop area.
      */
     private Paint mBorderPaint;
@@ -606,11 +611,11 @@ public class CropOverlayView extends View {
         } else {
             Path circleSelectionPath = new Path();
             if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17 && mCropShape == CropImageView.CropShape.OVAL) {
-                BitmapUtils.EMPTY_RECT_F.set(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2);
+                mDrawRect.set(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2);
             } else {
-                BitmapUtils.EMPTY_RECT_F.set(rect.left, rect.top, rect.right, rect.bottom);
+                mDrawRect.set(rect.left, rect.top, rect.right, rect.bottom);
             }
-            circleSelectionPath.addOval(BitmapUtils.EMPTY_RECT_F, Path.Direction.CW);
+            circleSelectionPath.addOval(mDrawRect, Path.Direction.CW);
             canvas.save();
             canvas.clipPath(circleSelectionPath, Region.Op.XOR);
             canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
