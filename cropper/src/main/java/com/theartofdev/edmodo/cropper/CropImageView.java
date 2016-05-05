@@ -605,7 +605,7 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Save the cropped image based on the current crop window to the given uri.<br>
-     * Use {@link Bitmap.CompressFormat.JPEG} with 90 compression quality.<br>
+     * Uses JPEG image compression with 90 compression quality.<br>
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      *
      * @param saveUri the Android Uri to save the cropped image to
