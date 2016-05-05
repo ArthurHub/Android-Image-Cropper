@@ -13,6 +13,8 @@ Android Image Cropper
 ## Usage
 *For a working implementation, please have a look at the Sample Project*
 
+See also [Using CropImageView in own Activity](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Using-CropImageView-in-own-Activity) for custom crop activity.
+
 1. Include the library
 
  ```
