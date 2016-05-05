@@ -110,31 +110,24 @@ final class BitmapUtils {
      */
     public static DecodeBitmapResult decodeSampledBitmap(Context context, Uri uri, int reqWidth, int reqHeight) {
 
-        InputStream stream = null;
         try {
             ContentResolver resolver = context.getContentResolver();
-            stream = resolver.openInputStream(uri);
 
             // First decode with inJustDecodeBounds=true to check dimensions
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(stream, EMPTY_RECT, options);
-            options.inJustDecodeBounds = false;
+            BitmapFactory.Options options = decodeImageForOption(resolver, uri);
 
             // Calculate inSampleSize
-            options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, reqWidth, reqHeight);
+            options.inSampleSize = Math.max(
+                    calculateInSampleSizeByReqestedSize(options.outWidth, options.outHeight, reqWidth, reqHeight),
+                    calculateInSampleSizeByMaxTextureSize(options.outWidth, options.outHeight));
 
             // Decode bitmap with inSampleSize set
-            closeSafe(stream);
-            stream = resolver.openInputStream(uri);
-            Bitmap bitmap = BitmapFactory.decodeStream(stream, EMPTY_RECT, options);
+            Bitmap bitmap = decodeImage(resolver, uri, options);
 
             return new DecodeBitmapResult(bitmap, options.inSampleSize);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load sampled bitmap: " + uri, e);
-        } finally {
-            closeSafe(stream);
         }
     }
 
@@ -202,22 +195,17 @@ final class BitmapUtils {
         } else {
 
             // failed to decode region, may be skia issue, try full decode and then crop
-            InputStream stream = null;
             try {
-                stream = context.getContentResolver().openInputStream(loadedImageUri);
-
                 BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inSampleSize = calculateInSampleSize(rect.width(), rect.height(), reqWidth, reqHeight);
+                options.inSampleSize = calculateInSampleSizeByReqestedSize(rect.width(), rect.height(), reqWidth, reqHeight);
 
-                Bitmap fullBitmap = BitmapFactory.decodeStream(stream, EMPTY_RECT, options);
+                Bitmap fullBitmap = decodeImage(context.getContentResolver(), loadedImageUri, options);
                 if (fullBitmap != null) {
                     result = cropBitmap(fullBitmap, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
                     fullBitmap.recycle();
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Failed to load sampled bitmap: " + loadedImageUri, e);
-            } finally {
-                closeSafe(stream);
             }
         }
 
@@ -272,28 +260,69 @@ final class BitmapUtils {
     //region: Private methods
 
     /**
+     * Decode image from uri using "inJustDecodeBounds" to get the image dimensions.
+     */
+    private static BitmapFactory.Options decodeImageForOption(ContentResolver resolver, Uri uri) throws FileNotFoundException {
+        InputStream stream = null;
+        try {
+            stream = resolver.openInputStream(uri);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(stream, EMPTY_RECT, options);
+            options.inJustDecodeBounds = false;
+            return options;
+        } finally {
+            closeSafe(stream);
+        }
+    }
+
+    /**
+     * Decode image from uri using given "inSampleSize", but if failed due to out-of-memory then raise
+     * the inSampleSize until success.
+     */
+    private static Bitmap decodeImage(ContentResolver resolver, Uri uri, BitmapFactory.Options options) throws FileNotFoundException {
+        do {
+            InputStream stream = null;
+            try {
+                stream = resolver.openInputStream(uri);
+                return BitmapFactory.decodeStream(stream, EMPTY_RECT, options);
+            } catch (OutOfMemoryError e) {
+                options.inSampleSize *= 2;
+            } finally {
+                closeSafe(stream);
+            }
+        } while (options.inSampleSize <= 512);
+        throw new RuntimeException("Failed to decode image: " + uri);
+    }
+
+    /**
      * Decode specific rectangle bitmap from stream using sampling to get bitmap with the requested limit.
      */
     private static Bitmap decodeSampledBitmapRegion(Context context, Uri uri, Rect rect, int reqWidth, int reqHeight) {
         InputStream stream = null;
+        BitmapRegionDecoder decoder = null;
         try {
-            ContentResolver resolver = context.getContentResolver();
-            stream = resolver.openInputStream(uri);
-
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = calculateInSampleSize(rect.width(), rect.height(), reqWidth, reqHeight);
+            options.inSampleSize = calculateInSampleSizeByReqestedSize(rect.width(), rect.height(), reqWidth, reqHeight);
 
-            BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(stream, false);
-            Bitmap bitmap = decoder.decodeRegion(rect, options);
-            decoder.recycle();
-
-            return bitmap;
-
+            stream = context.getContentResolver().openInputStream(uri);
+            decoder = BitmapRegionDecoder.newInstance(stream, false);
+            do {
+                try {
+                    return decoder.decodeRegion(rect, options);
+                } catch (OutOfMemoryError e) {
+                    options.inSampleSize *= 2;
+                }
+            } while (options.inSampleSize <= 512);
         } catch (Exception e) {
             throw new RuntimeException("Failed to load sampled bitmap: " + uri, e);
         } finally {
             closeSafe(stream);
+            if (decoder != null) {
+                decoder.recycle();
+            }
         }
+        return null;
     }
 
     /**
@@ -335,21 +364,28 @@ final class BitmapUtils {
      * Calculate the largest inSampleSize value that is a power of 2 and keeps both
      * height and width larger than the requested height and width.
      */
-    private static int calculateInSampleSize(int width, int height, int reqWidth, int reqHeight) {
+    private static int calculateInSampleSizeByReqestedSize(int width, int height, int reqWidth, int reqHeight) {
         int inSampleSize = 1;
         if (height > reqHeight || width > reqWidth) {
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-            while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
+            while ((height / 2 / inSampleSize) > reqHeight && (width / 2 / inSampleSize) > reqWidth) {
                 inSampleSize *= 2;
             }
-            if (mMaxTextureSize == 0) {
-                mMaxTextureSize = getMaxTextureSize();
-            }
-            if (mMaxTextureSize > 0) {
-                while ((height / inSampleSize) > mMaxTextureSize || (width / inSampleSize) > mMaxTextureSize) {
-                    inSampleSize *= 2;
-                }
+        }
+        return inSampleSize;
+    }
+
+    /**
+     * Calculate the largest inSampleSize value that is a power of 2 and keeps both
+     * height and width smaller than max texture size allowed for the device.
+     */
+    private static int calculateInSampleSizeByMaxTextureSize(int width, int height) {
+        int inSampleSize = 1;
+        if (mMaxTextureSize == 0) {
+            mMaxTextureSize = getMaxTextureSize();
+        }
+        if (mMaxTextureSize > 0) {
+            while ((height / inSampleSize) > mMaxTextureSize || (width / inSampleSize) > mMaxTextureSize) {
+                inSampleSize *= 2;
             }
         }
         return inSampleSize;
