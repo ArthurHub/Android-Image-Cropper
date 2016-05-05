@@ -16,38 +16,41 @@ Android Image Cropper
 1. Include the library
 
  ```
- compile 'com.theartofdev.edmodo:android-image-cropper:2.0.+'
+ compile 'com.theartofdev.edmodo:android-image-cropper:2.1.+'
  ```
 
-2. Add `CropImageView` into your activity
-
+2. Add `CropImageActivity` into your AndroidManifest.xml
+   
  ```xml
- <!-- Image Cropper fill the remaining available height -->
- <com.theartofdev.edmodo.cropper.CropImageView
-    xmlns:custom="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cropImageView"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"/>
+ <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"/>
  ```
 
-3. Set image to crop
+3. Start `CropImageActivity` using builder pattern from your activity
 
  ```java
- cropImageView.setImageBitmap(bitmap);
- // or
- cropImageView.setImageUriAsync(uri);
+ CropImage.activity(imageUri)
+    .setGuidelines(CropImageView.Guidelines.ON)
+    .start(this);
  ```
 
-4. Get cropped image
+4. Override `onActivityResult` method in your activity to get crop result
 
  ```java
- Bitmap cropped = cropImageView.getCroppedImage();
- // or (must subscribe to async event using cropImageView.setOnGetCroppedImageCompleteListener(listener))
- cropImageView.getCroppedImageAsync(CropImageView.CropShape.RECTANGLE, 400, 400);
+ @Override
+ public void onActivityResult(int requestCode, int resultCode, Intent data) {
+     if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+         CropImage.ActivityResult result = CropImage.getActivityResult(data);
+         if (resultCode == RESULT_OK) {
+             Uri resultUri = result.getUri();
+         } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+             Exception error = result.getError();
+         }
+     }
+ }
  ```
 
 ## Features
+- Built-in `CropImageActivity`.
 - Set cropping image as Bitmap, Resource or Android URI (Gallery, Camera, Dropbox, etc.).
 - Image rotation during cropping.
 - Auto zoom-in/out to relevant cropping area.
@@ -55,8 +58,8 @@ Android Image Cropper
 - Set result image min/max limits in pixels.
 - Set initial crop window size/location.
 - Bitmap memory optimization.
-- API Level 10.
-- More.
+- API Level 11.
+- More..
  
 ## Customizations
 - Cropping window shape: Rectangular or Oval (cube/circle by fixing aspect ratio).
@@ -73,6 +76,13 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.1.0*
+- Built-in `CropImageActivity` for quick start and common scenarios.
+- Save cropped image to Uri API `saveCroppedImageAsync(Uri)`.
+- Minimum SDK updated to 11 (Honeycomb).
+- Handle possible out-of-memory in image load by down-sampling until succeed.
+- Minor fixes.
+
 *2.0.1* (Beta)
 
 - Fix counter clockwise rotation resulting in negative degrees (#54). 
