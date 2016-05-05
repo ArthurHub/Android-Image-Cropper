@@ -230,7 +230,7 @@ public final class CropImage {
             String action = data.getAction();
             isCamera = action != null && action.equals(MediaStore.ACTION_IMAGE_CAPTURE);
         }
-        return isCamera ? getCaptureImageOutputUri(context) : data.getData();
+        return isCamera || data.getData() == null ? getCaptureImageOutputUri(context) : data.getData();
     }
 
     /**
