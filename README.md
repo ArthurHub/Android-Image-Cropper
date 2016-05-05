@@ -58,7 +58,7 @@ Android Image Cropper
 - Set result image min/max limits in pixels.
 - Set initial crop window size/location.
 - Bitmap memory optimization.
-- API Level 11.
+- API Level 10.
 - More..
  
 ## Customizations
@@ -76,10 +76,9 @@ For more information, see the [linked Github Wiki page](https://github.com/Arthu
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
-*2.1.0*
+*2.1.1*
 - Built-in `CropImageActivity` for quick start and common scenarios.
 - Save cropped image to Uri API `saveCroppedImageAsync(Uri)`.
-- Minimum SDK updated to 11 (Honeycomb).
 - Handle possible out-of-memory in image load by down-sampling until succeed.
 - Minor fixes.
 

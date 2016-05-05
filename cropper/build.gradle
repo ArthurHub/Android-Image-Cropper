@@ -6,7 +6,7 @@ apply plugin: 'maven-publish'
 ext {
     PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
     PUBLISH_ARTIFACT_ID = 'android-image-cropper'
-    PUBLISH_VERSION = '2.1.0'
+    PUBLISH_VERSION = '2.1.1'
     // gradlew clean build generateRelease
 }
 
@@ -15,7 +15,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion '23.0.1'
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion 10
         targetSdkVersion 23
         versionCode 1
         versionName PUBLISH_VERSION
@@ -47,3 +47,8 @@ publishing {
 }
 
 apply from: 'https://raw.githubusercontent.com/ArthurHub/release-android-library/master/android-release-aar.gradle'
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:23.2.1'
+}
+

@@ -10,7 +10,7 @@
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.DeviceDefault">
+        android:theme="@style/Base.Theme.AppCompat">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">

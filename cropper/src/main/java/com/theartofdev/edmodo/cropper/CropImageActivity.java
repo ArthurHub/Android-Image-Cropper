@@ -12,14 +12,14 @@
 
 package com.theartofdev.edmodo.cropper;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -29,7 +29,7 @@ import java.io.IOException;
 /**
  * TODO:a add doc
  */
-public class CropImageActivity extends Activity implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnSaveCroppedImageCompleteListener {
+public class CropImageActivity extends AppCompatActivity implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnSaveCroppedImageCompleteListener {
 
     /**
      * The crop image view library widget used in the activity
@@ -56,7 +56,7 @@ public class CropImageActivity extends Activity implements CropImageView.OnSetIm
             mCropImageView.setImageUriAsync(source);
         }
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(mOptions.activityTitle);
             actionBar.setDisplayHomeAsUpEnabled(true);
