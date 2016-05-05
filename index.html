@@ -1,41 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta charset="UTF-8">
     <title>Android Image Cropper by ArthurHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
-    <div id="container">
-      <div class="inner">
+    <section class="page-header">
+      <h1 class="project-name">Android Image Cropper</h1>
+      <h2 class="project-tagline">Image Cropping Library for Android, optimized for Camera / Gallery.</h2>
+      <a href="https://github.com/ArthurHub/Android-Image-Cropper" class="btn">View on GitHub</a>
+      <a href="https://github.com/ArthurHub/Android-Image-Cropper/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/ArthurHub/Android-Image-Cropper/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <header>
-          <h1>Android Image Cropper</h1>
-          <h2>Image Cropping Library for Android, optimized for Camera / Gallery.</h2>
-        </header>
-
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/ArthurHub/Android-Image-Cropper/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/ArthurHub/Android-Image-Cropper/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/ArthurHub/Android-Image-Cropper" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
-
-        <hr>
-
-        <section id="main_content">
-          <h1>
+    <section class="main-content">
+      <h1>
 <a id="android-image-cropper" class="anchor" href="#android-image-cropper" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Android Image Cropper</h1>
 
 <p><a href="https://travis-ci.org/ArthurHub/Android-Image-Cropper"><img src="https://travis-ci.org/ArthurHub/Android-Image-Cropper.svg" alt="build status"></a> 
 <a href="https://www.codacy.com/app/tep-arthur/Android-Image-Cropper"><img src="https://api.codacy.com/project/badge/grade/4d3781df0cce40959881a8d91365407a" alt="Codacy Badge"></a>
+<a href="https://android-arsenal.com/details/1/3487"><img src="https://img.shields.io/badge/Android%20Arsenal-Android--Image--Cropper-green.svg?style=true" alt="Android Arsenal"></a>
 <a href="https://bintray.com/arthurhub/maven/Android-Image-Cropper/_latestVersion"> <img src="https://api.bintray.com/packages/arthurhub/maven/Android-Image-Cropper/images/download.svg" alt="Download"> </a></p>
 
 <p><strong>Powerful</strong> (Zoom, Rotation, Multi-Source), <strong>customizable</strong> (Shape, Limits, Style), <strong>optimized</strong> (Async, Sampling, Matrix) and <strong>simple</strong> image cropping library for Android.</p>
@@ -51,33 +40,35 @@
 <li>
 <p>Include the library</p>
 
-<pre><code>compile 'com.theartofdev.edmodo:android-image-cropper:2.0.+'
+<pre><code>compile 'com.theartofdev.edmodo:android-image-cropper:2.1.+'
 </code></pre>
 </li>
 <li>
-<p>Add <code>CropImageView</code> into your activity</p>
+<p>Add <code>CropImageActivity</code> into your AndroidManifest.xml</p>
 
-<div class="highlight highlight-text-xml"><pre><span class="pl-c">&lt;!-- Image Cropper fill the remaining available height --&gt;</span>
-&lt;<span class="pl-ent">com</span>.theartofdev.edmodo.cropper.CropImageView
-  <span class="pl-e">xmlns</span><span class="pl-e">:</span><span class="pl-e">custom</span>=<span class="pl-s"><span class="pl-pds">"</span>http://schemas.android.com/apk/res-auto<span class="pl-pds">"</span></span>
-  <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>@+id/cropImageView<span class="pl-pds">"</span></span>
-  <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_width</span>=<span class="pl-s"><span class="pl-pds">"</span>match_parent<span class="pl-pds">"</span></span>
-  <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_height</span>=<span class="pl-s"><span class="pl-pds">"</span>0dp<span class="pl-pds">"</span></span>
-  <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_weight</span>=<span class="pl-s"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span>/&gt;</pre></div>
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">activity</span> <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>com.theartofdev.edmodo.cropper.CropImageActivity<span class="pl-pds">"</span></span>/&gt;</pre></div>
 </li>
 <li>
-<p>Set image to crop</p>
+<p>Start <code>CropImageActivity</code> using builder pattern from your activity</p>
 
-<div class="highlight highlight-source-java"><pre>cropImageView<span class="pl-k">.</span>setImageBitmap(bitmap);
-<span class="pl-c">// or</span>
-cropImageView<span class="pl-k">.</span>setImageUriAsync(uri);</pre></div>
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">CropImage</span><span class="pl-k">.</span>activity(imageUri)
+  .setGuidelines(<span class="pl-smi">CropImageView</span><span class="pl-k">.</span><span class="pl-smi">Guidelines</span><span class="pl-c1"><span class="pl-k">.</span>ON</span>)
+  .start(<span class="pl-v">this</span>);</pre></div>
 </li>
 <li>
-<p>Get cropped image</p>
+<p>Override <code>onActivityResult</code> method in your activity to get crop result</p>
 
-<div class="highlight highlight-source-java"><pre><span class="pl-smi">Bitmap</span> cropped <span class="pl-k">=</span> cropImageView<span class="pl-k">.</span>getCroppedImage();
-<span class="pl-c">// or (must subscribe to async event using cropImageView.setOnGetCroppedImageCompleteListener(listener))</span>
-cropImageView<span class="pl-k">.</span>getCroppedImageAsync(<span class="pl-smi">CropImageView</span><span class="pl-k">.</span><span class="pl-smi">CropShape</span><span class="pl-c1"><span class="pl-k">.</span>RECTANGLE</span>, <span class="pl-c1">400</span>, <span class="pl-c1">400</span>);</pre></div>
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Override</span>
+<span class="pl-k">public</span> <span class="pl-k">void</span> onActivityResult(<span class="pl-k">int</span> requestCode, <span class="pl-k">int</span> resultCode, <span class="pl-smi">Intent</span> data) {
+   <span class="pl-k">if</span> (requestCode <span class="pl-k">==</span> <span class="pl-smi">CropImage</span><span class="pl-c1"><span class="pl-k">.</span>CROP_IMAGE_ACTIVITY_REQUEST_CODE</span>) {
+       <span class="pl-smi">CropImage</span><span class="pl-k">.</span><span class="pl-smi">ActivityResult</span> result <span class="pl-k">=</span> <span class="pl-smi">CropImage</span><span class="pl-k">.</span>getActivityResult(data);
+       <span class="pl-k">if</span> (resultCode <span class="pl-k">==</span> <span class="pl-c1">RESULT_OK</span>) {
+           <span class="pl-smi">Uri</span> resultUri <span class="pl-k">=</span> result<span class="pl-k">.</span>getUri();
+       } <span class="pl-k">else</span> <span class="pl-k">if</span> (resultCode <span class="pl-k">==</span> <span class="pl-smi">CropImage</span><span class="pl-c1"><span class="pl-k">.</span>CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE</span>) {
+           <span class="pl-smi">Exception</span> error <span class="pl-k">=</span> result<span class="pl-k">.</span>getError();
+       }
+   }
+}</pre></div>
 </li>
 </ol>
 
@@ -85,6 +76,7 @@ cropImageView<span class="pl-k">.</span>getCroppedImageAsync(<span class="pl-smi
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
+<li>Built-in <code>CropImageActivity</code>.</li>
 <li>Set cropping image as Bitmap, Resource or Android URI (Gallery, Camera, Dropbox, etc.).</li>
 <li>Image rotation during cropping.</li>
 <li>Auto zoom-in/out to relevant cropping area.</li>
@@ -93,7 +85,7 @@ cropImageView<span class="pl-k">.</span>getCroppedImageAsync(<span class="pl-smi
 <li>Set initial crop window size/location.</li>
 <li>Bitmap memory optimization.</li>
 <li>API Level 10.</li>
-<li>More.</li>
+<li>More..</li>
 </ul>
 
 <h2>
@@ -120,6 +112,21 @@ cropImageView<span class="pl-k">.</span>getCroppedImageAsync(<span class="pl-smi
 
 <h2>
 <a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Change log</h2>
+
+<p><em>2.1.1</em></p>
+
+<ul>
+<li>Built-in <code>CropImageActivity</code> for quick start and common scenarios.</li>
+<li>Save cropped image to Uri API <code>saveCroppedImageAsync(Uri)</code>.</li>
+<li>Handle possible out-of-memory in image load by down-sampling until succeed.</li>
+<li>Minor fixes.</li>
+</ul>
+
+<p><em>2.0.1</em> (Beta)</p>
+
+<ul>
+<li>Fix counter clockwise rotation resulting in negative degrees (#54). </li>
+</ul>
 
 <p><em>2.0.0</em> (Beta)</p>
 
@@ -166,14 +173,16 @@ You may obtain a copy of the License in the LICENSE file, or at:</p>
 <p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
 
 <p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS   IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
-        </section>
 
-        <footer>
-          Android Image Cropper is maintained by <a href="https://github.com/ArthurHub">ArthurHub</a><br>
-          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/ArthurHub/Android-Image-Cropper">Android Image Cropper</a> is maintained by <a href="https://github.com/ArthurHub">ArthurHub</a>.</span>
 
-                  <script type="text/javascript">
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -184,7 +193,5 @@ You may obtain a copy of the License in the LICENSE file, or at:</p>
             } catch(err) {}
           </script>
 
-      </div>
-    </div>
   </body>
 </html>
