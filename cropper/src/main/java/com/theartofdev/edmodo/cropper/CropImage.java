@@ -33,11 +33,8 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.system.ErrnoException;
-import android.system.OsConstants;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -194,8 +191,16 @@ public final class CropImage {
             }
         }
 
+        Intent target;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            target = new Intent();
+        } else {
+            target = allIntents.get(allIntents.size() - 1);
+            allIntents.remove(allIntents.size() - 1);
+        }
+
         // Create a chooser from the main  intent
-        Intent chooserIntent = Intent.createChooser(new Intent(), title);
+        Intent chooserIntent = Intent.createChooser(target, title);
 
         // Add all other intents
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, allIntents.toArray(new Parcelable[allIntents.size()]));
@@ -262,15 +267,9 @@ public final class CropImage {
             InputStream stream = resolver.openInputStream(uri);
             stream.close();
             return false;
-        } catch (FileNotFoundException e) {
-            if (e.getCause() instanceof ErrnoException && ((ErrnoException) e.getCause()).errno == OsConstants.EACCES) {
-                return true;
-            }
-        } catch (SecurityException e) {
-            return true;
         } catch (Exception e) {
+            return true;
         }
-        return false;
     }
 
     /**
