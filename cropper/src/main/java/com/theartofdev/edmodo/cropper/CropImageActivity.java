@@ -18,6 +18,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -58,7 +59,10 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(mOptions.activityTitle);
+            String title = mOptions.activityTitle != null && !mOptions.activityTitle.isEmpty()
+                    ? mOptions.activityTitle
+                    : getResources().getString(R.string.crop_image_activity_title);
+            actionBar.setTitle(title);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -80,12 +84,27 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.crop_image_menu, menu);
+
         if (!mOptions.allowRotation) {
             menu.removeItem(R.id.crop_image_menu_rotate);
         }
+
+        Drawable cropIcon = null;
+        try {
+            cropIcon = ContextCompat.getDrawable(this, R.drawable.crop_image_menu_crop);
+            if (cropIcon != null) {
+                menu.findItem(R.id.crop_image_menu_crop).setIcon(cropIcon);
+            }
+        } catch (Exception e) {
+        }
+
         if (mOptions.activityMenuIconColor != 0) {
             updateMenuItemIconColor(menu, R.id.crop_image_menu_rotate, mOptions.activityMenuIconColor);
+            if (cropIcon != null) {
+                updateMenuItemIconColor(menu, R.id.crop_image_menu_crop, mOptions.activityMenuIconColor);
+            }
         }
+
         return true;
     }
 
