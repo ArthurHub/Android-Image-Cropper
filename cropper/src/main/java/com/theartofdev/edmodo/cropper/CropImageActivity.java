@@ -28,7 +28,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * TODO:a add doc
+ * Built-in activity for image cropping.<br>
+ * Use {@link CropImage#activity(Uri)} to create a builder to start this activity.
  */
 public class CropImageActivity extends AppCompatActivity implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnSaveCroppedImageCompleteListener {
 
