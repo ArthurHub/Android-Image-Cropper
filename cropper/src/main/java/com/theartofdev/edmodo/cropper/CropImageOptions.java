@@ -223,6 +223,11 @@ final class CropImageOptions implements Parcelable {
     public int outputRequestHeight;
 
     /**
+     * if the result of crop image activity should not save the cropped image bitmap
+     */
+    public boolean noOutputImage;
+
+    /**
      * the initial rectangle to set on the cropping image after loading
      */
     public Rect initialCropWindowRectangle;
@@ -285,6 +290,7 @@ final class CropImageOptions implements Parcelable {
         outputCompressQuality = 90;
         outputRequestWidth = 0;
         outputRequestHeight = 0;
+        noOutputImage = false;
 
         initialCropWindowRectangle = null;
         initialRotation = -1;
@@ -330,6 +336,7 @@ final class CropImageOptions implements Parcelable {
         outputCompressQuality = in.readInt();
         outputRequestWidth = in.readInt();
         outputRequestHeight = in.readInt();
+        noOutputImage = in.readByte() != 0;
         initialCropWindowRectangle = in.readParcelable(Rect.class.getClassLoader());
         initialRotation = in.readInt();
         allowRotation = in.readByte() != 0;
@@ -372,6 +379,7 @@ final class CropImageOptions implements Parcelable {
         dest.writeInt(outputCompressQuality);
         dest.writeInt(outputRequestWidth);
         dest.writeInt(outputRequestHeight);
+        dest.writeInt(noOutputImage ? 1 : 0);
         dest.writeParcelable(initialCropWindowRectangle, flags);
         dest.writeInt(initialRotation);
         dest.writeByte((byte) (allowRotation ? 1 : 0));

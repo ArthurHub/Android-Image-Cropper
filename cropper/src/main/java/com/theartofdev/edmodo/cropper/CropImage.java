@@ -599,6 +599,15 @@ public final class CropImage {
         }
 
         /**
+         * if the result of crop image activity should not save the cropped image bitmap.<br>
+         * Used if you want to crop the image manually and need only the crop rectangle and rotation data.
+         */
+        public ActivityBuilder setNoOutputImage(boolean noOutputImage) {
+            mOptions.noOutputImage = noOutputImage;
+            return this;
+        }
+
+        /**
          * the initial rectangle to set on the cropping image after loading
          */
         public ActivityBuilder setInitialCropWindowRectangle(Rect initialCropWindowRectangle) {

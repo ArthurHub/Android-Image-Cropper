@@ -157,12 +157,16 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
      * Execute crop image and save the result tou output uri.
      */
     protected void cropImage() {
-        Uri outputUri = getOutputUri();
-        mCropImageView.saveCroppedImageAsync(outputUri,
-                mOptions.outputCompressFormat,
-                mOptions.outputCompressQuality,
-                mOptions.outputRequestWidth,
-                mOptions.outputRequestHeight);
+        if (mOptions.noOutputImage) {
+            setResult(null, null);
+        } else {
+            Uri outputUri = getOutputUri();
+            mCropImageView.saveCroppedImageAsync(outputUri,
+                    mOptions.outputCompressFormat,
+                    mOptions.outputCompressQuality,
+                    mOptions.outputRequestWidth,
+                    mOptions.outputRequestHeight);
+        }
     }
 
     /**
