@@ -13,22 +13,21 @@ Android Image Cropper
 ## Usage
 *For a working implementation, please have a look at the Sample Project*
 
-See also [Using CropImageView in own Activity](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Using-CropImageView-in-own-Activity) for custom crop activity.
+[See GitHub Wiki for more info.](https://github.com/ArthurHub/Android-Image-Cropper/wiki)
 
 1. Include the library
-
  ```
  compile 'com.theartofdev.edmodo:android-image-cropper:2.1.+'
  ```
 
+### Using Activity
+
 2. Add `CropImageActivity` into your AndroidManifest.xml
-   
  ```xml
  <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"/>
  ```
 
 3. Start `CropImageActivity` using builder pattern from your activity
-
  ```java
  CropImage.activity(imageUri)
     .setGuidelines(CropImageView.Guidelines.ON)
@@ -36,7 +35,6 @@ See also [Using CropImageView in own Activity](https://github.com/ArthurHub/Andr
  ```
 
 4. Override `onActivityResult` method in your activity to get crop result
-
  ```java
  @Override
  public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -49,6 +47,32 @@ See also [Using CropImageView in own Activity](https://github.com/ArthurHub/Andr
          }
      }
  }
+ ```
+
+### Using View
+2. Add `CropImageView` into your activity
+ ```xml
+ <!-- Image Cropper fill the remaining available height -->
+ <com.theartofdev.edmodo.cropper.CropImageView
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cropImageView"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"/>
+ ```
+
+3. Set image to crop
+ ```java
+ cropImageView.setImageBitmap(bitmap);
+ // or
+ cropImageView.setImageUriAsync(uri);
+ ```
+
+4. Get cropped image
+ ```java
+ Bitmap cropped = cropImageView.getCroppedImage();
+ // or (must subscribe to async event using cropImageView.setOnGetCroppedImageCompleteListener(listener))
+ cropImageView.getCroppedImageAsync();
  ```
 
 ## Features
@@ -70,7 +94,7 @@ See also [Using CropImageView in own Activity](https://github.com/ArthurHub/Andr
 - Cropping window Border line, border corner and guidelines thickness and color.
 - Cropping background color.
 
-For more information, see the [linked Github Wiki page](https://github.com/ArthurHub/Android-Image-Cropper/wiki). 
+For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android-Image-Cropper/wiki). 
 
 ## Posts
  - [Android cropping image from camera or gallery](http://theartofdev.com/2015/02/15/android-cropping-image-from-camera-or-gallery/)
