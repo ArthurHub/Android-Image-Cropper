@@ -16,6 +16,7 @@ Android Image Cropper
 [See GitHub Wiki for more info.](https://github.com/ArthurHub/Android-Image-Cropper/wiki)
 
 1. Include the library
+
  ```
  compile 'com.theartofdev.edmodo:android-image-cropper:2.1.+'
  ```
