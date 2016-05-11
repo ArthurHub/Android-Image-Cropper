@@ -8,8 +8,6 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-    {% include head.html %}
-    {% seo %}
   </head>
   <body>
     <section class="page-header">
@@ -38,13 +36,17 @@
 
 <p><em>For a working implementation, please have a look at the Sample Project</em></p>
 
-<ol>
-<li>
+<p><a href="https://github.com/ArthurHub/Android-Image-Cropper/wiki">See GitHub Wiki for more info.</a></p>
+
 <p>Include the library</p>
 
-<pre><code>compile 'com.theartofdev.edmodo:android-image-cropper:2.1.+'
+<pre><code> compile 'com.theartofdev.edmodo:android-image-cropper:2.1.+'
 </code></pre>
-</li>
+
+<h3>
+<a id="using-activity" class="anchor" href="#using-activity" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using Activity</h3>
+
+<ol>
 <li>
 <p>Add <code>CropImageActivity</code> into your AndroidManifest.xml</p>
 
@@ -71,6 +73,37 @@
        }
    }
 }</pre></div>
+</li>
+</ol>
+
+<h3>
+<a id="using-view" class="anchor" href="#using-view" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using View</h3>
+
+<ol>
+<li>
+<p>Add <code>CropImageView</code> into your activity</p>
+
+<div class="highlight highlight-text-xml"><pre><span class="pl-c">&lt;!-- Image Cropper fill the remaining available height --&gt;</span>
+&lt;<span class="pl-ent">com</span>.theartofdev.edmodo.cropper.CropImageView
+  <span class="pl-e">xmlns</span><span class="pl-e">:</span><span class="pl-e">custom</span>=<span class="pl-s"><span class="pl-pds">"</span>http://schemas.android.com/apk/res-auto<span class="pl-pds">"</span></span>
+  <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>@+id/cropImageView<span class="pl-pds">"</span></span>
+  <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_width</span>=<span class="pl-s"><span class="pl-pds">"</span>match_parent<span class="pl-pds">"</span></span>
+  <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_height</span>=<span class="pl-s"><span class="pl-pds">"</span>0dp<span class="pl-pds">"</span></span>
+  <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_weight</span>=<span class="pl-s"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span>/&gt;</pre></div>
+</li>
+<li>
+<p>Set image to crop</p>
+
+<div class="highlight highlight-source-java"><pre>cropImageView<span class="pl-k">.</span>setImageBitmap(bitmap);
+<span class="pl-c">// or</span>
+cropImageView<span class="pl-k">.</span>setImageUriAsync(uri);</pre></div>
+</li>
+<li>
+<p>Get cropped image</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">Bitmap</span> cropped <span class="pl-k">=</span> cropImageView<span class="pl-k">.</span>getCroppedImage();
+<span class="pl-c">// or (must subscribe to async event using cropImageView.setOnGetCroppedImageCompleteListener(listener))</span>
+cropImageView<span class="pl-k">.</span>getCroppedImageAsync();</pre></div>
 </li>
 </ol>
 
@@ -101,7 +134,7 @@
 <li>Cropping background color.</li>
 </ul>
 
-<p>For more information, see the <a href="https://github.com/ArthurHub/Android-Image-Cropper/wiki">linked Github Wiki page</a>. </p>
+<p>For more information, see the <a href="https://github.com/ArthurHub/Android-Image-Cropper/wiki">GitHub Wiki</a>. </p>
 
 <h2>
 <a id="posts" class="anchor" href="#posts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Posts</h2>
