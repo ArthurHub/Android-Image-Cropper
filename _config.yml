@@ -1,0 +1,2 @@
+gems:
+  - jekyll-seo-tag
