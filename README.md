@@ -8,7 +8,7 @@ Android Image Cropper
 
 **Powerful** (Zoom, Rotation, Multi-Source), **customizable** (Shape, Limits, Style), **optimized** (Async, Sampling, Matrix) and **simple** image cropping library for Android.
 
-![Crop](https://github.com/ArthurHub/Android-Image-Cropper/blob/master/art/zoom%20sample.gif?raw=true)
+![Crop](https://github.com/ArthurHub/Android-Image-Cropper/blob/master/art/demo.gif?raw=true)
 
 ## Usage
 *For a working implementation, please have a look at the Sample Project*
