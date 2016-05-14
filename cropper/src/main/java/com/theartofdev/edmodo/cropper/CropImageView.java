@@ -911,28 +911,29 @@ public class CropImageView extends FrameLayout {
      * @param saveCompressQuality if saveUri is given, the given quiality will be used for the compression.
      */
     public void startCropWorkerTask(int reqWidth, int reqHeight, Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
-
-        mImageView.clearAnimation();
-
-        BitmapCroppingWorkerTask currentTask = mBitmapCroppingWorkerTask != null ? mBitmapCroppingWorkerTask.get() : null;
-        if (currentTask != null) {
-            // cancel previous cropping
-            currentTask.cancel(true);
+        if (mBitmap != null) {
+            mImageView.clearAnimation();
+    
+            BitmapCroppingWorkerTask currentTask = mBitmapCroppingWorkerTask != null ? mBitmapCroppingWorkerTask.get() : null;
+            if (currentTask != null) {
+                // cancel previous cropping
+                currentTask.cancel(true);
+            }
+    
+            int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
+            int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
+            if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
+                mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
+                        mDegreesRotated, orgWidth, orgHeight,
+                        mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
+                        reqWidth, reqHeight, saveUri, saveCompressFormat, saveCompressQuality));
+            } else {
+                mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), mDegreesRotated,
+                        mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(), saveUri, saveCompressFormat, saveCompressQuality));
+            }
+            mBitmapCroppingWorkerTask.get().execute();
+            setProgressBarVisibility();
         }
-
-        int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
-        int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
-        if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
-            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
-                    mDegreesRotated, orgWidth, orgHeight,
-                    mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                    reqWidth, reqHeight, saveUri, saveCompressFormat, saveCompressQuality));
-        } else {
-            mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), mDegreesRotated,
-                    mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(), saveUri, saveCompressFormat, saveCompressQuality));
-        }
-        mBitmapCroppingWorkerTask.get().execute();
-        setProgressBarVisibility();
     }
 
     @Override
