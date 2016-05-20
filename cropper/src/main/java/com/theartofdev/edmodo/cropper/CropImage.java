@@ -137,7 +137,7 @@ public final class CropImage {
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      */
     public static Intent getPickImageChooserIntent(Context context) {
-        return getPickImageChooserIntent(context, "Select source", false);
+        return getPickImageChooserIntent(context, context.getString(R.string.pick_image_intent_chooser_title), false);
     }
 
     /**
