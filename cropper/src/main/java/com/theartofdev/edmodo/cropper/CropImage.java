@@ -121,7 +121,8 @@ public final class CropImage {
 
     /**
      * Start an activity to get image for cropping using chooser intent that will have all the available
-     * applications for the device like camera (MyCamera), galery (Photos), store apps (Dropbox), etc.
+     * applications for the device like camera (MyCamera), galery (Photos), store apps (Dropbox), etc.<br>
+     * Use "pick_image_intent_chooser_title" string resource to override pick chooser title.
      *
      * @param activity the activity to be used to start activity from
      */
@@ -132,7 +133,8 @@ public final class CropImage {
     /**
      * Create a chooser intent to select the  source to get image from.<br>
      * The source can be camera's  (ACTION_IMAGE_CAPTURE) or gallery's (ACTION_GET_CONTENT).<br>
-     * All possible sources are added to the intent chooser.
+     * All possible sources are added to the intent chooser.<br>
+     * Use "pick_image_intent_chooser_title" string resource to override chooser title.
      *
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      */
