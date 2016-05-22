@@ -807,7 +807,9 @@ public class CropOverlayView extends View {
      */
     private void onActionMove(float x, float y) {
         if (mMoveHandler != null) {
-            mMoveHandler.move(x, y, mBitmapRect, mDegreesRotated, mViewWidth, mViewHeight, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
+            RectF rect = mCropWindowHandler.getRect();
+            mMoveHandler.move(rect, x, y, mBitmapRect, mDegreesRotated, mViewWidth, mViewHeight, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
+            mCropWindowHandler.setRect(rect);
             callOnCropWindowChanged(true);
             invalidate();
         }
