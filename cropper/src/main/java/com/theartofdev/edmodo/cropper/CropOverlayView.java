@@ -83,6 +83,11 @@ public class CropOverlayView extends View {
     private int mViewHeight;
 
     /**
+     * the degress clockwise the image is rotated.
+     */
+    private int mDegreesRotated;
+
+    /**
      * The offset to draw the border corener from the border
      */
     private float mBorderCornerOffset;
@@ -196,12 +201,14 @@ public class CropOverlayView extends View {
      * @param bitmapRect the image's bounding box
      * @param viewWidth The bounding image view width.
      * @param viewHeight The bounding image view height.
+     * @param degreesRotated the degress clockwise the image is rotated.
      */
-    public void setBitmapRect(RectF bitmapRect, int viewWidth, int viewHeight) {
+    public void setBitmapRect(RectF bitmapRect, int viewWidth, int viewHeight, int degreesRotated) {
         if (mBitmapRect == null || !bitmapRect.equals(mBitmapRect)) {
             mBitmapRect.set(bitmapRect);
             mViewWidth = viewWidth;
             mViewHeight = viewHeight;
+            mDegreesRotated = degreesRotated;
             RectF cropRect = mCropWindowHandler.getRect();
             if (cropRect.width() == 0 || cropRect.height() == 0) {
                 initCropWindow();
@@ -214,7 +221,7 @@ public class CropOverlayView extends View {
      */
     public void resetCropOverlayView() {
         if (initializedCropWindow) {
-            setBitmapRect(BitmapUtils.EMPTY_RECT_F, 0, 0);
+            setBitmapRect(BitmapUtils.EMPTY_RECT_F, 0, 0, mDegreesRotated);
             setCropWindowRect(BitmapUtils.EMPTY_RECT_F);
             initCropWindow();
             invalidate();
@@ -800,7 +807,7 @@ public class CropOverlayView extends View {
      */
     private void onActionMove(float x, float y) {
         if (mMoveHandler != null) {
-            mMoveHandler.move(x, y, mBitmapRect, mViewWidth, mViewHeight, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
+            mMoveHandler.move(x, y, mBitmapRect, mDegreesRotated, mViewWidth, mViewHeight, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
             callOnCropWindowChanged(true);
             invalidate();
         }

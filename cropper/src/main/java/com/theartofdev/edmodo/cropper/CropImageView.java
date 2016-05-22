@@ -913,13 +913,13 @@ public class CropImageView extends FrameLayout {
     public void startCropWorkerTask(int reqWidth, int reqHeight, Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
         if (mBitmap != null) {
             mImageView.clearAnimation();
-    
+
             BitmapCroppingWorkerTask currentTask = mBitmapCroppingWorkerTask != null ? mBitmapCroppingWorkerTask.get() : null;
             if (currentTask != null) {
                 // cancel previous cropping
                 currentTask.cancel(true);
             }
-    
+
             int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
             int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
@@ -1319,7 +1319,7 @@ public class CropImageView extends FrameLayout {
         }
 
         // set the bitmap rectangle and update the crop window after scale factor is set
-        mCropOverlayView.setBitmapRect(bitmapRect, getWidth(), getHeight());
+        mCropOverlayView.setBitmapRect(bitmapRect, getWidth(), getHeight(), mDegreesRotated);
     }
     //endregion
 
