@@ -418,7 +418,8 @@ public final class CropImage {
         }
 
         /**
-         * The shape of the cropping window.
+         * The shape of the cropping window.<br>
+         * <i>Default: RECTANGLE</i>
          */
         public ActivityBuilder setCropShape(CropImageView.CropShape cropShape) {
             mOptions.cropShape = cropShape;
@@ -428,7 +429,8 @@ public final class CropImage {
         /**
          * An edge of the crop window will snap to the corresponding edge of a specified bounding box
          * when the crop window edge is less than or equal to this distance (in pixels) away from the bounding box
-         * edge. (in pixels)
+         * edge (in pixels).<br>
+         * <i>Default: 3dp</i>
          */
         public ActivityBuilder setSnapRadius(float snapRadius) {
             mOptions.snapRadius = snapRadius;
@@ -436,9 +438,10 @@ public final class CropImage {
         }
 
         /**
-         * The radius of the touchable area around the handle. (in pixels)<br>
+         * The radius of the touchable area around the handle (in pixels).<br>
          * We are basing this value off of the recommended 48dp Rhythm.<br>
-         * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
+         * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm<br>
+         * <i>Default: 48dp</i>
          */
         public ActivityBuilder setTouchRadius(float touchRadius) {
             mOptions.touchRadius = touchRadius;
@@ -446,7 +449,8 @@ public final class CropImage {
         }
 
         /**
-         * whether the guidelines should be on, off, or only showing when resizing.
+         * whether the guidelines should be on, off, or only showing when resizing.<br>
+         * <i>Default: ON_TOUCH</i>
          */
         public ActivityBuilder setGuidelines(CropImageView.Guidelines guidelines) {
             mOptions.guidelines = guidelines;
@@ -454,7 +458,8 @@ public final class CropImage {
         }
 
         /**
-         * The initial scale type of the image in the crop image view
+         * The initial scale type of the image in the crop image view<br>
+         * <i>Default: FIT_CENTER</i>
          */
         public ActivityBuilder setScaleType(CropImageView.ScaleType scaleType) {
             mOptions.scaleType = scaleType;
@@ -464,7 +469,7 @@ public final class CropImage {
         /**
          * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
          * image.<br>
-         * default: true, may disable for animation or frame transition.
+         * <i>default: true, may disable for animation or frame transition.</i>
          */
         public ActivityBuilder setShowCropOverlay(boolean showCropOverlay) {
             mOptions.showCropOverlay = showCropOverlay;
@@ -481,7 +486,8 @@ public final class CropImage {
         }
 
         /**
-         * The max zoom allowed during cropping.
+         * The max zoom allowed during cropping.<br>
+         * <i>Default: 4</i>
          */
         public ActivityBuilder setMaxZoom(int maxZoom) {
             mOptions.maxZoom = maxZoom;
@@ -489,7 +495,8 @@ public final class CropImage {
         }
 
         /**
-         * The initial crop window padding from image borders in percentage of the cropping image dimensions.
+         * The initial crop window padding from image borders in percentage of the cropping image dimensions.<br>
+         * <i>Default: 0.1</i>
          */
         public ActivityBuilder setInitialCropWindowPaddingRatio(float initialCropWindowPaddingRatio) {
             mOptions.initialCropWindowPaddingRatio = initialCropWindowPaddingRatio;
@@ -497,7 +504,8 @@ public final class CropImage {
         }
 
         /**
-         * whether the width to height aspect ratio should be maintained or free to change.
+         * whether the width to height aspect ratio should be maintained or free to change.<br>
+         * <i>Default: false</i>
          */
         public ActivityBuilder setFixAspectRatio(boolean fixAspectRatio) {
             mOptions.fixAspectRatio = fixAspectRatio;
@@ -505,7 +513,8 @@ public final class CropImage {
         }
 
         /**
-         * the X,Y value of the aspect ratio
+         * the X,Y value of the aspect ratio.<br>
+         * <i>Default: 1/1</i>
          */
         public ActivityBuilder setAspectRatio(int aspectRatioX, int aspectRatioY) {
             mOptions.aspectRatioX = aspectRatioX;
@@ -514,7 +523,8 @@ public final class CropImage {
         }
 
         /**
-         * the thickness of the guidelines lines. (in pixels)
+         * the thickness of the guidelines lines (in pixels).<br>
+         * <i>Default: 3dp</i>
          */
         public ActivityBuilder setBorderLineThickness(float borderLineThickness) {
             mOptions.borderLineThickness = borderLineThickness;
@@ -522,7 +532,8 @@ public final class CropImage {
         }
 
         /**
-         * the color of the guidelines lines.
+         * the color of the guidelines lines.<br>
+         * <i>Default: Color.argb(170, 255, 255, 255)</i>
          */
         public ActivityBuilder setBorderLineColor(int borderLineColor) {
             mOptions.borderLineColor = borderLineColor;
@@ -530,7 +541,8 @@ public final class CropImage {
         }
 
         /**
-         * thickness of the corner line. (in pixels)
+         * thickness of the corner line (in pixels).<br>
+         * <i>Default: 2dp</i>
          */
         public ActivityBuilder setBorderCornerThickness(float borderCornerThickness) {
             mOptions.borderCornerThickness = borderCornerThickness;
@@ -538,7 +550,8 @@ public final class CropImage {
         }
 
         /**
-         * the offset of corner line from crop window border. (in pixels)
+         * the offset of corner line from crop window border (in pixels).<br>
+         * <i>Default: 5dp</i>
          */
         public ActivityBuilder setBorderCornerOffset(float borderCornerOffset) {
             mOptions.borderCornerOffset = borderCornerOffset;
@@ -546,7 +559,8 @@ public final class CropImage {
         }
 
         /**
-         * the length of the corner line away from the corner. (in pixels)
+         * the length of the corner line away from the corner (in pixels).<br>
+         * <i>Default: 14dp</i>
          */
         public ActivityBuilder setBorderCornerLength(float borderCornerLength) {
             mOptions.borderCornerLength = borderCornerLength;
@@ -554,7 +568,8 @@ public final class CropImage {
         }
 
         /**
-         * the color of the corner line.
+         * the color of the corner line.<br>
+         * <i>Default: WHITE</i>
          */
         public ActivityBuilder setBorderCornerColor(int borderCornerColor) {
             mOptions.borderCornerColor = borderCornerColor;
@@ -562,7 +577,8 @@ public final class CropImage {
         }
 
         /**
-         * the thickness of the guidelines lines. (in pixels)
+         * the thickness of the guidelines lines (in pixels).<br>
+         * <i>Default: 1dp</i>
          */
         public ActivityBuilder setGuidelinesThickness(float guidelinesThickness) {
             mOptions.guidelinesThickness = guidelinesThickness;
@@ -570,7 +586,8 @@ public final class CropImage {
         }
 
         /**
-         * the color of the guidelines lines.
+         * the color of the guidelines lines.<br>
+         * <i>Default: Color.argb(170, 255, 255, 255)</i>
          */
         public ActivityBuilder setGuidelinesColor(int guidelinesColor) {
             mOptions.guidelinesColor = guidelinesColor;
@@ -578,7 +595,8 @@ public final class CropImage {
         }
 
         /**
-         * the color of the overlay background around the crop window cover the image parts not in the crop window.
+         * the color of the overlay background around the crop window cover the image parts not in the crop window.<br>
+         * <i>Default: Color.argb(119, 0, 0, 0)</i>
          */
         public ActivityBuilder setBackgroundColor(int backgroundColor) {
             mOptions.backgroundColor = backgroundColor;
@@ -586,7 +604,8 @@ public final class CropImage {
         }
 
         /**
-         * the min size the crop window is allowed to be. (in pixels)
+         * the min size the crop window is allowed to be (in pixels).<br>
+         * <i>Default: 42dp, 42dp</i>
          */
         public ActivityBuilder setMinCropWindowSize(int minCropWindowWidth, int minCropWindowHeight) {
             mOptions.minCropWindowWidth = minCropWindowWidth;
@@ -595,7 +614,9 @@ public final class CropImage {
         }
 
         /**
-         * the min size the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
+         * the min size the resulting cropping image is allowed to be, affects the cropping window limits
+         * (in pixels).<br>
+         * <i>Default: 40px, 40px</i>
          */
         public ActivityBuilder setMinCropResultSize(int minCropResultWidth, int minCropResultHeight) {
             mOptions.minCropResultWidth = minCropResultWidth;
@@ -604,7 +625,9 @@ public final class CropImage {
         }
 
         /**
-         * the max size the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
+         * the max size the resulting cropping image is allowed to be, affects the cropping window limits
+         * (in pixels).<br>
+         * <i>Default: 99999, 99999</i>
          */
         public ActivityBuilder setMaxCropResultSize(int maxCropResultWidth, int maxCropResultHeight) {
             mOptions.maxCropResultWidth = maxCropResultWidth;
@@ -613,7 +636,8 @@ public final class CropImage {
         }
 
         /**
-         * the title of the {@link CropImageActivity}
+         * the title of the {@link CropImageActivity}.<br>
+         * <i>Default: ""</i>
          */
         public ActivityBuilder setActivityTitle(String activityTitle) {
             mOptions.activityTitle = activityTitle;
@@ -621,7 +645,8 @@ public final class CropImage {
         }
 
         /**
-         * the color to use for action bar items icons
+         * the color to use for action bar items icons.<br>
+         * <i>Default: NONE</i>
          */
         public ActivityBuilder setActivityMenuIconColor(int activityMenuIconColor) {
             mOptions.activityMenuIconColor = activityMenuIconColor;
@@ -629,7 +654,8 @@ public final class CropImage {
         }
 
         /**
-         * the Android Uri to save the cropped image to
+         * the Android Uri to save the cropped image to.<br>
+         * <i>Default: NONE, will create a temp file</i>
          */
         public ActivityBuilder setOutputUri(Uri outputUri) {
             mOptions.outputUri = outputUri;
@@ -637,7 +663,8 @@ public final class CropImage {
         }
 
         /**
-         * the compression format to use when writting the image
+         * the compression format to use when writting the image.<br>
+         * <i>Default: JPEG</i>
          */
         public ActivityBuilder setOutputCompressFormat(Bitmap.CompressFormat outputCompressFormat) {
             mOptions.outputCompressFormat = outputCompressFormat;
@@ -645,7 +672,8 @@ public final class CropImage {
         }
 
         /**
-         * the quility (if applicable) to use when writting the image (0 - 100)
+         * the quility (if applicable) to use when writting the image (0 - 100).<br>
+         * <i>Default: 90</i>
          */
         public ActivityBuilder setOutputCompressQuality(int outputCompressQuality) {
             mOptions.outputCompressQuality = outputCompressQuality;
@@ -657,6 +685,7 @@ public final class CropImage {
          * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
          * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
          * Bitmaps Efficiently</a><br>
+         * <i>Default: 0, 0 - not set, will not downsample</i>
          */
         public ActivityBuilder setRequestedSize(int reqWidth, int reqHeight) {
             mOptions.outputRequestWidth = reqWidth;
@@ -666,7 +695,8 @@ public final class CropImage {
 
         /**
          * if the result of crop image activity should not save the cropped image bitmap.<br>
-         * Used if you want to crop the image manually and need only the crop rectangle and rotation data.
+         * Used if you want to crop the image manually and need only the crop rectangle and rotation data.<br>
+         * <i>Default: false</i>
          */
         public ActivityBuilder setNoOutputImage(boolean noOutputImage) {
             mOptions.noOutputImage = noOutputImage;
@@ -674,7 +704,8 @@ public final class CropImage {
         }
 
         /**
-         * the initial rectangle to set on the cropping image after loading
+         * the initial rectangle to set on the cropping image after loading.<br>
+         * <i>Default: NONE - will initialize using initial crop window padding ratio</i>
          */
         public ActivityBuilder setInitialCropWindowRectangle(Rect initialCropWindowRectangle) {
             mOptions.initialCropWindowRectangle = initialCropWindowRectangle;
@@ -682,7 +713,8 @@ public final class CropImage {
         }
 
         /**
-         * the initial rotation to set on the cropping image after loading (0-360 degrees clockwise)
+         * the initial rotation to set on the cropping image after loading (0-360 degrees clockwise).<br>
+         * <i>Default: NONE - will read image exif data</i>
          */
         public ActivityBuilder setInitialRotation(int initialRotation) {
             mOptions.initialRotation = initialRotation;
@@ -690,7 +722,8 @@ public final class CropImage {
         }
 
         /**
-         * if to allow rotation during cropping
+         * if to allow rotation during cropping.<br>
+         * <i>Default: true</i>
          */
         public ActivityBuilder setAllowRotation(boolean allowRotation) {
             mOptions.allowRotation = allowRotation;
