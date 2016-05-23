@@ -13,12 +13,12 @@
 package com.theartofdev.edmodo.cropper.sample;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -59,6 +59,8 @@ public final class MainFragment extends Fragment
      */
     public void setImageUri(Uri imageUri) {
         mCropImageView.setImageUriAsync(imageUri);
+        //        CropImage.activity(imageUri)
+        //                .start(getContext(), this);
     }
 
     /**
@@ -191,11 +193,28 @@ public final class MainFragment extends Fragment
 
     @Override
     public void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error) {
+        handleCropResult(null, bitmap, error);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            handleCropResult(result.getUri(), null, result.getError());
+        }
+    }
+
+    private void handleCropResult(Uri uri, Bitmap bitmap, Exception error) {
         if (error == null) {
-            CropResultActivity.mImage = mCropImageView.getCropShape() == CropImageView.CropShape.OVAL
-                    ? CropImage.toOvalBitmap(bitmap)
-                    : bitmap;
             Intent intent = new Intent(getActivity(), CropResultActivity.class);
+            if (uri != null) {
+                intent.putExtra("URI", uri);
+            } else {
+                CropResultActivity.mImage = mCropImageView.getCropShape() == CropImageView.CropShape.OVAL
+                        ? CropImage.toOvalBitmap(bitmap)
+                        : bitmap;
+            }
             startActivity(intent);
         } else {
             Log.e("AIC", "Failed to crop image", error);

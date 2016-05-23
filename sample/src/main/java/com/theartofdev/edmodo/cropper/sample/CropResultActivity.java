@@ -13,7 +13,9 @@
 package com.theartofdev.edmodo.cropper.sample;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -38,9 +40,10 @@ public final class CropResultActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_crop_result);
 
+        imageView = ((ImageView) findViewById(R.id.resultImageView));
+        imageView.setBackgroundResource(R.drawable.backdrop);
+
         if (mImage != null) {
-            imageView = ((ImageView) findViewById(R.id.resultImageView));
-            imageView.setBackgroundResource(R.drawable.backdrop);
             imageView.setImageBitmap(mImage);
             double ratio = ((int) (10 * mImage.getWidth() / (double) mImage.getHeight())) / 10d;
             int byteCount = 0;
@@ -50,7 +53,13 @@ public final class CropResultActivity extends Activity {
             String desc = "(" + mImage.getWidth() + ", " + mImage.getHeight() + "), Ratio: " + ratio + ", Bytes: " + byteCount + "K";
             ((TextView) findViewById(R.id.resultImageText)).setText(desc);
         } else {
-            Toast.makeText(this, "No image is set to show", Toast.LENGTH_LONG).show();
+            Intent intent = getIntent();
+            Uri imageUri = intent.getParcelableExtra("URI");
+            if (imageUri != null) {
+                imageView.setImageURI(imageUri);
+            } else {
+                Toast.makeText(this, "No image is set to show", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
