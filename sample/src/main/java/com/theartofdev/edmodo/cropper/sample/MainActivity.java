@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 // request permissions and handle the result in onRequestPermissionsResult()
                 requirePermissions = true;
                 mCropImageUri = imageUri;
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
             } else {
 
                 mCurrentFragment.setImageUri(imageUri);
@@ -128,17 +128,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (mCropImageUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            mCurrentFragment.setImageUri(mCropImageUri);
-        } else {
-            Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG).show();
+        if (requestCode == CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                CropImage.startPickImageActivity(this);
+            } else {
+                Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG).show();
+            }
+        }
+        if (requestCode == CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
+            if (mCropImageUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mCurrentFragment.setImageUri(mCropImageUri);
+            } else {
+                Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
+    @SuppressLint("NewApi")
     public void onDrawerOptionClicked(View view) {
         switch (view.getId()) {
             case R.id.drawer_option_load:
-                CropImage.startPickImageActivity(this);
+                if (CropImage.isExplicitCameraPermissionRequired(this)) {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE);
+                } else {
+                    CropImage.startPickImageActivity(this);
+                }
                 mDrawerLayout.closeDrawers();
                 break;
             case R.id.drawer_option_oval:

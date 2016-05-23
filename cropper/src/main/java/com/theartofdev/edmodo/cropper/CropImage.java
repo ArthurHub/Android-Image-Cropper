@@ -18,6 +18,7 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -72,10 +73,14 @@ public final class CropImage {
     public static final int PICK_IMAGE_CHOOSER_REQUEST_CODE = 200;
 
     /**
-     * The request code used to start pick image activity to be used on result to identify the this specific request.
+     * The request code used to request permission to pick image from external storage.
      */
     public static final int PICK_IMAGE_PERMISSIONS_REQUEST_CODE = 201;
-    //endregion
+
+    /**
+     * The request code used to request permission to capture image from camera.
+     */
+    public static final int CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE = 2011;
 
     /**
      * The request code used to start {@link CropImageActivity} to be used on result to identify the this specific
@@ -87,6 +92,7 @@ public final class CropImage {
      * The result code used to return error from {@link CropImageActivity}.
      */
     public static final int CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE = 204;
+    //endregion
 
     private CropImage() {
     }
@@ -153,45 +159,14 @@ public final class CropImage {
      */
     public static Intent getPickImageChooserIntent(Context context, CharSequence title, boolean includeDocuments) {
 
-        // Determine Uri of camera image to  save.
-        Uri outputFileUri = getCaptureImageOutputUri(context);
-
         List<Intent> allIntents = new ArrayList<>();
         PackageManager packageManager = context.getPackageManager();
 
         // collect all camera intents
-        Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
-        for (ResolveInfo res : listCam) {
-            Intent intent = new Intent(captureIntent);
-            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
-            intent.setPackage(res.activityInfo.packageName);
-            if (outputFileUri != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-            }
-            allIntents.add(intent);
-        }
+        allIntents.addAll(getCameraIntents(context, packageManager));
 
         // collect all gallery intents
-        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
-        List<ResolveInfo> listGallery = packageManager.queryIntentActivities(galleryIntent, 0);
-        for (ResolveInfo res : listGallery) {
-            Intent intent = new Intent(galleryIntent);
-            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
-            intent.setPackage(res.activityInfo.packageName);
-            allIntents.add(intent);
-        }
-
-        // remove documents intent
-        if (!includeDocuments) {
-            for (Intent intent : allIntents) {
-                if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
-                    allIntents.remove(intent);
-                    break;
-                }
-            }
-        }
+        allIntents.addAll(getGalleryIntents(packageManager, includeDocuments));
 
         Intent target;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -208,6 +183,95 @@ public final class CropImage {
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, allIntents.toArray(new Parcelable[allIntents.size()]));
 
         return chooserIntent;
+    }
+
+    /**
+     * Get all Camera intents for capturing image using device camera apps.
+     */
+    public static List<Intent> getCameraIntents(Context context, PackageManager packageManager) {
+
+        List<Intent> allIntents = new ArrayList<>();
+
+        // Determine Uri of camera image to  save.
+        Uri outputFileUri = getCaptureImageOutputUri(context);
+
+        Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
+        for (ResolveInfo res : listCam) {
+            Intent intent = new Intent(captureIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            if (outputFileUri != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+            }
+            allIntents.add(intent);
+        }
+
+        return allIntents;
+    }
+
+    /**
+     * Get all Gallery intents for getting image from one of the apps of the device that handle images.
+     */
+    public static List<Intent> getGalleryIntents(PackageManager packageManager, boolean includeDocuments) {
+        List<Intent> intents = new ArrayList<>();
+        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        galleryIntent.setType("image/*");
+        List<ResolveInfo> listGallery = packageManager.queryIntentActivities(galleryIntent, 0);
+        for (ResolveInfo res : listGallery) {
+            Intent intent = new Intent(galleryIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            intents.add(intent);
+        }
+
+        // remove documents intent
+        if (!includeDocuments) {
+            for (Intent intent : intents) {
+                if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
+                    intents.remove(intent);
+                    break;
+                }
+            }
+        }
+        return intents;
+    }
+
+    /**
+     * Check if explicetly requesting camera permission is required.<br>
+     * It is required in Android Marshmellow and above if "CAMERA" permission is requested in the manifest.<br>
+     * See <a href="http://stackoverflow.com/questions/32789027/android-m-camera-intent-permission-bug">StackOverflow
+     * question</a>.
+     */
+    public static boolean isExplicitCameraPermissionRequired(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return hasPermissionInManifest(context, "android.permission.CAMERA") &&
+                    context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    /**
+     * Check if the app requests a specific permission in the manifest.
+     *
+     * @param permissionName the permission to check
+     * @return true - the permission in requested in manifest, false - not.
+     */
+    public static boolean hasPermissionInManifest(Context context, String permissionName) {
+        String packageName = context.getPackageName();
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+            final String[] declaredPermisisons = packageInfo.requestedPermissions;
+            if (declaredPermisisons != null && declaredPermisisons.length > 0) {
+                for (String p : declaredPermisisons) {
+                    if (p.equalsIgnoreCase(permissionName)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        return false;
     }
 
     /**
