@@ -103,7 +103,14 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.1.4*
+
+- Support for requesting CAMERA permission for android M when CAMERA is requested in the manifest.
+- Add `pick_image_intent_chooser_title` for changing and localizing pick image chooser title (thx maksymkhar).
+- NPE when clicking crop twice fast (thx Jesse).
+
 *2.1.1*
+
 - Built-in `CropImageActivity` for quick start and common scenarios.
 - Save cropped image to Uri API `saveCroppedImageAsync(Uri)`.
 - Handle possible out-of-memory in image load by down-sampling until succeed.

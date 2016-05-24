@@ -18,6 +18,7 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -32,6 +33,8 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import java.io.File;
@@ -54,17 +57,17 @@ public final class CropImage {
     /**
      * The key used to pass crop image source URI to {@link CropImageActivity}.
      */
-    static final String CROP_IMAGE_EXTRA_SOURCE = "CROP_IMAGE_EXTRA_SOURCE";
+    public static final String CROP_IMAGE_EXTRA_SOURCE = "CROP_IMAGE_EXTRA_SOURCE";
 
     /**
      * The key used to pass crop image options to {@link CropImageActivity}.
      */
-    static final String CROP_IMAGE_EXTRA_OPTIONS = "CROP_IMAGE_EXTRA_OPTIONS";
+    public static final String CROP_IMAGE_EXTRA_OPTIONS = "CROP_IMAGE_EXTRA_OPTIONS";
 
     /**
      * The key used to pass crop image result data back from {@link CropImageActivity}.
      */
-    static final String CROP_IMAGE_EXTRA_RESULT = "CROP_IMAGE_EXTRA_RESULT";
+    public static final String CROP_IMAGE_EXTRA_RESULT = "CROP_IMAGE_EXTRA_RESULT";
 
     /**
      * The request code used to start pick image activity to be used on result to identify the this specific request.
@@ -72,10 +75,14 @@ public final class CropImage {
     public static final int PICK_IMAGE_CHOOSER_REQUEST_CODE = 200;
 
     /**
-     * The request code used to start pick image activity to be used on result to identify the this specific request.
+     * The request code used to request permission to pick image from external storage.
      */
     public static final int PICK_IMAGE_PERMISSIONS_REQUEST_CODE = 201;
-    //endregion
+
+    /**
+     * The request code used to request permission to capture image from camera.
+     */
+    public static final int CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE = 2011;
 
     /**
      * The request code used to start {@link CropImageActivity} to be used on result to identify the this specific
@@ -87,6 +94,7 @@ public final class CropImage {
      * The result code used to return error from {@link CropImageActivity}.
      */
     public static final int CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE = 204;
+    //endregion
 
     private CropImage() {
     }
@@ -95,7 +103,7 @@ public final class CropImage {
      * Create a new bitmap that has all pixels beyond the oval shape transparent.
      * Old bitmap is recycled.
      */
-    public static Bitmap toOvalBitmap(Bitmap bitmap) {
+    public static Bitmap toOvalBitmap(@NonNull Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -126,7 +134,7 @@ public final class CropImage {
      *
      * @param activity the activity to be used to start activity from
      */
-    public static void startPickImageActivity(Activity activity) {
+    public static void startPickImageActivity(@NonNull Activity activity) {
         activity.startActivityForResult(getPickImageChooserIntent(activity), PICK_IMAGE_CHOOSER_REQUEST_CODE);
     }
 
@@ -138,7 +146,7 @@ public final class CropImage {
      *
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      */
-    public static Intent getPickImageChooserIntent(Context context) {
+    public static Intent getPickImageChooserIntent(@NonNull Context context) {
         return getPickImageChooserIntent(context, context.getString(R.string.pick_image_intent_chooser_title), false);
     }
 
@@ -151,47 +159,16 @@ public final class CropImage {
      * @param title the title to use for the chooser UI
      * @param includeDocuments if to include KitKat documents activity containing all sources
      */
-    public static Intent getPickImageChooserIntent(Context context, CharSequence title, boolean includeDocuments) {
-
-        // Determine Uri of camera image to  save.
-        Uri outputFileUri = getCaptureImageOutputUri(context);
+    public static Intent getPickImageChooserIntent(@NonNull Context context, CharSequence title, boolean includeDocuments) {
 
         List<Intent> allIntents = new ArrayList<>();
         PackageManager packageManager = context.getPackageManager();
 
         // collect all camera intents
-        Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
-        for (ResolveInfo res : listCam) {
-            Intent intent = new Intent(captureIntent);
-            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
-            intent.setPackage(res.activityInfo.packageName);
-            if (outputFileUri != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-            }
-            allIntents.add(intent);
-        }
+        allIntents.addAll(getCameraIntents(context, packageManager));
 
         // collect all gallery intents
-        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
-        List<ResolveInfo> listGallery = packageManager.queryIntentActivities(galleryIntent, 0);
-        for (ResolveInfo res : listGallery) {
-            Intent intent = new Intent(galleryIntent);
-            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
-            intent.setPackage(res.activityInfo.packageName);
-            allIntents.add(intent);
-        }
-
-        // remove documents intent
-        if (!includeDocuments) {
-            for (Intent intent : allIntents) {
-                if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
-                    allIntents.remove(intent);
-                    break;
-                }
-            }
-        }
+        allIntents.addAll(getGalleryIntents(packageManager, includeDocuments));
 
         Intent target;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -211,11 +188,100 @@ public final class CropImage {
     }
 
     /**
+     * Get all Camera intents for capturing image using device camera apps.
+     */
+    public static List<Intent> getCameraIntents(@NonNull Context context, @NonNull PackageManager packageManager) {
+
+        List<Intent> allIntents = new ArrayList<>();
+
+        // Determine Uri of camera image to  save.
+        Uri outputFileUri = getCaptureImageOutputUri(context);
+
+        Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
+        for (ResolveInfo res : listCam) {
+            Intent intent = new Intent(captureIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            if (outputFileUri != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+            }
+            allIntents.add(intent);
+        }
+
+        return allIntents;
+    }
+
+    /**
+     * Get all Gallery intents for getting image from one of the apps of the device that handle images.
+     */
+    public static List<Intent> getGalleryIntents(@NonNull PackageManager packageManager, boolean includeDocuments) {
+        List<Intent> intents = new ArrayList<>();
+        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        galleryIntent.setType("image/*");
+        List<ResolveInfo> listGallery = packageManager.queryIntentActivities(galleryIntent, 0);
+        for (ResolveInfo res : listGallery) {
+            Intent intent = new Intent(galleryIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            intents.add(intent);
+        }
+
+        // remove documents intent
+        if (!includeDocuments) {
+            for (Intent intent : intents) {
+                if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
+                    intents.remove(intent);
+                    break;
+                }
+            }
+        }
+        return intents;
+    }
+
+    /**
+     * Check if explicetly requesting camera permission is required.<br>
+     * It is required in Android Marshmellow and above if "CAMERA" permission is requested in the manifest.<br>
+     * See <a href="http://stackoverflow.com/questions/32789027/android-m-camera-intent-permission-bug">StackOverflow
+     * question</a>.
+     */
+    public static boolean isExplicitCameraPermissionRequired(@NonNull Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return hasPermissionInManifest(context, "android.permission.CAMERA") &&
+                    context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    /**
+     * Check if the app requests a specific permission in the manifest.
+     *
+     * @param permissionName the permission to check
+     * @return true - the permission in requested in manifest, false - not.
+     */
+    public static boolean hasPermissionInManifest(@NonNull Context context, @NonNull String permissionName) {
+        String packageName = context.getPackageName();
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+            final String[] declaredPermisisons = packageInfo.requestedPermissions;
+            if (declaredPermisisons != null && declaredPermisisons.length > 0) {
+                for (String p : declaredPermisisons) {
+                    if (p.equalsIgnoreCase(permissionName)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        return false;
+    }
+
+    /**
      * Get URI to image received from capture  by camera.
      *
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      */
-    public static Uri getCaptureImageOutputUri(Context context) {
+    public static Uri getCaptureImageOutputUri(@NonNull Context context) {
         Uri outputFileUri = null;
         File getImage = context.getExternalCacheDir();
         if (getImage != null) {
@@ -231,7 +297,7 @@ public final class CropImage {
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      * @param data the returned data of the  activity result
      */
-    public static Uri getPickImageResultUri(Context context, Intent data) {
+    public static Uri getPickImageResultUri(@NonNull Context context, @Nullable Intent data) {
         boolean isCamera = true;
         if (data != null && data.getData() != null) {
             String action = data.getAction();
@@ -250,7 +316,7 @@ public final class CropImage {
      * @param uri the result URI of image pick.
      * @return true - required permission are not granted, false - either no need for permissions or they are granted
      */
-    public static boolean isReadExternalStoragePermissionsRequired(Context context, Uri uri) {
+    public static boolean isReadExternalStoragePermissionsRequired(@NonNull Context context, @NonNull Uri uri) {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                 context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
                 isUriRequiresPermissions(context, uri);
@@ -263,7 +329,7 @@ public final class CropImage {
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      * @param uri the result URI of image pick.
      */
-    public static boolean isUriRequiresPermissions(Context context, Uri uri) {
+    public static boolean isUriRequiresPermissions(@NonNull Context context, @NonNull Uri uri) {
         try {
             ContentResolver resolver = context.getContentResolver();
             InputStream stream = resolver.openInputStream(uri);
@@ -282,7 +348,7 @@ public final class CropImage {
      * @param uri the image Android uri source to crop
      * @return builder for Crop Image Activity
      */
-    public static ActivityBuilder activity(Uri uri) {
+    public static ActivityBuilder activity(@NonNull Uri uri) {
         if (uri == null || uri.equals(Uri.EMPTY)) {
             throw new IllegalArgumentException("Uri must be non null or empty");
         }
@@ -295,7 +361,7 @@ public final class CropImage {
      * @param data result data intent as received in {@link Activity#onActivityResult(int, int, Intent)}.
      * @return Crop Image Activity Result object or null if none exists
      */
-    public static ActivityResult getActivityResult(Intent data) {
+    public static ActivityResult getActivityResult(@Nullable Intent data) {
         return data != null ? (ActivityResult) data.getParcelableExtra(CROP_IMAGE_EXTRA_RESULT) : null;
     }
 
@@ -316,7 +382,7 @@ public final class CropImage {
          */
         private final CropImageOptions mOptions;
 
-        private ActivityBuilder(Uri source) {
+        private ActivityBuilder(@NonNull Uri source) {
             mSource = source;
             mOptions = new CropImageOptions();
         }
@@ -324,11 +390,18 @@ public final class CropImage {
         /**
          * Get {@link CropImageActivity} intent to start the activity.
          */
-        public Intent getIntent(Context context) {
+        public Intent getIntent(@NonNull Context context) {
+            return getIntent(context, CropImageActivity.class);
+        }
+
+        /**
+         * Get {@link CropImageActivity} intent to start the activity.
+         */
+        public Intent getIntent(@NonNull Context context, @Nullable Class<?> cls) {
             mOptions.validate();
 
             Intent intent = new Intent();
-            intent.setClass(context, CropImageActivity.class);
+            intent.setClass(context, cls);
             intent.putExtra(CROP_IMAGE_EXTRA_SOURCE, mSource);
             intent.putExtra(CROP_IMAGE_EXTRA_OPTIONS, mOptions);
             return intent;
@@ -339,7 +412,7 @@ public final class CropImage {
          *
          * @param activity activity to receive result
          */
-        public void start(Activity activity) {
+        public void start(@NonNull Activity activity) {
             mOptions.validate();
             activity.startActivityForResult(getIntent(activity), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
         }
@@ -347,16 +420,36 @@ public final class CropImage {
         /**
          * Start {@link CropImageActivity}.
          *
+         * @param activity activity to receive result
+         */
+        public void start(@NonNull Activity activity, @Nullable Class<?> cls) {
+            mOptions.validate();
+            activity.startActivityForResult(getIntent(activity, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
          * @param fragment fragment to receive result
          */
-        public void start(Context context, Fragment fragment) {
+        public void start(@NonNull Context context, @NonNull Fragment fragment) {
             fragment.startActivityForResult(getIntent(context), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
         }
 
         /**
-         * The shape of the cropping window.
+         * Start {@link CropImageActivity}.
+         *
+         * @param fragment fragment to receive result
          */
-        public ActivityBuilder setCropShape(CropImageView.CropShape cropShape) {
+        public void start(@NonNull Context context, @NonNull Fragment fragment, @Nullable Class<?> cls) {
+            fragment.startActivityForResult(getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+        /**
+         * The shape of the cropping window.<br>
+         * <i>Default: RECTANGLE</i>
+         */
+        public ActivityBuilder setCropShape(@NonNull CropImageView.CropShape cropShape) {
             mOptions.cropShape = cropShape;
             return this;
         }
@@ -364,7 +457,8 @@ public final class CropImage {
         /**
          * An edge of the crop window will snap to the corresponding edge of a specified bounding box
          * when the crop window edge is less than or equal to this distance (in pixels) away from the bounding box
-         * edge. (in pixels)
+         * edge (in pixels).<br>
+         * <i>Default: 3dp</i>
          */
         public ActivityBuilder setSnapRadius(float snapRadius) {
             mOptions.snapRadius = snapRadius;
@@ -372,9 +466,10 @@ public final class CropImage {
         }
 
         /**
-         * The radius of the touchable area around the handle. (in pixels)<br>
+         * The radius of the touchable area around the handle (in pixels).<br>
          * We are basing this value off of the recommended 48dp Rhythm.<br>
-         * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
+         * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm<br>
+         * <i>Default: 48dp</i>
          */
         public ActivityBuilder setTouchRadius(float touchRadius) {
             mOptions.touchRadius = touchRadius;
@@ -382,17 +477,19 @@ public final class CropImage {
         }
 
         /**
-         * whether the guidelines should be on, off, or only showing when resizing.
+         * whether the guidelines should be on, off, or only showing when resizing.<br>
+         * <i>Default: ON_TOUCH</i>
          */
-        public ActivityBuilder setGuidelines(CropImageView.Guidelines guidelines) {
+        public ActivityBuilder setGuidelines(@NonNull CropImageView.Guidelines guidelines) {
             mOptions.guidelines = guidelines;
             return this;
         }
 
         /**
-         * The initial scale type of the image in the crop image view
+         * The initial scale type of the image in the crop image view<br>
+         * <i>Default: FIT_CENTER</i>
          */
-        public ActivityBuilder setScaleType(CropImageView.ScaleType scaleType) {
+        public ActivityBuilder setScaleType(@NonNull CropImageView.ScaleType scaleType) {
             mOptions.scaleType = scaleType;
             return this;
         }
@@ -400,7 +497,7 @@ public final class CropImage {
         /**
          * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
          * image.<br>
-         * default: true, may disable for animation or frame transition.
+         * <i>default: true, may disable for animation or frame transition.</i>
          */
         public ActivityBuilder setShowCropOverlay(boolean showCropOverlay) {
             mOptions.showCropOverlay = showCropOverlay;
@@ -417,7 +514,8 @@ public final class CropImage {
         }
 
         /**
-         * The max zoom allowed during cropping.
+         * The max zoom allowed during cropping.<br>
+         * <i>Default: 4</i>
          */
         public ActivityBuilder setMaxZoom(int maxZoom) {
             mOptions.maxZoom = maxZoom;
@@ -425,7 +523,8 @@ public final class CropImage {
         }
 
         /**
-         * The initial crop window padding from image borders in percentage of the cropping image dimensions.
+         * The initial crop window padding from image borders in percentage of the cropping image dimensions.<br>
+         * <i>Default: 0.1</i>
          */
         public ActivityBuilder setInitialCropWindowPaddingRatio(float initialCropWindowPaddingRatio) {
             mOptions.initialCropWindowPaddingRatio = initialCropWindowPaddingRatio;
@@ -433,7 +532,8 @@ public final class CropImage {
         }
 
         /**
-         * whether the width to height aspect ratio should be maintained or free to change.
+         * whether the width to height aspect ratio should be maintained or free to change.<br>
+         * <i>Default: false</i>
          */
         public ActivityBuilder setFixAspectRatio(boolean fixAspectRatio) {
             mOptions.fixAspectRatio = fixAspectRatio;
@@ -441,7 +541,8 @@ public final class CropImage {
         }
 
         /**
-         * the X,Y value of the aspect ratio
+         * the X,Y value of the aspect ratio.<br>
+         * <i>Default: 1/1</i>
          */
         public ActivityBuilder setAspectRatio(int aspectRatioX, int aspectRatioY) {
             mOptions.aspectRatioX = aspectRatioX;
@@ -450,7 +551,8 @@ public final class CropImage {
         }
 
         /**
-         * the thickness of the guidelines lines. (in pixels)
+         * the thickness of the guidelines lines (in pixels).<br>
+         * <i>Default: 3dp</i>
          */
         public ActivityBuilder setBorderLineThickness(float borderLineThickness) {
             mOptions.borderLineThickness = borderLineThickness;
@@ -458,7 +560,8 @@ public final class CropImage {
         }
 
         /**
-         * the color of the guidelines lines.
+         * the color of the guidelines lines.<br>
+         * <i>Default: Color.argb(170, 255, 255, 255)</i>
          */
         public ActivityBuilder setBorderLineColor(int borderLineColor) {
             mOptions.borderLineColor = borderLineColor;
@@ -466,7 +569,8 @@ public final class CropImage {
         }
 
         /**
-         * thickness of the corner line. (in pixels)
+         * thickness of the corner line (in pixels).<br>
+         * <i>Default: 2dp</i>
          */
         public ActivityBuilder setBorderCornerThickness(float borderCornerThickness) {
             mOptions.borderCornerThickness = borderCornerThickness;
@@ -474,7 +578,8 @@ public final class CropImage {
         }
 
         /**
-         * the offset of corner line from crop window border. (in pixels)
+         * the offset of corner line from crop window border (in pixels).<br>
+         * <i>Default: 5dp</i>
          */
         public ActivityBuilder setBorderCornerOffset(float borderCornerOffset) {
             mOptions.borderCornerOffset = borderCornerOffset;
@@ -482,7 +587,8 @@ public final class CropImage {
         }
 
         /**
-         * the length of the corner line away from the corner. (in pixels)
+         * the length of the corner line away from the corner (in pixels).<br>
+         * <i>Default: 14dp</i>
          */
         public ActivityBuilder setBorderCornerLength(float borderCornerLength) {
             mOptions.borderCornerLength = borderCornerLength;
@@ -490,7 +596,8 @@ public final class CropImage {
         }
 
         /**
-         * the color of the corner line.
+         * the color of the corner line.<br>
+         * <i>Default: WHITE</i>
          */
         public ActivityBuilder setBorderCornerColor(int borderCornerColor) {
             mOptions.borderCornerColor = borderCornerColor;
@@ -498,7 +605,8 @@ public final class CropImage {
         }
 
         /**
-         * the thickness of the guidelines lines. (in pixels)
+         * the thickness of the guidelines lines (in pixels).<br>
+         * <i>Default: 1dp</i>
          */
         public ActivityBuilder setGuidelinesThickness(float guidelinesThickness) {
             mOptions.guidelinesThickness = guidelinesThickness;
@@ -506,7 +614,8 @@ public final class CropImage {
         }
 
         /**
-         * the color of the guidelines lines.
+         * the color of the guidelines lines.<br>
+         * <i>Default: Color.argb(170, 255, 255, 255)</i>
          */
         public ActivityBuilder setGuidelinesColor(int guidelinesColor) {
             mOptions.guidelinesColor = guidelinesColor;
@@ -514,7 +623,8 @@ public final class CropImage {
         }
 
         /**
-         * the color of the overlay background around the crop window cover the image parts not in the crop window.
+         * the color of the overlay background around the crop window cover the image parts not in the crop window.<br>
+         * <i>Default: Color.argb(119, 0, 0, 0)</i>
          */
         public ActivityBuilder setBackgroundColor(int backgroundColor) {
             mOptions.backgroundColor = backgroundColor;
@@ -522,7 +632,8 @@ public final class CropImage {
         }
 
         /**
-         * the min size the crop window is allowed to be. (in pixels)
+         * the min size the crop window is allowed to be (in pixels).<br>
+         * <i>Default: 42dp, 42dp</i>
          */
         public ActivityBuilder setMinCropWindowSize(int minCropWindowWidth, int minCropWindowHeight) {
             mOptions.minCropWindowWidth = minCropWindowWidth;
@@ -531,7 +642,9 @@ public final class CropImage {
         }
 
         /**
-         * the min size the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
+         * the min size the resulting cropping image is allowed to be, affects the cropping window limits
+         * (in pixels).<br>
+         * <i>Default: 40px, 40px</i>
          */
         public ActivityBuilder setMinCropResultSize(int minCropResultWidth, int minCropResultHeight) {
             mOptions.minCropResultWidth = minCropResultWidth;
@@ -540,7 +653,9 @@ public final class CropImage {
         }
 
         /**
-         * the max size the resulting cropping image is allowed to be, affects the cropping window limits. (in pixels)
+         * the max size the resulting cropping image is allowed to be, affects the cropping window limits
+         * (in pixels).<br>
+         * <i>Default: 99999, 99999</i>
          */
         public ActivityBuilder setMaxCropResultSize(int maxCropResultWidth, int maxCropResultHeight) {
             mOptions.maxCropResultWidth = maxCropResultWidth;
@@ -549,7 +664,8 @@ public final class CropImage {
         }
 
         /**
-         * the title of the {@link CropImageActivity}
+         * the title of the {@link CropImageActivity}.<br>
+         * <i>Default: ""</i>
          */
         public ActivityBuilder setActivityTitle(String activityTitle) {
             mOptions.activityTitle = activityTitle;
@@ -557,7 +673,8 @@ public final class CropImage {
         }
 
         /**
-         * the color to use for action bar items icons
+         * the color to use for action bar items icons.<br>
+         * <i>Default: NONE</i>
          */
         public ActivityBuilder setActivityMenuIconColor(int activityMenuIconColor) {
             mOptions.activityMenuIconColor = activityMenuIconColor;
@@ -565,7 +682,8 @@ public final class CropImage {
         }
 
         /**
-         * the Android Uri to save the cropped image to
+         * the Android Uri to save the cropped image to.<br>
+         * <i>Default: NONE, will create a temp file</i>
          */
         public ActivityBuilder setOutputUri(Uri outputUri) {
             mOptions.outputUri = outputUri;
@@ -573,7 +691,8 @@ public final class CropImage {
         }
 
         /**
-         * the compression format to use when writting the image
+         * the compression format to use when writting the image.<br>
+         * <i>Default: JPEG</i>
          */
         public ActivityBuilder setOutputCompressFormat(Bitmap.CompressFormat outputCompressFormat) {
             mOptions.outputCompressFormat = outputCompressFormat;
@@ -581,7 +700,8 @@ public final class CropImage {
         }
 
         /**
-         * the quility (if applicable) to use when writting the image (0 - 100)
+         * the quility (if applicable) to use when writting the image (0 - 100).<br>
+         * <i>Default: 90</i>
          */
         public ActivityBuilder setOutputCompressQuality(int outputCompressQuality) {
             mOptions.outputCompressQuality = outputCompressQuality;
@@ -593,6 +713,7 @@ public final class CropImage {
          * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
          * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
          * Bitmaps Efficiently</a><br>
+         * <i>Default: 0, 0 - not set, will not downsample</i>
          */
         public ActivityBuilder setRequestedSize(int reqWidth, int reqHeight) {
             mOptions.outputRequestWidth = reqWidth;
@@ -602,7 +723,8 @@ public final class CropImage {
 
         /**
          * if the result of crop image activity should not save the cropped image bitmap.<br>
-         * Used if you want to crop the image manually and need only the crop rectangle and rotation data.
+         * Used if you want to crop the image manually and need only the crop rectangle and rotation data.<br>
+         * <i>Default: false</i>
          */
         public ActivityBuilder setNoOutputImage(boolean noOutputImage) {
             mOptions.noOutputImage = noOutputImage;
@@ -610,7 +732,8 @@ public final class CropImage {
         }
 
         /**
-         * the initial rectangle to set on the cropping image after loading
+         * the initial rectangle to set on the cropping image after loading.<br>
+         * <i>Default: NONE - will initialize using initial crop window padding ratio</i>
          */
         public ActivityBuilder setInitialCropWindowRectangle(Rect initialCropWindowRectangle) {
             mOptions.initialCropWindowRectangle = initialCropWindowRectangle;
@@ -618,7 +741,8 @@ public final class CropImage {
         }
 
         /**
-         * the initial rotation to set on the cropping image after loading (0-360 degrees clockwise)
+         * the initial rotation to set on the cropping image after loading (0-360 degrees clockwise).<br>
+         * <i>Default: NONE - will read image exif data</i>
          */
         public ActivityBuilder setInitialRotation(int initialRotation) {
             mOptions.initialRotation = initialRotation;
@@ -626,7 +750,8 @@ public final class CropImage {
         }
 
         /**
-         * if to allow rotation during cropping
+         * if to allow rotation during cropping.<br>
+         * <i>Default: true</i>
          */
         public ActivityBuilder setAllowRotation(boolean allowRotation) {
             mOptions.allowRotation = allowRotation;

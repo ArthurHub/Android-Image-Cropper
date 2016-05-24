@@ -26,7 +26,7 @@ import android.util.TypedValue;
  * All the possible options that can be set to customize crop image.<br>
  * Initialized with default values.
  */
-final class CropImageOptions implements Parcelable {
+public class CropImageOptions implements Parcelable {
 
     public static final Creator<CropImageOptions> CREATOR = new Creator<CropImageOptions>() {
         @Override

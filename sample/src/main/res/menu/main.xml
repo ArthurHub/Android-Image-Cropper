@@ -4,11 +4,11 @@
     <item
         android:id="@+id/main_action_rotate"
         android:icon="@android:drawable/ic_menu_rotate"
-        android:showAsAction="always"
-        android:title="@string/main_action_rotate"/>
+        android:title="@string/main_action_rotate"
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/main_action_crop"
-        android:showAsAction="always"
-        android:title="@string/main_action_crop"/>
+        android:title="@string/main_action_crop"
+        app:showAsAction="always"/>
 
 </menu>
