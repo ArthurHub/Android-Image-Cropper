@@ -29,7 +29,7 @@
 
 <p><strong>Powerful</strong> (Zoom, Rotation, Multi-Source), <strong>customizable</strong> (Shape, Limits, Style), <strong>optimized</strong> (Async, Sampling, Matrix) and <strong>simple</strong> image cropping library for Android.</p>
 
-<p><img src="https://github.com/ArthurHub/Android-Image-Cropper/blob/master/art/zoom%20sample.gif?raw=true" alt="Crop"></p>
+<p><img src="https://github.com/ArthurHub/Android-Image-Cropper/blob/master/art/demo.gif?raw=true" alt="Crop"></p>
 
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
@@ -147,6 +147,14 @@ cropImageView<span class="pl-k">.</span>getCroppedImageAsync();</pre></div>
 
 <h2>
 <a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Change log</h2>
+
+<p><em>2.1.4</em></p>
+
+<ul>
+<li>Support for requesting CAMERA permission for android M when CAMERA is requested in the manifest.</li>
+<li>Add <code>pick_image_intent_chooser_title</code> for changing and localizing pick image chooser title (thx maksymkhar).</li>
+<li>NPE when clicking crop twice fast (thx Jesse).</li>
+</ul>
 
 <p><em>2.1.1</em></p>
 
