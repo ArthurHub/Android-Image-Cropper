@@ -21,8 +21,10 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +60,12 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
             mCropImageView.setImageUriAsync(source);
         }
 
+        if (getSupportActionBar() == null) {
+            setSupportActionBar((Toolbar) findViewById(R.id.cropImageToolbar));
+        } else {
+            findViewById(R.id.cropImageToolbar).setVisibility(View.GONE);
+        }
+        
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             String title = mOptions.activityTitle != null && !mOptions.activityTitle.isEmpty()

@@ -15,10 +15,12 @@ package com.theartofdev.edmodo.cropper.sample;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -59,8 +61,8 @@ public final class MainFragment extends Fragment
      */
     public void setImageUri(Uri imageUri) {
         mCropImageView.setImageUriAsync(imageUri);
-        //        CropImage.activity(imageUri)
-        //                .start(getContext(), this);
+        //      CropImage.activity(imageUri)
+        //            .start(getContext(), this);
     }
 
     /**
