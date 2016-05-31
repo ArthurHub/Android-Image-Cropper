@@ -212,7 +212,9 @@ public class CropOverlayView extends View {
     public void setBitmapRect(RectF bitmapRect, float[] bitmapPoints, int viewWidth, int viewHeight) {
         if (mBitmapRect == null || !bitmapRect.equals(mBitmapRect)) {
             mBitmapRect.set(bitmapRect);
-            System.arraycopy(bitmapPoints, 0, mBitmapPoints, 0, bitmapPoints.length);
+            if (bitmapPoints != null) {
+                System.arraycopy(bitmapPoints, 0, mBitmapPoints, 0, bitmapPoints.length);
+            }
             mViewWidth = viewWidth;
             mViewHeight = viewHeight;
             RectF cropRect = mCropWindowHandler.getRect();
@@ -551,7 +553,7 @@ public class CropOverlayView extends View {
             rect.bottom -= adj;
         }
 
-        calculateBounds(rect, true);
+        calculateBounds(rect);
         if (mBounds.width() > 0 && mBounds.height() > 0) {
             float leftLimit = Math.max(mBounds.left, 0);
             float topLimit = Math.max(mBounds.top, 0);
@@ -818,7 +820,7 @@ public class CropOverlayView extends View {
             float snapRadius = mSnapRadius;
             RectF rect = mCropWindowHandler.getRect();
 
-            if (calculateBounds(rect, false)) {
+            if (calculateBounds(rect)) {
                 snapRadius = 0;
             }
 
@@ -835,10 +837,9 @@ public class CropOverlayView extends View {
      * otherwsie we find the max rectangle that is within the image bounds starting from the crop window rectangle.
      *
      * @param rect the crop window rectangle to start finsing bounded rectangle from
-     * @param strict more strict bounds that forces the boundes to be fully inside the image
      * @return true - non straight rotation in place, false - otherwise.
      */
-    private boolean calculateBounds(RectF rect, boolean strict) {
+    private boolean calculateBounds(RectF rect) {
 
         mBounds.set(mBitmapRect);
 
@@ -882,27 +883,25 @@ public class CropOverlayView extends View {
             float b2 = y2 - a0 * x2;
             float b3 = y2 - a1 * x2;
 
+            float c0 = (rect.centerY() - rect.top) / (rect.centerX() - rect.left);
+            float c1 = -c0;
+            float d0 = rect.top - c0 * rect.left;
+            float d1 = rect.top - c1 * rect.right;
+
             float left = mBounds.left;
             float top = mBounds.top;
             float right = mBounds.right;
             float bottom = mBounds.bottom;
 
-            left = Math.max(left, (rect.top - b0) / a0 + Math.abs((rect.top - b0) / a0 - rect.left) / 2f);
-            left = Math.max(left, (rect.bottom - b0) / a0 + Math.abs((rect.bottom - b0) / a0 - rect.left) / 2f);
-            left = Math.max(left, (rect.bottom - b3) / a1 + Math.abs((rect.bottom - b3) / a1 - rect.left) / 2f);
-            top = Math.max(top, rect.left * a0 + b0 + Math.abs((rect.left * a0 + b0) - rect.top) / 2f);
-            top = Math.max(top, rect.left * a1 + b1 + Math.abs((rect.left * a1 + b1) - rect.top) / 2f);
-            top = Math.max(top, rect.right * a1 + b1 + Math.abs((rect.right * a1 + b1) - rect.top) / 2f);
-            right = Math.min(right, (rect.top - b1) / a1 - Math.abs((rect.top - b1) / a1 - rect.right) / 2f);
-            right = Math.min(right, (rect.top - b2) / a0 - Math.abs((rect.top - b2) / a0 - rect.right) / 2f);
-            right = Math.min(right, (rect.bottom - b2) / a0 - Math.abs((rect.bottom - b2) / a0 - rect.right) / 2f);
-            bottom = Math.min(bottom, rect.left * a1 + b3 - Math.abs((rect.left * a1 + b3) - rect.bottom) / 2f);
-            bottom = Math.min(bottom, rect.right * a1 + b3 - Math.abs((rect.right * a1 + b3) - rect.bottom) / 2f);
-            bottom = Math.min(bottom, rect.right * a0 + b2 - Math.abs((rect.right * a0 + b2) - rect.bottom) / 2f);
+            left = Math.max(left, (d0 - b0) / (a0 - c0) < rect.right ? (d0 - b0) / (a0 - c0) : left);
+            left = Math.max(left, (d0 - b1) / (a1 - c0) < rect.right ? (d0 - b1) / (a1 - c0) : left);
+            left = Math.max(left, (d1 - b3) / (a1 - c1) < rect.right ? (d1 - b3) / (a1 - c1) : left);
+            right = Math.min(right, (d1 - b1) / (a1 - c1) > rect.left ? (d1 - b1) / (a1 - c1) : right);
+            right = Math.min(right, (d1 - b2) / (a0 - c1) > rect.left ? (d1 - b2) / (a0 - c1) : right);
+            right = Math.min(right, (d0 - b2) / (a0 - c0) > rect.left ? (d0 - b2) / (a0 - c0) : right);
 
-            if (strict) {
-
-            }
+            top = Math.max(top, Math.max(a0 * left + b0, a1 * right + b1));
+            bottom = Math.min(bottom, Math.min(a1 * left + b3, a0 * right + b2));
 
             mBounds.left = left;
             mBounds.top = top;
