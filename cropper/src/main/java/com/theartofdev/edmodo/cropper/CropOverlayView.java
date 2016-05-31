@@ -73,6 +73,16 @@ public class CropOverlayView extends View {
     private final RectF mBitmapRect = new RectF();
 
     /**
+     * The bounding box around the Bitmap that we are cropping.
+     */
+    private final float[] mBitmapPoints = new float[8];
+
+    /**
+     * The bounding box around the Bitmap that we are cropping.
+     */
+    private final RectF mBounds = new RectF();
+
+    /**
      * The bounding image view width used to know the crop overlay is at view edges.
      */
     private int mViewWidth;
@@ -81,11 +91,6 @@ public class CropOverlayView extends View {
      * The bounding image view height used to know the crop overlay is at view edges.
      */
     private int mViewHeight;
-
-    /**
-     * the degress clockwise the image is rotated.
-     */
-    private int mDegreesRotated;
 
     /**
      * The offset to draw the border corener from the border
@@ -199,16 +204,17 @@ public class CropOverlayView extends View {
      * ImageView. This is necessary to call in order to draw the crop window.
      *
      * @param bitmapRect the image's bounding box
+     * @param bitmapPoints the image's bounding points
      * @param viewWidth The bounding image view width.
      * @param viewHeight The bounding image view height.
      * @param degreesRotated the degress clockwise the image is rotated.
      */
-    public void setBitmapRect(RectF bitmapRect, int viewWidth, int viewHeight, int degreesRotated) {
+    public void setBitmapRect(RectF bitmapRect, float[] bitmapPoints, int viewWidth, int viewHeight) {
         if (mBitmapRect == null || !bitmapRect.equals(mBitmapRect)) {
             mBitmapRect.set(bitmapRect);
+            System.arraycopy(bitmapPoints, 0, mBitmapPoints, 0, bitmapPoints.length);
             mViewWidth = viewWidth;
             mViewHeight = viewHeight;
-            mDegreesRotated = degreesRotated;
             RectF cropRect = mCropWindowHandler.getRect();
             if (cropRect.width() == 0 || cropRect.height() == 0) {
                 initCropWindow();
@@ -221,7 +227,7 @@ public class CropOverlayView extends View {
      */
     public void resetCropOverlayView() {
         if (initializedCropWindow) {
-            setBitmapRect(BitmapUtils.EMPTY_RECT_F, 0, 0, mDegreesRotated);
+            setBitmapRect(BitmapUtils.EMPTY_RECT_F, mBitmapPoints, 0, 0);
             setCropWindowRect(BitmapUtils.EMPTY_RECT_F);
             initCropWindow();
             invalidate();
@@ -442,7 +448,7 @@ public class CropOverlayView extends View {
      */
     private void initCropWindow() {
 
-        if (mBitmapRect == null || mBitmapRect.width() == 0 || mBitmapRect.height() == 0) {
+        if (mBitmapRect.width() == 0 || mBitmapRect.height() == 0) {
             return;
         }
 
@@ -544,11 +550,13 @@ public class CropOverlayView extends View {
             rect.top += adj;
             rect.bottom -= adj;
         }
-        if (mBitmapRect != null && mBitmapRect.width() > 0 && mBitmapRect.height() > 0) {
-            float leftLimit = Math.max(mBitmapRect.left, 0);
-            float topLimit = Math.max(mBitmapRect.top, 0);
-            float rightLimit = Math.min(mBitmapRect.right, getWidth());
-            float bottomLimit = Math.min(mBitmapRect.bottom, getHeight());
+
+        calculateBounds(rect, true);
+        if (mBounds.width() > 0 && mBounds.height() > 0) {
+            float leftLimit = Math.max(mBounds.left, 0);
+            float topLimit = Math.max(mBounds.top, 0);
+            float rightLimit = Math.min(mBounds.right, getWidth());
+            float bottomLimit = Math.min(mBounds.bottom, getHeight());
             if (rect.left < leftLimit) {
                 rect.left = leftLimit;
             }
@@ -807,12 +815,103 @@ public class CropOverlayView extends View {
      */
     private void onActionMove(float x, float y) {
         if (mMoveHandler != null) {
+            float snapRadius = mSnapRadius;
             RectF rect = mCropWindowHandler.getRect();
-            mMoveHandler.move(rect, x, y, mBitmapRect, mDegreesRotated, mViewWidth, mViewHeight, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
+
+            if (calculateBounds(rect, false)) {
+                snapRadius = 0;
+            }
+
+            mMoveHandler.move(rect, x, y, mBounds, mViewWidth, mViewHeight, snapRadius, mFixAspectRatio, mTargetAspectRatio);
             mCropWindowHandler.setRect(rect);
             callOnCropWindowChanged(true);
             invalidate();
         }
+    }
+
+    /**
+     * Calculate the bounding rectangle for current crop window, handle non-straight rotation angles.<br>
+     * If the rotation angle is straight then the bounds rectangle is the bitmap rectangle,
+     * otherwsie we find the max rectangle that is within the image bounds starting from the crop window rectangle.
+     *
+     * @param rect the crop window rectangle to start finsing bounded rectangle from
+     * @param strict more strict bounds that forces the boundes to be fully inside the image
+     * @return true - non straight rotation in place, false - otherwise.
+     */
+    private boolean calculateBounds(RectF rect, boolean strict) {
+
+        mBounds.set(mBitmapRect);
+
+        if (mBitmapPoints[0] != mBitmapPoints[6] && mBitmapPoints[1] != mBitmapPoints[7]) {
+            float x0 = mBitmapPoints[0];
+            float y0 = mBitmapPoints[1];
+            float x2 = mBitmapPoints[4];
+            float y2 = mBitmapPoints[5];
+            float x3 = mBitmapPoints[6];
+            float y3 = mBitmapPoints[7];
+
+            if (mBitmapPoints[7] < mBitmapPoints[1]) {
+                if (mBitmapPoints[1] < mBitmapPoints[3]) {
+                    x0 = mBitmapPoints[6];
+                    y0 = mBitmapPoints[7];
+                    x2 = mBitmapPoints[2];
+                    y2 = mBitmapPoints[3];
+                    x3 = mBitmapPoints[4];
+                    y3 = mBitmapPoints[5];
+                } else {
+                    x0 = mBitmapPoints[4];
+                    y0 = mBitmapPoints[5];
+                    x2 = mBitmapPoints[0];
+                    y2 = mBitmapPoints[1];
+                    x3 = mBitmapPoints[2];
+                    y3 = mBitmapPoints[3];
+                }
+            } else if (mBitmapPoints[1] > mBitmapPoints[3]) {
+                x0 = mBitmapPoints[2];
+                y0 = mBitmapPoints[3];
+                x2 = mBitmapPoints[6];
+                y2 = mBitmapPoints[7];
+                x3 = mBitmapPoints[0];
+                y3 = mBitmapPoints[1];
+            }
+
+            float a0 = (y3 - y0) / (x3 - x0);
+            float a1 = -1f / a0;
+            float b0 = y0 - a0 * x0;
+            float b1 = y0 - a1 * x0;
+            float b2 = y2 - a0 * x2;
+            float b3 = y2 - a1 * x2;
+
+            float left = mBounds.left;
+            float top = mBounds.top;
+            float right = mBounds.right;
+            float bottom = mBounds.bottom;
+
+            left = Math.max(left, (rect.top - b0) / a0 + Math.abs((rect.top - b0) / a0 - rect.left) / 2f);
+            left = Math.max(left, (rect.bottom - b0) / a0 + Math.abs((rect.bottom - b0) / a0 - rect.left) / 2f);
+            left = Math.max(left, (rect.bottom - b3) / a1 + Math.abs((rect.bottom - b3) / a1 - rect.left) / 2f);
+            top = Math.max(top, rect.left * a0 + b0 + Math.abs((rect.left * a0 + b0) - rect.top) / 2f);
+            top = Math.max(top, rect.left * a1 + b1 + Math.abs((rect.left * a1 + b1) - rect.top) / 2f);
+            top = Math.max(top, rect.right * a1 + b1 + Math.abs((rect.right * a1 + b1) - rect.top) / 2f);
+            right = Math.min(right, (rect.top - b1) / a1 - Math.abs((rect.top - b1) / a1 - rect.right) / 2f);
+            right = Math.min(right, (rect.top - b2) / a0 - Math.abs((rect.top - b2) / a0 - rect.right) / 2f);
+            right = Math.min(right, (rect.bottom - b2) / a0 - Math.abs((rect.bottom - b2) / a0 - rect.right) / 2f);
+            bottom = Math.min(bottom, rect.left * a1 + b3 - Math.abs((rect.left * a1 + b3) - rect.bottom) / 2f);
+            bottom = Math.min(bottom, rect.right * a1 + b3 - Math.abs((rect.right * a1 + b3) - rect.bottom) / 2f);
+            bottom = Math.min(bottom, rect.right * a0 + b2 - Math.abs((rect.right * a0 + b2) - rect.bottom) / 2f);
+
+            if (strict) {
+
+            }
+
+            mBounds.left = left;
+            mBounds.top = top;
+            mBounds.right = right;
+            mBounds.bottom = bottom;
+
+            return true;
+        }
+        return false;
     }
 
     /**

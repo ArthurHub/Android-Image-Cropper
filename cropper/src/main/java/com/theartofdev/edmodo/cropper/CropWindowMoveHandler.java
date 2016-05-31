@@ -92,7 +92,6 @@ final class CropWindowMoveHandler {
      * @param x the new x-coordinate of this handle
      * @param y the new y-coordinate of this handle
      * @param bounds the bounding rectangle of the image
-     * @param degreesRotated the degress clockwise the image is rotated.
      * @param viewWidth The bounding image view width used to know the crop overlay is at view edges.
      * @param viewHeight The bounding image view height used to know the crop overlay is at view edges.
      * @param parentView the parent View containing the image
@@ -100,7 +99,7 @@ final class CropWindowMoveHandler {
      * @param fixedAspectRatio is the aspect ration fixed and 'targetAspectRatio' should be used
      * @param aspectRatio the aspect ratio to maintain
      */
-    public void move(RectF rect, float x, float y, RectF bounds, int degreesRotated, int viewWidth, int viewHeight, float snapMargin, boolean fixedAspectRatio, float aspectRatio) {
+    public void move(RectF rect, float x, float y, RectF bounds, int viewWidth, int viewHeight, float snapMargin, boolean fixedAspectRatio, float aspectRatio) {
 
         // Adjust the coordinates for the finger position's offset (i.e. the
         // distance from the initial touch to the precise handle location).

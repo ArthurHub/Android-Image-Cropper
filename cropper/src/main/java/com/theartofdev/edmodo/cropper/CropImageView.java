@@ -75,6 +75,11 @@ public class CropImageView extends FrameLayout {
     private final RectF mImageRect = new RectF();
 
     /**
+     * Rectengale used in image matrix transformation calculation (reusing rect instance)
+     */
+    private final float[] mImagePoints = new float[8];
+
+    /**
      * Animation class to smooth animate zoom-in/out
      */
     private CropImageAnimation mAnimation;
@@ -1196,24 +1201,24 @@ public class CropImageView extends FrameLayout {
 
             // move the image to the center of the image view first so we can manipulate it from there
             mImageMatrix.postTranslate((width - mImageRect.width()) / 2, (height - mImageRect.height()) / 2);
-            mapImageRectangleByImageMatrix(mImageRect);
+            mapImageRectangleByImageMatrix();
 
             // rotate the image the required degrees from center of image
             if (mDegreesRotated > 0) {
                 mImageMatrix.postRotate(mDegreesRotated, mImageRect.centerX(), mImageRect.centerY());
-                mapImageRectangleByImageMatrix(mImageRect);
+                mapImageRectangleByImageMatrix();
             }
 
             // scale the image to the image view, image rect transformed to know new width/height
             float scale = Math.min(width / mImageRect.width(), height / mImageRect.height());
             if (mScaleType == ScaleType.FIT_CENTER || (mScaleType == ScaleType.CENTER_INSIDE && scale < 1) || (scale > 1 && mAutoZoomEnabled)) {
                 mImageMatrix.postScale(scale, scale, mImageRect.centerX(), mImageRect.centerY());
-                mapImageRectangleByImageMatrix(mImageRect);
+                mapImageRectangleByImageMatrix();
             }
 
             // scale by the current zoom level
             mImageMatrix.postScale(mZoom, mZoom, mImageRect.centerX(), mImageRect.centerY());
-            mapImageRectangleByImageMatrix(mImageRect);
+            mapImageRectangleByImageMatrix();
 
             RectF cropRect = mCropOverlayView.getCropWindowRect();
 
@@ -1236,7 +1241,7 @@ public class CropImageView extends FrameLayout {
             mImageMatrix.postTranslate(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
             cropRect.offset(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
             mCropOverlayView.setCropWindowRect(cropRect);
-            mapImageRectangleByImageMatrix(mImageRect);
+            mapImageRectangleByImageMatrix();
 
             // set matrix to apply
             if (animate) {
@@ -1256,9 +1261,18 @@ public class CropImageView extends FrameLayout {
      * Adjust the given image rectangle by image transformation matrix to know the final rectangle of the image.<br>
      * To get the proper rectangle it must be first reset to orginal image rectangle.
      */
-    private void mapImageRectangleByImageMatrix(RectF imgRect) {
-        imgRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
-        mImageMatrix.mapRect(imgRect);
+    private void mapImageRectangleByImageMatrix() {
+        mImageRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+        mImageMatrix.mapRect(mImageRect);
+        mImagePoints[0] = 0;
+        mImagePoints[1] = 0;
+        mImagePoints[2] = mBitmap.getWidth();
+        mImagePoints[3] = 0;
+        mImagePoints[4] = mBitmap.getWidth();
+        mImagePoints[5] = mBitmap.getHeight();
+        mImagePoints[6] = 0;
+        mImagePoints[7] = mBitmap.getHeight();
+        mImageMatrix.mapPoints(mImagePoints);
     }
 
     /**
@@ -1319,7 +1333,7 @@ public class CropImageView extends FrameLayout {
         }
 
         // set the bitmap rectangle and update the crop window after scale factor is set
-        mCropOverlayView.setBitmapRect(bitmapRect, getWidth(), getHeight(), mDegreesRotated);
+        mCropOverlayView.setBitmapRect(bitmapRect, mImagePoints, getWidth(), getHeight());
     }
     //endregion
 
