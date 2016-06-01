@@ -68,6 +68,11 @@ public class CropOverlayView extends View {
     private Paint mBackgroundPaint;
 
     /**
+     * Used for oval crop window shape or non-straight rotation drawing.
+     */
+    private Path mPath = new Path();
+
+    /**
      * The bounding box around the Bitmap that we are cropping.
      */
     private final RectF mBitmapRect = new RectF();
@@ -594,7 +599,7 @@ public class CropOverlayView extends View {
         super.onDraw(canvas);
 
         // Draw translucent background for the cropped area.
-        drawBackground(canvas, mBitmapRect);
+        drawBackground(canvas);
 
         if (mCropWindowHandler.showGuidelines()) {
             // Determines whether guidelines should be drawn or not
@@ -616,26 +621,46 @@ public class CropOverlayView extends View {
     /**
      * Draw shadow background over the image not including the crop area.
      */
-    private void drawBackground(Canvas canvas, RectF bitmapRect) {
+    private void drawBackground(Canvas canvas) {
 
         RectF rect = mCropWindowHandler.getRect();
 
+        float left = Math.max(mBitmapRect.left, 0);
+        float top = Math.max(mBitmapRect.top, 0);
+        float right = Math.min(mBitmapRect.right, getWidth());
+        float bottom = Math.min(mBitmapRect.bottom, getHeight());
+
         if (mCropShape == CropImageView.CropShape.RECTANGLE) {
-            canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, rect.top, mBackgroundPaint);
-            canvas.drawRect(bitmapRect.left, rect.bottom, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
-            canvas.drawRect(bitmapRect.left, rect.top, rect.left, rect.bottom, mBackgroundPaint);
-            canvas.drawRect(rect.right, rect.top, bitmapRect.right, rect.bottom, mBackgroundPaint);
+            if (!isNonStraightAngleRotated() || Build.VERSION.SDK_INT <= 17) {
+                canvas.drawRect(left, top, right, rect.top, mBackgroundPaint);
+                canvas.drawRect(left, rect.bottom, right, bottom, mBackgroundPaint);
+                canvas.drawRect(left, rect.top, rect.left, rect.bottom, mBackgroundPaint);
+                canvas.drawRect(rect.right, rect.top, right, rect.bottom, mBackgroundPaint);
+            } else {
+                mPath.reset();
+                mPath.moveTo(mBitmapPoints[0], mBitmapPoints[1]);
+                mPath.lineTo(mBitmapPoints[2], mBitmapPoints[3]);
+                mPath.lineTo(mBitmapPoints[4], mBitmapPoints[5]);
+                mPath.lineTo(mBitmapPoints[6], mBitmapPoints[7]);
+                mPath.close();
+
+                canvas.save();
+                canvas.clipPath(mPath, Region.Op.INTERSECT);
+                canvas.clipRect(rect, Region.Op.XOR);
+                canvas.drawRect(left, top, right, bottom, mBackgroundPaint);
+                canvas.restore();
+            }
         } else {
-            Path circleSelectionPath = new Path();
+            mPath.reset();
             if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17 && mCropShape == CropImageView.CropShape.OVAL) {
                 mDrawRect.set(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2);
             } else {
                 mDrawRect.set(rect.left, rect.top, rect.right, rect.bottom);
             }
-            circleSelectionPath.addOval(mDrawRect, Path.Direction.CW);
+            mPath.addOval(mDrawRect, Path.Direction.CW);
             canvas.save();
-            canvas.clipPath(circleSelectionPath, Region.Op.XOR);
-            canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
+            canvas.clipPath(mPath, Region.Op.XOR);
+            canvas.drawRect(left, top, right, bottom, mBackgroundPaint);
             canvas.restore();
         }
     }
@@ -843,7 +868,7 @@ public class CropOverlayView extends View {
 
         mBounds.set(mBitmapRect);
 
-        if (mBitmapPoints[0] != mBitmapPoints[6] && mBitmapPoints[1] != mBitmapPoints[7]) {
+        if (isNonStraightAngleRotated()) {
             float x0 = mBitmapPoints[0];
             float y0 = mBitmapPoints[1];
             float x2 = mBitmapPoints[4];
@@ -911,6 +936,13 @@ public class CropOverlayView extends View {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Is the cropping image has been rotated by NOT 0,90,180 or 270 degrees.
+     */
+    private boolean isNonStraightAngleRotated() {
+        return mBitmapPoints[0] != mBitmapPoints[6] && mBitmapPoints[1] != mBitmapPoints[7];
     }
 
     /**
