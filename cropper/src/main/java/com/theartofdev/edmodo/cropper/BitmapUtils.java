@@ -54,6 +54,11 @@ final class BitmapUtils {
     static final RectF RECT = new RectF();
 
     /**
+     * Reusable point for general internal usage
+     */
+    static final float[] POINT = new float[2];
+
+    /**
      * Used to know the max texture size allowed to be rendered
      */
     static int mMaxTextureSize;

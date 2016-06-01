@@ -758,38 +758,42 @@ public class CropImageView extends FrameLayout {
      */
     public void rotateImage(int degrees) {
         if (mBitmap != null) {
-            if (degrees % 90 == 0) {
+            boolean straight = degrees % 90 == 0;
 
-                BitmapUtils.RECT.set(mCropOverlayView.getCropWindowRect());
+            BitmapUtils.RECT.set(mCropOverlayView.getCropWindowRect());
+            float halfWidth = BitmapUtils.RECT.width() / mZoom / 2f;
+            float halfHeight = BitmapUtils.RECT.height() / mZoom / 2f;
 
-                mImageMatrix.invert(mImageInverseMatrix);
+            mImageMatrix.invert(mImageInverseMatrix);
+
+            if (straight) {
                 mImageInverseMatrix.mapRect(BitmapUtils.RECT);
-
-                mZoom = 1;
-                mZoomOffsetX = 0;
-                mZoomOffsetY = 0;
-                mDegreesRotated += degrees;
-                mDegreesRotated = mDegreesRotated >= 0 ? mDegreesRotated % 360 : mDegreesRotated % 360 + 360;
-
-                applyImageMatrix(getWidth(), getHeight(), true, false);
-
-                mImageMatrix.mapRect(BitmapUtils.RECT);
-
-                mCropOverlayView.resetCropOverlayView();
-                mCropOverlayView.setCropWindowRect(BitmapUtils.RECT);
-                applyImageMatrix(getWidth(), getHeight(), true, false);
-                handleCropWindowChanged(false, false);
-
             } else {
-
-                mDegreesRotated += degrees;
-                mDegreesRotated = mDegreesRotated >= 0 ? mDegreesRotated % 360 : mDegreesRotated % 360 + 360;
-
-                mZoom = 1;
-                mZoomOffsetX = mZoomOffsetY = 0;
-                mCropOverlayView.resetCropOverlayView();
-                applyImageMatrix(getWidth(), getHeight(), true, false);
+                BitmapUtils.POINT[0] = BitmapUtils.RECT.centerX();
+                BitmapUtils.POINT[1] = BitmapUtils.RECT.centerY();
+                mImageInverseMatrix.mapPoints(BitmapUtils.POINT);
             }
+
+            mZoom = 1;
+            mZoomOffsetX = 0;
+            mZoomOffsetY = 0;
+            mDegreesRotated += degrees;
+            mDegreesRotated = mDegreesRotated >= 0 ? mDegreesRotated % 360 : mDegreesRotated % 360 + 360;
+
+            applyImageMatrix(getWidth(), getHeight(), true, false);
+
+            if (straight) {
+                mImageMatrix.mapRect(BitmapUtils.RECT);
+            } else {
+                mImageMatrix.mapPoints(BitmapUtils.POINT);
+                BitmapUtils.RECT.set(BitmapUtils.POINT[0] - halfWidth, BitmapUtils.POINT[1] - halfHeight,
+                        BitmapUtils.POINT[0] + halfWidth, BitmapUtils.POINT[1] + halfHeight);
+            }
+
+            mCropOverlayView.resetCropOverlayView();
+            mCropOverlayView.setCropWindowRect(BitmapUtils.RECT);
+            applyImageMatrix(getWidth(), getHeight(), true, false);
+            handleCropWindowChanged(false, false);
         }
     }
 
