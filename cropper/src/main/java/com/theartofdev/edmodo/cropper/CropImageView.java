@@ -758,22 +758,25 @@ public class CropImageView extends FrameLayout {
      */
     public void rotateImage(int degrees) {
         if (mBitmap != null) {
-            boolean straight = degrees % 90 == 0;
 
+            boolean flipAxes = (degrees > 45 && degrees < 135) || (degrees > 215 && degrees < 305);
             BitmapUtils.RECT.set(mCropOverlayView.getCropWindowRect());
-            float halfWidth = BitmapUtils.RECT.width() / mZoom / 2f;
-            float halfHeight = BitmapUtils.RECT.height() / mZoom / 2f;
+            float halfWidth = (flipAxes ? BitmapUtils.RECT.height() : BitmapUtils.RECT.width()) / 2f;
+            float halfHeight = (flipAxes ? BitmapUtils.RECT.width() : BitmapUtils.RECT.height()) / 2f;
 
             mImageMatrix.invert(mImageInverseMatrix);
 
-            if (straight) {
-                mImageInverseMatrix.mapRect(BitmapUtils.RECT);
-            } else {
-                BitmapUtils.POINT[0] = BitmapUtils.RECT.centerX();
-                BitmapUtils.POINT[1] = BitmapUtils.RECT.centerY();
-                mImageInverseMatrix.mapPoints(BitmapUtils.POINT);
-            }
+            BitmapUtils.POINTS[0] = BitmapUtils.RECT.centerX();
+            BitmapUtils.POINTS[1] = BitmapUtils.RECT.centerY();
+            BitmapUtils.POINTS[2] = 0;
+            BitmapUtils.POINTS[3] = 0;
+            BitmapUtils.POINTS[4] = 1;
+            BitmapUtils.POINTS[5] = 0;
+            BitmapUtils.POINTS[6] = 0;
+            BitmapUtils.POINTS[7] = 1;
+            mImageInverseMatrix.mapPoints(BitmapUtils.POINTS);
 
+            float oldZoom = mZoom;
             mZoom = 1;
             mZoomOffsetX = 0;
             mZoomOffsetY = 0;
@@ -782,13 +785,14 @@ public class CropImageView extends FrameLayout {
 
             applyImageMatrix(getWidth(), getHeight(), true, false);
 
-            if (straight) {
-                mImageMatrix.mapRect(BitmapUtils.RECT);
-            } else {
-                mImageMatrix.mapPoints(BitmapUtils.POINT);
-                BitmapUtils.RECT.set(BitmapUtils.POINT[0] - halfWidth, BitmapUtils.POINT[1] - halfHeight,
-                        BitmapUtils.POINT[0] + halfWidth, BitmapUtils.POINT[1] + halfHeight);
-            }
+            mImageMatrix.mapPoints(BitmapUtils.POINTS);
+
+            // adjust the width/height by the changes in scaling to the image
+            halfWidth *= Math.sqrt(Math.pow(BitmapUtils.POINTS[4] - BitmapUtils.POINTS[2], 2) + Math.pow(BitmapUtils.POINTS[5] - BitmapUtils.POINTS[3], 2));
+            halfHeight *= Math.sqrt(Math.pow(BitmapUtils.POINTS[6] - BitmapUtils.POINTS[2], 2) + Math.pow(BitmapUtils.POINTS[7] - BitmapUtils.POINTS[3], 2));
+
+            BitmapUtils.RECT.set(BitmapUtils.POINTS[0] - halfWidth, BitmapUtils.POINTS[1] - halfHeight,
+                    BitmapUtils.POINTS[0] + halfWidth, BitmapUtils.POINTS[1] + halfHeight);
 
             mCropOverlayView.resetCropOverlayView();
             mCropOverlayView.setCropWindowRect(BitmapUtils.RECT);
@@ -1115,10 +1119,10 @@ public class CropImageView extends FrameLayout {
                     handleCropWindowChanged(false, false);
                 }
             } else {
-                updateImageBounds(null);
+                updateImageBounds(true);
             }
         } else {
-            updateImageBounds(null);
+            updateImageBounds(true);
         }
     }
 
@@ -1251,7 +1255,7 @@ public class CropImageView extends FrameLayout {
             }
 
             // update the image rectangle in the crop overlay
-            updateImageBounds(mImagePoints);
+            updateImageBounds(false);
         }
     }
 
@@ -1319,17 +1323,17 @@ public class CropImageView extends FrameLayout {
     /**
      * Update the scale factor between the actual image bitmap and the shown image.<br>
      */
-    private void updateImageBounds(float[] bounds) {
-        if (mBitmap != null && bounds != null) {
+    private void updateImageBounds(boolean clear) {
+        if (mBitmap != null && !clear) {
 
             // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for width/height.
-            float scaleFactorWidth = mBitmap.getWidth() * mLoadedSampleSize / BitmapUtils.getRectWidth(bounds);
-            float scaleFactorHeight = mBitmap.getHeight() * mLoadedSampleSize / BitmapUtils.getRectHeight(bounds);
+            float scaleFactorWidth = mBitmap.getWidth() * mLoadedSampleSize / BitmapUtils.getRectWidth(mImagePoints);
+            float scaleFactorHeight = mBitmap.getHeight() * mLoadedSampleSize / BitmapUtils.getRectHeight(mImagePoints);
             mCropOverlayView.setCropWindowLimits(getWidth(), getHeight(), scaleFactorWidth, scaleFactorHeight);
         }
 
         // set the bitmap rectangle and update the crop window after scale factor is set
-        mCropOverlayView.setBitmapRect(bounds, getWidth(), getHeight());
+        mCropOverlayView.setBitmapRect(mImagePoints, getWidth(), getHeight());
     }
     //endregion
 
