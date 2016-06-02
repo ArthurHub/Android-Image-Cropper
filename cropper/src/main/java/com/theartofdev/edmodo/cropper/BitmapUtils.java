@@ -400,7 +400,7 @@ final class BitmapUtils {
             double rads = Math.toRadians(degreesRotated);
             int compareTo = degreesRotated < 90 || (degreesRotated > 180 && degreesRotated < 270) ? rect.left : rect.right;
             for (int i = 0; i < points.length; i += 2) {
-                if (((int) points[i]) == compareTo) {
+                if (points[i] >= compareTo - 1 && points[i] <= compareTo + 1) {
                     adjLeft = (int) Math.abs(Math.sin(rads) * (rect.bottom - points[i + 1]));
                     adjTop = (int) Math.abs(Math.cos(rads) * (points[i + 1] - rect.top));
                     width = (int) Math.abs((points[i + 1] - rect.top) / Math.sin(rads));
