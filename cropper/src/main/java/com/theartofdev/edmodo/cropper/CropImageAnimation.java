@@ -79,12 +79,12 @@ final class CropImageAnimation extends Animation implements Animation.AnimationL
         mAnimRect.top = mStartCropWindowRect.top + (mEndCropWindowRect.top - mStartCropWindowRect.top) * interpolatedTime;
         mAnimRect.right = mStartCropWindowRect.right + (mEndCropWindowRect.right - mStartCropWindowRect.right) * interpolatedTime;
         mAnimRect.bottom = mStartCropWindowRect.bottom + (mEndCropWindowRect.bottom - mStartCropWindowRect.bottom) * interpolatedTime;
-        mCropOverlayView.setCropWindowRect(mAnimRect);
+        mCropOverlayView.setCropWindowRect(mAnimRect, false);
 
         for (int i = 0; i < mAnimPoints.length; i++) {
             mAnimPoints[i] = mStartBoundPoints[i] + (mEndBoundPoints[i] - mStartBoundPoints[i]) * interpolatedTime;
         }
-        mCropOverlayView.setBitmapRect(mAnimPoints, mImageView.getWidth(), mImageView.getHeight());
+        mCropOverlayView.setBounds(mAnimPoints, mImageView.getWidth(), mImageView.getHeight());
 
         for (int i = 0; i < mAnimMatrix.length; i++) {
             mAnimMatrix[i] = mStartImageMatrix[i] + (mEndImageMatrix[i] - mStartImageMatrix[i]) * interpolatedTime;

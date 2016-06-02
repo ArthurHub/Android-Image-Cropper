@@ -795,7 +795,7 @@ public class CropImageView extends FrameLayout {
                     BitmapUtils.POINTS[0] + halfWidth, BitmapUtils.POINTS[1] + halfHeight);
 
             mCropOverlayView.resetCropOverlayView();
-            mCropOverlayView.setCropWindowRect(BitmapUtils.RECT);
+            mCropOverlayView.setCropWindowRect(BitmapUtils.RECT, true);
             applyImageMatrix(getWidth(), getHeight(), true, false);
             handleCropWindowChanged(false, false);
         }
@@ -1114,7 +1114,7 @@ public class CropImageView extends FrameLayout {
                 // after state restore we want to restore the window crop, possible only after widget size is known
                 if (mBitmap != null && mRestoreCropWindowRect != null) {
                     mImageMatrix.mapRect(mRestoreCropWindowRect);
-                    mCropOverlayView.setCropWindowRect(mRestoreCropWindowRect);
+                    mCropOverlayView.setCropWindowRect(mRestoreCropWindowRect, false);
                     mRestoreCropWindowRect = null;
                     handleCropWindowChanged(false, false);
                 }
@@ -1187,7 +1187,7 @@ public class CropImageView extends FrameLayout {
         float yCenterOffset = getHeight() / 2 - cropRect.centerY();
         cropRect.offset(xCenterOffset - xCenterOffset * zoomChange, yCenterOffset - yCenterOffset * zoomChange);
         cropRect.inset((cropRect.width() - cropRect.width() * zoomChange) / 2f, (cropRect.height() - cropRect.height() * zoomChange) / 2f);
-        mCropOverlayView.setCropWindowRect(cropRect);
+        mCropOverlayView.setCropWindowRect(cropRect, false);
     }
 
     /**
@@ -1242,7 +1242,7 @@ public class CropImageView extends FrameLayout {
             // apply to zoom offset translate and update the crop rectangle to offset correctly
             mImageMatrix.postTranslate(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
             cropRect.offset(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
-            mCropOverlayView.setCropWindowRect(cropRect);
+            mCropOverlayView.setCropWindowRect(cropRect, false);
             mapImagePointsByImageMatrix();
 
             // set matrix to apply
@@ -1333,7 +1333,7 @@ public class CropImageView extends FrameLayout {
         }
 
         // set the bitmap rectangle and update the crop window after scale factor is set
-        mCropOverlayView.setBitmapRect(mImagePoints, getWidth(), getHeight());
+        mCropOverlayView.setBounds(clear ? null : mImagePoints, getWidth(), getHeight());
     }
     //endregion
 

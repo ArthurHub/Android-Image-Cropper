@@ -77,7 +77,7 @@ public class CropOverlayView extends View {
     /**
      * The bounding box around the Bitmap that we are cropping.
      */
-    private final float[] mBoundPoints = new float[8];
+    private final float[] mBoundsPoints = new float[8];
 
     /**
      * The bounding box around the Bitmap that we are cropping.
@@ -196,8 +196,13 @@ public class CropOverlayView extends View {
 
     /**
      * Set the left/top/right/bottom coordinates of the crop window.
+     *
+     * @param fix if to fix the rect by bounds
      */
-    public void setCropWindowRect(RectF rect) {
+    public void setCropWindowRect(RectF rect, boolean fix) {
+        if (fix) {
+            fixCropWindowRectByRules(rect);
+        }
         mCropWindowHandler.setRect(rect);
     }
 
@@ -205,17 +210,17 @@ public class CropOverlayView extends View {
      * Informs the CropOverlayView of the image's position relative to the
      * ImageView. This is necessary to call in order to draw the crop window.
      *
-     * @param bitmapPoints the image's bounding points
+     * @param boundsPoints the image's bounding points
      * @param viewWidth The bounding image view width.
      * @param viewHeight The bounding image view height.
      * @param degreesRotated the degress clockwise the image is rotated.
      */
-    public void setBitmapRect(float[] bitmapPoints, int viewWidth, int viewHeight) {
-        if (bitmapPoints == null || !Arrays.equals(mBoundPoints, bitmapPoints)) {
-            if (bitmapPoints == null) {
-                Arrays.fill(mBoundPoints, 0);
+    public void setBounds(float[] boundsPoints, int viewWidth, int viewHeight) {
+        if (boundsPoints == null || !Arrays.equals(mBoundsPoints, boundsPoints)) {
+            if (boundsPoints == null) {
+                Arrays.fill(mBoundsPoints, 0);
             } else {
-                System.arraycopy(bitmapPoints, 0, mBoundPoints, 0, bitmapPoints.length);
+                System.arraycopy(boundsPoints, 0, mBoundsPoints, 0, boundsPoints.length);
             }
             mViewWidth = viewWidth;
             mViewHeight = viewHeight;
@@ -231,8 +236,7 @@ public class CropOverlayView extends View {
      */
     public void resetCropOverlayView() {
         if (initializedCropWindow) {
-            setBitmapRect(null, 0, 0);
-            setCropWindowRect(BitmapUtils.EMPTY_RECT_F);
+            setCropWindowRect(BitmapUtils.EMPTY_RECT_F, false);
             initCropWindow();
             invalidate();
         }
@@ -452,10 +456,10 @@ public class CropOverlayView extends View {
      */
     private void initCropWindow() {
 
-        float leftLimit = Math.max(BitmapUtils.getRectLeft(mBoundPoints), 0);
-        float topLimit = Math.max(BitmapUtils.getRectTop(mBoundPoints), 0);
-        float rightLimit = Math.min(BitmapUtils.getRectRight(mBoundPoints), getWidth());
-        float bottomLimit = Math.min(BitmapUtils.getRectBottom(mBoundPoints), getHeight());
+        float leftLimit = Math.max(BitmapUtils.getRectLeft(mBoundsPoints), 0);
+        float topLimit = Math.max(BitmapUtils.getRectTop(mBoundsPoints), 0);
+        float rightLimit = Math.min(BitmapUtils.getRectRight(mBoundsPoints), getWidth());
+        float bottomLimit = Math.min(BitmapUtils.getRectBottom(mBoundsPoints), getHeight());
 
         if (rightLimit <= leftLimit || bottomLimit <= topLimit) {
             return;
@@ -623,10 +627,10 @@ public class CropOverlayView extends View {
 
         RectF rect = mCropWindowHandler.getRect();
 
-        float left = Math.max(BitmapUtils.getRectLeft(mBoundPoints), 0);
-        float top = Math.max(BitmapUtils.getRectTop(mBoundPoints), 0);
-        float right = Math.min(BitmapUtils.getRectRight(mBoundPoints), getWidth());
-        float bottom = Math.min(BitmapUtils.getRectBottom(mBoundPoints), getHeight());
+        float left = Math.max(BitmapUtils.getRectLeft(mBoundsPoints), 0);
+        float top = Math.max(BitmapUtils.getRectTop(mBoundsPoints), 0);
+        float right = Math.min(BitmapUtils.getRectRight(mBoundsPoints), getWidth());
+        float bottom = Math.min(BitmapUtils.getRectBottom(mBoundsPoints), getHeight());
 
         if (mCropShape == CropImageView.CropShape.RECTANGLE) {
             if (!isNonStraightAngleRotated() || Build.VERSION.SDK_INT <= 17) {
@@ -636,10 +640,10 @@ public class CropOverlayView extends View {
                 canvas.drawRect(rect.right, rect.top, right, rect.bottom, mBackgroundPaint);
             } else {
                 mPath.reset();
-                mPath.moveTo(mBoundPoints[0], mBoundPoints[1]);
-                mPath.lineTo(mBoundPoints[2], mBoundPoints[3]);
-                mPath.lineTo(mBoundPoints[4], mBoundPoints[5]);
-                mPath.lineTo(mBoundPoints[6], mBoundPoints[7]);
+                mPath.moveTo(mBoundsPoints[0], mBoundsPoints[1]);
+                mPath.lineTo(mBoundsPoints[2], mBoundsPoints[3]);
+                mPath.lineTo(mBoundsPoints[4], mBoundsPoints[5]);
+                mPath.lineTo(mBoundsPoints[6], mBoundsPoints[7]);
                 mPath.close();
 
                 canvas.save();
@@ -864,45 +868,45 @@ public class CropOverlayView extends View {
      */
     private boolean calculateBounds(RectF rect) {
 
-        float left = BitmapUtils.getRectLeft(mBoundPoints);
-        float top = BitmapUtils.getRectTop(mBoundPoints);
-        float right = BitmapUtils.getRectRight(mBoundPoints);
-        float bottom = BitmapUtils.getRectBottom(mBoundPoints);
+        float left = BitmapUtils.getRectLeft(mBoundsPoints);
+        float top = BitmapUtils.getRectTop(mBoundsPoints);
+        float right = BitmapUtils.getRectRight(mBoundsPoints);
+        float bottom = BitmapUtils.getRectBottom(mBoundsPoints);
 
         if (!isNonStraightAngleRotated()) {
             mCalcBounds.set(left, top, right, bottom);
             return false;
         } else {
-            float x0 = mBoundPoints[0];
-            float y0 = mBoundPoints[1];
-            float x2 = mBoundPoints[4];
-            float y2 = mBoundPoints[5];
-            float x3 = mBoundPoints[6];
-            float y3 = mBoundPoints[7];
+            float x0 = mBoundsPoints[0];
+            float y0 = mBoundsPoints[1];
+            float x2 = mBoundsPoints[4];
+            float y2 = mBoundsPoints[5];
+            float x3 = mBoundsPoints[6];
+            float y3 = mBoundsPoints[7];
 
-            if (mBoundPoints[7] < mBoundPoints[1]) {
-                if (mBoundPoints[1] < mBoundPoints[3]) {
-                    x0 = mBoundPoints[6];
-                    y0 = mBoundPoints[7];
-                    x2 = mBoundPoints[2];
-                    y2 = mBoundPoints[3];
-                    x3 = mBoundPoints[4];
-                    y3 = mBoundPoints[5];
+            if (mBoundsPoints[7] < mBoundsPoints[1]) {
+                if (mBoundsPoints[1] < mBoundsPoints[3]) {
+                    x0 = mBoundsPoints[6];
+                    y0 = mBoundsPoints[7];
+                    x2 = mBoundsPoints[2];
+                    y2 = mBoundsPoints[3];
+                    x3 = mBoundsPoints[4];
+                    y3 = mBoundsPoints[5];
                 } else {
-                    x0 = mBoundPoints[4];
-                    y0 = mBoundPoints[5];
-                    x2 = mBoundPoints[0];
-                    y2 = mBoundPoints[1];
-                    x3 = mBoundPoints[2];
-                    y3 = mBoundPoints[3];
+                    x0 = mBoundsPoints[4];
+                    y0 = mBoundsPoints[5];
+                    x2 = mBoundsPoints[0];
+                    y2 = mBoundsPoints[1];
+                    x3 = mBoundsPoints[2];
+                    y3 = mBoundsPoints[3];
                 }
-            } else if (mBoundPoints[1] > mBoundPoints[3]) {
-                x0 = mBoundPoints[2];
-                y0 = mBoundPoints[3];
-                x2 = mBoundPoints[6];
-                y2 = mBoundPoints[7];
-                x3 = mBoundPoints[0];
-                y3 = mBoundPoints[1];
+            } else if (mBoundsPoints[1] > mBoundsPoints[3]) {
+                x0 = mBoundsPoints[2];
+                y0 = mBoundsPoints[3];
+                x2 = mBoundsPoints[6];
+                y2 = mBoundsPoints[7];
+                x3 = mBoundsPoints[0];
+                y3 = mBoundsPoints[1];
             }
 
             float a0 = (y3 - y0) / (x3 - x0);
@@ -939,7 +943,7 @@ public class CropOverlayView extends View {
      * Is the cropping image has been rotated by NOT 0,90,180 or 270 degrees.
      */
     private boolean isNonStraightAngleRotated() {
-        return mBoundPoints[0] != mBoundPoints[6] && mBoundPoints[1] != mBoundPoints[7];
+        return mBoundsPoints[0] != mBoundsPoints[6] && mBoundsPoints[1] != mBoundsPoints[7];
     }
 
     /**
