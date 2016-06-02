@@ -182,11 +182,11 @@ final class CropWindowMoveHandler {
     private void moveCenter(RectF rect, float x, float y, RectF bounds, int viewWidth, int viewHeight, float snapRadius) {
         float dx = x - rect.centerX();
         float dy = y - rect.centerY();
-        if (rect.left + dx < 0 || rect.right + dx > viewWidth) {
+        if (rect.left + dx < 0 || rect.right + dx > viewWidth || rect.left + dx < bounds.left || rect.right + dx > bounds.right) {
             dx /= 1.05f;
             mTouchOffset.x -= dx / 2;
         }
-        if (rect.top + dy < 0 || rect.bottom + dy > viewHeight) {
+        if (rect.top + dy < 0 || rect.bottom + dy > viewHeight || rect.top + dy < bounds.top || rect.bottom + dy > bounds.bottom) {
             dy /= 1.05f;
             mTouchOffset.y -= dy / 2;
         }
@@ -334,6 +334,10 @@ final class CropWindowMoveHandler {
             mTouchOffset.x -= newLeft / 1.1f;
         }
 
+        if (newLeft < bounds.left) {
+            mTouchOffset.x -= (newLeft - bounds.left) / 2f;
+        }
+
         if (newLeft - bounds.left < snapMargin) {
             newLeft = bounds.left;
         }
@@ -404,6 +408,10 @@ final class CropWindowMoveHandler {
         if (newRight > viewWidth) {
             newRight = viewWidth + (newRight - viewWidth) / 1.05f;
             mTouchOffset.x -= (newRight - viewWidth) / 1.1f;
+        }
+
+        if (newRight > bounds.right) {
+            mTouchOffset.x -= (newRight - bounds.right) / 2f;
         }
 
         // If close to the edge
@@ -479,6 +487,10 @@ final class CropWindowMoveHandler {
             mTouchOffset.y -= newTop / 1.1f;
         }
 
+        if (newTop < bounds.top) {
+            mTouchOffset.y -= (newTop - bounds.top) / 2f;
+        }
+
         if (newTop - bounds.top < snapMargin) {
             newTop = bounds.top;
         }
@@ -549,6 +561,10 @@ final class CropWindowMoveHandler {
         if (newBottom > viewHeight) {
             newBottom = viewHeight + (newBottom - viewHeight) / 1.05f;
             mTouchOffset.y -= (newBottom - viewHeight) / 1.1f;
+        }
+
+        if (newBottom > bounds.bottom) {
+            mTouchOffset.y -= (newBottom - bounds.bottom) / 2f;
         }
 
         if (bounds.bottom - newBottom < snapMargin) {
