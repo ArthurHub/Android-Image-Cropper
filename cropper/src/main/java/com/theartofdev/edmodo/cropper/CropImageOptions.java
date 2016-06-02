@@ -238,9 +238,19 @@ public class CropImageOptions implements Parcelable {
     public int initialRotation;
 
     /**
-     * if to allow rotation during cropping
+     * if to allow (all) rotation during cropping (activity)
      */
     public boolean allowRotation;
+
+    /**
+     * if to allow counter-clockwise rotation during cropping (activity)
+     */
+    public boolean allowCounterRotation;
+
+    /**
+     * the amount of degreees to rotate clockwise or counter-clockwise
+     */
+    public int rotationDegrees;
 
     /**
      * Init options with defaults.
@@ -295,6 +305,8 @@ public class CropImageOptions implements Parcelable {
         initialCropWindowRectangle = null;
         initialRotation = -1;
         allowRotation = true;
+        allowCounterRotation = false;
+        rotationDegrees = 90;
     }
 
     /**
@@ -340,6 +352,8 @@ public class CropImageOptions implements Parcelable {
         initialCropWindowRectangle = in.readParcelable(Rect.class.getClassLoader());
         initialRotation = in.readInt();
         allowRotation = in.readByte() != 0;
+        allowCounterRotation = in.readByte() != 0;
+        rotationDegrees = in.readInt();
     }
 
     @Override
@@ -383,6 +397,8 @@ public class CropImageOptions implements Parcelable {
         dest.writeParcelable(initialCropWindowRectangle, flags);
         dest.writeInt(initialRotation);
         dest.writeByte((byte) (allowRotation ? 1 : 0));
+        dest.writeByte((byte) (allowCounterRotation ? 1 : 0));
+        dest.writeInt(rotationDegrees);
     }
 
     @Override
@@ -440,6 +456,9 @@ public class CropImageOptions implements Parcelable {
         }
         if (outputRequestHeight < 0) {
             throw new IllegalArgumentException("Cannot set request height value to a number < 0 ");
+        }
+        if (rotationDegrees < 0 || rotationDegrees > 360) {
+            throw new IllegalArgumentException("Cannot set rotation degrees value to a number < 0 or > 360");
         }
     }
 }
