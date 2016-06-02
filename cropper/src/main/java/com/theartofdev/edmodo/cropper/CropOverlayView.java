@@ -213,7 +213,6 @@ public class CropOverlayView extends View {
      * @param boundsPoints the image's bounding points
      * @param viewWidth The bounding image view width.
      * @param viewHeight The bounding image view height.
-     * @param degreesRotated the degress clockwise the image is rotated.
      */
     public void setBounds(float[] boundsPoints, int viewWidth, int viewHeight) {
         if (boundsPoints == null || !Arrays.equals(mBoundsPoints, boundsPoints)) {
