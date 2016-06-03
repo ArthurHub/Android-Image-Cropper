@@ -18,7 +18,7 @@ Android Image Cropper
 Include the library
 
  ```
- compile 'com.theartofdev.edmodo:android-image-cropper:2.1.+'
+ compile 'com.theartofdev.edmodo:android-image-cropper:2.2.+'
  ```
 
 ### Using Activity
@@ -103,6 +103,12 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.2.0*
+
+- Fix non-straight angle rotation handling.
+- Add activity counter-clockwise rotation button (configurable, hidden by default).
+- Add activity rotation degrees configuration (default 90)
+
 *2.1.4*
 
 - Support for requesting CAMERA permission for android M when CAMERA is requested in the manifest.
@@ -115,28 +121,6 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 - Save cropped image to Uri API `saveCroppedImageAsync(Uri)`.
 - Handle possible out-of-memory in image load by down-sampling until succeed.
 - Minor fixes.
-
-*2.0.1* (Beta)
-
-- Fix counter clockwise rotation resulting in negative degrees (#54). 
-
-*2.0.0* (Beta)
-
-- **Auto-zoom**: zoom-in when crop window takes less than 50% of the image, zoom-out when more than 65%.
-- Handle cropping of non-straight angles rotations for URI loaded images.
-- Improve performance for image rotation.
-- Improve performance for rotation due to exif orientation data.
-- Improve performance for orientation change.
-- Preserve crop window on rotations for straight angles - 90/180/270.
-- Preserve crop window on orientation change.
-- Handle max allowed texture size on device by down-sampling to be within the limit.
-- API breaking changes:
- - Renamed `CropImageHelper` to `CropImage`
- - Removed `getActualCropRect()` and `getActualCropRectNoRotation()`, replaced by 'getCropPoints()' and 'getCropRect()'.
- - Moved to custom `CropImageView.ScaleType` for 'setScaleType()'
- - Removed `CropShape` from `getCroppedImage` API, added `CropImage.toOvalBitmap`.
-- Known issues:
- - Boundaries and orientation change for non-straight angle rotation of images.
  
 See [full change log](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log).
 
