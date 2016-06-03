@@ -30,9 +30,9 @@ final class CropImageAnimation extends Animation implements Animation.AnimationL
 
     private final CropOverlayView mCropOverlayView;
 
-    private final RectF mStartImageRect = new RectF();
+    private final float[] mStartBoundPoints = new float[8];
 
-    private final RectF mEndImageRect = new RectF();
+    private final float[] mEndBoundPoints = new float[8];
 
     private final RectF mStartCropWindowRect = new RectF();
 
@@ -43,6 +43,8 @@ final class CropImageAnimation extends Animation implements Animation.AnimationL
     private final float[] mEndImageMatrix = new float[9];
 
     private final RectF mAnimRect = new RectF();
+
+    private final float[] mAnimPoints = new float[8];
 
     private final float[] mAnimMatrix = new float[9];
     //endregion
@@ -57,15 +59,15 @@ final class CropImageAnimation extends Animation implements Animation.AnimationL
         setAnimationListener(this);
     }
 
-    public void setStartState(RectF imageRect, Matrix imageMatrix) {
+    public void setStartState(float[] boundPoints, Matrix imageMatrix) {
         reset();
-        mStartImageRect.set(imageRect);
+        System.arraycopy(boundPoints, 0, mStartBoundPoints, 0, 8);
         mStartCropWindowRect.set(mCropOverlayView.getCropWindowRect());
         imageMatrix.getValues(mStartImageMatrix);
     }
 
-    public void setEndState(RectF imageRect, Matrix imageMatrix) {
-        mEndImageRect.set(imageRect);
+    public void setEndState(float[] boundPoints, Matrix imageMatrix) {
+        System.arraycopy(boundPoints, 0, mEndBoundPoints, 0, 8);
         mEndCropWindowRect.set(mCropOverlayView.getCropWindowRect());
         imageMatrix.getValues(mEndImageMatrix);
     }
@@ -79,11 +81,10 @@ final class CropImageAnimation extends Animation implements Animation.AnimationL
         mAnimRect.bottom = mStartCropWindowRect.bottom + (mEndCropWindowRect.bottom - mStartCropWindowRect.bottom) * interpolatedTime;
         mCropOverlayView.setCropWindowRect(mAnimRect);
 
-        mAnimRect.left = mStartImageRect.left + (mEndImageRect.left - mStartImageRect.left) * interpolatedTime;
-        mAnimRect.top = mStartImageRect.top + (mEndImageRect.top - mStartImageRect.top) * interpolatedTime;
-        mAnimRect.right = mStartImageRect.right + (mEndImageRect.right - mStartImageRect.right) * interpolatedTime;
-        mAnimRect.bottom = mStartImageRect.bottom + (mEndImageRect.bottom - mStartImageRect.bottom) * interpolatedTime;
-        mCropOverlayView.setBitmapRect(mAnimRect, mImageView.getWidth(), mImageView.getHeight());
+        for (int i = 0; i < mAnimPoints.length; i++) {
+            mAnimPoints[i] = mStartBoundPoints[i] + (mEndBoundPoints[i] - mStartBoundPoints[i]) * interpolatedTime;
+        }
+        mCropOverlayView.setBounds(mAnimPoints, mImageView.getWidth(), mImageView.getHeight());
 
         for (int i = 0; i < mAnimMatrix.length; i++) {
             mAnimMatrix[i] = mStartImageMatrix[i] + (mEndImageMatrix[i] - mStartImageMatrix[i]) * interpolatedTime;

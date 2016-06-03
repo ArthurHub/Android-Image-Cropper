@@ -25,6 +25,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.Arrays;
+
 /**
  * A custom View representing the crop window and the shaded background outside the crop window.
  */
@@ -68,9 +70,19 @@ public class CropOverlayView extends View {
     private Paint mBackgroundPaint;
 
     /**
+     * Used for oval crop window shape or non-straight rotation drawing.
+     */
+    private Path mPath = new Path();
+
+    /**
      * The bounding box around the Bitmap that we are cropping.
      */
-    private final RectF mBitmapRect = new RectF();
+    private final float[] mBoundsPoints = new float[8];
+
+    /**
+     * The bounding box around the Bitmap that we are cropping.
+     */
+    private final RectF mCalcBounds = new RectF();
 
     /**
      * The bounding image view width used to know the crop overlay is at view edges.
@@ -190,16 +202,29 @@ public class CropOverlayView extends View {
     }
 
     /**
+     * Fix the current crop window rectangle if it is outside of cropping image or view bounds.
+     */
+    public void fixCurrentCropWindowRect() {
+        RectF rect = getCropWindowRect();
+        fixCropWindowRectByRules(rect);
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
      * Informs the CropOverlayView of the image's position relative to the
      * ImageView. This is necessary to call in order to draw the crop window.
      *
-     * @param bitmapRect the image's bounding box
+     * @param boundsPoints the image's bounding points
      * @param viewWidth The bounding image view width.
      * @param viewHeight The bounding image view height.
      */
-    public void setBitmapRect(RectF bitmapRect, int viewWidth, int viewHeight) {
-        if (mBitmapRect == null || !bitmapRect.equals(mBitmapRect)) {
-            mBitmapRect.set(bitmapRect);
+    public void setBounds(float[] boundsPoints, int viewWidth, int viewHeight) {
+        if (boundsPoints == null || !Arrays.equals(mBoundsPoints, boundsPoints)) {
+            if (boundsPoints == null) {
+                Arrays.fill(mBoundsPoints, 0);
+            } else {
+                System.arraycopy(boundsPoints, 0, mBoundsPoints, 0, boundsPoints.length);
+            }
             mViewWidth = viewWidth;
             mViewHeight = viewHeight;
             RectF cropRect = mCropWindowHandler.getRect();
@@ -214,7 +239,6 @@ public class CropOverlayView extends View {
      */
     public void resetCropOverlayView() {
         if (initializedCropWindow) {
-            setBitmapRect(BitmapUtils.EMPTY_RECT_F, 0, 0);
             setCropWindowRect(BitmapUtils.EMPTY_RECT_F);
             initCropWindow();
             invalidate();
@@ -435,7 +459,12 @@ public class CropOverlayView extends View {
      */
     private void initCropWindow() {
 
-        if (mBitmapRect == null || mBitmapRect.width() == 0 || mBitmapRect.height() == 0) {
+        float leftLimit = Math.max(BitmapUtils.getRectLeft(mBoundsPoints), 0);
+        float topLimit = Math.max(BitmapUtils.getRectTop(mBoundsPoints), 0);
+        float rightLimit = Math.min(BitmapUtils.getRectRight(mBoundsPoints), getWidth());
+        float bottomLimit = Math.min(BitmapUtils.getRectBottom(mBoundsPoints), getHeight());
+
+        if (rightLimit <= leftLimit || bottomLimit <= topLimit) {
             return;
         }
 
@@ -444,12 +473,8 @@ public class CropOverlayView extends View {
         // Tells the attribute functions the crop window has already been initialized
         initializedCropWindow = true;
 
-        float leftLimit = Math.max(mBitmapRect.left, 0);
-        float topLimit = Math.max(mBitmapRect.top, 0);
-        float rightLimit = Math.min(mBitmapRect.right, getWidth());
-        float bottomLimit = Math.min(mBitmapRect.bottom, getHeight());
-        float horizontalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.width();
-        float verticalPadding = mInitialCropWindowPaddingRatio * mBitmapRect.height();
+        float horizontalPadding = mInitialCropWindowPaddingRatio * (rightLimit - leftLimit);
+        float verticalPadding = mInitialCropWindowPaddingRatio * (bottomLimit - topLimit);
 
         if (mInitialCropWindowRect.width() > 0 && mInitialCropWindowRect.height() > 0) {
             // Get crop window position relative to the displayed image.
@@ -464,11 +489,11 @@ public class CropOverlayView extends View {
             rect.right = Math.min(rightLimit, rect.right);
             rect.bottom = Math.min(bottomLimit, rect.bottom);
 
-        } else if (mFixAspectRatio && !mBitmapRect.isEmpty()) {
+        } else if (mFixAspectRatio && rightLimit > leftLimit && bottomLimit > topLimit) {
 
             // If the image aspect ratio is wider than the crop aspect ratio,
             // then the image height is the determining initial length. Else, vice-versa.
-            float bitmapAspectRatio = mBitmapRect.width() / mBitmapRect.height();
+            float bitmapAspectRatio = (rightLimit - leftLimit) / (bottomLimit - topLimit);
             if (bitmapAspectRatio > mTargetAspectRatio) {
 
                 rect.top = topLimit + verticalPadding;
@@ -537,11 +562,13 @@ public class CropOverlayView extends View {
             rect.top += adj;
             rect.bottom -= adj;
         }
-        if (mBitmapRect != null && mBitmapRect.width() > 0 && mBitmapRect.height() > 0) {
-            float leftLimit = Math.max(mBitmapRect.left, 0);
-            float topLimit = Math.max(mBitmapRect.top, 0);
-            float rightLimit = Math.min(mBitmapRect.right, getWidth());
-            float bottomLimit = Math.min(mBitmapRect.bottom, getHeight());
+
+        calculateBounds(rect);
+        if (mCalcBounds.width() > 0 && mCalcBounds.height() > 0) {
+            float leftLimit = Math.max(mCalcBounds.left, 0);
+            float topLimit = Math.max(mCalcBounds.top, 0);
+            float rightLimit = Math.min(mCalcBounds.right, getWidth());
+            float bottomLimit = Math.min(mCalcBounds.bottom, getHeight());
             if (rect.left < leftLimit) {
                 rect.left = leftLimit;
             }
@@ -577,7 +604,7 @@ public class CropOverlayView extends View {
         super.onDraw(canvas);
 
         // Draw translucent background for the cropped area.
-        drawBackground(canvas, mBitmapRect);
+        drawBackground(canvas);
 
         if (mCropWindowHandler.showGuidelines()) {
             // Determines whether guidelines should be drawn or not
@@ -599,26 +626,46 @@ public class CropOverlayView extends View {
     /**
      * Draw shadow background over the image not including the crop area.
      */
-    private void drawBackground(Canvas canvas, RectF bitmapRect) {
+    private void drawBackground(Canvas canvas) {
 
         RectF rect = mCropWindowHandler.getRect();
 
+        float left = Math.max(BitmapUtils.getRectLeft(mBoundsPoints), 0);
+        float top = Math.max(BitmapUtils.getRectTop(mBoundsPoints), 0);
+        float right = Math.min(BitmapUtils.getRectRight(mBoundsPoints), getWidth());
+        float bottom = Math.min(BitmapUtils.getRectBottom(mBoundsPoints), getHeight());
+
         if (mCropShape == CropImageView.CropShape.RECTANGLE) {
-            canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, rect.top, mBackgroundPaint);
-            canvas.drawRect(bitmapRect.left, rect.bottom, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
-            canvas.drawRect(bitmapRect.left, rect.top, rect.left, rect.bottom, mBackgroundPaint);
-            canvas.drawRect(rect.right, rect.top, bitmapRect.right, rect.bottom, mBackgroundPaint);
+            if (!isNonStraightAngleRotated() || Build.VERSION.SDK_INT <= 17) {
+                canvas.drawRect(left, top, right, rect.top, mBackgroundPaint);
+                canvas.drawRect(left, rect.bottom, right, bottom, mBackgroundPaint);
+                canvas.drawRect(left, rect.top, rect.left, rect.bottom, mBackgroundPaint);
+                canvas.drawRect(rect.right, rect.top, right, rect.bottom, mBackgroundPaint);
+            } else {
+                mPath.reset();
+                mPath.moveTo(mBoundsPoints[0], mBoundsPoints[1]);
+                mPath.lineTo(mBoundsPoints[2], mBoundsPoints[3]);
+                mPath.lineTo(mBoundsPoints[4], mBoundsPoints[5]);
+                mPath.lineTo(mBoundsPoints[6], mBoundsPoints[7]);
+                mPath.close();
+
+                canvas.save();
+                canvas.clipPath(mPath, Region.Op.INTERSECT);
+                canvas.clipRect(rect, Region.Op.XOR);
+                canvas.drawRect(left, top, right, bottom, mBackgroundPaint);
+                canvas.restore();
+            }
         } else {
-            Path circleSelectionPath = new Path();
+            mPath.reset();
             if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17 && mCropShape == CropImageView.CropShape.OVAL) {
                 mDrawRect.set(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2);
             } else {
                 mDrawRect.set(rect.left, rect.top, rect.right, rect.bottom);
             }
-            circleSelectionPath.addOval(mDrawRect, Path.Direction.CW);
+            mPath.addOval(mDrawRect, Path.Direction.CW);
             canvas.save();
-            canvas.clipPath(circleSelectionPath, Region.Op.XOR);
-            canvas.drawRect(bitmapRect.left, bitmapRect.top, bitmapRect.right, bitmapRect.bottom, mBackgroundPaint);
+            canvas.clipPath(mPath, Region.Op.XOR);
+            canvas.drawRect(left, top, right, bottom, mBackgroundPaint);
             canvas.restore();
         }
     }
@@ -800,10 +847,106 @@ public class CropOverlayView extends View {
      */
     private void onActionMove(float x, float y) {
         if (mMoveHandler != null) {
-            mMoveHandler.move(x, y, mBitmapRect, mViewWidth, mViewHeight, mSnapRadius, mFixAspectRatio, mTargetAspectRatio);
+            float snapRadius = mSnapRadius;
+            RectF rect = mCropWindowHandler.getRect();
+
+            if (calculateBounds(rect)) {
+                snapRadius = 0;
+            }
+
+            mMoveHandler.move(rect, x, y, mCalcBounds, mViewWidth, mViewHeight, snapRadius, mFixAspectRatio, mTargetAspectRatio);
+            mCropWindowHandler.setRect(rect);
             callOnCropWindowChanged(true);
             invalidate();
         }
+    }
+
+    /**
+     * Calculate the bounding rectangle for current crop window, handle non-straight rotation angles.<br>
+     * If the rotation angle is straight then the bounds rectangle is the bitmap rectangle,
+     * otherwsie we find the max rectangle that is within the image bounds starting from the crop window rectangle.
+     *
+     * @param rect the crop window rectangle to start finsing bounded rectangle from
+     * @return true - non straight rotation in place, false - otherwise.
+     */
+    private boolean calculateBounds(RectF rect) {
+
+        float left = BitmapUtils.getRectLeft(mBoundsPoints);
+        float top = BitmapUtils.getRectTop(mBoundsPoints);
+        float right = BitmapUtils.getRectRight(mBoundsPoints);
+        float bottom = BitmapUtils.getRectBottom(mBoundsPoints);
+
+        if (!isNonStraightAngleRotated()) {
+            mCalcBounds.set(left, top, right, bottom);
+            return false;
+        } else {
+            float x0 = mBoundsPoints[0];
+            float y0 = mBoundsPoints[1];
+            float x2 = mBoundsPoints[4];
+            float y2 = mBoundsPoints[5];
+            float x3 = mBoundsPoints[6];
+            float y3 = mBoundsPoints[7];
+
+            if (mBoundsPoints[7] < mBoundsPoints[1]) {
+                if (mBoundsPoints[1] < mBoundsPoints[3]) {
+                    x0 = mBoundsPoints[6];
+                    y0 = mBoundsPoints[7];
+                    x2 = mBoundsPoints[2];
+                    y2 = mBoundsPoints[3];
+                    x3 = mBoundsPoints[4];
+                    y3 = mBoundsPoints[5];
+                } else {
+                    x0 = mBoundsPoints[4];
+                    y0 = mBoundsPoints[5];
+                    x2 = mBoundsPoints[0];
+                    y2 = mBoundsPoints[1];
+                    x3 = mBoundsPoints[2];
+                    y3 = mBoundsPoints[3];
+                }
+            } else if (mBoundsPoints[1] > mBoundsPoints[3]) {
+                x0 = mBoundsPoints[2];
+                y0 = mBoundsPoints[3];
+                x2 = mBoundsPoints[6];
+                y2 = mBoundsPoints[7];
+                x3 = mBoundsPoints[0];
+                y3 = mBoundsPoints[1];
+            }
+
+            float a0 = (y3 - y0) / (x3 - x0);
+            float a1 = -1f / a0;
+            float b0 = y0 - a0 * x0;
+            float b1 = y0 - a1 * x0;
+            float b2 = y2 - a0 * x2;
+            float b3 = y2 - a1 * x2;
+
+            float c0 = (rect.centerY() - rect.top) / (rect.centerX() - rect.left);
+            float c1 = -c0;
+            float d0 = rect.top - c0 * rect.left;
+            float d1 = rect.top - c1 * rect.right;
+
+            left = Math.max(left, (d0 - b0) / (a0 - c0) < rect.right ? (d0 - b0) / (a0 - c0) : left);
+            left = Math.max(left, (d0 - b1) / (a1 - c0) < rect.right ? (d0 - b1) / (a1 - c0) : left);
+            left = Math.max(left, (d1 - b3) / (a1 - c1) < rect.right ? (d1 - b3) / (a1 - c1) : left);
+            right = Math.min(right, (d1 - b1) / (a1 - c1) > rect.left ? (d1 - b1) / (a1 - c1) : right);
+            right = Math.min(right, (d1 - b2) / (a0 - c1) > rect.left ? (d1 - b2) / (a0 - c1) : right);
+            right = Math.min(right, (d0 - b2) / (a0 - c0) > rect.left ? (d0 - b2) / (a0 - c0) : right);
+
+            top = Math.max(top, Math.max(a0 * left + b0, a1 * right + b1));
+            bottom = Math.min(bottom, Math.min(a1 * left + b3, a0 * right + b2));
+
+            mCalcBounds.left = left;
+            mCalcBounds.top = top;
+            mCalcBounds.right = right;
+            mCalcBounds.bottom = bottom;
+            return true;
+        }
+    }
+
+    /**
+     * Is the cropping image has been rotated by NOT 0,90,180 or 270 degrees.
+     */
+    private boolean isNonStraightAngleRotated() {
+        return mBoundsPoints[0] != mBoundsPoints[6] && mBoundsPoints[1] != mBoundsPoints[7];
     }
 
     /**

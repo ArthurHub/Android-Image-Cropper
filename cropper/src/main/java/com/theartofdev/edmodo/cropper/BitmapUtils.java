@@ -54,6 +54,16 @@ final class BitmapUtils {
     static final RectF RECT = new RectF();
 
     /**
+     * Reusable point for general internal usage
+     */
+    static final float[] POINTS = new float[6];
+
+    /**
+     * Reusable point for general internal usage
+     */
+    static final float[] POINTS2 = new float[6];
+
+    /**
      * Used to know the max texture size allowed to be rendered
      */
     static int mMaxTextureSize;
@@ -213,14 +223,70 @@ final class BitmapUtils {
     }
 
     /**
+     * Get left value of the bounding rectangle of the given points.
+     */
+    public static float getRectLeft(float[] points) {
+        return Math.min(Math.min(Math.min(points[0], points[2]), points[4]), points[6]);
+    }
+
+    /**
+     * Get top value of the bounding rectangle of the given points.
+     */
+    public static float getRectTop(float[] points) {
+        return Math.min(Math.min(Math.min(points[1], points[3]), points[5]), points[7]);
+    }
+
+    /**
+     * Get right value of the bounding rectangle of the given points.
+     */
+    public static float getRectRight(float[] points) {
+        return Math.max(Math.max(Math.max(points[0], points[2]), points[4]), points[6]);
+    }
+
+    /**
+     * Get bottom value of the bounding rectangle of the given points.
+     */
+    public static float getRectBottom(float[] points) {
+        return Math.max(Math.max(Math.max(points[1], points[3]), points[5]), points[7]);
+    }
+
+    /**
+     * Get width of the bounding rectangle of the given points.
+     */
+    public static float getRectWidth(float[] points) {
+        return getRectRight(points) - getRectLeft(points);
+    }
+
+    /**
+     * Get heightof the bounding rectangle of the given points.
+     */
+    public static float getRectHeight(float[] points) {
+        return getRectBottom(points) - getRectTop(points);
+    }
+
+    /**
+     * Get horizontal center value of the bounding rectangle of the given points.
+     */
+    public static float getRectCenterX(float[] points) {
+        return (getRectRight(points) + getRectLeft(points)) / 2f;
+    }
+
+    /**
+     * Get verical center value of the bounding rectangle of the given points.
+     */
+    public static float getRectCenterY(float[] points) {
+        return (getRectBottom(points) + getRectTop(points)) / 2f;
+    }
+
+    /**
      * Get a rectangle for the given 4 points (x0,y0,x1,y1,x2,y2,x3,y3) by finding the min/max 2 points that
      * contains the given 4 points and is a stright rectangle.
      */
     public static Rect getRectFromPoints(float[] points, int imageWidth, int imageHeight, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
-        int left = Math.round(Math.max(0, Math.min(Math.min(Math.min(points[0], points[2]), points[4]), points[6])));
-        int top = Math.round(Math.max(0, Math.min(Math.min(Math.min(points[1], points[3]), points[5]), points[7])));
-        int right = Math.round(Math.min(imageWidth, Math.max(Math.max(Math.max(points[0], points[2]), points[4]), points[6])));
-        int bottom = Math.round(Math.min(imageHeight, Math.max(Math.max(Math.max(points[1], points[3]), points[5]), points[7])));
+        int left = Math.round(Math.max(0, getRectLeft(points)));
+        int top = Math.round(Math.max(0, getRectTop(points)));
+        int right = Math.round(Math.min(imageWidth, getRectRight(points)));
+        int bottom = Math.round(Math.min(imageHeight, getRectBottom(points)));
 
         Rect rect = new Rect(left, top, right, bottom);
         if (fixAspectRatio) {
@@ -339,7 +405,7 @@ final class BitmapUtils {
             double rads = Math.toRadians(degreesRotated);
             int compareTo = degreesRotated < 90 || (degreesRotated > 180 && degreesRotated < 270) ? rect.left : rect.right;
             for (int i = 0; i < points.length; i += 2) {
-                if (((int) points[i]) == compareTo) {
+                if (points[i] >= compareTo - 1 && points[i] <= compareTo + 1) {
                     adjLeft = (int) Math.abs(Math.sin(rads) * (rect.bottom - points[i + 1]));
                     adjTop = (int) Math.abs(Math.cos(rads) * (points[i + 1] - rect.top));
                     width = (int) Math.abs((points[i + 1] - rect.top) / Math.sin(rads));

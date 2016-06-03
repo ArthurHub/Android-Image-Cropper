@@ -87,7 +87,10 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
         getMenuInflater().inflate(R.menu.crop_image_menu, menu);
 
         if (!mOptions.allowRotation) {
-            menu.removeItem(R.id.crop_image_menu_rotate);
+            menu.removeItem(R.id.crop_image_menu_rotate_left);
+            menu.removeItem(R.id.crop_image_menu_rotate_right);
+        } else if (mOptions.allowCounterRotation) {
+            menu.findItem(R.id.crop_image_menu_rotate_left).setVisible(true);
         }
 
         Drawable cropIcon = null;
@@ -100,7 +103,8 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
         }
 
         if (mOptions.activityMenuIconColor != 0) {
-            updateMenuItemIconColor(menu, R.id.crop_image_menu_rotate, mOptions.activityMenuIconColor);
+            updateMenuItemIconColor(menu, R.id.crop_image_menu_rotate_left, mOptions.activityMenuIconColor);
+            updateMenuItemIconColor(menu, R.id.crop_image_menu_rotate_right, mOptions.activityMenuIconColor);
             if (cropIcon != null) {
                 updateMenuItemIconColor(menu, R.id.crop_image_menu_crop, mOptions.activityMenuIconColor);
             }
@@ -115,8 +119,12 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
             cropImage();
             return true;
         }
-        if (item.getItemId() == R.id.crop_image_menu_rotate) {
-            rotateImage();
+        if (item.getItemId() == R.id.crop_image_menu_rotate_left) {
+            rotateImage(-mOptions.rotationDegrees);
+            return true;
+        }
+        if (item.getItemId() == R.id.crop_image_menu_rotate_right) {
+            rotateImage(mOptions.rotationDegrees);
             return true;
         }
         if (item.getItemId() == android.R.id.home) {
@@ -172,8 +180,8 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
     /**
      * Rotate the image in the crop image view.
      */
-    protected void rotateImage() {
-        mCropImageView.rotateImage(90);
+    protected void rotateImage(int degrees) {
+        mCropImageView.rotateImage(degrees);
     }
 
     /**

@@ -757,6 +757,25 @@ public final class CropImage {
             mOptions.allowRotation = allowRotation;
             return this;
         }
+
+        /**
+         * if to allow counter-clockwise rotation during cropping.<br>
+         * Note: if rotation is disabled this option has no effect.<br>
+         * <i>Default: false</i>
+         */
+        public ActivityBuilder setAllowCounterRotation(boolean allowCounterRotation) {
+            mOptions.allowCounterRotation = allowCounterRotation;
+            return this;
+        }
+
+        /**
+         * The amount of degreees to rotate clockwise or counter-clockwise (0-360).<br>
+         * <i>Default: 90</i>
+         */
+        public ActivityBuilder setRotationDegrees(int rotationDegrees) {
+            mOptions.rotationDegrees = rotationDegrees;
+            return this;
+        }
     }
     //endregion
 

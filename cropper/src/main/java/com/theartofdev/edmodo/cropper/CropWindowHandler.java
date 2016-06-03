@@ -95,28 +95,28 @@ final class CropWindowHandler {
     }
 
     /**
-     * Minimum height in pixels that the crop window can get.
+     * Minimum width in pixels that the crop window can get.
      */
     public float getMinCropWidth() {
         return Math.max(mMinCropWindowWidth, mMinCropResultWidth / mScaleFactorWidth);
     }
 
     /**
-     * Minimum width in pixels that the crop window can get.
+     * Minimum height in pixels that the crop window can get.
      */
     public float getMinCropHeight() {
         return Math.max(mMinCropWindowHeight, mMinCropResultHeight / mScaleFactorHeight);
     }
 
     /**
-     * Maximum height in pixels that the crop window can get.
+     * Maximum width in pixels that the crop window can get.
      */
     public float getMaxCropWidth() {
         return Math.min(mMaxCropWindowWidth, mMaxCropResultWidth / mScaleFactorWidth);
     }
 
     /**
-     * Maximum width in pixels that the crop window can get.
+     * Maximum height in pixels that the crop window can get.
      */
     public float getMaxCropHeight() {
         return Math.min(mMaxCropWindowHeight, mMaxCropResultHeight / mScaleFactorHeight);
