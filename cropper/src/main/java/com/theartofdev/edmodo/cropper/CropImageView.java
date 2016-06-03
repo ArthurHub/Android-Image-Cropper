@@ -1120,8 +1120,9 @@ public class CropImageView extends FrameLayout {
                 if (mBitmap != null && mRestoreCropWindowRect != null) {
                     mImageMatrix.mapRect(mRestoreCropWindowRect);
                     mCropOverlayView.setCropWindowRect(mRestoreCropWindowRect);
-                    mRestoreCropWindowRect = null;
                     handleCropWindowChanged(false, false);
+                    mCropOverlayView.fixCurrentCropWindowRect();
+                    mRestoreCropWindowRect = null;
                 }
             } else {
                 updateImageBounds(true);
