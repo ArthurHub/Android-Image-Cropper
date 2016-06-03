@@ -782,6 +782,7 @@ public class CropImageView extends FrameLayout {
             // adjust the zoom so the crop window size remains the same even after image scale change
             mImageMatrix.mapPoints(BitmapUtils.POINTS2, BitmapUtils.POINTS);
             mZoom /= Math.sqrt(Math.pow(BitmapUtils.POINTS2[4] - BitmapUtils.POINTS2[2], 2) + Math.pow(BitmapUtils.POINTS2[5] - BitmapUtils.POINTS2[3], 2));
+            mZoom = Math.max(mZoom, 1);
 
             applyImageMatrix(getWidth(), getHeight(), true, false);
 
