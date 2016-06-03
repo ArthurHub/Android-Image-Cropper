@@ -56,7 +56,12 @@ final class BitmapUtils {
     /**
      * Reusable point for general internal usage
      */
-    static final float[] POINTS = new float[8];
+    static final float[] POINTS = new float[6];
+
+    /**
+     * Reusable point for general internal usage
+     */
+    static final float[] POINTS2 = new float[6];
 
     /**
      * Used to know the max texture size allowed to be rendered

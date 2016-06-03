@@ -196,13 +196,17 @@ public class CropOverlayView extends View {
 
     /**
      * Set the left/top/right/bottom coordinates of the crop window.
-     *
-     * @param fix if to fix the rect by bounds
      */
-    public void setCropWindowRect(RectF rect, boolean fix) {
-        if (fix) {
-            fixCropWindowRectByRules(rect);
-        }
+    public void setCropWindowRect(RectF rect) {
+        mCropWindowHandler.setRect(rect);
+    }
+
+    /**
+     * Fix the current crop window rectangle if it is outside of cropping image or view bounds.
+     */
+    public void fixCurrentCropWindowRect() {
+        RectF rect = getCropWindowRect();
+        fixCropWindowRectByRules(rect);
         mCropWindowHandler.setRect(rect);
     }
 
@@ -235,7 +239,7 @@ public class CropOverlayView extends View {
      */
     public void resetCropOverlayView() {
         if (initializedCropWindow) {
-            setCropWindowRect(BitmapUtils.EMPTY_RECT_F, false);
+            setCropWindowRect(BitmapUtils.EMPTY_RECT_F);
             initCropWindow();
             invalidate();
         }

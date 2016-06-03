@@ -772,32 +772,37 @@ public class CropImageView extends FrameLayout {
             BitmapUtils.POINTS[3] = 0;
             BitmapUtils.POINTS[4] = 1;
             BitmapUtils.POINTS[5] = 0;
-            BitmapUtils.POINTS[6] = 0;
-            BitmapUtils.POINTS[7] = 1;
             mImageInverseMatrix.mapPoints(BitmapUtils.POINTS);
 
-            float oldZoom = mZoom;
-            mZoom = 1;
-            mZoomOffsetX = 0;
-            mZoomOffsetY = 0;
             mDegreesRotated += degrees;
             mDegreesRotated = mDegreesRotated >= 0 ? mDegreesRotated % 360 : mDegreesRotated % 360 + 360;
 
             applyImageMatrix(getWidth(), getHeight(), true, false);
 
-            mImageMatrix.mapPoints(BitmapUtils.POINTS);
+            // adjust the zoom so the crop window size remains the same even after image scale change
+            mImageMatrix.mapPoints(BitmapUtils.POINTS2, BitmapUtils.POINTS);
+            mZoom /= Math.sqrt(Math.pow(BitmapUtils.POINTS2[4] - BitmapUtils.POINTS2[2], 2) + Math.pow(BitmapUtils.POINTS2[5] - BitmapUtils.POINTS2[3], 2));
+
+            applyImageMatrix(getWidth(), getHeight(), true, false);
+
+            mImageMatrix.mapPoints(BitmapUtils.POINTS2, BitmapUtils.POINTS);
 
             // adjust the width/height by the changes in scaling to the image
-            halfWidth *= Math.sqrt(Math.pow(BitmapUtils.POINTS[4] - BitmapUtils.POINTS[2], 2) + Math.pow(BitmapUtils.POINTS[5] - BitmapUtils.POINTS[3], 2));
-            halfHeight *= Math.sqrt(Math.pow(BitmapUtils.POINTS[6] - BitmapUtils.POINTS[2], 2) + Math.pow(BitmapUtils.POINTS[7] - BitmapUtils.POINTS[3], 2));
+            double change = Math.sqrt(Math.pow(BitmapUtils.POINTS2[4] - BitmapUtils.POINTS2[2], 2) + Math.pow(BitmapUtils.POINTS2[5] - BitmapUtils.POINTS2[3], 2));
+            halfWidth *= change;
+            halfHeight *= change;
 
-            BitmapUtils.RECT.set(BitmapUtils.POINTS[0] - halfWidth, BitmapUtils.POINTS[1] - halfHeight,
-                    BitmapUtils.POINTS[0] + halfWidth, BitmapUtils.POINTS[1] + halfHeight);
+            // calculate the new crop window rectangle to center in the same location and have proper width/height
+            BitmapUtils.RECT.set(BitmapUtils.POINTS2[0] - halfWidth, BitmapUtils.POINTS2[1] - halfHeight,
+                    BitmapUtils.POINTS2[0] + halfWidth, BitmapUtils.POINTS2[1] + halfHeight);
 
             mCropOverlayView.resetCropOverlayView();
-            mCropOverlayView.setCropWindowRect(BitmapUtils.RECT, true);
+            mCropOverlayView.setCropWindowRect(BitmapUtils.RECT);
             applyImageMatrix(getWidth(), getHeight(), true, false);
             handleCropWindowChanged(false, false);
+
+            // make sure the crop window rectangle is within the cropping image bounds after all the changes
+            mCropOverlayView.fixCurrentCropWindowRect();
         }
     }
 
@@ -1114,7 +1119,7 @@ public class CropImageView extends FrameLayout {
                 // after state restore we want to restore the window crop, possible only after widget size is known
                 if (mBitmap != null && mRestoreCropWindowRect != null) {
                     mImageMatrix.mapRect(mRestoreCropWindowRect);
-                    mCropOverlayView.setCropWindowRect(mRestoreCropWindowRect, false);
+                    mCropOverlayView.setCropWindowRect(mRestoreCropWindowRect);
                     mRestoreCropWindowRect = null;
                     handleCropWindowChanged(false, false);
                 }
@@ -1187,7 +1192,7 @@ public class CropImageView extends FrameLayout {
         float yCenterOffset = getHeight() / 2 - cropRect.centerY();
         cropRect.offset(xCenterOffset - xCenterOffset * zoomChange, yCenterOffset - yCenterOffset * zoomChange);
         cropRect.inset((cropRect.width() - cropRect.width() * zoomChange) / 2f, (cropRect.height() - cropRect.height() * zoomChange) / 2f);
-        mCropOverlayView.setCropWindowRect(cropRect, false);
+        mCropOverlayView.setCropWindowRect(cropRect);
     }
 
     /**
@@ -1242,7 +1247,7 @@ public class CropImageView extends FrameLayout {
             // apply to zoom offset translate and update the crop rectangle to offset correctly
             mImageMatrix.postTranslate(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
             cropRect.offset(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
-            mCropOverlayView.setCropWindowRect(cropRect, false);
+            mCropOverlayView.setCropWindowRect(cropRect);
             mapImagePointsByImageMatrix();
 
             // set matrix to apply
