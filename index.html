@@ -40,7 +40,7 @@
 
 <p>Include the library</p>
 
-<pre><code> compile 'com.theartofdev.edmodo:android-image-cropper:2.1.+'
+<pre><code> compile 'com.theartofdev.edmodo:android-image-cropper:2.2.+'
 </code></pre>
 
 <h3>
@@ -148,6 +148,14 @@ cropImageView<span class="pl-k">.</span>getCroppedImageAsync();</pre></div>
 <h2>
 <a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Change log</h2>
 
+<p><em>2.2.0</em></p>
+
+<ul>
+<li>Fix non-straight angle rotation handling.</li>
+<li>Add activity counter-clockwise rotation button (configurable, hidden by default).</li>
+<li>Add activity rotation degrees configuration (default 90)</li>
+</ul>
+
 <p><em>2.1.4</em></p>
 
 <ul>
@@ -163,42 +171,6 @@ cropImageView<span class="pl-k">.</span>getCroppedImageAsync();</pre></div>
 <li>Save cropped image to Uri API <code>saveCroppedImageAsync(Uri)</code>.</li>
 <li>Handle possible out-of-memory in image load by down-sampling until succeed.</li>
 <li>Minor fixes.</li>
-</ul>
-
-<p><em>2.0.1</em> (Beta)</p>
-
-<ul>
-<li>Fix counter clockwise rotation resulting in negative degrees (#54). </li>
-</ul>
-
-<p><em>2.0.0</em> (Beta)</p>
-
-<ul>
-<li>
-<strong>Auto-zoom</strong>: zoom-in when crop window takes less than 50% of the image, zoom-out when more than 65%.</li>
-<li>Handle cropping of non-straight angles rotations for URI loaded images.</li>
-<li>Improve performance for image rotation.</li>
-<li>Improve performance for rotation due to exif orientation data.</li>
-<li>Improve performance for orientation change.</li>
-<li>Preserve crop window on rotations for straight angles - 90/180/270.</li>
-<li>Preserve crop window on orientation change.</li>
-<li>Handle max allowed texture size on device by down-sampling to be within the limit.</li>
-<li>API breaking changes:
-
-<ul>
-<li>Renamed <code>CropImageHelper</code> to <code>CropImage</code>
-</li>
-<li>Removed <code>getActualCropRect()</code> and <code>getActualCropRectNoRotation()</code>, replaced by 'getCropPoints()' and 'getCropRect()'.</li>
-<li>Moved to custom <code>CropImageView.ScaleType</code> for 'setScaleType()'</li>
-<li>Removed <code>CropShape</code> from <code>getCroppedImage</code> API, added <code>CropImage.toOvalBitmap</code>.</li>
-</ul>
-</li>
-<li>Known issues:
-
-<ul>
-<li>Boundaries and orientation change for non-straight angle rotation of images.</li>
-</ul>
-</li>
 </ul>
 
 <p>See <a href="https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log">full change log</a>.</p>
