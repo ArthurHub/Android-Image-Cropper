@@ -103,6 +103,10 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.2.1*
+
+- Fix listeners getting garbage collected bug (thx @TheFinestArtist)
+
 *2.2.0*
 
 - Fix non-straight angle rotation handling.

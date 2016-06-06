@@ -827,8 +827,9 @@ public class CropImageView extends FrameLayout {
             mDegreesRotated = result.degreesRotated;
         }
 
-        if (mOnSetImageUriCompleteListener != null) {
-            mOnSetImageUriCompleteListener.onSetImageUriComplete(this, result.uri, result.error);
+        OnSetImageUriCompleteListener listener = mOnSetImageUriCompleteListener;
+        if (listener != null) {
+            listener.onSetImageUriComplete(this, result.uri, result.error);
         }
     }
 
@@ -843,12 +844,14 @@ public class CropImageView extends FrameLayout {
         setProgressBarVisibility();
 
         if (result.isSave) {
-            if (mOnSaveCroppedImageCompleteListener != null) {
-                mOnSaveCroppedImageCompleteListener.onSaveCroppedImageComplete(this, result.uri, result.error);
+            OnSaveCroppedImageCompleteListener listener = mOnSaveCroppedImageCompleteListener;
+            if (listener != null) {
+                listener.onSaveCroppedImageComplete(this, result.uri, result.error);
             }
         } else {
-            if (mOnGetCroppedImageCompleteListener != null) {
-                mOnGetCroppedImageCompleteListener.onGetCroppedImageComplete(this, result.bitmap, result.error);
+            OnGetCroppedImageCompleteListener listener = mOnGetCroppedImageCompleteListener;
+            if (listener != null) {
+                listener.onGetCroppedImageComplete(this, result.bitmap, result.error);
             }
         }
     }
