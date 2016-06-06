@@ -759,7 +759,7 @@ public class CropImageView extends FrameLayout {
     public void rotateImage(int degrees) {
         if (mBitmap != null) {
 
-            boolean flipAxes = (degrees > 45 && degrees < 135) || (degrees > 215 && degrees < 305);
+            boolean flipAxes = !mCropOverlayView.isFixAspectRatio() && (degrees > 45 && degrees < 135) || (degrees > 215 && degrees < 305);
             BitmapUtils.RECT.set(mCropOverlayView.getCropWindowRect());
             float halfWidth = (flipAxes ? BitmapUtils.RECT.height() : BitmapUtils.RECT.width()) / 2f;
             float halfHeight = (flipAxes ? BitmapUtils.RECT.width() : BitmapUtils.RECT.height()) / 2f;
