@@ -121,17 +121,17 @@ public class CropImageView extends FrameLayout {
     /**
      * callback to be invoked when image async loading is complete
      */
-    private WeakReference<OnSetImageUriCompleteListener> mOnSetImageUriCompleteListener;
+    private OnSetImageUriCompleteListener mOnSetImageUriCompleteListener;
 
     /**
      * callback to be invoked when image async cropping is complete (get bitmap)
      */
-    private WeakReference<OnGetCroppedImageCompleteListener> mOnGetCroppedImageCompleteListener;
+    private OnGetCroppedImageCompleteListener mOnGetCroppedImageCompleteListener;
 
     /**
      * callback to be invoked when image async cropping is complete (save to uri)
      */
-    private WeakReference<OnSaveCroppedImageCompleteListener> mOnSaveCroppedImageCompleteListener;
+    private OnSaveCroppedImageCompleteListener mOnSaveCroppedImageCompleteListener;
 
     /**
      * The URI that the image was loaded from (if loaded from URI)
@@ -653,7 +653,7 @@ public class CropImageView extends FrameLayout {
      * is complete (successful or failed).
      */
     public void setOnSetImageUriCompleteListener(OnSetImageUriCompleteListener listener) {
-        mOnSetImageUriCompleteListener = listener != null ? new WeakReference<>(listener) : null;
+        mOnSetImageUriCompleteListener = listener;
     }
 
     /**
@@ -661,7 +661,7 @@ public class CropImageView extends FrameLayout {
      * is complete (successful or failed).
      */
     public void setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener listener) {
-        mOnGetCroppedImageCompleteListener = listener != null ? new WeakReference<>(listener) : null;
+        mOnGetCroppedImageCompleteListener = listener;
     }
 
     /**
@@ -669,7 +669,7 @@ public class CropImageView extends FrameLayout {
      * is complete (successful or failed).
      */
     public void setOnSaveCroppedImageCompleteListener(OnSaveCroppedImageCompleteListener listener) {
-        mOnSaveCroppedImageCompleteListener = listener != null ? new WeakReference<>(listener) : null;
+        mOnSaveCroppedImageCompleteListener = listener;
     }
 
     /**
@@ -827,10 +827,8 @@ public class CropImageView extends FrameLayout {
             mDegreesRotated = result.degreesRotated;
         }
 
-        OnSetImageUriCompleteListener listener = mOnSetImageUriCompleteListener != null
-                ? mOnSetImageUriCompleteListener.get() : null;
-        if (listener != null) {
-            listener.onSetImageUriComplete(this, result.uri, result.error);
+        if (mOnSetImageUriCompleteListener != null) {
+            mOnSetImageUriCompleteListener.onSetImageUriComplete(this, result.uri, result.error);
         }
     }
 
@@ -845,16 +843,12 @@ public class CropImageView extends FrameLayout {
         setProgressBarVisibility();
 
         if (result.isSave) {
-            OnSaveCroppedImageCompleteListener listener = mOnSaveCroppedImageCompleteListener != null
-                    ? mOnSaveCroppedImageCompleteListener.get() : null;
-            if (listener != null) {
-                listener.onSaveCroppedImageComplete(this, result.uri, result.error);
+            if (mOnSaveCroppedImageCompleteListener != null) {
+                mOnSaveCroppedImageCompleteListener.onSaveCroppedImageComplete(this, result.uri, result.error);
             }
         } else {
-            OnGetCroppedImageCompleteListener listener = mOnGetCroppedImageCompleteListener != null
-                    ? mOnGetCroppedImageCompleteListener.get() : null;
-            if (listener != null) {
-                listener.onGetCroppedImageComplete(this, result.bitmap, result.error);
+            if (mOnGetCroppedImageCompleteListener != null) {
+                mOnGetCroppedImageCompleteListener.onGetCroppedImageComplete(this, result.bitmap, result.error);
             }
         }
     }
