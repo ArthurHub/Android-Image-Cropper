@@ -103,6 +103,10 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.2.3*
+
+- Fix Android state restore overrides state set by client.
+
 *2.2.2*
 
 - Fix rotation zooms and changes aspect ratio when fixed aspect ratio is used.
@@ -117,19 +121,6 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 - Add activity counter-clockwise rotation button (configurable, hidden by default).
 - Add activity rotation degrees configuration (default 90)
 
-*2.1.4*
-
-- Support for requesting CAMERA permission for android M when CAMERA is requested in the manifest.
-- Add `pick_image_intent_chooser_title` for changing and localizing pick image chooser title (thx maksymkhar).
-- NPE when clicking crop twice fast (thx Jesse).
-
-*2.1.1*
-
-- Built-in `CropImageActivity` for quick start and common scenarios.
-- Save cropped image to Uri API `saveCroppedImageAsync(Uri)`.
-- Handle possible out-of-memory in image load by down-sampling until succeed.
-- Minor fixes.
- 
 See [full change log](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log).
 
 ## License

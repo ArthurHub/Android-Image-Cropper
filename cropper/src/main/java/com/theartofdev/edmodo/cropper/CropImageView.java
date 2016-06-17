@@ -986,54 +986,57 @@ public class CropImageView extends FrameLayout {
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
+
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
 
-            Bitmap bitmap = null;
-            Uri uri = bundle.getParcelable("LOADED_IMAGE_URI");
-            if (uri != null) {
-                String key = bundle.getString("LOADED_IMAGE_STATE_BITMAP_KEY");
-                if (key != null) {
-                    Bitmap stateBitmap = BitmapUtils.mStateBitmap != null && BitmapUtils.mStateBitmap.first.equals(key)
-                            ? BitmapUtils.mStateBitmap.second.get() : null;
-                    if (stateBitmap != null && !stateBitmap.isRecycled()) {
-                        BitmapUtils.mStateBitmap = null;
-                        setBitmap(stateBitmap, true);
-                        mLoadedImageUri = uri;
-                        mLoadedSampleSize = bundle.getInt("LOADED_SAMPLE_SIZE");
-                    }
-                }
-                if (mLoadedImageUri == null) {
-                    setImageUriAsync(uri);
-                }
+            // prevent restoring state if already set by outside code
+            if (mBitmapLoadingWorkerTask == null && mLoadedImageUri == null && mBitmap == null && mImageResource == 0) {
 
-            } else {
-                int resId = bundle.getInt("LOADED_IMAGE_RESOURCE");
-                if (resId > 0) {
-                    setImageResource(resId);
+                Uri uri = bundle.getParcelable("LOADED_IMAGE_URI");
+                if (uri != null) {
+                    String key = bundle.getString("LOADED_IMAGE_STATE_BITMAP_KEY");
+                    if (key != null) {
+                        Bitmap stateBitmap = BitmapUtils.mStateBitmap != null && BitmapUtils.mStateBitmap.first.equals(key)
+                                ? BitmapUtils.mStateBitmap.second.get() : null;
+                        if (stateBitmap != null && !stateBitmap.isRecycled()) {
+                            BitmapUtils.mStateBitmap = null;
+                            setBitmap(stateBitmap, true);
+                            mLoadedImageUri = uri;
+                            mLoadedSampleSize = bundle.getInt("LOADED_SAMPLE_SIZE");
+                        }
+                    }
+                    if (mLoadedImageUri == null) {
+                        setImageUriAsync(uri);
+                    }
                 } else {
-                    bitmap = bundle.getParcelable("SET_BITMAP");
-                    if (bitmap != null) {
-                        setBitmap(bitmap, true);
+                    int resId = bundle.getInt("LOADED_IMAGE_RESOURCE");
+                    if (resId > 0) {
+                        setImageResource(resId);
                     } else {
-                        uri = bundle.getParcelable("LOADING_IMAGE_URI");
-                        if (uri != null) {
-                            setImageUriAsync(uri);
+                        Bitmap bitmap = bundle.getParcelable("SET_BITMAP");
+                        if (bitmap != null) {
+                            setBitmap(bitmap, true);
+                        } else {
+                            uri = bundle.getParcelable("LOADING_IMAGE_URI");
+                            if (uri != null) {
+                                setImageUriAsync(uri);
+                            }
                         }
                     }
                 }
+
+                mDegreesRotated = bundle.getInt("DEGREES_ROTATED");
+
+                mCropOverlayView.setInitialCropWindowRect((Rect) bundle.getParcelable("INITIAL_CROP_RECT"));
+
+                mRestoreCropWindowRect = bundle.getParcelable("CROP_WINDOW_RECT");
+
+                mCropOverlayView.setCropShape(CropShape.valueOf(bundle.getString("CROP_SHAPE")));
+
+                mAutoZoomEnabled = bundle.getBoolean("CROP_AUTO_ZOOM_ENABLED");
+                mMaxZoom = bundle.getInt("CROP_MAX_ZOOM");
             }
-
-            mDegreesRotated = bundle.getInt("DEGREES_ROTATED");
-
-            mCropOverlayView.setInitialCropWindowRect((Rect) bundle.getParcelable("INITIAL_CROP_RECT"));
-
-            mRestoreCropWindowRect = bundle.getParcelable("CROP_WINDOW_RECT");
-
-            mCropOverlayView.setCropShape(CropShape.valueOf(bundle.getString("CROP_SHAPE")));
-
-            mAutoZoomEnabled = bundle.getBoolean("CROP_AUTO_ZOOM_ENABLED");
-            mMaxZoom = bundle.getInt("CROP_MAX_ZOOM");
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
         } else {
