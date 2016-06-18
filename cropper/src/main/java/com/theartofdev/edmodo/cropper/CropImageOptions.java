@@ -198,6 +198,11 @@ public class CropImageOptions implements Parcelable {
     public int activityMenuIconColor;
 
     /**
+     * the color to use for the activity background
+     */
+    public int activityBackgroundColor;
+
+    /**
      * the Android Uri to save the cropped image to
      */
     public Uri outputUri;
@@ -343,6 +348,7 @@ public class CropImageOptions implements Parcelable {
         maxCropResultHeight = in.readInt();
         activityTitle = in.readString();
         activityMenuIconColor = in.readInt();
+        activityBackgroundColor = in.readInt();
         outputUri = in.readParcelable(Uri.class.getClassLoader());
         outputCompressFormat = Bitmap.CompressFormat.valueOf(in.readString());
         outputCompressQuality = in.readInt();
@@ -388,6 +394,7 @@ public class CropImageOptions implements Parcelable {
         dest.writeInt(maxCropResultHeight);
         dest.writeString(activityTitle);
         dest.writeInt(activityMenuIconColor);
+        dest.writeInt(activityBackgroundColor);
         dest.writeParcelable(outputUri, flags);
         dest.writeString(outputCompressFormat.name());
         dest.writeInt(outputCompressQuality);
