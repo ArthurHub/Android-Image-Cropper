@@ -679,7 +679,7 @@ public class CropImageView extends FrameLayout {
      */
     public void setImageBitmap(Bitmap bitmap) {
         mCropOverlayView.setInitialCropWindowRect(null);
-        setBitmap(bitmap, true);
+        setBitmap(bitmap);
     }
 
     /**
@@ -701,7 +701,7 @@ public class CropImageView extends FrameLayout {
             setBitmap = bitmap;
         }
         mCropOverlayView.setInitialCropWindowRect(null);
-        setBitmap(setBitmap, true);
+        setBitmap(setBitmap);
     }
 
     /**
@@ -713,8 +713,7 @@ public class CropImageView extends FrameLayout {
         if (resId != 0) {
             mCropOverlayView.setInitialCropWindowRect(null);
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
-            setBitmap(bitmap, true);
-            mImageResource = resId;
+            setBitmap(bitmap, resId);
         }
     }
 
@@ -734,7 +733,7 @@ public class CropImageView extends FrameLayout {
             }
 
             // either no existing task is working or we canceled it, need to load new URI
-            clearImage(true);
+            clearImageInt();
             mCropOverlayView.setInitialCropWindowRect(null);
             mBitmapLoadingWorkerTask = new WeakReference<>(new BitmapLoadingWorkerTask(this, uri));
             mBitmapLoadingWorkerTask.get().execute();
@@ -746,7 +745,7 @@ public class CropImageView extends FrameLayout {
      * Clear the current image set for cropping.
      */
     public void clearImage() {
-        clearImage(true);
+        clearImageInt();
         mCropOverlayView.setInitialCropWindowRect(null);
     }
 
@@ -821,10 +820,7 @@ public class CropImageView extends FrameLayout {
         setProgressBarVisibility();
 
         if (result.error == null) {
-            setBitmap(result.bitmap, true);
-            mLoadedImageUri = result.uri;
-            mLoadedSampleSize = result.loadSampleSize;
-            mDegreesRotated = result.degreesRotated;
+            setBitmap(result.bitmap, result.uri, result.loadSampleSize, result.degreesRotated);
         }
 
         OnSetImageUriCompleteListener listener = mOnSetImageUriCompleteListener;
@@ -857,18 +853,44 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
+     */
+    private void setBitmap(Bitmap bitmap) {
+        setBitmap(bitmap, 0, null, 0, 0);
+    }
+
+    /**
+     * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
+     */
+    private void setBitmap(Bitmap bitmap, int imageResource) {
+        setBitmap(bitmap, imageResource, null, 0, 0);
+    }
+
+    /**
+     * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
+     */
+    private void setBitmap(Bitmap bitmap, Uri imageUri, int loadSampleSize, int degreesRotated) {
+        setBitmap(bitmap, 0, imageUri, loadSampleSize, degreesRotated);
+    }
+
+    /**
      * Set the given bitmap to be used in for cropping<br>
      * Optionally clear full if the bitmap is new, or partial clear if the bitmap has been manipulated.
      */
-    private void setBitmap(Bitmap bitmap, boolean clearFull) {
+    private void setBitmap(Bitmap bitmap, int imageResource, Uri imageUri, int loadSampleSize, int degreesRotated) {
         if (mBitmap == null || !mBitmap.equals(bitmap)) {
 
             mImageView.clearAnimation();
 
-            clearImage(clearFull);
+            clearImageInt();
 
             mBitmap = bitmap;
             mImageView.setImageBitmap(mBitmap);
+
+            mLoadedImageUri = imageUri;
+            mImageResource = imageResource;
+            mLoadedSampleSize = loadSampleSize;
+            mDegreesRotated = degreesRotated;
 
             applyImageMatrix(getWidth(), getHeight(), true, false);
 
@@ -884,7 +906,7 @@ public class CropImageView extends FrameLayout {
      * Full clear will also clear the data of the set image like Uri or Resource id while partial clear
      * will only clear the bitmap and recycle if required.
      */
-    private void clearImage(boolean full) {
+    private void clearImageInt() {
 
         // if we allocated the bitmap, release it as fast as possible
         if (mBitmap != null && (mImageResource > 0 || mLoadedImageUri != null)) {
@@ -892,21 +914,19 @@ public class CropImageView extends FrameLayout {
         }
         mBitmap = null;
 
-        if (full) {
-            // clean the loaded image flags for new image
-            mImageResource = 0;
-            mLoadedImageUri = null;
-            mLoadedSampleSize = 1;
-            mDegreesRotated = 0;
-            mZoom = 1;
-            mZoomOffsetX = 0;
-            mZoomOffsetY = 0;
-            mImageMatrix.reset();
+        // clean the loaded image flags for new image
+        mImageResource = 0;
+        mLoadedImageUri = null;
+        mLoadedSampleSize = 1;
+        mDegreesRotated = 0;
+        mZoom = 1;
+        mZoomOffsetX = 0;
+        mZoomOffsetY = 0;
+        mImageMatrix.reset();
 
-            mImageView.setImageBitmap(null);
+        mImageView.setImageBitmap(null);
 
-            setCropOverlayVisibility();
-        }
+        setCropOverlayVisibility();
     }
 
     /**
@@ -1001,9 +1021,7 @@ public class CropImageView extends FrameLayout {
                                 ? BitmapUtils.mStateBitmap.second.get() : null;
                         if (stateBitmap != null && !stateBitmap.isRecycled()) {
                             BitmapUtils.mStateBitmap = null;
-                            setBitmap(stateBitmap, true);
-                            mLoadedImageUri = uri;
-                            mLoadedSampleSize = bundle.getInt("LOADED_SAMPLE_SIZE");
+                            setBitmap(stateBitmap, uri, bundle.getInt("LOADED_SAMPLE_SIZE"), 0);
                         }
                     }
                     if (mLoadedImageUri == null) {
@@ -1016,7 +1034,7 @@ public class CropImageView extends FrameLayout {
                     } else {
                         Bitmap bitmap = bundle.getParcelable("SET_BITMAP");
                         if (bitmap != null) {
-                            setBitmap(bitmap, true);
+                            setBitmap(bitmap);
                         } else {
                             uri = bundle.getParcelable("LOADING_IMAGE_URI");
                             if (uri != null) {
