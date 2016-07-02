@@ -212,7 +212,9 @@ final class BitmapUtils {
                 Bitmap fullBitmap = decodeImage(context.getContentResolver(), loadedImageUri, options);
                 if (fullBitmap != null) {
                     result = cropBitmap(fullBitmap, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
-                    fullBitmap.recycle();
+                    if (result != fullBitmap) {
+                        fullBitmap.recycle();
+                    }
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Failed to load sampled bitmap: " + loadedImageUri + "\r\n" + e.getMessage(), e);
@@ -421,7 +423,9 @@ final class BitmapUtils {
 
             Bitmap bitmapTmp = bitmap;
             bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
-            bitmapTmp.recycle();
+            if (bitmapTmp != bitmap) {
+                bitmapTmp.recycle();
+            }
         }
         return bitmap;
     }
