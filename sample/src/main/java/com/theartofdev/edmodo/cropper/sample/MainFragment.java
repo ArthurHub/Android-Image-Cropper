@@ -14,7 +14,6 @@ package com.theartofdev.edmodo.cropper.sample;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,7 +33,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
  * The fragment that will show the Image Cropping UI by requested preset.
  */
 public final class MainFragment extends Fragment
-        implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnGetCroppedImageCompleteListener {
+        implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnCropImageCompleteListener {
 
     //region: Fields and Consts
 
@@ -140,7 +139,7 @@ public final class MainFragment extends Fragment
 
         mCropImageView = (CropImageView) view.findViewById(R.id.cropImageView);
         mCropImageView.setOnSetImageUriCompleteListener(this);
-        mCropImageView.setOnGetCroppedImageCompleteListener(this);
+        mCropImageView.setOnCropImageCompleteListener(this);
 
         updateCurrentCropViewOptions();
 
@@ -192,8 +191,8 @@ public final class MainFragment extends Fragment
     }
 
     @Override
-    public void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error) {
-        handleCropResult(null, bitmap, error);
+    public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
+        handleCropResult(result);
     }
 
     @Override
@@ -201,24 +200,24 @@ public final class MainFragment extends Fragment
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            handleCropResult(result.getUri(), null, result.getError());
+            handleCropResult(result);
         }
     }
 
-    private void handleCropResult(Uri uri, Bitmap bitmap, Exception error) {
-        if (error == null) {
+    private void handleCropResult(CropImageView.CropResult result) {
+        if (result.getError() == null) {
             Intent intent = new Intent(getActivity(), CropResultActivity.class);
-            if (uri != null) {
-                intent.putExtra("URI", uri);
+            if (result.getUri() != null) {
+                intent.putExtra("URI", result.getUri());
             } else {
                 CropResultActivity.mImage = mCropImageView.getCropShape() == CropImageView.CropShape.OVAL
-                        ? CropImage.toOvalBitmap(bitmap)
-                        : bitmap;
+                        ? CropImage.toOvalBitmap(result.getBitmap())
+                        : result.getBitmap();
             }
             startActivity(intent);
         } else {
-            Log.e("AIC", "Failed to crop image", error);
-            Toast.makeText(getActivity(), "Image crop failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            Log.e("AIC", "Failed to crop image", result.getError());
+            Toast.makeText(getActivity(), "Image crop failed: " + result.getError().getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }

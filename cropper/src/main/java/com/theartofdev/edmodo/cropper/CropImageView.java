@@ -119,18 +119,25 @@ public class CropImageView extends FrameLayout {
     private int mMaxZoom;
 
     /**
-     * callback to be invoked when image async loading is complete
+     * callback to be invoked when image async loading is complete.
      */
     private OnSetImageUriCompleteListener mOnSetImageUriCompleteListener;
 
     /**
+     * callback to be invoked when image async cropping is complete.
+     */
+    private OnCropImageCompleteListener mOnCropImageCompleteListener;
+
+    /**
      * callback to be invoked when image async cropping is complete (get bitmap)
      */
+    @Deprecated
     private OnGetCroppedImageCompleteListener mOnGetCroppedImageCompleteListener;
 
     /**
      * callback to be invoked when image async cropping is complete (save to uri)
      */
+    @Deprecated
     private OnSaveCroppedImageCompleteListener mOnSaveCroppedImageCompleteListener;
 
     /**
@@ -597,8 +604,8 @@ public class CropImageView extends FrameLayout {
      * @param reqHeight the height to downsample the cropped image to
      */
     public void getCroppedImageAsync(int reqWidth, int reqHeight) {
-        if (mOnGetCroppedImageCompleteListener == null) {
-            throw new IllegalArgumentException("OnGetCroppedImageCompleteListener is not set");
+        if (mOnCropImageCompleteListener == null && mOnGetCroppedImageCompleteListener == null) {
+            throw new IllegalArgumentException("mOnCropImageCompleteListener is not set");
         }
         startCropWorkerTask(reqWidth, reqHeight, null, null, 0);
     }
@@ -642,8 +649,8 @@ public class CropImageView extends FrameLayout {
      * @param reqHeight the height to downsample the cropped image to
      */
     public void saveCroppedImageAsync(Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality, int reqWidth, int reqHeight) {
-        if (mOnSaveCroppedImageCompleteListener == null) {
-            throw new IllegalArgumentException("mOnSaveCroppedImageCompleteListener is not set");
+        if (mOnCropImageCompleteListener == null && mOnSaveCroppedImageCompleteListener == null) {
+            throw new IllegalArgumentException("mOnCropImageCompleteListener is not set");
         }
         startCropWorkerTask(reqWidth, reqHeight, saveUri, saveCompressFormat, saveCompressQuality);
     }
@@ -657,9 +664,20 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * Set the callback to be invoked when image async cropping image ({@link #getCroppedImageAsync()} or
+     * {@link #saveCroppedImageAsync(Uri)}) is complete (successful or failed).
+     */
+    public void setOnCropImageCompleteListener(OnCropImageCompleteListener listener) {
+        mOnCropImageCompleteListener = listener;
+    }
+
+    /**
      * Set the callback to be invoked when image async get cropping image ({@link #getCroppedImageAsync()})
      * is complete (successful or failed).
+     *
+     * @deprecated use {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      */
+    @Deprecated
     public void setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener listener) {
         mOnGetCroppedImageCompleteListener = listener;
     }
@@ -667,7 +685,10 @@ public class CropImageView extends FrameLayout {
     /**
      * Set the callback to be invoked when image async save cropping image ({@link #saveCroppedImageAsync(Uri)})
      * is complete (successful or failed).
+     *
+     * @deprecated use {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      */
+    @Deprecated
     public void setOnSaveCroppedImageCompleteListener(OnSaveCroppedImageCompleteListener listener) {
         mOnSaveCroppedImageCompleteListener = listener;
     }
@@ -839,15 +860,21 @@ public class CropImageView extends FrameLayout {
         mBitmapCroppingWorkerTask = null;
         setProgressBarVisibility();
 
+        OnCropImageCompleteListener listener = mOnCropImageCompleteListener;
+        if (listener != null) {
+            CropResult cropResult = new CropResult(result.bitmap, result.uri, result.error, getCropPoints(), getCropRect(), getRotatedDegrees());
+            listener.onCropImageComplete(this, cropResult);
+        }
+
         if (result.isSave) {
-            OnSaveCroppedImageCompleteListener listener = mOnSaveCroppedImageCompleteListener;
-            if (listener != null) {
-                listener.onSaveCroppedImageComplete(this, result.uri, result.error);
+            OnSaveCroppedImageCompleteListener listener2 = mOnSaveCroppedImageCompleteListener;
+            if (listener2 != null) {
+                listener2.onSaveCroppedImageComplete(this, result.uri, result.error);
             }
         } else {
-            OnGetCroppedImageCompleteListener listener = mOnGetCroppedImageCompleteListener;
-            if (listener != null) {
-                listener.onGetCroppedImageComplete(this, result.bitmap, result.error);
+            OnGetCroppedImageCompleteListener listener2 = mOnGetCroppedImageCompleteListener;
+            if (listener2 != null) {
+                listener2.onGetCroppedImageComplete(this, result.bitmap, result.error);
             }
         }
     }
@@ -856,14 +883,14 @@ public class CropImageView extends FrameLayout {
      * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
      */
     private void setBitmap(Bitmap bitmap) {
-        setBitmap(bitmap, 0, null, 0, 0);
+        setBitmap(bitmap, 0, null, 1, 0);
     }
 
     /**
      * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
      */
     private void setBitmap(Bitmap bitmap, int imageResource) {
-        setBitmap(bitmap, imageResource, null, 0, 0);
+        setBitmap(bitmap, imageResource, null, 1, 0);
     }
 
     /**
@@ -1459,8 +1486,31 @@ public class CropImageView extends FrameLayout {
     //region: Inner class: OnGetCroppedImageCompleteListener
 
     /**
-     * Interface definition for a callback to be invoked when image async cropping is complete.
+     * Interface definition for a callback to be invoked when image async crop is complete.
      */
+    public interface OnCropImageCompleteListener {
+
+        /**
+         * Called when a crop image view has completed cropping image.<br>
+         * Result object contains the cropped bitmap, saved cropped image uri, crop points data or
+         * the error occured during cropping.
+         *
+         * @param view The crop image view that cropping of image was complete.
+         * @param result the crop image result data (with cropped image or error)
+         */
+        void onCropImageComplete(CropImageView view, CropResult result);
+    }
+    //endregion
+
+    //region: Inner class: OnGetCroppedImageCompleteListener
+
+    /**
+     * Interface definition for a callback to be invoked when image async cropping is complete.
+     *
+     * @deprecated use {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)} and {@link
+     * OnCropImageCompleteListener}.
+     */
+    @Deprecated
     public interface OnGetCroppedImageCompleteListener {
 
         /**
@@ -1479,7 +1529,11 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Interface definition for a callback to be invoked when image async cropping is complete.
+     *
+     * @deprecated use {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)} and {@link
+     * OnCropImageCompleteListener}.
      */
+    @Deprecated
     public interface OnSaveCroppedImageCompleteListener {
 
         /**
@@ -1491,6 +1545,107 @@ public class CropImageView extends FrameLayout {
          * @param error if error occurred during cropping will contain the error, otherwise null.
          */
         void onSaveCroppedImageComplete(CropImageView view, Uri uri, Exception error);
+    }
+    //endregion
+
+    //region: Inner class: ActivityResult
+
+    /**
+     * Result data of crop image.
+     */
+    public static class CropResult {
+
+        /**
+         * The cropped image bitmap result.<br>
+         * Null if save cropped image was executed, no output requested or failure.
+         */
+        private final Bitmap mBitmap;
+
+        /**
+         * The Android uri of the saved cropped image result.<br>
+         * Null if get cropped image was executed, no output requested or failure.
+         */
+        private final Uri mUri;
+
+        /**
+         * The error that failed the loading/cropping (null if successful)
+         */
+        private final Exception mError;
+
+        /**
+         * The 4 points of the cropping window in the source image
+         */
+        private final float[] mCropPoints;
+
+        /**
+         * The rectangle of the cropping window in the source image
+         */
+        private final Rect mCropRect;
+
+        /**
+         * The final rotation of the cropped image relative to source
+         */
+        private final int mRotation;
+
+        CropResult(Bitmap bitmap, Uri uri, Exception error, float[] cropPoints, Rect cropRect, int rotation) {
+            mBitmap = bitmap;
+            mUri = uri;
+            mError = error;
+            mCropPoints = cropPoints;
+            mCropRect = cropRect;
+            mRotation = rotation;
+        }
+
+        /**
+         * Is the result is success or error.
+         */
+        public boolean isSuccessful() {
+            return mError == null;
+        }
+
+        /**
+         * The cropped image bitmap result.<br>
+         * Null if save cropped image was executed, no output requested or failure.
+         */
+        public Bitmap getBitmap() {
+            return mBitmap;
+        }
+
+        /**
+         * The Android uri of the saved cropped image result
+         * Null if get cropped image was executed, no output requested or failure.
+         */
+        public Uri getUri() {
+            return mUri;
+        }
+
+        /**
+         * The error that failed the loading/cropping (null if successful)
+         */
+        public Exception getError() {
+            return mError;
+        }
+
+        /**
+         * The 4 points of the cropping window in the source image
+         */
+        public float[] getCropPoints() {
+            return mCropPoints;
+        }
+
+        /**
+         * The rectangle of the cropping window in the source image
+         */
+        public Rect getCropRect() {
+            return mCropRect;
+        }
+
+        /**
+         * The final rotation of the cropped image relative to source
+         */
+        public int getRotation() {
+            return mRotation;
+        }
     }
     //endregion
 }

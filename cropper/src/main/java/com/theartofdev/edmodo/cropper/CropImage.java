@@ -784,7 +784,7 @@ public final class CropImage {
     /**
      * Result data of Crop Image Activity.
      */
-    public static final class ActivityResult implements Parcelable {
+    public static final class ActivityResult extends CropImageView.CropResult implements Parcelable {
 
         public static final Creator<ActivityResult> CREATOR = new Creator<ActivityResult>() {
             @Override
@@ -798,101 +798,31 @@ public final class CropImage {
             }
         };
 
-        /**
-         * The Android uri of the saved cropped image result
-         */
-        private final Uri mUri;
-
-        /**
-         * The error that failed the loading/cropping (null if successful)
-         */
-        private final Exception mError;
-
-        /**
-         * The 4 points of the cropping window in the source image
-         */
-        private final float[] mCropPoints;
-
-        /**
-         * The rectangle of the cropping window in the source image
-         */
-        private final Rect mCropRect;
-
-        /**
-         * The final rotation of the cropped image relative to source
-         */
-        private final int mRotation;
-
-        ActivityResult(Uri uri, Exception error, float[] cropPoints, Rect cropRect, int rotation) {
-            mUri = uri;
-            mError = error;
-            mCropPoints = cropPoints;
-            mCropRect = cropRect;
-            mRotation = rotation;
+        public ActivityResult(Bitmap bitmap, Uri uri, Exception error, float[] cropPoints, Rect cropRect, int rotation) {
+            super(bitmap, uri, error, cropPoints, cropRect, rotation);
         }
 
         protected ActivityResult(Parcel in) {
-            mUri = in.readParcelable(Uri.class.getClassLoader());
-            mError = (Exception) in.readSerializable();
-            mCropPoints = in.createFloatArray();
-            mCropRect = in.readParcelable(Rect.class.getClassLoader());
-            mRotation = in.readInt();
+            super(null,
+                    (Uri) in.readParcelable(Uri.class.getClassLoader()),
+                    (Exception) in.readSerializable(),
+                    in.createFloatArray(),
+                    (Rect) in.readParcelable(Rect.class.getClassLoader()),
+                    in.readInt());
         }
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeParcelable(mUri, flags);
-            dest.writeSerializable(mError);
-            dest.writeFloatArray(mCropPoints);
-            dest.writeParcelable(mCropRect, flags);
-            dest.writeInt(mRotation);
+            dest.writeParcelable(getUri(), flags);
+            dest.writeSerializable(getError());
+            dest.writeFloatArray(getCropPoints());
+            dest.writeParcelable(getCropRect(), flags);
+            dest.writeInt(getRotation());
         }
 
         @Override
         public int describeContents() {
             return 0;
-        }
-
-        /**
-         * Is the result is success or error.
-         */
-        public boolean isSuccessful() {
-            return mError == null;
-        }
-
-        /**
-         * The Android uri of the saved cropped image result
-         */
-        public Uri getUri() {
-            return mUri;
-        }
-
-        /**
-         * The error that failed the loading/cropping (null if successful)
-         */
-        public Exception getError() {
-            return mError;
-        }
-
-        /**
-         * The 4 points of the cropping window in the source image
-         */
-        public float[] getCropPoints() {
-            return mCropPoints;
-        }
-
-        /**
-         * The rectangle of the cropping window in the source image
-         */
-        public Rect getCropRect() {
-            return mCropRect;
-        }
-
-        /**
-         * The final rotation of the cropped image relative to source
-         */
-        public int getRotation() {
-            return mRotation;
         }
     }
     //endregion
