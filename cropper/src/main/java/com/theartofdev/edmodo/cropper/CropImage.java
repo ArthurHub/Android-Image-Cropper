@@ -421,10 +421,32 @@ public final class CropImage {
          * Start {@link CropImageActivity}.
          *
          * @param activity activity to receive result
+         * @param requestCode custom request code
+         */
+        public void start(@NonNull Activity activity, int requestCode) {
+            mOptions.validate();
+            activity.startActivityForResult(getIntent(activity), requestCode);
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param activity activity to receive result
          */
         public void start(@NonNull Activity activity, @Nullable Class<?> cls) {
             mOptions.validate();
             activity.startActivityForResult(getIntent(activity, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param activity activity to receive result
+         * @param requestCode custom request code
+         */
+        public void start(@NonNull Activity activity, @Nullable Class<?> cls, int requestCode) {
+            mOptions.validate();
+            activity.startActivityForResult(getIntent(activity, cls), requestCode);
         }
 
         /**
@@ -440,9 +462,29 @@ public final class CropImage {
          * Start {@link CropImageActivity}.
          *
          * @param fragment fragment to receive result
+         * @param requestCode custom request code
+         */
+        public void start(@NonNull Context context, @NonNull Fragment fragment, int requestCode) {
+            fragment.startActivityForResult(getIntent(context), requestCode);
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param fragment fragment to receive result
          */
         public void start(@NonNull Context context, @NonNull Fragment fragment, @Nullable Class<?> cls) {
             fragment.startActivityForResult(getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param fragment fragment to receive result
+         * @param requestCode custom request code
+         */
+        public void start(@NonNull Context context, @NonNull Fragment fragment, @Nullable Class<?> cls, int requestCode) {
+            fragment.startActivityForResult(getIntent(context, cls), requestCode);
         }
 
         /**
