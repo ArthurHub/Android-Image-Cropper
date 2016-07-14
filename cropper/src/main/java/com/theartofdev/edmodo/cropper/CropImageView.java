@@ -856,14 +856,14 @@ public class CropImageView extends FrameLayout {
      * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
      */
     private void setBitmap(Bitmap bitmap) {
-        setBitmap(bitmap, 0, null, 0, 0);
+        setBitmap(bitmap, 0, null, 1, 0);
     }
 
     /**
      * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
      */
     private void setBitmap(Bitmap bitmap, int imageResource) {
-        setBitmap(bitmap, imageResource, null, 0, 0);
+        setBitmap(bitmap, imageResource, null, 1, 0);
     }
 
     /**
