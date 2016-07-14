@@ -103,6 +103,12 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.2.5*
+
+- Fix to webp file extension (thx Nathan)
+- Fix wrong initial crop window when image contains exif data.
+- Added corners to circular crop window, can be removed by setting `BorderCornerThickness` to 0.
+
 *2.2.3*
 
 - Fix Android state restore overrides state set by client.

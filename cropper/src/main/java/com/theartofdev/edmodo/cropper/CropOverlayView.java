@@ -618,9 +618,7 @@ public class CropOverlayView extends View {
 
         drawBorders(canvas);
 
-        if (mCropShape == CropImageView.CropShape.RECTANGLE) {
-            drawCorners(canvas);
-        }
+        drawCorners(canvas);
     }
 
     /**
