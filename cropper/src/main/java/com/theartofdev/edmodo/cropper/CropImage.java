@@ -167,8 +167,12 @@ public final class CropImage {
         // collect all camera intents
         allIntents.addAll(getCameraIntents(context, packageManager));
 
-        // collect all gallery intents
-        allIntents.addAll(getGalleryIntents(packageManager, includeDocuments));
+        if (getGalleryIntents(packageManager, includeDocuments).size() > 0)
+            // collect all gallery intents
+            allIntents.addAll(getGalleryIntents(packageManager, includeDocuments));
+        else
+            // collect all gallery intents
+            allIntents.addAll(getPickIntents(packageManager, includeDocuments));
 
         Intent target;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -222,6 +226,33 @@ public final class CropImage {
         List<ResolveInfo> listGallery = packageManager.queryIntentActivities(galleryIntent, 0);
         for (ResolveInfo res : listGallery) {
             Intent intent = new Intent(galleryIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            intents.add(intent);
+        }
+
+        // remove documents intent
+        if (!includeDocuments) {
+            for (Intent intent : intents) {
+                if (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity")) {
+                    intents.remove(intent);
+                    break;
+                }
+            }
+        }
+        return intents;
+    }
+
+    /**
+     * Get all Gallery intents for getting image from one of the apps of the device that handle images.
+     */
+    public static List<Intent> getPickIntents(@NonNull PackageManager packageManager, boolean includeDocuments) {
+        List<Intent> intents = new ArrayList<>();
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+        List<ResolveInfo> listGallery = packageManager.queryIntentActivities(pickIntent, 0);
+        for (ResolveInfo res : listGallery) {
+            Intent intent = new Intent(pickIntent);
             intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
             intent.setPackage(res.activityInfo.packageName);
             intents.add(intent);
