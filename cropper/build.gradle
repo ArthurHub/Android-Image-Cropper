@@ -1,7 +1,8 @@
 apply plugin: 'com.android.library'
 // https://docs.gradle.org/current/userguide/publishing_maven.html
 // http://www.flexlabs.org/2013/06/using-local-aar-android-library-packages-in-gradle-builds
-apply plugin: 'maven-publish'
+apply plugin: 'com.github.dcendents.android-maven'
+group = "com.github.thoughtbot"
 
 ext {
     PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
@@ -15,7 +16,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion '23.0.1'
     defaultConfig {
-        minSdkVersion 10
+        minSdkVersion 11
         targetSdkVersion 23
         versionCode 1
         versionName PUBLISH_VERSION
@@ -28,25 +29,6 @@ android {
         abortOnError false
     }
 }
-
-// This configuration is used to publish the library to a local repo while a being forked and modified.
-// It should really be set up so that the version are all in line, and set to be a SNAPSHOT.
-// The version listed here is a temp hack to allow me to keep working.
-android.libraryVariants
-publishing {
-    publications {
-        maven(MavenPublication) {
-
-            groupId PUBLISH_GROUP_ID
-            artifactId PUBLISH_ARTIFACT_ID
-            version PUBLISH_VERSION + '-SNAPSHOT'
-
-            //artifact bundleRelease
-        }
-    }
-}
-
-apply from: 'https://raw.githubusercontent.com/ArthurHub/release-android-library/master/android-release-aar.gradle'
 
 dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
