@@ -40,6 +40,11 @@ public class CropOverlayView extends View {
      */
     private ScaleGestureDetector mScaleDetector;
 
+  /**
+   * Boolean to see if multi touch is enabled for the crop rectangle
+   */
+  private boolean mMultiTouchEnabled;
+
     /**
      * Handler from crop window stuff, moving and knowing possition.
      */
@@ -443,6 +448,8 @@ public class CropOverlayView extends View {
 
         mTouchRadius = options.touchRadius;
 
+        mMultiTouchEnabled = options.multiTouchEnabled;
+
         mInitialCropWindowPaddingRatio = options.initialCropWindowPaddingRatio;
 
         mBorderPaint = getNewPaintOrNull(options.borderLineThickness, options.borderLineColor);
@@ -802,9 +809,11 @@ public class CropOverlayView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // If this View is not enabled, don't allow for touch interactions.
-        mScaleDetector.onTouchEvent(event);
-
         if (isEnabled()) {
+            if (mMultiTouchEnabled) {
+                mScaleDetector.onTouchEvent(event);
+            }
+
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     onActionDown(event.getX(), event.getY());
@@ -986,6 +995,10 @@ public class CropOverlayView extends View {
     }
     //endregion
 
+    //region: Inner class: ScaleListener
+    /**
+     * Handle scaling the rectangle based on two finger input
+     */
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
@@ -1016,5 +1029,5 @@ public class CropOverlayView extends View {
             return true;
         }
     }
-
+    //endregion
 }

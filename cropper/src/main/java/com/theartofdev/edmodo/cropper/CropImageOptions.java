@@ -87,6 +87,12 @@ public class CropImageOptions implements Parcelable {
      */
     public boolean autoZoomEnabled;
 
+  /**
+   * if multi-touch should be enabled on the crop box
+   * default: false
+   */
+    public boolean multiTouchEnabled;
+
     /**
      * The max zoom allowed during cropping.
      */
@@ -267,6 +273,7 @@ public class CropImageOptions implements Parcelable {
         showCropOverlay = true;
         showProgressBar = true;
         autoZoomEnabled = true;
+        multiTouchEnabled = false;
         maxZoom = 4;
         initialCropWindowPaddingRatio = 0.1f;
 
@@ -321,6 +328,7 @@ public class CropImageOptions implements Parcelable {
         showCropOverlay = in.readByte() != 0;
         showProgressBar = in.readByte() != 0;
         autoZoomEnabled = in.readByte() != 0;
+        multiTouchEnabled = in.readByte() != 0;
         maxZoom = in.readInt();
         initialCropWindowPaddingRatio = in.readFloat();
         fixAspectRatio = in.readByte() != 0;
@@ -366,6 +374,7 @@ public class CropImageOptions implements Parcelable {
         dest.writeByte((byte) (showCropOverlay ? 1 : 0));
         dest.writeByte((byte) (showProgressBar ? 1 : 0));
         dest.writeByte((byte) (autoZoomEnabled ? 1 : 0));
+        dest.writeByte((byte) (multiTouchEnabled ? 1 : 0));
         dest.writeInt(maxZoom);
         dest.writeFloat(initialCropWindowPaddingRatio);
         dest.writeByte((byte) (fixAspectRatio ? 1 : 0));
