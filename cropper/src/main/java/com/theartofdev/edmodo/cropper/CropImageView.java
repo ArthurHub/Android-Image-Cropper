@@ -55,7 +55,7 @@ public class CropImageView extends FrameLayout {
     private final CropOverlayView mCropOverlayView;
 
     /**
-     * The matrix used to transform the cripping image in the image view
+     * The matrix used to transform the cropping image in the image view
      */
     private final Matrix mImageMatrix = new Matrix();
 
@@ -112,12 +112,6 @@ public class CropImageView extends FrameLayout {
      * default: true.
      */
     private boolean mAutoZoomEnabled = true;
-
-    /**
-     * if multi touch functionality is enabled.<br>
-     * default: false.
-     */
-    private boolean mMultiTouchEnabled = false;
 
     /**
      * The max zoom allowed during cropping
@@ -319,8 +313,7 @@ public class CropImageView extends FrameLayout {
      * Set multi touch functionality to enabled/disabled.
      */
     public void setMultiTouchEnabled(boolean multiTouchEnabled) {
-        if (mMultiTouchEnabled != multiTouchEnabled) {
-            mMultiTouchEnabled = multiTouchEnabled;
+        if (mCropOverlayView.setMultiTouchEnabled(multiTouchEnabled)) {
             handleCropWindowChanged(false, false);
             mCropOverlayView.invalidate();
         }
@@ -871,21 +864,21 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
+     * {@link #setBitmap(Bitmap, int, Uri, int, int)}}
      */
     private void setBitmap(Bitmap bitmap) {
         setBitmap(bitmap, 0, null, 1, 0);
     }
 
     /**
-     * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
+     * {@link #setBitmap(Bitmap, int, Uri, int, int)}}
      */
     private void setBitmap(Bitmap bitmap, int imageResource) {
         setBitmap(bitmap, imageResource, null, 1, 0);
     }
 
     /**
-     * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
+     * {@link #setBitmap(Bitmap, int, Uri, int, int)}}
      */
     private void setBitmap(Bitmap bitmap, Uri imageUri, int loadSampleSize, int degreesRotated) {
         setBitmap(bitmap, 0, imageUri, loadSampleSize, degreesRotated);
