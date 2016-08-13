@@ -13,7 +13,7 @@ ext {
 android {
 
     compileSdkVersion 24
-    buildToolsVersion '23.0.1'
+    buildToolsVersion '24.0.1'
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 24
