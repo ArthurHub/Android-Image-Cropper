@@ -12,11 +12,11 @@ ext {
 
 android {
 
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion '23.0.1'
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName PUBLISH_VERSION
     }
@@ -49,6 +49,6 @@ publishing {
 apply from: 'https://raw.githubusercontent.com/ArthurHub/release-android-library/master/android-release-aar.gradle'
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:appcompat-v7:24.1.1'
 }
 

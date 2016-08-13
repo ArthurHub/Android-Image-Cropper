@@ -55,7 +55,7 @@ public class CropImageView extends FrameLayout {
     private final CropOverlayView mCropOverlayView;
 
     /**
-     * The matrix used to transform the cripping image in the image view
+     * The matrix used to transform the cropping image in the image view
      */
     private final Matrix mImageMatrix = new Matrix();
 
@@ -206,6 +206,7 @@ public class CropImageView extends FrameLayout {
                     options.aspectRatioY = ta.getInteger(R.styleable.CropImageView_cropAspectRatioY, options.aspectRatioY);
                     options.scaleType = ScaleType.values()[ta.getInt(R.styleable.CropImageView_cropScaleType, options.scaleType.ordinal())];
                     options.autoZoomEnabled = ta.getBoolean(R.styleable.CropImageView_cropAutoZoomEnabled, options.autoZoomEnabled);
+                    options.multiTouchEnabled = ta.getBoolean(R.styleable.CropImageView_cropMultiTouchEnabled, options.multiTouchEnabled);
                     options.maxZoom = ta.getInteger(R.styleable.CropImageView_cropMaxZoom, options.maxZoom);
                     options.cropShape = CropShape.values()[ta.getInt(R.styleable.CropImageView_cropShape, options.cropShape.ordinal())];
                     options.guidelines = Guidelines.values()[ta.getInt(R.styleable.CropImageView_cropGuidelines, options.guidelines.ordinal())];
@@ -310,6 +311,16 @@ public class CropImageView extends FrameLayout {
     public void setAutoZoomEnabled(boolean autoZoomEnabled) {
         if (mAutoZoomEnabled != autoZoomEnabled) {
             mAutoZoomEnabled = autoZoomEnabled;
+            handleCropWindowChanged(false, false);
+            mCropOverlayView.invalidate();
+        }
+    }
+
+    /**
+     * Set multi touch functionality to enabled/disabled.
+     */
+    public void setMultiTouchEnabled(boolean multiTouchEnabled) {
+        if (mCropOverlayView.setMultiTouchEnabled(multiTouchEnabled)) {
             handleCropWindowChanged(false, false);
             mCropOverlayView.invalidate();
         }
@@ -880,21 +891,21 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
+     * {@link #setBitmap(Bitmap, int, Uri, int, int)}}
      */
     private void setBitmap(Bitmap bitmap) {
         setBitmap(bitmap, 0, null, 1, 0);
     }
 
     /**
-     * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
+     * {@link #setBitmap(Bitmap, int, Uri, int, int)}}
      */
     private void setBitmap(Bitmap bitmap, int imageResource) {
         setBitmap(bitmap, imageResource, null, 1, 0);
     }
 
     /**
-     * {@link #setBitmap(Bitmap, Uri, int, int, int)}}
+     * {@link #setBitmap(Bitmap, int, Uri, int, int)}}
      */
     private void setBitmap(Bitmap bitmap, Uri imageUri, int loadSampleSize, int degreesRotated) {
         setBitmap(bitmap, 0, imageUri, loadSampleSize, degreesRotated);

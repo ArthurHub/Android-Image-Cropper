@@ -12,6 +12,7 @@
 
 package com.theartofdev.edmodo.cropper;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -23,6 +24,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import java.util.Arrays;
@@ -33,6 +35,16 @@ import java.util.Arrays;
 public class CropOverlayView extends View {
 
     //region: Fields and Consts
+
+    /**
+     * Gesture detector used for multi touch box scaling
+     */
+    private ScaleGestureDetector mScaleDetector;
+
+    /**
+     * Boolean to see if multi touch is enabled for the crop rectangle
+     */
+    private boolean mMultiTouchEnabled;
 
     /**
      * Handler from crop window stuff, moving and knowing possition.
@@ -377,6 +389,20 @@ public class CropOverlayView extends View {
     }
 
     /**
+     * Set multi touch functionality to enabled/disabled.
+     */
+    public boolean setMultiTouchEnabled(boolean multiTouchEnabled) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && mMultiTouchEnabled != multiTouchEnabled) {
+            mMultiTouchEnabled = multiTouchEnabled;
+            if (mMultiTouchEnabled && mScaleDetector == null) {
+                mScaleDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * set the max width/height and scale factor of the showen image to original image to scale the limits
      * appropriately.
      */
@@ -434,6 +460,8 @@ public class CropOverlayView extends View {
 
         setAspectRatioY(options.aspectRatioY);
 
+        setMultiTouchEnabled(options.multiTouchEnabled);
+
         mTouchRadius = options.touchRadius;
 
         mInitialCropWindowPaddingRatio = options.initialCropWindowPaddingRatio;
@@ -454,8 +482,6 @@ public class CropOverlayView extends View {
     /**
      * Set the initial crop window size and position. This is dependent on the
      * size and position of the image being cropped.
-     *
-     * @param mBitmapRect the bounding box around the image being cropped
      */
     private void initCropWindow() {
 
@@ -796,6 +822,10 @@ public class CropOverlayView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         // If this View is not enabled, don't allow for touch interactions.
         if (isEnabled()) {
+            if (mMultiTouchEnabled) {
+                mScaleDetector.onTouchEvent(event);
+            }
+
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     onActionDown(event.getX(), event.getY());
@@ -974,6 +1004,45 @@ public class CropOverlayView extends View {
          * @param inProgress is the crop window change operation is still in progress by user touch
          */
         void onCropWindowChanged(boolean inProgress);
+    }
+    //endregion
+
+    //region: Inner class: ScaleListener
+
+    /**
+     * Handle scaling the rectangle based on two finger input
+     */
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+
+        @Override
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+        public boolean onScale(ScaleGestureDetector detector) {
+            RectF rect = mCropWindowHandler.getRect();
+
+            float x = detector.getFocusX();
+            float y = detector.getFocusY();
+            float dY = detector.getCurrentSpanY() / 2;
+            float dX = detector.getCurrentSpanX() / 2;
+
+            float newTop = y - dY;
+            float newLeft = x - dX;
+            float newRight = x + dX;
+            float newBottom = y + dY;
+
+            if (newLeft < newRight &&
+                    newTop <= newBottom &&
+                    newLeft >= 0 &&
+                    newRight <= mCropWindowHandler.getMaxCropWidth() &&
+                    newTop >= 0 &&
+                    newBottom <= mCropWindowHandler.getMaxCropHeight()) {
+
+                rect.set(newLeft, newTop, newRight, newBottom);
+                mCropWindowHandler.setRect(rect);
+                invalidate();
+            }
+
+            return true;
+        }
     }
     //endregion
 }
