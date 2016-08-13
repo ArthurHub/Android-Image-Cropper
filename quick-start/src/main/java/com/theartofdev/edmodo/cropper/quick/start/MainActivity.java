@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
     private void startCropImageActivity(Uri imageUri) {
         CropImage.activity(imageUri)
                 .setGuidelines(CropImageView.Guidelines.ON)
+                .setMultiTouchEnabled(true)
                 .start(this);
     }
 }

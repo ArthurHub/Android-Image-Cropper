@@ -114,6 +114,12 @@ public class CropImageView extends FrameLayout {
     private boolean mAutoZoomEnabled = true;
 
     /**
+     * if multi touch functionality is enabled.<br>
+     * default: false.
+     */
+    private boolean mMultiTouchEnabled = false;
+
+    /**
      * The max zoom allowed during cropping
      */
     private int mMaxZoom;
@@ -199,6 +205,7 @@ public class CropImageView extends FrameLayout {
                     options.aspectRatioY = ta.getInteger(R.styleable.CropImageView_cropAspectRatioY, options.aspectRatioY);
                     options.scaleType = ScaleType.values()[ta.getInt(R.styleable.CropImageView_cropScaleType, options.scaleType.ordinal())];
                     options.autoZoomEnabled = ta.getBoolean(R.styleable.CropImageView_cropAutoZoomEnabled, options.autoZoomEnabled);
+                    options.multiTouchEnabled = ta.getBoolean(R.styleable.CropImageView_cropMultiTouchEnabled, options.multiTouchEnabled);
                     options.maxZoom = ta.getInteger(R.styleable.CropImageView_cropMaxZoom, options.maxZoom);
                     options.cropShape = CropShape.values()[ta.getInt(R.styleable.CropImageView_cropShape, options.cropShape.ordinal())];
                     options.guidelines = Guidelines.values()[ta.getInt(R.styleable.CropImageView_cropGuidelines, options.guidelines.ordinal())];
@@ -303,6 +310,17 @@ public class CropImageView extends FrameLayout {
     public void setAutoZoomEnabled(boolean autoZoomEnabled) {
         if (mAutoZoomEnabled != autoZoomEnabled) {
             mAutoZoomEnabled = autoZoomEnabled;
+            handleCropWindowChanged(false, false);
+            mCropOverlayView.invalidate();
+        }
+    }
+
+    /**
+     * Set multi touch functionality to enabled/disabled.
+     */
+    public void setMultiTouchEnabled(boolean multiTouchEnabled) {
+        if (mMultiTouchEnabled != multiTouchEnabled) {
+            mMultiTouchEnabled = multiTouchEnabled;
             handleCropWindowChanged(false, false);
             mCropOverlayView.invalidate();
         }

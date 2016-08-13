@@ -23,16 +23,27 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
-
 import java.util.Arrays;
 
 /**
  * A custom View representing the crop window and the shaded background outside the crop window.
  */
 public class CropOverlayView extends View {
+    private static final String TAG = "CropOverlayView";
 
     //region: Fields and Consts
+
+    /**
+     * Gesture detector used for multi touch box scaling
+     */
+    private ScaleGestureDetector mScaleDetector;
+
+  /**
+   * Boolean to see if multi touch is enabled for the crop rectangle
+   */
+  private boolean mMultiTouchEnabled;
 
     /**
      * Handler from crop window stuff, moving and knowing possition.
@@ -178,6 +189,7 @@ public class CropOverlayView extends View {
 
     public CropOverlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
     /**
@@ -435,6 +447,8 @@ public class CropOverlayView extends View {
         setAspectRatioY(options.aspectRatioY);
 
         mTouchRadius = options.touchRadius;
+
+        mMultiTouchEnabled = options.multiTouchEnabled;
 
         mInitialCropWindowPaddingRatio = options.initialCropWindowPaddingRatio;
 
@@ -796,6 +810,10 @@ public class CropOverlayView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         // If this View is not enabled, don't allow for touch interactions.
         if (isEnabled()) {
+            if (mMultiTouchEnabled) {
+                mScaleDetector.onTouchEvent(event);
+            }
+
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     onActionDown(event.getX(), event.getY());
@@ -974,6 +992,42 @@ public class CropOverlayView extends View {
          * @param inProgress is the crop window change operation is still in progress by user touch
          */
         void onCropWindowChanged(boolean inProgress);
+    }
+    //endregion
+
+    //region: Inner class: ScaleListener
+    /**
+     * Handle scaling the rectangle based on two finger input
+     */
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            RectF rect = mCropWindowHandler.getRect();
+
+            float x = detector.getFocusX();
+            float y = detector.getFocusY();
+            float dY = detector.getCurrentSpanY() / 2;
+            float dX = detector.getCurrentSpanX() / 2;
+
+            float newTop = y - dY;
+            float newLeft = x - dX;
+            float newRight = x + dX;
+            float newBottom = y + dY;
+
+            if(newLeft < newRight &&
+                newTop <= newBottom &&
+                newLeft >= 0 &&
+                newRight <= mCropWindowHandler.getMaxCropWidth() &&
+                newTop >= 0 &&
+                newBottom <= mCropWindowHandler.getMaxCropHeight()) {
+
+                rect.set(newLeft, newTop, newRight, newBottom);
+                mCropWindowHandler.setRect(rect);
+                invalidate();
+            }
+
+            return true;
+        }
     }
     //endregion
 }

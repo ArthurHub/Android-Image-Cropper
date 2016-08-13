@@ -514,6 +514,15 @@ public final class CropImage {
         }
 
         /**
+         * if multi touch functionality is enabled.<br>
+         * default: true.
+         */
+        public ActivityBuilder setMultiTouchEnabled(boolean multiTouchEnabled) {
+            mOptions.multiTouchEnabled = multiTouchEnabled;
+            return this;
+        }
+
+        /**
          * The max zoom allowed during cropping.<br>
          * <i>Default: 4</i>
          */
