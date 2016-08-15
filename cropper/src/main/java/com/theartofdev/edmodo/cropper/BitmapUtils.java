@@ -49,7 +49,7 @@ final class BitmapUtils {
     static final RectF EMPTY_RECT_F = new RectF();
 
     /**
-     * Reusable rectengale for general internal usage
+     * Reusable rectangle for general internal usage
      */
     static final RectF RECT = new RectF();
 
@@ -146,10 +146,10 @@ final class BitmapUtils {
      * if the rotation is not 0,90,180 or 270 degrees then we must first crop a larger area of the image that
      * contains the requires rectangle, rotate and then crop again a sub rectangle.
      */
-    public static Bitmap cropBitmap(Bitmap bitmap, float[] points,
-                                    int degreesRotated, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
+    public static Bitmap cropBitmap(Bitmap bitmap, float[] points, int degreesRotated,
+                                    boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
 
-        // get the rectangle in original image that contains the required cropped area (larger for non rectengular crop)
+        // get the rectangle in original image that contains the required cropped area (larger for non rectangular crop)
         Rect rect = getRectFromPoints(points, bitmap.getWidth(), bitmap.getHeight(), fixAspectRatio, aspectRatioX, aspectRatioY);
 
         // crop and rotate the cropped image in one operation
@@ -165,7 +165,7 @@ final class BitmapUtils {
         // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
         if (degreesRotated % 90 != 0) {
 
-            // extra crop because non rectengular crop cannot be done directly on the image without rotating first
+            // extra crop because non rectangular crop cannot be done directly on the image without rotating first
             result = cropForRotatedImage(result, points, rect, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
         }
 
@@ -173,55 +173,28 @@ final class BitmapUtils {
     }
 
     /**
-     * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.
+     * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.<br>
+     * Additionally if OOM is thrown try to increase the sampling (2,4,8).
      */
     public static Bitmap cropBitmap(Context context, Uri loadedImageUri, float[] points,
                                     int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
                                     int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight) {
-
-        // get the rectangle in original image that contains the required cropped area (larger for non rectengular crop)
-        Rect rect = getRectFromPoints(points, orgWidth, orgHeight, fixAspectRatio, aspectRatioX, aspectRatioY);
-
-        int width = reqWidth > 0 ? reqWidth : rect.width();
-        int height = reqHeight > 0 ? reqHeight : rect.height();
-
-        Bitmap result = null;
-        try {
-            // decode only the required image from URI, optionally sub-sampling if reqWidth/reqHeight is given.
-            result = decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height);
-        } catch (Exception e) {
-        }
-
-        if (result != null) {
-            // rotate the decoded region by the required amount
-            result = rotateBitmapInt(result, degreesRotated);
-
-            // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
-            if (degreesRotated % 90 != 0) {
-
-                // extra crop because non rectengular crop cannot be done directly on the image without rotating first
-                result = cropForRotatedImage(result, points, rect, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
-            }
-        } else {
-
-            // failed to decode region, may be skia issue, try full decode and then crop
+        int sampleMulti = 1;
+        while (true) {
             try {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inSampleSize = calculateInSampleSizeByReqestedSize(rect.width(), rect.height(), reqWidth, reqHeight);
-
-                Bitmap fullBitmap = decodeImage(context.getContentResolver(), loadedImageUri, options);
-                if (fullBitmap != null) {
-                    result = cropBitmap(fullBitmap, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
-                    if (result != fullBitmap) {
-                        fullBitmap.recycle();
-                    }
+                // if successful, just return the resulting bitmap
+                return cropBitmap(context, loadedImageUri, points,
+                        degreesRotated, orgWidth, orgHeight, fixAspectRatio,
+                        aspectRatioX, aspectRatioY, reqWidth, reqHeight,
+                        sampleMulti);
+            } catch (OutOfMemoryError e) {
+                // if OOM try to increase the sampling to lower the memory usage
+                sampleMulti *= 2;
+                if (sampleMulti > 8) {
+                    throw new RuntimeException("Failed to handle OOM by sampling (" + sampleMulti + "): " + loadedImageUri + "\r\n" + e.getMessage(), e);
                 }
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to load sampled bitmap: " + loadedImageUri + "\r\n" + e.getMessage(), e);
             }
         }
-
-        return result;
     }
 
     /**
@@ -328,6 +301,95 @@ final class BitmapUtils {
     //region: Private methods
 
     /**
+     * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.
+     *
+     * @param orgWidth used to get rectangle from points (handle edge cases to limit rectangle)
+     * @param orgHeight used to get rectangle from points (handle edge cases to limit rectangle)
+     * @param sampleMulti used to increase the sampling of the image to handle memory issues.
+     */
+    private static Bitmap cropBitmap(Context context, Uri loadedImageUri, float[] points,
+                                     int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
+                                     int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight, int sampleMulti) {
+
+        // get the rectangle in original image that contains the required cropped area (larger for non rectangular crop)
+        Rect rect = getRectFromPoints(points, orgWidth, orgHeight, fixAspectRatio, aspectRatioX, aspectRatioY);
+
+        int width = reqWidth > 0 ? reqWidth : rect.width();
+        int height = reqHeight > 0 ? reqHeight : rect.height();
+
+        Bitmap result = null;
+        try {
+            // decode only the required image from URI, optionally sub-sampling if reqWidth/reqHeight is given.
+            result = decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height, sampleMulti);
+        } catch (Exception e) {
+        }
+
+        if (result != null) {
+            try {
+                // rotate the decoded region by the required amount
+                result = rotateBitmapInt(result, degreesRotated);
+
+                // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
+                if (degreesRotated % 90 != 0) {
+
+                    // extra crop because non rectangular crop cannot be done directly on the image without rotating first
+                    result = cropForRotatedImage(result, points, rect, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
+                }
+            } catch (OutOfMemoryError e) {
+                if (result != null) {
+                    result.recycle();
+                }
+                throw e;
+            }
+        } else {
+
+            // failed to decode region, may be skia issue, try full decode and then crop
+            result = cropBitmap(context, loadedImageUri, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, sampleMulti, rect, width, height);
+        }
+
+        return result;
+    }
+
+    /**
+     * Crop bitmap by fully loading the original and then cropping it, fallback in case cropping region failed.
+     */
+    private static Bitmap cropBitmap(Context context, Uri loadedImageUri, float[] points,
+                                     int degreesRotated, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
+                                     int sampleMulti, Rect rect, int width, int height) {
+        Bitmap result = null;
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = sampleMulti * calculateInSampleSizeByReqestedSize(rect.width(), rect.height(), width, height);
+
+            Bitmap fullBitmap = decodeImage(context.getContentResolver(), loadedImageUri, options);
+            if (fullBitmap != null) {
+                try {
+                    // adjust crop points by the sampling because the image is smaller
+                    float[] points2 = new float[points.length];
+                    System.arraycopy(points, 0, points2, 0, points.length);
+                    for (int i = 0; i < points2.length; i++) {
+                        points2[i] = points2[i] / options.inSampleSize;
+                    }
+
+                    result = cropBitmap(fullBitmap, points2, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
+                } finally {
+                    if (result != fullBitmap) {
+                        fullBitmap.recycle();
+                    }
+                }
+            }
+        } catch (OutOfMemoryError e) {
+            if (result != null) {
+                result.recycle();
+            }
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load sampled bitmap: " + loadedImageUri + "\r\n" + e.getMessage(), e);
+        }
+        return result;
+    }
+
+    /**
      * Decode image from uri using "inJustDecodeBounds" to get the image dimensions.
      */
     private static BitmapFactory.Options decodeImageForOption(ContentResolver resolver, Uri uri) throws FileNotFoundException {
@@ -365,13 +427,15 @@ final class BitmapUtils {
 
     /**
      * Decode specific rectangle bitmap from stream using sampling to get bitmap with the requested limit.
+     *
+     * @param sampleMulti used to increase the sampling of the image to handle memory issues.
      */
-    private static Bitmap decodeSampledBitmapRegion(Context context, Uri uri, Rect rect, int reqWidth, int reqHeight) {
+    private static Bitmap decodeSampledBitmapRegion(Context context, Uri uri, Rect rect, int reqWidth, int reqHeight, int sampleMulti) {
         InputStream stream = null;
         BitmapRegionDecoder decoder = null;
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = calculateInSampleSizeByReqestedSize(rect.width(), rect.height(), reqWidth, reqHeight);
+            options.inSampleSize = sampleMulti * calculateInSampleSizeByReqestedSize(rect.width(), rect.height(), reqWidth, reqHeight);
 
             stream = context.getContentResolver().openInputStream(uri);
             decoder = BitmapRegionDecoder.newInstance(stream, false);
