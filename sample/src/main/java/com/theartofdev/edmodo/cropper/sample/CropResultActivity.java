@@ -43,17 +43,18 @@ public final class CropResultActivity extends Activity {
         imageView = ((ImageView) findViewById(R.id.resultImageView));
         imageView.setBackgroundResource(R.drawable.backdrop);
 
+        Intent intent = getIntent();
         if (mImage != null) {
             imageView.setImageBitmap(mImage);
+            int sampleSize = intent.getIntExtra("SAMPLE_SIZE", 1);
             double ratio = ((int) (10 * mImage.getWidth() / (double) mImage.getHeight())) / 10d;
             int byteCount = 0;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB_MR1) {
                 byteCount = mImage.getByteCount() / 1024;
             }
-            String desc = "(" + mImage.getWidth() + ", " + mImage.getHeight() + "), Ratio: " + ratio + ", Bytes: " + byteCount + "K";
+            String desc = "(" + mImage.getWidth() + ", " + mImage.getHeight() + "), Sample: " + sampleSize + ", Ratio: " + ratio + ", Bytes: " + byteCount + "K";
             ((TextView) findViewById(R.id.resultImageText)).setText(desc);
         } else {
-            Intent intent = getIntent();
             Uri imageUri = intent.getParcelableExtra("URI");
             if (imageUri != null) {
                 imageView.setImageURI(imageUri);

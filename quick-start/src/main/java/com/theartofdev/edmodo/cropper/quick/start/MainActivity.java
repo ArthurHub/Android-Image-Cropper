@@ -56,10 +56,8 @@ public class MainActivity extends AppCompatActivity {
             Uri imageUri = CropImage.getPickImageResultUri(this, data);
 
             // For API >= 23 we need to check specifically that we have permissions to read external storage.
-            boolean requirePermissions = false;
             if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {
                 // request permissions and handle the result in onRequestPermissionsResult()
-                requirePermissions = true;
                 mCropImageUri = imageUri;
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
             } else {
@@ -73,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 ((ImageView) findViewById(R.id.quick_start_cropped_image)).setImageURI(result.getUri());
+                Toast.makeText(this, "Cropping successful, Sample: " + result.getSampleSize(), Toast.LENGTH_LONG).show();
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
             }

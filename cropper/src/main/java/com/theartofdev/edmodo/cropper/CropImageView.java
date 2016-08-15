@@ -570,8 +570,8 @@ public class CropImageView extends FrameLayout {
      * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
      * Bitmaps Efficiently</a>
      *
-     * @param reqWidth the width to downsample the cropped image to
-     * @param reqHeight the height to downsample the cropped image to
+     * @param reqWidth the width to down-sample the cropped image to
+     * @param reqHeight the height to down-sample the cropped image to
      * @return a new Bitmap representing the cropped image
      */
     public Bitmap getCroppedImage(int reqWidth, int reqHeight) {
@@ -581,10 +581,12 @@ public class CropImageView extends FrameLayout {
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
                 int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
                 int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
-                croppedBitmap = BitmapUtils.cropBitmap(getContext(), mLoadedImageUri, getCropPoints(),
-                        mDegreesRotated, orgWidth, orgHeight,
-                        mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                        reqWidth, reqHeight);
+                BitmapUtils.BitmapSampled bitmapSampled =
+                        BitmapUtils.cropBitmap(getContext(), mLoadedImageUri, getCropPoints(),
+                                mDegreesRotated, orgWidth, orgHeight,
+                                mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
+                                reqWidth, reqHeight);
+                croppedBitmap = bitmapSampled.bitmap;
             } else {
                 croppedBitmap = BitmapUtils.cropBitmap(mBitmap, getCropPoints(), mDegreesRotated,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY());
@@ -873,7 +875,7 @@ public class CropImageView extends FrameLayout {
 
         OnCropImageCompleteListener listener = mOnCropImageCompleteListener;
         if (listener != null) {
-            CropResult cropResult = new CropResult(result.bitmap, result.uri, result.error, getCropPoints(), getCropRect(), getRotatedDegrees());
+            CropResult cropResult = new CropResult(result.bitmap, result.uri, result.error, getCropPoints(), getCropRect(), getRotatedDegrees(), result.sampleSize);
             listener.onCropImageComplete(this, cropResult);
         }
 
@@ -1598,13 +1600,19 @@ public class CropImageView extends FrameLayout {
          */
         private final int mRotation;
 
-        CropResult(Bitmap bitmap, Uri uri, Exception error, float[] cropPoints, Rect cropRect, int rotation) {
+        /**
+         * sample size used creating the crop bitmap to lower its size
+         */
+        private final int mSampleSize;
+
+        CropResult(Bitmap bitmap, Uri uri, Exception error, float[] cropPoints, Rect cropRect, int rotation, int sampleSize) {
             mBitmap = bitmap;
             mUri = uri;
             mError = error;
             mCropPoints = cropPoints;
             mCropRect = cropRect;
             mRotation = rotation;
+            mSampleSize = sampleSize;
         }
 
         /**
@@ -1656,6 +1664,13 @@ public class CropImageView extends FrameLayout {
          */
         public int getRotation() {
             return mRotation;
+        }
+
+        /**
+         * sample size used creating the crop bitmap to lower its size
+         */
+        public int getSampleSize() {
+            return mSampleSize;
         }
     }
     //endregion

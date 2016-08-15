@@ -172,19 +172,25 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
             if (!isCancelled()) {
 
                 Bitmap bitmap = null;
+                int sampleSize = 1;
                 if (mUri != null) {
-                    bitmap = BitmapUtils.cropBitmap(mContext, mUri, mCropPoints, mDegreesRotated, mOrgWidth, mOrgHeight,
-                            mFixAspectRatio, mAspectRatioX, mAspectRatioY, mReqWidth, mReqHeight);
+                    BitmapUtils.BitmapSampled bitmapSampled =
+                            BitmapUtils.cropBitmap(mContext, mUri, mCropPoints, mDegreesRotated, mOrgWidth, mOrgHeight,
+                                    mFixAspectRatio, mAspectRatioX, mAspectRatioY, mReqWidth, mReqHeight);
+                    bitmap = bitmapSampled.bitmap;
+                    sampleSize = bitmapSampled.sampleSize;
                 } else if (mBitmap != null) {
                     bitmap = BitmapUtils.cropBitmap(mBitmap, mCropPoints, mDegreesRotated, mFixAspectRatio, mAspectRatioX, mAspectRatioY);
                 }
 
                 if (mSaveUri == null) {
-                    return new Result(bitmap);
+                    return new Result(bitmap, sampleSize);
                 } else {
                     BitmapUtils.writeBitmapToUri(mContext, bitmap, mSaveUri, mSaveCompressFormat, mSaveCompressQuality);
-                    bitmap.recycle();
-                    return new Result(mSaveUri);
+                    if (bitmap != null) {
+                        bitmap.recycle();
+                    }
+                    return new Result(mSaveUri, sampleSize);
                 }
             }
             return null;
@@ -243,18 +249,25 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
          */
         public final boolean isSave;
 
-        Result(Bitmap bitmap) {
+        /**
+         * sample size used creating the crop bitmap to lower its size
+         */
+        public final int sampleSize;
+
+        Result(Bitmap bitmap, int sampleSize) {
             this.bitmap = bitmap;
             this.uri = null;
             this.error = null;
             this.isSave = false;
+            this.sampleSize = sampleSize;
         }
 
-        Result(Uri uri) {
+        Result(Uri uri, int sampleSize) {
             this.bitmap = null;
             this.uri = uri;
             this.error = null;
             this.isSave = true;
+            this.sampleSize = sampleSize;
         }
 
         Result(Exception error, boolean isSave) {
@@ -262,6 +275,7 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
             this.uri = null;
             this.error = error;
             this.isSave = isSave;
+            this.sampleSize = 1;
         }
     }
     //endregion

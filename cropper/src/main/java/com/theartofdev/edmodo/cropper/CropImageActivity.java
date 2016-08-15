@@ -31,7 +31,7 @@ import java.io.IOException;
  * Built-in activity for image cropping.<br>
  * Use {@link CropImage#activity(Uri)} to create a builder to start this activity.
  */
-public class CropImageActivity extends AppCompatActivity implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnSaveCroppedImageCompleteListener {
+public class CropImageActivity extends AppCompatActivity implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnCropImageCompleteListener {
 
     /**
      * The crop image view library widget used in the activity
@@ -72,14 +72,14 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
     protected void onStart() {
         super.onStart();
         mCropImageView.setOnSetImageUriCompleteListener(this);
-        mCropImageView.setOnSaveCroppedImageCompleteListener(this);
+        mCropImageView.setOnCropImageCompleteListener(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         mCropImageView.setOnSetImageUriCompleteListener(null);
-        mCropImageView.setOnSaveCroppedImageCompleteListener(null);
+        mCropImageView.setOnCropImageCompleteListener(null);
     }
 
     @Override
@@ -150,13 +150,13 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
                 mCropImageView.setRotatedDegrees(mOptions.initialRotation);
             }
         } else {
-            setResult(null, error);
+            setResult(null, error, 1);
         }
     }
 
     @Override
-    public void onSaveCroppedImageComplete(CropImageView view, Uri uri, Exception error) {
-        setResult(uri, error);
+    public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
+        setResult(result.getUri(), result.getError(), result.getSampleSize());
     }
 
     //region: Private methods
@@ -166,7 +166,7 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
      */
     protected void cropImage() {
         if (mOptions.noOutputImage) {
-            setResult(null, null);
+            setResult(null, null, 1);
         } else {
             Uri outputUri = getOutputUri();
             mCropImageView.saveCroppedImageAsync(outputUri,
@@ -205,9 +205,9 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
     /**
      * Result with cropped image data or error if failed.
      */
-    protected void setResult(Uri uri, Exception error) {
+    protected void setResult(Uri uri, Exception error, int sampleSize) {
         int resultCode = error == null ? RESULT_OK : CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE;
-        setResult(resultCode, getResultIntent(uri, error));
+        setResult(resultCode, getResultIntent(uri, error, sampleSize));
         finish();
     }
 
@@ -222,13 +222,14 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
     /**
      * Get intent instance to be used for the result of this activity.
      */
-    protected Intent getResultIntent(Uri uri, Exception error) {
+    protected Intent getResultIntent(Uri uri, Exception error, int sampleSize) {
         CropImage.ActivityResult result = new CropImage.ActivityResult(null,
                 uri,
                 error,
                 mCropImageView.getCropPoints(),
                 mCropImageView.getCropRect(),
-                mCropImageView.getRotatedDegrees());
+                mCropImageView.getRotatedDegrees(),
+                sampleSize);
         Intent intent = new Intent();
         intent.putExtra(CropImage.CROP_IMAGE_EXTRA_RESULT, result);
         return intent;

@@ -83,7 +83,7 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
         try {
             if (!isCancelled()) {
 
-                BitmapUtils.DecodeBitmapResult decodeResult =
+                BitmapUtils.BitmapSampled decodeResult =
                         BitmapUtils.decodeSampledBitmap(mContext, mUri, mWidth, mHeight);
 
                 if (!isCancelled()) {

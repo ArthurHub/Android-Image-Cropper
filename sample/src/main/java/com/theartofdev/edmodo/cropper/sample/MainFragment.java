@@ -176,7 +176,7 @@ public final class MainFragment extends Fragment
         super.onDetach();
         if (mCropImageView != null) {
             mCropImageView.setOnSetImageUriCompleteListener(null);
-            mCropImageView.setOnGetCroppedImageCompleteListener(null);
+            mCropImageView.setOnCropImageCompleteListener(null);
         }
     }
 
@@ -207,6 +207,7 @@ public final class MainFragment extends Fragment
     private void handleCropResult(CropImageView.CropResult result) {
         if (result.getError() == null) {
             Intent intent = new Intent(getActivity(), CropResultActivity.class);
+            intent.putExtra("SAMPLE_SIZE", result.getSampleSize());
             if (result.getUri() != null) {
                 intent.putExtra("URI", result.getUri());
             } else {

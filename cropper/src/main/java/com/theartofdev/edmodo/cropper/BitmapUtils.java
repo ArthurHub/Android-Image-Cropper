@@ -118,7 +118,7 @@ final class BitmapUtils {
     /**
      * Decode bitmap from stream using sampling to get bitmap with the requested limit.
      */
-    public static DecodeBitmapResult decodeSampledBitmap(Context context, Uri uri, int reqWidth, int reqHeight) {
+    public static BitmapSampled decodeSampledBitmap(Context context, Uri uri, int reqWidth, int reqHeight) {
 
         try {
             ContentResolver resolver = context.getContentResolver();
@@ -134,7 +134,7 @@ final class BitmapUtils {
             // Decode bitmap with inSampleSize set
             Bitmap bitmap = decodeImage(resolver, uri, options);
 
-            return new DecodeBitmapResult(bitmap, options.inSampleSize);
+            return new BitmapSampled(bitmap, options.inSampleSize);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load sampled bitmap: " + uri + "\r\n" + e.getMessage(), e);
@@ -176,9 +176,9 @@ final class BitmapUtils {
      * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.<br>
      * Additionally if OOM is thrown try to increase the sampling (2,4,8).
      */
-    public static Bitmap cropBitmap(Context context, Uri loadedImageUri, float[] points,
-                                    int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
-                                    int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight) {
+    public static BitmapSampled cropBitmap(Context context, Uri loadedImageUri, float[] points,
+                                           int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
+                                           int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight) {
         int sampleMulti = 1;
         while (true) {
             try {
@@ -307,9 +307,9 @@ final class BitmapUtils {
      * @param orgHeight used to get rectangle from points (handle edge cases to limit rectangle)
      * @param sampleMulti used to increase the sampling of the image to handle memory issues.
      */
-    private static Bitmap cropBitmap(Context context, Uri loadedImageUri, float[] points,
-                                     int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
-                                     int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight, int sampleMulti) {
+    private static BitmapSampled cropBitmap(Context context, Uri loadedImageUri, float[] points,
+                                            int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
+                                            int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight, int sampleMulti) {
 
         // get the rectangle in original image that contains the required cropped area (larger for non rectangular crop)
         Rect rect = getRectFromPoints(points, orgWidth, orgHeight, fixAspectRatio, aspectRatioX, aspectRatioY);
@@ -318,9 +318,12 @@ final class BitmapUtils {
         int height = reqHeight > 0 ? reqHeight : rect.height();
 
         Bitmap result = null;
+        int sampleSize = 1;
         try {
             // decode only the required image from URI, optionally sub-sampling if reqWidth/reqHeight is given.
-            result = decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height, sampleMulti);
+            BitmapSampled bitmapSampled = decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height, sampleMulti);
+            result = bitmapSampled.bitmap;
+            sampleSize = bitmapSampled.sampleSize;
         } catch (Exception e) {
         }
 
@@ -341,25 +344,24 @@ final class BitmapUtils {
                 }
                 throw e;
             }
+            return new BitmapSampled(result, sampleSize);
         } else {
-
             // failed to decode region, may be skia issue, try full decode and then crop
-            result = cropBitmap(context, loadedImageUri, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, sampleMulti, rect, width, height);
+            return cropBitmap(context, loadedImageUri, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, sampleMulti, rect, width, height);
         }
-
-        return result;
     }
 
     /**
      * Crop bitmap by fully loading the original and then cropping it, fallback in case cropping region failed.
      */
-    private static Bitmap cropBitmap(Context context, Uri loadedImageUri, float[] points,
-                                     int degreesRotated, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
-                                     int sampleMulti, Rect rect, int width, int height) {
+    private static BitmapSampled cropBitmap(Context context, Uri loadedImageUri, float[] points,
+                                            int degreesRotated, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
+                                            int sampleMulti, Rect rect, int width, int height) {
         Bitmap result = null;
+        int sampleSize;
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = sampleMulti * calculateInSampleSizeByReqestedSize(rect.width(), rect.height(), width, height);
+            options.inSampleSize = sampleSize = sampleMulti * calculateInSampleSizeByReqestedSize(rect.width(), rect.height(), width, height);
 
             Bitmap fullBitmap = decodeImage(context.getContentResolver(), loadedImageUri, options);
             if (fullBitmap != null) {
@@ -386,7 +388,7 @@ final class BitmapUtils {
         } catch (Exception e) {
             throw new RuntimeException("Failed to load sampled bitmap: " + loadedImageUri + "\r\n" + e.getMessage(), e);
         }
-        return result;
+        return new BitmapSampled(result, sampleSize);
     }
 
     /**
@@ -430,7 +432,7 @@ final class BitmapUtils {
      *
      * @param sampleMulti used to increase the sampling of the image to handle memory issues.
      */
-    private static Bitmap decodeSampledBitmapRegion(Context context, Uri uri, Rect rect, int reqWidth, int reqHeight, int sampleMulti) {
+    private static BitmapSampled decodeSampledBitmapRegion(Context context, Uri uri, Rect rect, int reqWidth, int reqHeight, int sampleMulti) {
         InputStream stream = null;
         BitmapRegionDecoder decoder = null;
         try {
@@ -441,7 +443,7 @@ final class BitmapUtils {
             decoder = BitmapRegionDecoder.newInstance(stream, false);
             do {
                 try {
-                    return decoder.decodeRegion(rect, options);
+                    return new BitmapSampled(decoder.decodeRegion(rect, options), options.inSampleSize);
                 } catch (OutOfMemoryError e) {
                     options.inSampleSize *= 2;
                 }
@@ -454,7 +456,7 @@ final class BitmapUtils {
                 decoder.recycle();
             }
         }
-        return null;
+        return new BitmapSampled(null, 1);
     }
 
     /**
@@ -639,26 +641,26 @@ final class BitmapUtils {
     }
     //endregion
 
-    //region: Inner class: DecodeBitmapResult
+    //region: Inner class: BitmapSampled
 
     /**
-     * The result of {@link #decodeSampledBitmap(android.content.Context, android.net.Uri, int, int)}.
+     * Holds bitmap instance and the sample size that the bitmap was loaded/cropped with.
      */
-    public static final class DecodeBitmapResult {
+    public static final class BitmapSampled {
 
         /**
-         * The loaded bitmap
+         * The bitmap instance
          */
         public final Bitmap bitmap;
 
         /**
-         * The sample size used to load the given bitmap
+         * The sample size used to lower the size of the bitmap (1,2,4,8,...)
          */
         public final int sampleSize;
 
-        DecodeBitmapResult(Bitmap bitmap, int sampleSize) {
-            this.sampleSize = sampleSize;
+        public BitmapSampled(Bitmap bitmap, int sampleSize) {
             this.bitmap = bitmap;
+            this.sampleSize = sampleSize;
         }
     }
     //endregion
