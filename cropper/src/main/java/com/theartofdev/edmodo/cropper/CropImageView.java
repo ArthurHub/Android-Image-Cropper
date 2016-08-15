@@ -611,7 +611,7 @@ public class CropImageView extends FrameLayout {
      * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
      * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
      * Bitmaps Efficiently</a><br>
-     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     * The result will be invoked to listener set by {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      *
      * @param reqWidth the width to downsample the cropped image to
      * @param reqHeight the height to downsample the cropped image to
@@ -1423,7 +1423,7 @@ public class CropImageView extends FrameLayout {
 
         /**
          * Scale the image uniformly (maintain the image's aspect ratio) to fit in crop image view.<br>
-         * The largest dimension will be equals to crop image viee and the second dimension will be smaller.
+         * The largest dimension will be equals to crop image view and the second dimension will be smaller.
          */
         FIT_CENTER,
 
@@ -1474,6 +1474,44 @@ public class CropImageView extends FrameLayout {
          * Always show
          */
         ON
+    }
+    //endregion
+
+    //region: Inner class: RequestSizeOptions
+
+    /**
+     * Possible options for handling requested width/height for cropping.
+     */
+    public enum RequestSizeOptions {
+
+        /**
+         * No resize/sampling is done unless required for memory management (OOM).
+         */
+        NONE,
+
+        /**
+         * Resize the image uniformly (maintain the image's aspect ratio) so that both
+         * dimensions (width and height) of the image will be equal to or <b>less</b> than the
+         * corresponding requested dimension.<br>
+         * If the image is smaller than the requested size it will NOT change.
+         */
+        RESIZE_INSIDE,
+
+        /**
+         * Resize the image uniformly (maintain the image's aspect ratio) to fit in the given width/height.<br>
+         * The largest dimension will be equals to the requested and the second dimension will be smaller.<br>
+         * If the image is smaller than the requested size it will enlarge it.
+         */
+        RESIZE_FIT,
+
+        /**
+         * Only sample the image during loading (if image set using URI) so the smallest of the image
+         * dimensions will be between the requested size and x2 requested size.<br>
+         * NOTE: resulting image will not be exactly requested width/height
+         * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
+         * Bitmaps Efficiently</a>.
+         */
+        SAMPLING
     }
     //endregion
 
