@@ -626,7 +626,7 @@ public class CropImageView extends FrameLayout {
             reqWidth = options != RequestSizeOptions.NONE ? reqWidth : 0;
             reqHeight = options != RequestSizeOptions.NONE ? reqHeight : 0;
 
-            if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
+            if (mLoadedImageUri != null && (mLoadedSampleSize > 1 || options == RequestSizeOptions.SAMPLING)) {
                 int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
                 int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
                 BitmapUtils.BitmapSampled bitmapSampled =
@@ -1066,7 +1066,7 @@ public class CropImageView extends FrameLayout {
 
             int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
             int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
-            if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
+            if (mLoadedImageUri != null && (mLoadedSampleSize > 1 || options == RequestSizeOptions.SAMPLING)) {
                 mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
                         mDegreesRotated, orgWidth, orgHeight,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
