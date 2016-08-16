@@ -231,6 +231,13 @@ public class CropImageView extends FrameLayout {
                     options.minCropResultHeight = (int) ta.getFloat(R.styleable.CropImageView_cropMinCropResultHeightPX, options.minCropResultHeight);
                     options.maxCropResultWidth = (int) ta.getFloat(R.styleable.CropImageView_cropMaxCropResultWidthPX, options.maxCropResultWidth);
                     options.maxCropResultHeight = (int) ta.getFloat(R.styleable.CropImageView_cropMaxCropResultHeightPX, options.maxCropResultHeight);
+
+                    // if aspect ratio is set then set fixed to true
+                    if (ta.hasValue(R.styleable.CropImageView_cropAspectRatioX) &&
+                            ta.hasValue(R.styleable.CropImageView_cropAspectRatioX) &&
+                            !ta.hasValue(R.styleable.CropImageView_cropFixAspectRatio)) {
+                        options.fixAspectRatio = true;
+                    }
                 } finally {
                     ta.recycle();
                 }
@@ -400,7 +407,8 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * Sets the both the X and Y values of the aspectRatio.
+     * Sets the both the X and Y values of the aspectRatio.<br>
+     * Sets fixed aspect ratio to TRUE.
      *
      * @param aspectRatioX int that specifies the new X value of the aspect ratio
      * @param aspectRatioY int that specifies the new Y value of the aspect ratio
@@ -408,6 +416,16 @@ public class CropImageView extends FrameLayout {
     public void setAspectRatio(int aspectRatioX, int aspectRatioY) {
         mCropOverlayView.setAspectRatioX(aspectRatioX);
         mCropOverlayView.setAspectRatioY(aspectRatioY);
+        setFixedAspectRatio(true);
+    }
+
+    /**
+     * Clears set aspect ratio values and sets fixed aspect ratio to FALSE.
+     */
+    public void clearAspectRatio() {
+        mCropOverlayView.setAspectRatioX(1);
+        mCropOverlayView.setAspectRatioY(1);
+        setFixedAspectRatio(false);
     }
 
     /**

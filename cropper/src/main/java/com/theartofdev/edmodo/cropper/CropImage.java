@@ -556,11 +556,16 @@ public final class CropImage {
 
         /**
          * the X,Y value of the aspect ratio.<br>
+         * Also sets fixes aspect ratio to TRUE.<br>
          * <i>Default: 1/1</i>
+         *
+         * @param aspectRatioX the width
+         * @param aspectRatioY the height
          */
         public ActivityBuilder setAspectRatio(int aspectRatioX, int aspectRatioY) {
             mOptions.aspectRatioX = aspectRatioX;
             mOptions.aspectRatioY = aspectRatioY;
+            mOptions.fixAspectRatio = true;
             return this;
         }
 
