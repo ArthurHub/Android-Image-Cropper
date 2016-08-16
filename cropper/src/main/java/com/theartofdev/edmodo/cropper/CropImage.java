@@ -452,6 +452,7 @@ public final class CropImage {
 
         /**
          * The shape of the cropping window.<br>
+         * To set square/circle crop shape set aspect ratio to 1:1.<br>
          * <i>Default: RECTANGLE</i>
          */
         public ActivityBuilder setCropShape(@NonNull CropImageView.CropShape cropShape) {

@@ -1,7 +1,5 @@
 Android Image Cropper
 =======
-[![build status](https://travis-ci.org/ArthurHub/Android-Image-Cropper.svg)](https://travis-ci.org/ArthurHub/Android-Image-Cropper) 
-[![Codacy Badge](https://api.codacy.com/project/badge/grade/4d3781df0cce40959881a8d91365407a)](https://www.codacy.com/app/tep-arthur/Android-Image-Cropper)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android--Image--Cropper-green.svg?style=true)](https://android-arsenal.com/details/1/3487)
 [ ![Download](https://api.bintray.com/packages/arthurhub/maven/Android-Image-Cropper/images/download.svg) ](https://bintray.com/arthurhub/maven/Android-Image-Cropper/_latestVersion)
 
@@ -18,14 +16,15 @@ Android Image Cropper
 Include the library
 
  ```
- compile 'com.theartofdev.edmodo:android-image-cropper:2.2.+'
+ compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
  ```
 
 ### Using Activity
 
 2. Add `CropImageActivity` into your AndroidManifest.xml
  ```xml
- <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"/>
+ <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+     android:theme="@style/Base.Theme.AppCompat"/>
  ```
 
 3. Start `CropImageActivity` using builder pattern from your activity
@@ -103,29 +102,15 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.3.0*
+
+
+
 *2.2.5*
 
 - Fix to webp file extension (thx Nathan)
 - Fix wrong initial crop window when image contains exif data.
 - Added corners to circular crop window, can be removed by setting `BorderCornerThickness` to 0.
-
-*2.2.3*
-
-- Fix Android state restore overrides state set by client.
-
-*2.2.2*
-
-- Fix rotation zooms and changes aspect ratio when fixed aspect ratio is used.
-
-*2.2.1*
-
-- Fix listeners getting garbage collected bug (thx @TheFinestArtist)
-
-*2.2.0*
-
-- Fix non-straight angle rotation handling.
-- Add activity counter-clockwise rotation button (configurable, hidden by default).
-- Add activity rotation degrees configuration (default 90)
 
 See [full change log](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log).
 

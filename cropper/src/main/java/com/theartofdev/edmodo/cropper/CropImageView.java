@@ -299,7 +299,8 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
-     * The shape of the cropping area - rectangle/circular.
+     * The shape of the cropping area - rectangle/circular.<br>
+     * To set square/circle crop shape set aspect ratio to 1:1.
      */
     public void setCropShape(CropShape cropShape) {
         mCropOverlayView.setCropShape(cropShape);
@@ -1463,7 +1464,8 @@ public class CropImageView extends FrameLayout {
     //region: Inner class: CropShape
 
     /**
-     * The possible cropping area shape.
+     * The possible cropping area shape.<br>
+     * To set square/circle crop shape set aspect ratio to 1:1.
      */
     public enum CropShape {
         RECTANGLE,
