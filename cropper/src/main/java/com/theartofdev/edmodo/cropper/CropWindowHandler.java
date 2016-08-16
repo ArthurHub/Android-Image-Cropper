@@ -137,6 +137,24 @@ final class CropWindowHandler {
     }
 
     /**
+     * the min size the resulting cropping image is allowed to be, affects the cropping window limits
+     * (in pixels).<br>
+     */
+    public void setMinCropResultSize(int minCropResultWidth, int minCropResultHeight) {
+        mMinCropResultWidth = minCropResultWidth;
+        mMinCropResultHeight = minCropResultHeight;
+    }
+
+    /**
+     * the max size the resulting cropping image is allowed to be, affects the cropping window limits
+     * (in pixels).<br>
+     */
+    public void setMaxCropResultSize(int maxCropResultWidth, int maxCropResultHeight) {
+        mMaxCropResultWidth = maxCropResultWidth;
+        mMaxCropResultHeight = maxCropResultHeight;
+    }
+
+    /**
      * set the max width/height and scale factor of the showen image to original image to scale the limits
      * appropriately.
      */
@@ -183,10 +201,6 @@ final class CropWindowHandler {
      *
      * @param x the x-coordinate of the touch point
      * @param y the y-coordinate of the touch point
-     * @param left the x-coordinate of the left bound
-     * @param top the y-coordinate of the top bound
-     * @param right the x-coordinate of the right bound
-     * @param bottom the y-coordinate of the bottom bound
      * @param targetRadius the target radius in pixels
      * @return the Handle that was pressed; null if no Handle was pressed
      */
@@ -205,10 +219,6 @@ final class CropWindowHandler {
      *
      * @param x the x-coordinate of the touch point
      * @param y the y-coordinate of the touch point
-     * @param left the x-coordinate of the left bound
-     * @param top the y-coordinate of the top bound
-     * @param right the x-coordinate of the right bound
-     * @param bottom the y-coordinate of the bottom bound
      * @param targetRadius the target radius in pixels
      * @return the Handle that was pressed; null if no Handle was pressed
      */
@@ -247,10 +257,6 @@ final class CropWindowHandler {
      *
      * @param x the x-coordinate of the touch point
      * @param y the y-coordinate of the touch point
-     * @param left the x-coordinate of the left bound
-     * @param top the y-coordinate of the top bound
-     * @param right the x-coordinate of the right bound
-     * @param bottom the y-coordinate of the bottom bound
      * @return the Handle that was pressed; null if no Handle was pressed
      */
     private CropWindowMoveHandler.Type getOvalPressedMoveType(float x, float y) {

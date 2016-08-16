@@ -403,7 +403,23 @@ public class CropOverlayView extends View {
     }
 
     /**
-     * set the max width/height and scale factor of the showen image to original image to scale the limits
+     * the min size the resulting cropping image is allowed to be, affects the cropping window limits
+     * (in pixels).<br>
+     */
+    public void setMinCropResultSize(int minCropResultWidth, int minCropResultHeight) {
+        mCropWindowHandler.setMinCropResultSize(minCropResultWidth, minCropResultHeight);
+    }
+
+    /**
+     * the max size the resulting cropping image is allowed to be, affects the cropping window limits
+     * (in pixels).<br>
+     */
+    public void setMaxCropResultSize(int maxCropResultWidth, int maxCropResultHeight) {
+        mCropWindowHandler.setMaxCropResultSize(maxCropResultWidth, maxCropResultHeight);
+    }
+
+    /**
+     * set the max width/height and scale factor of the shown image to original image to scale the limits
      * appropriately.
      */
     public void setCropWindowLimits(float maxWidth, float maxHeight, float scaleFactorWidth, float scaleFactorHeight) {

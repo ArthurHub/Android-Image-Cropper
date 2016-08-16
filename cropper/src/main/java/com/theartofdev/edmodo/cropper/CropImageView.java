@@ -353,6 +353,23 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * the min size the resulting cropping image is allowed to be, affects the cropping window limits
+     * (in pixels).<br>
+     */
+    public void setMinCropResultSize(int minCropResultWidth, int minCropResultHeight) {
+        mCropOverlayView.setMinCropResultSize(minCropResultWidth, minCropResultHeight);
+
+    }
+
+    /**
+     * the max size the resulting cropping image is allowed to be, affects the cropping window limits
+     * (in pixels).<br>
+     */
+    public void setMaxCropResultSize(int maxCropResultWidth, int maxCropResultHeight) {
+        mCropOverlayView.setMaxCropResultSize(maxCropResultWidth, maxCropResultHeight);
+    }
+
+    /**
      * Get the amount of degrees the cropping image is rotated cloackwise.<br>
      *
      * @return 0-360
