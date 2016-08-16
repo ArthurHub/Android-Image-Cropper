@@ -24,6 +24,7 @@ import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.util.Pair;
 
 import java.io.Closeable;
@@ -296,6 +297,39 @@ final class BitmapUtils {
         } finally {
             closeSafe(outputStream);
         }
+    }
+
+    /**
+     * Resize the given bitmap to the given width/height by the given option.<br>
+     */
+    public static Bitmap resizeBitmap(Bitmap bitmap, int reqWidth, int reqHeight, CropImageView.RequestSizeOptions options) {
+        try {
+            if (reqWidth > 0 && reqHeight > 0 && (options == CropImageView.RequestSizeOptions.RESIZE_FIT ||
+                    options == CropImageView.RequestSizeOptions.RESIZE_INSIDE ||
+                    options == CropImageView.RequestSizeOptions.RESIZE_EXACT)) {
+
+                Bitmap resized = null;
+                if (options == CropImageView.RequestSizeOptions.RESIZE_EXACT) {
+                    resized = Bitmap.createScaledBitmap(bitmap, reqWidth, reqHeight, false);
+                } else {
+                    int width = bitmap.getWidth();
+                    int height = bitmap.getHeight();
+                    float scale = Math.max(width / (float) reqWidth, height / (float) reqHeight);
+                    if (scale > 1 || options == CropImageView.RequestSizeOptions.RESIZE_FIT) {
+                        resized = Bitmap.createScaledBitmap(bitmap, (int) (width / scale), (int) (height / scale), false);
+                    }
+                }
+                if (resized != null) {
+                    if (resized != bitmap) {
+                        bitmap.recycle();
+                    }
+                    return resized;
+                }
+            }
+        } catch (Exception e) {
+            Log.w("AIC", "Failed to resize cropped image, return bitmap before resize", e);
+        }
+        return bitmap;
     }
 
     //region: Private methods

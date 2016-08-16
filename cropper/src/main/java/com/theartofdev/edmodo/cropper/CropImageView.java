@@ -559,25 +559,37 @@ public class CropImageView extends FrameLayout {
      * @return a new Bitmap representing the cropped image
      */
     public Bitmap getCroppedImage() {
-        return getCroppedImage(0, 0);
+        return getCroppedImage(0, 0, RequestSizeOptions.NONE);
     }
 
     /**
      * Gets the cropped image based on the current crop window.<br>
-     * If image loaded from URI will use sample size to fit in the requested width and height down-sampling
-     * if required - optimization to get best size to quality.<br>
-     * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
-     * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
-     * Bitmaps Efficiently</a>
+     * Uses {@link RequestSizeOptions#RESIZE_INSIDE} option.
      *
-     * @param reqWidth the width to down-sample the cropped image to
-     * @param reqHeight the height to down-sample the cropped image to
+     * @param reqWidth the width to resize the cropped image to
+     * @param reqHeight the height to resize the cropped image to
      * @return a new Bitmap representing the cropped image
      */
     public Bitmap getCroppedImage(int reqWidth, int reqHeight) {
+        return getCroppedImage(0, 0, RequestSizeOptions.RESIZE_INSIDE);
+    }
+
+    /**
+     * Gets the cropped image based on the current crop window.<br>
+     *
+     * @param reqWidth the width to resize the cropped image to (see options)
+     * @param reqHeight the height to resize the cropped image to (see options)
+     * @param options the resize method to use, see its documentation
+     * @return a new Bitmap representing the cropped image
+     */
+    public Bitmap getCroppedImage(int reqWidth, int reqHeight, RequestSizeOptions options) {
         Bitmap croppedBitmap = null;
         if (mBitmap != null) {
             mImageView.clearAnimation();
+
+            reqWidth = options != RequestSizeOptions.NONE ? reqWidth : 0;
+            reqHeight = options != RequestSizeOptions.NONE ? reqHeight : 0;
+
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
                 int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
                 int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
@@ -591,6 +603,8 @@ public class CropImageView extends FrameLayout {
                 croppedBitmap = BitmapUtils.cropBitmap(mBitmap, getCropPoints(), mDegreesRotated,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY());
             }
+
+            croppedBitmap = BitmapUtils.resizeBitmap(croppedBitmap, reqWidth, reqHeight, options);
         }
 
         return croppedBitmap;
@@ -601,26 +615,34 @@ public class CropImageView extends FrameLayout {
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      */
     public void getCroppedImageAsync() {
-        getCroppedImageAsync(0, 0);
+        getCroppedImageAsync(0, 0, RequestSizeOptions.NONE);
     }
 
     /**
      * Gets the cropped image based on the current crop window.<br>
-     * If (reqWidth,reqHeight) is given AND image is loaded from URI cropping will try to use sample size to fit in
-     * the requested width and height down-sampling if possible - optimization to get best size to quality.<br>
-     * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
-     * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
-     * Bitmaps Efficiently</a><br>
+     * Uses {@link RequestSizeOptions#RESIZE_INSIDE} option.<br>
      * The result will be invoked to listener set by {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      *
-     * @param reqWidth the width to downsample the cropped image to
-     * @param reqHeight the height to downsample the cropped image to
+     * @param reqWidth the width to resize the cropped image to
+     * @param reqHeight the height to resize the cropped image to
      */
     public void getCroppedImageAsync(int reqWidth, int reqHeight) {
+        getCroppedImageAsync(reqWidth, reqHeight, RequestSizeOptions.RESIZE_INSIDE);
+    }
+
+    /**
+     * Gets the cropped image based on the current crop window.<br>
+     * The result will be invoked to listener set by {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
+     *
+     * @param reqWidth the width to resize the cropped image to (see options)
+     * @param reqHeight the height to resize the cropped image to (see options)
+     * @param options the resize method to use, see its documentation
+     */
+    public void getCroppedImageAsync(int reqWidth, int reqHeight, RequestSizeOptions options) {
         if (mOnCropImageCompleteListener == null && mOnGetCroppedImageCompleteListener == null) {
             throw new IllegalArgumentException("mOnCropImageCompleteListener is not set");
         }
-        startCropWorkerTask(reqWidth, reqHeight, null, null, 0);
+        startCropWorkerTask(reqWidth, reqHeight, options, null, null, 0);
     }
 
     /**
@@ -631,7 +653,7 @@ public class CropImageView extends FrameLayout {
      * @param saveUri the Android Uri to save the cropped image to
      */
     public void saveCroppedImageAsync(Uri saveUri) {
-        saveCroppedImageAsync(saveUri, Bitmap.CompressFormat.JPEG, 90, 0, 0);
+        saveCroppedImageAsync(saveUri, Bitmap.CompressFormat.JPEG, 90, 0, 0, RequestSizeOptions.NONE);
     }
 
     /**
@@ -639,33 +661,44 @@ public class CropImageView extends FrameLayout {
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      *
      * @param saveUri the Android Uri to save the cropped image to
-     * @param saveCompressFormat the compression format to use when writting the image
-     * @param saveCompressQuality the quility (if applicable) to use when writting the image (0 - 100)
+     * @param saveCompressFormat the compression format to use when writing the image
+     * @param saveCompressQuality the quality (if applicable) to use when writing the image (0 - 100)
      */
     public void saveCroppedImageAsync(Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
-        saveCroppedImageAsync(saveUri, saveCompressFormat, saveCompressQuality, 0, 0);
+        saveCroppedImageAsync(saveUri, saveCompressFormat, saveCompressQuality, 0, 0, RequestSizeOptions.NONE);
     }
 
     /**
      * Save the cropped image based on the current crop window to the given uri.<br>
-     * If (reqWidth,reqHeight) is given AND image is loaded from URI cropping will try to use sample size to fit in
-     * the requested width and height down-sampling if possible - optimization to get best size to quality.<br>
-     * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
-     * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
-     * Bitmaps Efficiently</a><br>
+     * Uses {@link RequestSizeOptions#RESIZE_INSIDE} option.<br>
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      *
      * @param saveUri the Android Uri to save the cropped image to
-     * @param saveCompressFormat the compression format to use when writting the image
-     * @param saveCompressQuality the quility (if applicable) to use when writting the image (0 - 100)
-     * @param reqWidth the width to downsample the cropped image to
-     * @param reqHeight the height to downsample the cropped image to
+     * @param saveCompressFormat the compression format to use when writing the image
+     * @param saveCompressQuality the quality (if applicable) to use when writing the image (0 - 100)
+     * @param reqWidth the width to resize the cropped image to
+     * @param reqHeight the height to resize the cropped image to
      */
     public void saveCroppedImageAsync(Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality, int reqWidth, int reqHeight) {
+        saveCroppedImageAsync(saveUri, saveCompressFormat, saveCompressQuality, reqWidth, reqHeight, RequestSizeOptions.RESIZE_INSIDE);
+    }
+
+    /**
+     * Save the cropped image based on the current crop window to the given uri.<br>
+     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     *
+     * @param saveUri the Android Uri to save the cropped image to
+     * @param saveCompressFormat the compression format to use when writing the image
+     * @param saveCompressQuality the quality (if applicable) to use when writing the image (0 - 100)
+     * @param reqWidth the width to resize the cropped image to (see options)
+     * @param reqHeight the height to resize the cropped image to (see options)
+     * @param options the resize method to use, see its documentation
+     */
+    public void saveCroppedImageAsync(Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality, int reqWidth, int reqHeight, RequestSizeOptions options) {
         if (mOnCropImageCompleteListener == null && mOnSaveCroppedImageCompleteListener == null) {
             throw new IllegalArgumentException("mOnCropImageCompleteListener is not set");
         }
-        startCropWorkerTask(reqWidth, reqHeight, saveUri, saveCompressFormat, saveCompressQuality);
+        startCropWorkerTask(reqWidth, reqHeight, options, saveUri, saveCompressFormat, saveCompressQuality);
     }
 
     /**
@@ -975,13 +1008,14 @@ public class CropImageView extends FrameLayout {
      * the requested width and height down-sampling if possible - optimization to get best size to quality.<br>
      * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
      *
-     * @param reqWidth optional: the width to downsample the cropped image to
-     * @param reqHeight optional: the height to downsample the cropped image to
+     * @param reqWidth the width to resize the cropped image to (see options)
+     * @param reqHeight the height to resize the cropped image to (see options)
+     * @param options the resize method to use on the cropped bitmap
      * @param saveUri optional: to save the cropped image to
      * @param saveCompressFormat if saveUri is given, the given compression will be used for saving the image
-     * @param saveCompressQuality if saveUri is given, the given quiality will be used for the compression.
+     * @param saveCompressQuality if saveUri is given, the given quality will be used for the compression.
      */
-    public void startCropWorkerTask(int reqWidth, int reqHeight, Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
+    public void startCropWorkerTask(int reqWidth, int reqHeight, RequestSizeOptions options, Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
         if (mBitmap != null) {
             mImageView.clearAnimation();
 
@@ -991,16 +1025,22 @@ public class CropImageView extends FrameLayout {
                 currentTask.cancel(true);
             }
 
+            reqWidth = options != RequestSizeOptions.NONE ? reqWidth : 0;
+            reqHeight = options != RequestSizeOptions.NONE ? reqHeight : 0;
+
             int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
             int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
             if (mLoadedImageUri != null && mLoadedSampleSize > 1) {
                 mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
                         mDegreesRotated, orgWidth, orgHeight,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                        reqWidth, reqHeight, saveUri, saveCompressFormat, saveCompressQuality));
+                        reqWidth, reqHeight, options,
+                        saveUri, saveCompressFormat, saveCompressQuality));
             } else {
                 mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), mDegreesRotated,
-                        mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(), saveUri, saveCompressFormat, saveCompressQuality));
+                        mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
+                        reqWidth, reqHeight, options,
+                        saveUri, saveCompressFormat, saveCompressQuality));
             }
             mBitmapCroppingWorkerTask.get().execute();
             setProgressBarVisibility();
@@ -1490,6 +1530,15 @@ public class CropImageView extends FrameLayout {
         NONE,
 
         /**
+         * Only sample the image during loading (if image set using URI) so the smallest of the image
+         * dimensions will be between the requested size and x2 requested size.<br>
+         * NOTE: resulting image will not be exactly requested width/height
+         * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
+         * Bitmaps Efficiently</a>.
+         */
+        SAMPLING,
+
+        /**
          * Resize the image uniformly (maintain the image's aspect ratio) so that both
          * dimensions (width and height) of the image will be equal to or <b>less</b> than the
          * corresponding requested dimension.<br>
@@ -1505,13 +1554,11 @@ public class CropImageView extends FrameLayout {
         RESIZE_FIT,
 
         /**
-         * Only sample the image during loading (if image set using URI) so the smallest of the image
-         * dimensions will be between the requested size and x2 requested size.<br>
-         * NOTE: resulting image will not be exactly requested width/height
-         * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
-         * Bitmaps Efficiently</a>.
+         * Resize the image to fit exactly in the given width/height.<br>
+         * This resize method does NOT preserve aspect ratio.<br>
+         * If the image is smaller than the requested size it will enlarge it.
          */
-        SAMPLING
+        RESIZE_EXACT
     }
     //endregion
 

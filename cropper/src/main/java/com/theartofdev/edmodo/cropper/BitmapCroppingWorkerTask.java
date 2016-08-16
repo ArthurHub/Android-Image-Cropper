@@ -92,23 +92,29 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
     private final int mReqHeight;
 
     /**
+     * The option to handle requested width/height
+     */
+    private final CropImageView.RequestSizeOptions mReqSizeOptions;
+
+    /**
      * the Android Uri to save the cropped image to
      */
     private final Uri mSaveUri;
 
     /**
-     * the compression format to use when writting the image
+     * the compression format to use when writing the image
      */
     private final Bitmap.CompressFormat mSaveCompressFormat;
 
     /**
-     * the quility (if applicable) to use when writting the image (0 - 100)
+     * the quality (if applicable) to use when writing the image (0 - 100)
      */
     private final int mSaveCompressQuality;
     //endregion
 
     public BitmapCroppingWorkerTask(CropImageView cropImageView, Bitmap bitmap, float[] cropPoints,
                                     int degreesRotated, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
+                                    int reqWidth, int reqHeight, CropImageView.RequestSizeOptions options,
                                     Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
 
         mCropImageViewReference = new WeakReference<>(cropImageView);
@@ -120,19 +126,20 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
         mFixAspectRatio = fixAspectRatio;
         mAspectRatioX = aspectRatioX;
         mAspectRatioY = aspectRatioY;
+        mReqWidth = reqWidth;
+        mReqHeight = reqHeight;
+        mReqSizeOptions = options;
         mSaveUri = saveUri;
         mSaveCompressFormat = saveCompressFormat;
         mSaveCompressQuality = saveCompressQuality;
         mOrgWidth = 0;
         mOrgHeight = 0;
-        mReqWidth = 0;
-        mReqHeight = 0;
     }
 
     public BitmapCroppingWorkerTask(CropImageView cropImageView, Uri uri, float[] cropPoints,
                                     int degreesRotated, int orgWidth, int orgHeight,
                                     boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
-                                    int reqWidth, int reqHeight,
+                                    int reqWidth, int reqHeight, CropImageView.RequestSizeOptions options,
                                     Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
 
         mCropImageViewReference = new WeakReference<>(cropImageView);
@@ -147,6 +154,7 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
         mOrgHeight = orgHeight;
         mReqWidth = reqWidth;
         mReqHeight = reqHeight;
+        mReqSizeOptions = options;
         mSaveUri = saveUri;
         mSaveCompressFormat = saveCompressFormat;
         mSaveCompressQuality = saveCompressQuality;
@@ -182,6 +190,8 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
                 } else if (mBitmap != null) {
                     bitmap = BitmapUtils.cropBitmap(mBitmap, mCropPoints, mDegreesRotated, mFixAspectRatio, mAspectRatioX, mAspectRatioY);
                 }
+
+                bitmap = BitmapUtils.resizeBitmap(bitmap, mReqWidth, mReqHeight, mReqSizeOptions);
 
                 if (mSaveUri == null) {
                     return new Result(bitmap, sampleSize);
