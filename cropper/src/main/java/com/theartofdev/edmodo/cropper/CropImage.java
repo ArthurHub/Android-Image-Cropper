@@ -723,15 +723,22 @@ public final class CropImage {
         }
 
         /**
-         * the size to downsample the cropped image to.<br>
-         * NOTE: resulting image will not be exactly (reqWidth, reqHeight)
-         * see: <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">Loading Large
-         * Bitmaps Efficiently</a><br>
-         * <i>Default: 0, 0 - not set, will not downsample</i>
+         * the size to resize the cropped image to.<br>
+         * Uses {@link CropImageView.RequestSizeOptions#RESIZE_INSIDE} option.<br>
+         * <i>Default: 0, 0 - not set, will not resize</i>
          */
         public ActivityBuilder setRequestedSize(int reqWidth, int reqHeight) {
+            return setRequestedSize(reqWidth, reqHeight, CropImageView.RequestSizeOptions.RESIZE_INSIDE);
+        }
+
+        /**
+         * the size to resize the cropped image to.<br>
+         * <i>Default: 0, 0 - not set, will not resize</i>
+         */
+        public ActivityBuilder setRequestedSize(int reqWidth, int reqHeight, CropImageView.RequestSizeOptions options) {
             mOptions.outputRequestWidth = reqWidth;
             mOptions.outputRequestHeight = reqHeight;
+            mOptions.outputRequestSizeOptions = options;
             return this;
         }
 

@@ -209,24 +209,29 @@ public class CropImageOptions implements Parcelable {
     public Uri outputUri;
 
     /**
-     * the compression format to use when writting the image
+     * the compression format to use when writing the image
      */
     public Bitmap.CompressFormat outputCompressFormat;
 
     /**
-     * the quility (if applicable) to use when writting the image (0 - 100)
+     * the quality (if applicable) to use when writing the image (0 - 100)
      */
     public int outputCompressQuality;
 
     /**
-     * the width to downsample the cropped image to
+     * the width to resize the cropped image to (see options)
      */
     public int outputRequestWidth;
 
     /**
-     * the height to downsample the cropped image to
+     * the height to resize the cropped image to (see options)
      */
     public int outputRequestHeight;
+
+    /**
+     * the resize method to use on the cropped bitmap (see options documentation)
+     */
+    public CropImageView.RequestSizeOptions outputRequestSizeOptions;
 
     /**
      * if the result of crop image activity should not save the cropped image bitmap
@@ -307,6 +312,7 @@ public class CropImageOptions implements Parcelable {
         outputCompressQuality = 90;
         outputRequestWidth = 0;
         outputRequestHeight = 0;
+        outputRequestSizeOptions = CropImageView.RequestSizeOptions.NONE;
         noOutputImage = false;
 
         initialCropWindowRectangle = null;
@@ -356,6 +362,7 @@ public class CropImageOptions implements Parcelable {
         outputCompressQuality = in.readInt();
         outputRequestWidth = in.readInt();
         outputRequestHeight = in.readInt();
+        outputRequestSizeOptions = CropImageView.RequestSizeOptions.values()[in.readInt()];
         noOutputImage = in.readByte() != 0;
         initialCropWindowRectangle = in.readParcelable(Rect.class.getClassLoader());
         initialRotation = in.readInt();
@@ -402,6 +409,7 @@ public class CropImageOptions implements Parcelable {
         dest.writeInt(outputCompressQuality);
         dest.writeInt(outputRequestWidth);
         dest.writeInt(outputRequestHeight);
+        dest.writeInt(outputRequestSizeOptions.ordinal());
         dest.writeInt(noOutputImage ? 1 : 0);
         dest.writeParcelable(initialCropWindowRectangle, flags);
         dest.writeInt(initialRotation);
