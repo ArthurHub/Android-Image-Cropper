@@ -24,7 +24,7 @@ Include the library
 2. Add `CropImageActivity` into your AndroidManifest.xml
  ```xml
  <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-     android:theme="@style/Base.Theme.AppCompat"/>
+     android:theme="@style/Base.Theme.AppCompat"/> <!-- optional (needed if default theme has no action bar) -->
  ```
 
 3. Start `CropImageActivity` using builder pattern from your activity
@@ -32,6 +32,10 @@ Include the library
  CropImage.activity(imageUri)
     .setGuidelines(CropImageView.Guidelines.ON)
     .start(this);
+
+ // for fragment (DO NOT use `getActivity()`)
+ CropImage.activity(imageUri)
+     .start(getContext(), this);
  ```
 
 4. Override `onActivityResult` method in your activity to get crop result
@@ -71,7 +75,7 @@ Include the library
 4. Get cropped image
  ```java
  Bitmap cropped = cropImageView.getCroppedImage();
- // or (must subscribe to async event using cropImageView.setOnGetCroppedImageCompleteListener(listener))
+ // or (must subscribe to async event using cropImageView.setOnCropImageCompleteListener(listener))
  cropImageView.getCroppedImageAsync();
  ```
 
@@ -83,7 +87,8 @@ Include the library
 - Auto rotate bitmap by image Exif data.
 - Set result image min/max limits in pixels.
 - Set initial crop window size/location.
-- Bitmap memory optimization.
+- Request cropped image resize to specific size.
+- Bitmap memory optimization, OOM handling (should never occur)!
 - API Level 10.
 - More..
  
@@ -104,7 +109,17 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 ## Change log
 *2.3.0*
 
-
+- Change required width/height behavior to support resizing (inside/fit/exact) see wiki for details.
+- Add sampling fallback to lower cropped image resolution on OOM error (if image loaded from URI).
+- Setting aspect ratio will also set it to fixed, to help with confusion, add clear aspect ratio method.
+- Add support for setting min/max crop result size in code on CropImageView.
+- Fix cropping failing bug when skia fails region cropping.
+- Add Fallback to Intent.ACTION_PICK if no intent found for Intent.ACTION_GET_CONTENT (thx geolyth)
+- Multi touch support for cropping window (experimental, thx bbwharris)
+- **BREAKING CHANGES**:
+ - If you previously used requested width/height the default behavior now is to resize inside the cropped image, to preserve the previous behavior you need to pass the SAMPLING option.
+ - `OnGetCroppedImageCompleteListener` and `OnSaveCroppedImageCompleteListener` is deprecated, use `OnCropImageCompleteListener` that combines the two and provides the result object as crop activity.
+ - Set aspect ratio also sets fixed aspect ratio to true, if this is not the desired behavior set the fix aspect ratio flag manually or call the method after calling set aspect ratio.
 
 *2.2.5*
 
