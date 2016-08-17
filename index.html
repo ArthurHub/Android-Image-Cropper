@@ -22,9 +22,7 @@
       <h1>
 <a id="android-image-cropper" class="anchor" href="#android-image-cropper" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Android Image Cropper</h1>
 
-<p><a href="https://travis-ci.org/ArthurHub/Android-Image-Cropper"><img src="https://travis-ci.org/ArthurHub/Android-Image-Cropper.svg" alt="build status"></a> 
-<a href="https://www.codacy.com/app/tep-arthur/Android-Image-Cropper"><img src="https://api.codacy.com/project/badge/grade/4d3781df0cce40959881a8d91365407a" alt="Codacy Badge"></a>
-<a href="https://android-arsenal.com/details/1/3487"><img src="https://img.shields.io/badge/Android%20Arsenal-Android--Image--Cropper-green.svg?style=true" alt="Android Arsenal"></a>
+<p><a href="https://android-arsenal.com/details/1/3487"><img src="https://img.shields.io/badge/Android%20Arsenal-Android--Image--Cropper-green.svg?style=true" alt="Android Arsenal"></a>
 <a href="https://bintray.com/arthurhub/maven/Android-Image-Cropper/_latestVersion"> <img src="https://api.bintray.com/packages/arthurhub/maven/Android-Image-Cropper/images/download.svg" alt="Download"> </a></p>
 
 <p><strong>Powerful</strong> (Zoom, Rotation, Multi-Source), <strong>customizable</strong> (Shape, Limits, Style), <strong>optimized</strong> (Async, Sampling, Matrix) and <strong>simple</strong> image cropping library for Android.</p>
@@ -40,7 +38,7 @@
 
 <p>Include the library</p>
 
-<pre><code> compile 'com.theartofdev.edmodo:android-image-cropper:2.2.+'
+<pre><code> compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
 </code></pre>
 
 <h3>
@@ -50,14 +48,19 @@
 <li>
 <p>Add <code>CropImageActivity</code> into your AndroidManifest.xml</p>
 
-<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">activity</span> <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>com.theartofdev.edmodo.cropper.CropImageActivity<span class="pl-pds">"</span></span>/&gt;</pre></div>
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">activity</span> <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>com.theartofdev.edmodo.cropper.CropImageActivity<span class="pl-pds">"</span></span>
+   <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">theme</span>=<span class="pl-s"><span class="pl-pds">"</span>@style/Base.Theme.AppCompat<span class="pl-pds">"</span></span>/&gt; <span class="pl-c">&lt;!-- optional (needed if default theme has no action bar) --&gt;</span></pre></div>
 </li>
 <li>
 <p>Start <code>CropImageActivity</code> using builder pattern from your activity</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-smi">CropImage</span><span class="pl-k">.</span>activity(imageUri)
   .setGuidelines(<span class="pl-smi">CropImageView</span><span class="pl-k">.</span><span class="pl-smi">Guidelines</span><span class="pl-c1"><span class="pl-k">.</span>ON</span>)
-  .start(<span class="pl-v">this</span>);</pre></div>
+  .start(<span class="pl-v">this</span>);
+
+<span class="pl-c">// for fragment (DO NOT use `getActivity()`)</span>
+<span class="pl-smi">CropImage</span><span class="pl-k">.</span>activity(imageUri)
+   .start(getContext(), <span class="pl-v">this</span>);</pre></div>
 </li>
 <li>
 <p>Override <code>onActivityResult</code> method in your activity to get crop result</p>
@@ -102,7 +105,7 @@ cropImageView<span class="pl-k">.</span>setImageUriAsync(uri);</pre></div>
 <p>Get cropped image</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-smi">Bitmap</span> cropped <span class="pl-k">=</span> cropImageView<span class="pl-k">.</span>getCroppedImage();
-<span class="pl-c">// or (must subscribe to async event using cropImageView.setOnGetCroppedImageCompleteListener(listener))</span>
+<span class="pl-c">// or (must subscribe to async event using cropImageView.setOnCropImageCompleteListener(listener))</span>
 cropImageView<span class="pl-k">.</span>getCroppedImageAsync();</pre></div>
 </li>
 </ol>
@@ -118,7 +121,8 @@ cropImageView<span class="pl-k">.</span>getCroppedImageAsync();</pre></div>
 <li>Auto rotate bitmap by image Exif data.</li>
 <li>Set result image min/max limits in pixels.</li>
 <li>Set initial crop window size/location.</li>
-<li>Bitmap memory optimization.</li>
+<li>Request cropped image resize to specific size.</li>
+<li>Bitmap memory optimization, OOM handling (should never occur)!</li>
 <li>API Level 10.</li>
 <li>More..</li>
 </ul>
@@ -148,29 +152,34 @@ cropImageView<span class="pl-k">.</span>getCroppedImageAsync();</pre></div>
 <h2>
 <a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Change log</h2>
 
-<p><em>2.2.0</em></p>
+<p><em>2.3.0</em></p>
 
 <ul>
-<li>Fix non-straight angle rotation handling.</li>
-<li>Add activity counter-clockwise rotation button (configurable, hidden by default).</li>
-<li>Add activity rotation degrees configuration (default 90)</li>
+<li>Change required width/height behavior to support resizing (inside/fit/exact) see wiki for details.</li>
+<li>Add sampling fallback to lower cropped image resolution on OOM error (if image loaded from URI).</li>
+<li>Setting aspect ratio will also set it to fixed, to help with confusion, add clear aspect ratio method.</li>
+<li>Add support for setting min/max crop result size in code on CropImageView.</li>
+<li>Fix cropping failing bug when skia fails region cropping.</li>
+<li>Add Fallback to Intent.ACTION_PICK if no intent found for Intent.ACTION_GET_CONTENT (thx geolyth)</li>
+<li>Multi touch support for cropping window (experimental, thx bbwharris)</li>
+<li>
+<strong>BREAKING CHANGES</strong>:
+
+<ul>
+<li>If you previously used requested width/height the default behavior now is to resize inside the cropped image, to preserve the previous behavior you need to pass the SAMPLING option.</li>
+<li>
+<code>OnGetCroppedImageCompleteListener</code> and <code>OnSaveCroppedImageCompleteListener</code> is deprecated, use <code>OnCropImageCompleteListener</code> that combines the two and provides the result object as crop activity.</li>
+<li>Set aspect ratio also sets fixed aspect ratio to true, if this is not the desired behavior set the fix aspect ratio flag manually or call the method after calling set aspect ratio.</li>
+</ul>
+</li>
 </ul>
 
-<p><em>2.1.4</em></p>
+<p><em>2.2.5</em></p>
 
 <ul>
-<li>Support for requesting CAMERA permission for android M when CAMERA is requested in the manifest.</li>
-<li>Add <code>pick_image_intent_chooser_title</code> for changing and localizing pick image chooser title (thx maksymkhar).</li>
-<li>NPE when clicking crop twice fast (thx Jesse).</li>
-</ul>
-
-<p><em>2.1.1</em></p>
-
-<ul>
-<li>Built-in <code>CropImageActivity</code> for quick start and common scenarios.</li>
-<li>Save cropped image to Uri API <code>saveCroppedImageAsync(Uri)</code>.</li>
-<li>Handle possible out-of-memory in image load by down-sampling until succeed.</li>
-<li>Minor fixes.</li>
+<li>Fix to webp file extension (thx Nathan)</li>
+<li>Fix wrong initial crop window when image contains exif data.</li>
+<li>Added corners to circular crop window, can be removed by setting <code>BorderCornerThickness</code> to 0.</li>
 </ul>
 
 <p>See <a href="https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log">full change log</a>.</p>
