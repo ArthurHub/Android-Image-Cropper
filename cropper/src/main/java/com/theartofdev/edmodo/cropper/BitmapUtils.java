@@ -191,7 +191,7 @@ final class BitmapUtils {
             } catch (OutOfMemoryError e) {
                 // if OOM try to increase the sampling to lower the memory usage
                 sampleMulti *= 2;
-                if (sampleMulti > 8) {
+                if (sampleMulti > 16) {
                     throw new RuntimeException("Failed to handle OOM by sampling (" + sampleMulti + "): " + loadedImageUri + "\r\n" + e.getMessage(), e);
                 }
             }
