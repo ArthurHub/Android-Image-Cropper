@@ -35,6 +35,8 @@ final class CropImageViewOptions {
 
     public boolean fixAspectRatio;
 
+    public boolean multitouch;
+
     public boolean showCropOverlay;
 
     public boolean showProgressBar;

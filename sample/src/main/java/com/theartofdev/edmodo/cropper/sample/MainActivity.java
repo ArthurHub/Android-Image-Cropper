@@ -233,6 +233,11 @@ public class MainActivity extends AppCompatActivity {
                 mCurrentFragment.resetCropRect();
                 mDrawerLayout.closeDrawers();
                 break;
+            case R.id.drawer_option_toggle_multitouch:
+                mCropImageViewOptions.multitouch = !mCropImageViewOptions.multitouch;
+                mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
+                updateDrawerTogglesByOptions(mCropImageViewOptions);
+                break;
             case R.id.drawer_option_toggle_show_overlay:
                 mCropImageViewOptions.showCropOverlay = !mCropImageViewOptions.showCropOverlay;
                 mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
@@ -259,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.drawer_option_toggle_scale)).setText(getResources().getString(R.string.drawer_option_toggle_scale, options.scaleType.name()));
         ((TextView) findViewById(R.id.drawer_option_toggle_shape)).setText(getResources().getString(R.string.drawer_option_toggle_shape, options.cropShape.name()));
         ((TextView) findViewById(R.id.drawer_option_toggle_guidelines)).setText(getResources().getString(R.string.drawer_option_toggle_guidelines, options.guidelines.name()));
+        ((TextView) findViewById(R.id.drawer_option_toggle_multitouch)).setText(getResources().getString(R.string.drawer_option_toggle_multitouch, Boolean.toString(options.multitouch)));
         ((TextView) findViewById(R.id.drawer_option_toggle_show_overlay)).setText(getResources().getString(R.string.drawer_option_toggle_show_overlay, Boolean.toString(options.showCropOverlay)));
         ((TextView) findViewById(R.id.drawer_option_toggle_show_progress_bar)).setText(getResources().getString(R.string.drawer_option_toggle_show_progress_bar, Boolean.toString(options.showProgressBar)));
 

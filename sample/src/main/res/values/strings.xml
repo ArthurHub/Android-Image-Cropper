@@ -26,6 +26,7 @@
     <string name="drawer_option_toggle_max_zoom">Max zoom level: %1s</string>
     <string name="drawer_option_set_initial_crop_rect">Set initial crop rectangle</string>
     <string name="drawer_option_reset_crop_rect">Reset crop rectangle to initial</string>
+    <string name="drawer_option_toggle_multitouch">Multitouch: %1s</string>
     <string name="drawer_option_toggle_show_overlay">Show Overlay: %1s</string>
     <string name="drawer_option_toggle_show_progress_bar">Show Progress Bar: %1s</string>
 

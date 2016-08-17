@@ -71,6 +71,7 @@ public final class MainFragment extends Fragment
         mCropImageView.setGuidelines(options.guidelines);
         mCropImageView.setAspectRatio(options.aspectRatio.first, options.aspectRatio.second);
         mCropImageView.setFixedAspectRatio(options.fixAspectRatio);
+        mCropImageView.setMultiTouchEnabled(options.multitouch);
         mCropImageView.setShowCropOverlay(options.showCropOverlay);
         mCropImageView.setShowProgressBar(options.showProgressBar);
         mCropImageView.setAutoZoomEnabled(options.autoZoomEnabled);

@@ -127,6 +127,12 @@
                 android:text="@string/drawer_option_reset_crop_rect"/>
 
             <TextView
+                android:id="@+id/drawer_option_toggle_multitouch"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
+                android:onClick="onDrawerOptionClicked"
+                android:text="@string/drawer_option_toggle_multitouch"/>
+
+            <TextView
                 android:id="@+id/drawer_option_toggle_show_overlay"
                 style="@style/Cropper.Widget.Drawer.Option.TextView"
                 android:onClick="onDrawerOptionClicked"
