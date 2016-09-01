@@ -1,33 +1,5 @@
-<!--<com.theartofdev.edmodo.cropper.CropImageView
+<com.theartofdev.edmodo.cropper.CropImageView
     android:id="@+id/cropImageView"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>-->
-
-<LinearLayout
-    android:id="@+id/cropImageViewLayout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:visibility="visible">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Testing 1..2..3.."/>
-
-    <com.theartofdev.edmodo.cropper.CropImageView
-        android:id="@+id/cropImageView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:text="Testing 1..2..3.."
-        android:layout_weight="2"
-        android:textSize="40sp"/>
-</LinearLayout>
+    android:layout_height="match_parent"/>
