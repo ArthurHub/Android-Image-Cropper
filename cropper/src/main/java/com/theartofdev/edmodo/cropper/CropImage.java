@@ -175,7 +175,7 @@ public final class CropImage {
         allIntents.addAll(galleryIntents);
 
         Intent target;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (allIntents.isEmpty()) {
             target = new Intent();
         } else {
             target = allIntents.get(allIntents.size() - 1);
