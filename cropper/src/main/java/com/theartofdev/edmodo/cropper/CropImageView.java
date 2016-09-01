@@ -1249,10 +1249,10 @@ public class CropImageView extends FrameLayout {
             setLayoutParams(origParams);
 
             if (mBitmap != null) {
-                applyImageMatrix(r - l, b - t, false, false);
+                applyImageMatrix(r - l, b - t, true, false);
 
                 // after state restore we want to restore the window crop, possible only after widget size is known
-                if (mBitmap != null && mRestoreCropWindowRect != null) {
+                if (mRestoreCropWindowRect != null) {
                     mImageMatrix.mapRect(mRestoreCropWindowRect);
                     mCropOverlayView.setCropWindowRect(mRestoreCropWindowRect);
                     handleCropWindowChanged(false, false);
@@ -1309,26 +1309,12 @@ public class CropImageView extends FrameLayout {
                         mAnimation.setStartState(mImagePoints, mImageMatrix);
                     }
 
-                    updateCropRectByZoomChange(newZoom / mZoom);
                     mZoom = newZoom;
 
                     applyImageMatrix(width, height, true, animate);
                 }
             }
         }
-    }
-
-    /**
-     * Adjust the given crop window rectangle by the change in zoom, need to update the location and size
-     * of the crop rectangle to cover the same area in new zoom level.
-     */
-    private void updateCropRectByZoomChange(float zoomChange) {
-        RectF cropRect = mCropOverlayView.getCropWindowRect();
-        float xCenterOffset = getWidth() / 2 - cropRect.centerX();
-        float yCenterOffset = getHeight() / 2 - cropRect.centerY();
-        cropRect.offset(xCenterOffset - xCenterOffset * zoomChange, yCenterOffset - yCenterOffset * zoomChange);
-        cropRect.inset((cropRect.width() - cropRect.width() * zoomChange) / 2f, (cropRect.height() - cropRect.height() * zoomChange) / 2f);
-        mCropOverlayView.setCropWindowRect(cropRect);
     }
 
     /**
@@ -1339,6 +1325,10 @@ public class CropImageView extends FrameLayout {
      */
     private void applyImageMatrix(float width, float height, boolean center, boolean animate) {
         if (mBitmap != null && width > 0 && height > 0) {
+
+            mImageMatrix.invert(mImageInverseMatrix);
+            RectF cropRect = mCropOverlayView.getCropWindowRect();
+            mImageInverseMatrix.mapRect(cropRect);
 
             mImageMatrix.reset();
 
@@ -1363,10 +1353,7 @@ public class CropImageView extends FrameLayout {
             mImageMatrix.postScale(mZoom, mZoom, BitmapUtils.getRectCenterX(mImagePoints), BitmapUtils.getRectCenterY(mImagePoints));
             mapImagePointsByImageMatrix();
 
-            RectF cropRect = mCropOverlayView.getCropWindowRect();
-
-            // reset the crop window offset so we can update it to required value
-            cropRect.offset(-mZoomOffsetX * mZoom, -mZoomOffsetY * mZoom);
+            mImageMatrix.mapRect(cropRect);
 
             if (center) {
                 // set the zoomed area to be as to the center of cropping window as possible
