@@ -175,11 +175,10 @@ public final class CropImage {
         allIntents.addAll(galleryIntents);
 
         Intent target;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (allIntents.isEmpty()) {
             target = new Intent();
         } else {
-            target = allIntents.get(allIntents.size() - 1);
-            allIntents.remove(allIntents.size() - 1);
+            target = allIntents.remove(0);
         }
 
         // Create a chooser from the main  intent
