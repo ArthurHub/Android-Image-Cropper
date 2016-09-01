@@ -171,6 +171,12 @@ public class CropImageView extends FrameLayout {
     private RectF mRestoreCropWindowRect;
 
     /**
+     * Used to detect size change to handle auto-zoom using {@link #handleCropWindowChanged(boolean, boolean)} in
+     * {@link #layout(int, int, int, int)}.
+     */
+    private boolean mSizeChanged;
+
+    /**
      * Task used to load bitmap async from UI thread
      */
     private WeakReference<BitmapLoadingWorkerTask> mBitmapLoadingWorkerTask;
@@ -1258,6 +1264,9 @@ public class CropImageView extends FrameLayout {
                     handleCropWindowChanged(false, false);
                     mCropOverlayView.fixCurrentCropWindowRect();
                     mRestoreCropWindowRect = null;
+                } else if (mSizeChanged) {
+                    mSizeChanged = false;
+                    handleCropWindowChanged(false, false);
                 }
             } else {
                 updateImageBounds(true);
@@ -1265,6 +1274,16 @@ public class CropImageView extends FrameLayout {
         } else {
             updateImageBounds(true);
         }
+    }
+
+    /**
+     * Detect size change to handle auto-zoom using {@link #handleCropWindowChanged(boolean, boolean)} in
+     * {@link #layout(int, int, int, int)}.
+     */
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mSizeChanged = oldw > 0 && oldh > 0;
     }
 
     /**
