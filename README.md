@@ -107,6 +107,11 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.3.1*
+
+- Fix image picker for xiaomi and huawei phones (thx @nicolabeghin)
+- Fix crop window get corrupted on `CropImageView` resize.
+
 *2.3.0*
 
 - Change required width/height behavior to support resizing (inside/fit/exact) see wiki for details.
