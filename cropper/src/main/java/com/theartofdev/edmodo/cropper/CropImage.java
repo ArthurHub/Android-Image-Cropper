@@ -50,6 +50,7 @@ import java.util.List;
  * Added value you get out-of-the-box is some edge case handling that you may miss otherwise, like the
  * stupid-ass Android camera result URI that may differ from version to version and from device to device.
  */
+@SuppressWarnings("WeakerAccess, unused")
 public final class CropImage {
 
     //region: Fields and Consts
@@ -379,6 +380,7 @@ public final class CropImage {
         /**
          * The image to crop source Android uri.
          */
+        @Nullable
         private final Uri mSource;
 
         /**
@@ -386,7 +388,7 @@ public final class CropImage {
          */
         private final CropImageOptions mOptions;
 
-        private ActivityBuilder(@NonNull Uri source) {
+        private ActivityBuilder(@Nullable Uri source) {
             mSource = source;
             mOptions = new CropImageOptions();
         }
