@@ -195,6 +195,30 @@ public final class CropImage {
     }
 
     /**
+     * Get the main Camera intent for capturing image using device camera app.
+     * If the outputFileUri is null, a default Uri will be created with {@link #getCaptureImageOutputUri(Context)}, so then
+     * you will be able to get the pictureUri using {@link #getPickImageResultUri(Context, Intent)}. Otherwise, it is just you use
+     * the Uri passed to this method.
+     *
+     * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
+     * @param outputFileUri the Uri where the picture will be placed.
+     */
+    public static Intent getCameraIntent(@NonNull Context context, Uri outputFileUri) {
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if (outputFileUri == null) {
+
+            outputFileUri = getCaptureImageOutputUri(context);
+
+        }
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+
+        return intent;
+    }
+
+    /**
      * Get all Camera intents for capturing image using device camera apps.
      */
     public static List<Intent> getCameraIntents(@NonNull Context context, @NonNull PackageManager packageManager) {
