@@ -204,17 +204,11 @@ public final class CropImage {
      * @param outputFileUri the Uri where the picture will be placed.
      */
     public static Intent getCameraIntent(@NonNull Context context, Uri outputFileUri) {
-
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
         if (outputFileUri == null) {
-
             outputFileUri = getCaptureImageOutputUri(context);
-
         }
-
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-
         return intent;
     }
 
