@@ -67,7 +67,7 @@ final class BitmapUtils {
     /**
      * Used to know the max texture size allowed to be rendered
      */
-    static int mMaxTextureSize;
+    private static int mMaxTextureSize;
 
     /**
      * used to save bitmaps during state save and restore so not to reload them.
@@ -79,7 +79,7 @@ final class BitmapUtils {
      * If no rotation is required the image will not be rotated.<br>
      * New bitmap is created and the old one is recycled.
      */
-    public static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, Context context, Uri uri) {
+    static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, Context context, Uri uri) {
         try {
             File file = getFileFromUri(context, uri);
             if (file.exists()) {
@@ -96,7 +96,7 @@ final class BitmapUtils {
      * If no rotation is required the image will not be rotated.<br>
      * New bitmap is created and the old one is recycled.
      */
-    public static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, ExifInterface exif) {
+    static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, ExifInterface exif) {
         int degrees;
         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
         switch (orientation) {
@@ -119,7 +119,7 @@ final class BitmapUtils {
     /**
      * Decode bitmap from stream using sampling to get bitmap with the requested limit.
      */
-    public static BitmapSampled decodeSampledBitmap(Context context, Uri uri, int reqWidth, int reqHeight) {
+    static BitmapSampled decodeSampledBitmap(Context context, Uri uri, int reqWidth, int reqHeight) {
 
         try {
             ContentResolver resolver = context.getContentResolver();
@@ -145,17 +145,42 @@ final class BitmapUtils {
     /**
      * Crop image bitmap from given bitmap using the given points in the original bitmap and the given rotation.<br>
      * if the rotation is not 0,90,180 or 270 degrees then we must first crop a larger area of the image that
-     * contains the requires rectangle, rotate and then crop again a sub rectangle.
+     * contains the requires rectangle, rotate and then crop again a sub rectangle.<br>
+     * If crop fails due to OOM we scale the cropping image by 0.5 every time it fails until it is small enough.
      */
-    public static Bitmap cropBitmap(Bitmap bitmap, float[] points, int degreesRotated,
-                                    boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
+    static BitmapSampled cropBitmapObjectHandleOOM(Bitmap bitmap, float[] points, int degreesRotated,
+                                                   boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
+        int scale = 1;
+        while (true) {
+            try {
+                Bitmap cropBitmap = cropBitmapObjectWithScale(bitmap, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, 1 / (float) scale);
+                return new BitmapSampled(cropBitmap, scale);
+            } catch (OutOfMemoryError e) {
+                scale *= 2;
+                if (scale > 8) {
+                    throw e;
+                }
+            }
+        }
+    }
+
+    /**
+     * Crop image bitmap from given bitmap using the given points in the original bitmap and the given rotation.<br>
+     * if the rotation is not 0,90,180 or 270 degrees then we must first crop a larger area of the image that
+     * contains the requires rectangle, rotate and then crop again a sub rectangle.
+     *
+     * @param scale how much to scale the cropped image part, use 0.5 to lower the image by half (OOM handling)
+     */
+    private static Bitmap cropBitmapObjectWithScale(Bitmap bitmap, float[] points, int degreesRotated,
+                                                    boolean fixAspectRatio, int aspectRatioX, int aspectRatioY, float scale) {
 
         // get the rectangle in original image that contains the required cropped area (larger for non rectangular crop)
         Rect rect = getRectFromPoints(points, bitmap.getWidth(), bitmap.getHeight(), fixAspectRatio, aspectRatioX, aspectRatioY);
 
         // crop and rotate the cropped image in one operation
         Matrix matrix = new Matrix();
-        matrix.setRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
+        matrix.setScale(scale, scale);
+        matrix.postRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
         Bitmap result = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height(), matrix, true);
 
         if (result == bitmap) {
@@ -177,9 +202,9 @@ final class BitmapUtils {
      * Crop image bitmap from URI by decoding it with specific width and height to down-sample if required.<br>
      * Additionally if OOM is thrown try to increase the sampling (2,4,8).
      */
-    public static BitmapSampled cropBitmap(Context context, Uri loadedImageUri, float[] points,
-                                           int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
-                                           int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight) {
+    static BitmapSampled cropBitmap(Context context, Uri loadedImageUri, float[] points,
+                                    int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
+                                    int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight) {
         int sampleMulti = 1;
         while (true) {
             try {
@@ -201,56 +226,56 @@ final class BitmapUtils {
     /**
      * Get left value of the bounding rectangle of the given points.
      */
-    public static float getRectLeft(float[] points) {
+    static float getRectLeft(float[] points) {
         return Math.min(Math.min(Math.min(points[0], points[2]), points[4]), points[6]);
     }
 
     /**
      * Get top value of the bounding rectangle of the given points.
      */
-    public static float getRectTop(float[] points) {
+    static float getRectTop(float[] points) {
         return Math.min(Math.min(Math.min(points[1], points[3]), points[5]), points[7]);
     }
 
     /**
      * Get right value of the bounding rectangle of the given points.
      */
-    public static float getRectRight(float[] points) {
+    static float getRectRight(float[] points) {
         return Math.max(Math.max(Math.max(points[0], points[2]), points[4]), points[6]);
     }
 
     /**
      * Get bottom value of the bounding rectangle of the given points.
      */
-    public static float getRectBottom(float[] points) {
+    static float getRectBottom(float[] points) {
         return Math.max(Math.max(Math.max(points[1], points[3]), points[5]), points[7]);
     }
 
     /**
      * Get width of the bounding rectangle of the given points.
      */
-    public static float getRectWidth(float[] points) {
+    static float getRectWidth(float[] points) {
         return getRectRight(points) - getRectLeft(points);
     }
 
     /**
      * Get heightof the bounding rectangle of the given points.
      */
-    public static float getRectHeight(float[] points) {
+    static float getRectHeight(float[] points) {
         return getRectBottom(points) - getRectTop(points);
     }
 
     /**
      * Get horizontal center value of the bounding rectangle of the given points.
      */
-    public static float getRectCenterX(float[] points) {
+    static float getRectCenterX(float[] points) {
         return (getRectRight(points) + getRectLeft(points)) / 2f;
     }
 
     /**
      * Get verical center value of the bounding rectangle of the given points.
      */
-    public static float getRectCenterY(float[] points) {
+    static float getRectCenterY(float[] points) {
         return (getRectBottom(points) + getRectTop(points)) / 2f;
     }
 
@@ -258,7 +283,7 @@ final class BitmapUtils {
      * Get a rectangle for the given 4 points (x0,y0,x1,y1,x2,y2,x3,y3) by finding the min/max 2 points that
      * contains the given 4 points and is a stright rectangle.
      */
-    public static Rect getRectFromPoints(float[] points, int imageWidth, int imageHeight, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
+    static Rect getRectFromPoints(float[] points, int imageWidth, int imageHeight, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
         int left = Math.round(Math.max(0, getRectLeft(points)));
         int top = Math.round(Math.max(0, getRectTop(points)));
         int right = Math.round(Math.min(imageWidth, getRectRight(points)));
@@ -276,7 +301,7 @@ final class BitmapUtils {
      * Fix the given rectangle if it doesn't confirm to aspect ration rule.<br>
      * Make sure that width and height are equal if 1:1 fixed aspect ratio is requested.
      */
-    public static void fixRectForAspectRatio(Rect rect, int aspectRatioX, int aspectRatioY) {
+    private static void fixRectForAspectRatio(Rect rect, int aspectRatioX, int aspectRatioY) {
         if (aspectRatioX == aspectRatioY && rect.width() != rect.height()) {
             if (rect.height() > rect.width()) {
                 rect.bottom -= rect.height() - rect.width();
@@ -289,7 +314,7 @@ final class BitmapUtils {
     /**
      * Write the given bitmap to the given uri using the given compression.
      */
-    public static void writeBitmapToUri(Context context, Bitmap bitmap, Uri uri, Bitmap.CompressFormat compressFormat, int compressQuality) throws FileNotFoundException {
+    static void writeBitmapToUri(Context context, Bitmap bitmap, Uri uri, Bitmap.CompressFormat compressFormat, int compressQuality) throws FileNotFoundException {
         OutputStream outputStream = null;
         try {
             outputStream = context.getContentResolver().openOutputStream(uri);
@@ -302,7 +327,7 @@ final class BitmapUtils {
     /**
      * Resize the given bitmap to the given width/height by the given option.<br>
      */
-    public static Bitmap resizeBitmap(Bitmap bitmap, int reqWidth, int reqHeight, CropImageView.RequestSizeOptions options) {
+    static Bitmap resizeBitmap(Bitmap bitmap, int reqWidth, int reqHeight, CropImageView.RequestSizeOptions options) {
         try {
             if (reqWidth > 0 && reqHeight > 0 && (options == CropImageView.RequestSizeOptions.RESIZE_FIT ||
                     options == CropImageView.RequestSizeOptions.RESIZE_INSIDE ||
@@ -358,7 +383,7 @@ final class BitmapUtils {
             BitmapSampled bitmapSampled = decodeSampledBitmapRegion(context, loadedImageUri, rect, width, height, sampleMulti);
             result = bitmapSampled.bitmap;
             sampleSize = bitmapSampled.sampleSize;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         if (result != null) {
@@ -407,7 +432,7 @@ final class BitmapUtils {
                         points2[i] = points2[i] / options.inSampleSize;
                     }
 
-                    result = cropBitmap(fullBitmap, points2, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY);
+                    result = cropBitmapObjectWithScale(fullBitmap, points2, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, 1);
                 } finally {
                     if (result != fullBitmap) {
                         fullBitmap.recycle();
@@ -578,10 +603,12 @@ final class BitmapUtils {
         try {
             String[] proj = {MediaStore.Images.Media.DATA};
             cursor = context.getContentResolver().query(uri, proj, null, null, null);
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            String realPath = cursor.getString(column_index);
-            file = new File(realPath);
+            if (cursor != null) {
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                cursor.moveToFirst();
+                String realPath = cursor.getString(column_index);
+                file = new File(realPath);
+            }
         } catch (Exception ignored) {
         } finally {
             if (cursor != null) {
@@ -680,7 +707,7 @@ final class BitmapUtils {
     /**
      * Holds bitmap instance and the sample size that the bitmap was loaded/cropped with.
      */
-    public static final class BitmapSampled {
+    static final class BitmapSampled {
 
         /**
          * The bitmap instance
@@ -690,9 +717,9 @@ final class BitmapUtils {
         /**
          * The sample size used to lower the size of the bitmap (1,2,4,8,...)
          */
-        public final int sampleSize;
+        final int sampleSize;
 
-        public BitmapSampled(Bitmap bitmap, int sampleSize) {
+        BitmapSampled(Bitmap bitmap, int sampleSize) {
             this.bitmap = bitmap;
             this.sampleSize = sampleSize;
         }
@@ -704,7 +731,7 @@ final class BitmapUtils {
     /**
      * The result of {@link #rotateBitmapByExif(android.graphics.Bitmap, android.media.ExifInterface)}.
      */
-    public static final class RotateBitmapResult {
+    static final class RotateBitmapResult {
 
         /**
          * The loaded bitmap
@@ -714,7 +741,7 @@ final class BitmapUtils {
         /**
          * The degrees the image was rotated
          */
-        public final int degrees;
+        final int degrees;
 
         RotateBitmapResult(Bitmap bitmap, int degrees) {
             this.bitmap = bitmap;
