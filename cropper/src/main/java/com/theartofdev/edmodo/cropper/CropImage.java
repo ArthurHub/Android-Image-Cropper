@@ -50,6 +50,7 @@ import java.util.List;
  * Added value you get out-of-the-box is some edge case handling that you may miss otherwise, like the
  * stupid-ass Android camera result URI that may differ from version to version and from device to device.
  */
+@SuppressWarnings("WeakerAccess, unused")
 public final class CropImage {
 
     //region: Fields and Consts
@@ -164,8 +165,10 @@ public final class CropImage {
         List<Intent> allIntents = new ArrayList<>();
         PackageManager packageManager = context.getPackageManager();
 
-        // collect all camera intents
-        allIntents.addAll(getCameraIntents(context, packageManager));
+        // collect all camera intents if Camera permission is available
+        if (!isExplicitCameraPermissionRequired(context)) {
+            allIntents.addAll(getCameraIntents(context, packageManager));
+        }
 
         List<Intent> galleryIntents = getGalleryIntents(packageManager, Intent.ACTION_GET_CONTENT, includeDocuments);
         if (galleryIntents.size() == 0) {
@@ -350,13 +353,10 @@ public final class CropImage {
      * Result will be recieved in {@link Activity#onActivityResult(int, int, Intent)} and can be retrieved
      * using {@link #getActivityResult(Intent)}.
      *
-     * @param uri the image Android uri source to crop
+     * @param uri the image Android uri source to crop or null to start a picker
      * @return builder for Crop Image Activity
      */
-    public static ActivityBuilder activity(@NonNull Uri uri) {
-        if (uri == null || uri.equals(Uri.EMPTY)) {
-            throw new IllegalArgumentException("Uri must be non null or empty");
-        }
+    public static ActivityBuilder activity(@Nullable Uri uri) {
         return new ActivityBuilder(uri);
     }
 
@@ -380,6 +380,7 @@ public final class CropImage {
         /**
          * The image to crop source Android uri.
          */
+        @Nullable
         private final Uri mSource;
 
         /**
@@ -387,7 +388,7 @@ public final class CropImage {
          */
         private final CropImageOptions mOptions;
 
-        private ActivityBuilder(@NonNull Uri source) {
+        private ActivityBuilder(@Nullable Uri source) {
             mSource = source;
             mOptions = new CropImageOptions();
         }
