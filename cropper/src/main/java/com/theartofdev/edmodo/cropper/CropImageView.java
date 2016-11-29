@@ -860,14 +860,20 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Rotates image by the specified number of degrees clockwise.<br>
-     * Cycles from 0 to 360 degrees.
+     * Negative values represent counter-clockwise rotations.
      *
      * @param degrees Integer specifying the number of degrees to rotate.
      */
     public void rotateImage(int degrees) {
         if (mBitmap != null) {
+            // Force degrees to be a non-zero value between 0 and 360 (inclusive)
+            if (degrees < 0) {
+                degrees = (degrees % 360) + 360;
+            } else {
+                degrees = degrees % 360;
+            }
 
-            boolean flipAxes = !mCropOverlayView.isFixAspectRatio() && (degrees > 45 && degrees < 135) || (degrees > 215 && degrees < 305);
+            boolean flipAxes = !mCropOverlayView.isFixAspectRatio() && ((degrees > 45 && degrees < 135) || (degrees > 215 && degrees < 305));
             BitmapUtils.RECT.set(mCropOverlayView.getCropWindowRect());
             float halfWidth = (flipAxes ? BitmapUtils.RECT.height() : BitmapUtils.RECT.width()) / 2f;
             float halfHeight = (flipAxes ? BitmapUtils.RECT.width() : BitmapUtils.RECT.height()) / 2f;
@@ -882,8 +888,8 @@ public class CropImageView extends FrameLayout {
             BitmapUtils.POINTS[5] = 0;
             mImageInverseMatrix.mapPoints(BitmapUtils.POINTS);
 
-            mDegreesRotated += degrees;
-            mDegreesRotated = mDegreesRotated >= 0 ? mDegreesRotated % 360 : mDegreesRotated % 360 + 360;
+            // This is valid because degrees is not negative.
+            mDegreesRotated = (mDegreesRotated + degrees) % 360;
 
             applyImageMatrix(getWidth(), getHeight(), true, false);
 
