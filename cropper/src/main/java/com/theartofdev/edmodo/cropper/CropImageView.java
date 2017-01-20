@@ -119,6 +119,11 @@ public class CropImageView extends FrameLayout {
     private int mMaxZoom;
 
     /**
+     * callback to be invoked when crop overlay is released.
+     */
+    private OnSetCropOverlayReleasedListener mOnSetCropOverlayReleasedListener;
+
+    /**
      * callback to be invoked when image async loading is complete.
      */
     private OnSetImageUriCompleteListener mOnSetImageUriCompleteListener;
@@ -269,6 +274,9 @@ public class CropImageView extends FrameLayout {
             @Override
             public void onCropWindowChanged(boolean inProgress) {
                 handleCropWindowChanged(inProgress, true);
+                if(!inProgress){
+                    mOnSetCropOverlayReleasedListener.onCropOverlayReleased(getCropRect());
+                }
             }
         });
         mCropOverlayView.setInitialAttributeValues(options);
@@ -741,6 +749,13 @@ public class CropImageView extends FrameLayout {
             throw new IllegalArgumentException("mOnCropImageCompleteListener is not set");
         }
         startCropWorkerTask(reqWidth, reqHeight, options, saveUri, saveCompressFormat, saveCompressQuality);
+    }
+
+    /**
+     * Set the callback t
+     */
+    public void setOnSetCropOverlayReleasedListener(OnSetCropOverlayReleasedListener listener) {
+        mOnSetCropOverlayReleasedListener = listener;
     }
 
     /**
@@ -1612,6 +1627,18 @@ public class CropImageView extends FrameLayout {
     //endregion
 
     //region: Inner class: OnSetImageUriCompleteListener
+
+    /**
+     * Interface definition for a callback to be invoked when the crop overlay is released.
+     */
+    public interface OnSetCropOverlayReleasedListener{
+        /**
+         * Called when the crop overlay changed listener is called and inProgress is false.
+         *
+         * @param rect The rect coordinates of the cropped overlay
+         */
+        void onCropOverlayReleased(Rect rect);
+    }
 
     /**
      * Interface definition for a callback to be invoked when image async loading is complete.
