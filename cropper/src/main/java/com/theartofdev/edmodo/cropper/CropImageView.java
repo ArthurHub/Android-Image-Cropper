@@ -134,18 +134,6 @@ public class CropImageView extends FrameLayout {
     private OnCropImageCompleteListener mOnCropImageCompleteListener;
 
     /**
-     * callback to be invoked when image async cropping is complete (get bitmap)
-     */
-    @Deprecated
-    private OnGetCroppedImageCompleteListener mOnGetCroppedImageCompleteListener;
-
-    /**
-     * callback to be invoked when image async cropping is complete (save to uri)
-     */
-    @Deprecated
-    private OnSaveCroppedImageCompleteListener mOnSaveCroppedImageCompleteListener;
-
-    /**
      * The URI that the image was loaded from (if loaded from URI)
      */
     private Uri mLoadedImageUri;
@@ -693,7 +681,7 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Gets the cropped image based on the current crop window.<br>
-     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     * The result will be invoked to listener set by {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      */
     public void getCroppedImageAsync() {
         getCroppedImageAsync(0, 0, RequestSizeOptions.NONE);
@@ -720,7 +708,7 @@ public class CropImageView extends FrameLayout {
      * @param options the resize method to use, see its documentation
      */
     public void getCroppedImageAsync(int reqWidth, int reqHeight, RequestSizeOptions options) {
-        if (mOnCropImageCompleteListener == null && mOnGetCroppedImageCompleteListener == null) {
+        if (mOnCropImageCompleteListener == null) {
             throw new IllegalArgumentException("mOnCropImageCompleteListener is not set");
         }
         startCropWorkerTask(reqWidth, reqHeight, options, null, null, 0);
@@ -729,7 +717,7 @@ public class CropImageView extends FrameLayout {
     /**
      * Save the cropped image based on the current crop window to the given uri.<br>
      * Uses JPEG image compression with 90 compression quality.<br>
-     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     * The result will be invoked to listener set by {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      *
      * @param saveUri the Android Uri to save the cropped image to
      */
@@ -739,7 +727,7 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Save the cropped image based on the current crop window to the given uri.<br>
-     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     * The result will be invoked to listener set by {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      *
      * @param saveUri the Android Uri to save the cropped image to
      * @param saveCompressFormat the compression format to use when writing the image
@@ -752,7 +740,7 @@ public class CropImageView extends FrameLayout {
     /**
      * Save the cropped image based on the current crop window to the given uri.<br>
      * Uses {@link RequestSizeOptions#RESIZE_INSIDE} option.<br>
-     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     * The result will be invoked to listener set by {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      *
      * @param saveUri the Android Uri to save the cropped image to
      * @param saveCompressFormat the compression format to use when writing the image
@@ -766,7 +754,7 @@ public class CropImageView extends FrameLayout {
 
     /**
      * Save the cropped image based on the current crop window to the given uri.<br>
-     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     * The result will be invoked to listener set by {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      *
      * @param saveUri the Android Uri to save the cropped image to
      * @param saveCompressFormat the compression format to use when writing the image
@@ -776,7 +764,7 @@ public class CropImageView extends FrameLayout {
      * @param options the resize method to use, see its documentation
      */
     public void saveCroppedImageAsync(Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality, int reqWidth, int reqHeight, RequestSizeOptions options) {
-        if (mOnCropImageCompleteListener == null && mOnSaveCroppedImageCompleteListener == null) {
+        if (mOnCropImageCompleteListener == null) {
             throw new IllegalArgumentException("mOnCropImageCompleteListener is not set");
         }
         startCropWorkerTask(reqWidth, reqHeight, options, saveUri, saveCompressFormat, saveCompressQuality);
@@ -803,28 +791,6 @@ public class CropImageView extends FrameLayout {
      */
     public void setOnCropImageCompleteListener(OnCropImageCompleteListener listener) {
         mOnCropImageCompleteListener = listener;
-    }
-
-    /**
-     * Set the callback to be invoked when image async get cropping image ({@link #getCroppedImageAsync()})
-     * is complete (successful or failed).
-     *
-     * @deprecated use {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
-     */
-    @Deprecated
-    public void setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener listener) {
-        mOnGetCroppedImageCompleteListener = listener;
-    }
-
-    /**
-     * Set the callback to be invoked when image async save cropping image ({@link #saveCroppedImageAsync(Uri)})
-     * is complete (successful or failed).
-     *
-     * @deprecated use {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
-     */
-    @Deprecated
-    public void setOnSaveCroppedImageCompleteListener(OnSaveCroppedImageCompleteListener listener) {
-        mOnSaveCroppedImageCompleteListener = listener;
     }
 
     /**
@@ -1021,18 +987,6 @@ public class CropImageView extends FrameLayout {
             CropResult cropResult = new CropResult(result.bitmap, result.uri, result.error, getCropPoints(), getCropRect(), getRotatedDegrees(), result.sampleSize);
             listener.onCropImageComplete(this, cropResult);
         }
-
-        if (result.isSave) {
-            OnSaveCroppedImageCompleteListener listener2 = mOnSaveCroppedImageCompleteListener;
-            if (listener2 != null) {
-                listener2.onSaveCroppedImageComplete(this, result.uri, result.error);
-            }
-        } else {
-            OnGetCroppedImageCompleteListener listener2 = mOnGetCroppedImageCompleteListener;
-            if (listener2 != null) {
-                listener2.onGetCroppedImageComplete(this, result.bitmap, result.error);
-            }
-        }
     }
 
     /**
@@ -1116,7 +1070,7 @@ public class CropImageView extends FrameLayout {
      * Gets the cropped image based on the current crop window.<br>
      * If (reqWidth,reqHeight) is given AND image is loaded from URI cropping will try to use sample size to fit in
      * the requested width and height down-sampling if possible - optimization to get best size to quality.<br>
-     * The result will be invoked to listener set by {@link #setOnGetCroppedImageCompleteListener(OnGetCroppedImageCompleteListener)}.
+     * The result will be invoked to listener set by {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)}.
      *
      * @param reqWidth the width to resize the cropped image to (see options)
      * @param reqHeight the height to resize the cropped image to (see options)
@@ -1729,52 +1683,6 @@ public class CropImageView extends FrameLayout {
          * @param result the crop image result data (with cropped image or error)
          */
         void onCropImageComplete(CropImageView view, CropResult result);
-    }
-    //endregion
-
-    //region: Inner class: OnGetCroppedImageCompleteListener
-
-    /**
-     * Interface definition for a callback to be invoked when image async cropping is complete.
-     *
-     * @deprecated use {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)} and {@link
-     * OnCropImageCompleteListener}.
-     */
-    @Deprecated
-    public interface OnGetCroppedImageCompleteListener {
-
-        /**
-         * Called when a crop image view has completed cropping image.<br>
-         * If cropping failed error parameter will contain the error.
-         *
-         * @param view The crop image view that cropping of image was complete.
-         * @param bitmap the cropped image bitmap (null if failed)
-         * @param error if error occurred during cropping will contain the error, otherwise null.
-         */
-        void onGetCroppedImageComplete(CropImageView view, Bitmap bitmap, Exception error);
-    }
-    //endregion
-
-    //region: Inner class: OnSaveCroppedImageCompleteListener
-
-    /**
-     * Interface definition for a callback to be invoked when image async cropping is complete.
-     *
-     * @deprecated use {@link #setOnCropImageCompleteListener(OnCropImageCompleteListener)} and {@link
-     * OnCropImageCompleteListener}.
-     */
-    @Deprecated
-    public interface OnSaveCroppedImageCompleteListener {
-
-        /**
-         * Called when a crop image view has completed cropping image.<br>
-         * If cropping failed error parameter will contain the error.
-         *
-         * @param view The crop image view that cropping of image was complete.
-         * @param uri the cropped image uri (null if failed)
-         * @param error if error occurred during cropping will contain the error, otherwise null.
-         */
-        void onSaveCroppedImageComplete(CropImageView view, Uri uri, Exception error);
     }
     //endregion
 
