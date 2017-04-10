@@ -984,7 +984,8 @@ public class CropImageView extends FrameLayout {
 
         OnCropImageCompleteListener listener = mOnCropImageCompleteListener;
         if (listener != null) {
-            CropResult cropResult = new CropResult(result.bitmap, result.uri, result.error, getCropPoints(), getCropRect(), getRotatedDegrees(), result.sampleSize);
+            CropResult cropResult = new CropResult(mBitmap, mLoadedImageUri, result.bitmap, result.uri, result.error,
+                    getCropPoints(), getCropRect(), getRotatedDegrees(), result.sampleSize);
             listener.onCropImageComplete(this, cropResult);
         }
     }
@@ -1694,6 +1695,18 @@ public class CropImageView extends FrameLayout {
     public static class CropResult {
 
         /**
+         * The image bitmap of the original image loaded for cropping.<br>
+         * Null if uri used to load image or activity result is used.
+         */
+        private final Bitmap mOriginalBitmap;
+
+        /**
+         * The Android uri of the original image loaded for cropping.<br>
+         * Null if bitmap was used to load image.
+         */
+        private final Uri mOriginalUri;
+
+        /**
          * The cropped image bitmap result.<br>
          * Null if save cropped image was executed, no output requested or failure.
          */
@@ -1730,7 +1743,10 @@ public class CropImageView extends FrameLayout {
          */
         private final int mSampleSize;
 
-        CropResult(Bitmap bitmap, Uri uri, Exception error, float[] cropPoints, Rect cropRect, int rotation, int sampleSize) {
+        CropResult(Bitmap originalBitmap, Uri originalUri, Bitmap bitmap, Uri uri, Exception error,
+                   float[] cropPoints, Rect cropRect, int rotation, int sampleSize) {
+            mOriginalBitmap = originalBitmap;
+            mOriginalUri = originalUri;
             mBitmap = bitmap;
             mUri = uri;
             mError = error;
@@ -1738,6 +1754,22 @@ public class CropImageView extends FrameLayout {
             mCropRect = cropRect;
             mRotation = rotation;
             mSampleSize = sampleSize;
+        }
+
+        /**
+         * The image bitmap of the original image loaded for cropping.<br>
+         * Null if uri used to load image or activity result is used.
+         */
+        public Bitmap getOriginalBitmap() {
+            return mOriginalBitmap;
+        }
+
+        /**
+         * The Android uri of the original image loaded for cropping.<br>
+         * Null if bitmap was used to load image.
+         */
+        public Uri getOriginalUri() {
+            return mOriginalUri;
         }
 
         /**

@@ -113,6 +113,7 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 - Handle OOM error for cropping set bitmap object, previously only image set by URI handled OOM.
 - Allows for rotation degrees to be negative, fixes operator-precedence-related bug in flipAxes computation (thx Tim Cooke)
 - Added crop overlay released listener (thx Richard Yee)
+- Added originalUri and originalBitmap to CropResult object.
 - Removed deprecated listeners.
 
 *2.3.1*

@@ -294,7 +294,8 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
      * Get intent instance to be used for the result of this activity.
      */
     protected Intent getResultIntent(Uri uri, Exception error, int sampleSize) {
-        CropImage.ActivityResult result = new CropImage.ActivityResult(null,
+        CropImage.ActivityResult result = new CropImage.ActivityResult(
+                mCropImageView.getImageUri(),
                 uri,
                 error,
                 mCropImageView.getCropPoints(),

@@ -196,8 +196,10 @@ public final class CropImage {
 
     /**
      * Get the main Camera intent for capturing image using device camera app.
-     * If the outputFileUri is null, a default Uri will be created with {@link #getCaptureImageOutputUri(Context)}, so then
-     * you will be able to get the pictureUri using {@link #getPickImageResultUri(Context, Intent)}. Otherwise, it is just you use
+     * If the outputFileUri is null, a default Uri will be created with {@link #getCaptureImageOutputUri(Context)}, so
+     * then
+     * you will be able to get the pictureUri using {@link #getPickImageResultUri(Context, Intent)}. Otherwise, it is
+     * just you use
      * the Uri passed to this method.
      *
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
@@ -844,21 +846,26 @@ public final class CropImage {
             }
         };
 
-        public ActivityResult(Bitmap bitmap, Uri uri, Exception error, float[] cropPoints, Rect cropRect, int rotation, int sampleSize) {
-            super(bitmap, uri, error, cropPoints, cropRect, rotation, sampleSize);
+        public ActivityResult(Uri originalUri, Uri uri, Exception error,
+                              float[] cropPoints, Rect cropRect, int rotation, int sampleSize) {
+            super(null, originalUri, null, uri, error, cropPoints, cropRect, rotation, sampleSize);
         }
 
         protected ActivityResult(Parcel in) {
             super(null,
                     (Uri) in.readParcelable(Uri.class.getClassLoader()),
+                    null,
+                    (Uri) in.readParcelable(Uri.class.getClassLoader()),
                     (Exception) in.readSerializable(),
                     in.createFloatArray(),
                     (Rect) in.readParcelable(Rect.class.getClassLoader()),
-                    in.readInt(), in.readInt());
+                    in.readInt(),
+                    in.readInt());
         }
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
+            dest.writeParcelable(getOriginalUri(), flags);
             dest.writeParcelable(getUri(), flags);
             dest.writeSerializable(getError());
             dest.writeFloatArray(getCropPoints());
