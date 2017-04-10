@@ -16,7 +16,7 @@ Android Image Cropper
 Include the library
 
  ```
- compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
+ compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
  ```
 
 ### Using Activity
@@ -29,12 +29,12 @@ Include the library
 
 3. Start `CropImageActivity` using builder pattern from your activity
  ```java
- CropImage.activity(imageUri)
+ CropImage.activity()
     .setGuidelines(CropImageView.Guidelines.ON)
     .start(this);
 
  // for fragment (DO NOT use `getActivity()`)
- CropImage.activity(imageUri)
+ CropImage.activity()
      .start(getContext(), this);
  ```
 
@@ -67,9 +67,9 @@ Include the library
 
 3. Set image to crop
  ```java
- cropImageView.setImageBitmap(bitmap);
- // or
  cropImageView.setImageUriAsync(uri);
+ // or (prefer using uri for performance and better user experience)
+ cropImageView.setImageBitmap(bitmap);
  ```
 
 4. Get cropped image
@@ -107,30 +107,18 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.4.0*
+
+- Super simple crop activity quick start flow that handles URI and permissions (huge thanks to @adwiv)
+- Handle OOM error for cropping set bitmap object, previously only image set by URI handled OOM.
+- Allows for rotation degrees to be negative, fixes operator-precedence-related bug in flipAxes computation (thx Tim Cooke)
+- Added crop overlay released listener (thx Richard Yee)
+- Removed deprecated listeners.
+
 *2.3.1*
 
 - Fix image picker for xiaomi and huawei phones (thx @nicolabeghin)
 - Fix crop window get corrupted on `CropImageView` resize.
-
-*2.3.0*
-
-- Change required width/height behavior to support resizing (inside/fit/exact) see wiki for details.
-- Add sampling fallback to lower cropped image resolution on OOM error (if image loaded from URI).
-- Setting aspect ratio will also set it to fixed, to help with confusion, add clear aspect ratio method.
-- Add support for setting min/max crop result size in code on CropImageView.
-- Fix cropping failing bug when skia fails region cropping.
-- Add Fallback to Intent.ACTION_PICK if no intent found for Intent.ACTION_GET_CONTENT (thx geolyth)
-- Multi touch support for cropping window (experimental, thx bbwharris)
-- **BREAKING CHANGES**:
- - If you previously used requested width/height the default behavior now is to resize inside the cropped image, to preserve the previous behavior you need to pass the SAMPLING option.
- - `OnGetCroppedImageCompleteListener` and `OnSaveCroppedImageCompleteListener` is deprecated, use `OnCropImageCompleteListener` that combines the two and provides the result object as crop activity.
- - Set aspect ratio also sets fixed aspect ratio to true, if this is not the desired behavior set the fix aspect ratio flag manually or call the method after calling set aspect ratio.
-
-*2.2.5*
-
-- Fix to webp file extension (thx Nathan)
-- Fix wrong initial crop window when image contains exif data.
-- Added corners to circular crop window, can be removed by setting `BorderCornerThickness` to 0.
 
 See [full change log](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log).
 
