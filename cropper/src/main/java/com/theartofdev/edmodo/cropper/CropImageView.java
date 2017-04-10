@@ -121,7 +121,7 @@ public class CropImageView extends FrameLayout {
     /**
      * callback to be invoked when crop overlay is released.
      */
-    private OnSetCropOverlayReleasedListener mOnSetCropOverlayReleasedListener;
+    private OnSetCropOverlayReleasedListener mOnCropOverlayReleasedListener;
 
     /**
      * callback to be invoked when image async loading is complete.
@@ -274,8 +274,8 @@ public class CropImageView extends FrameLayout {
             @Override
             public void onCropWindowChanged(boolean inProgress) {
                 handleCropWindowChanged(inProgress, true);
-                if(!inProgress){
-                    mOnSetCropOverlayReleasedListener.onCropOverlayReleased(getCropRect());
+                if (!inProgress) {
+                    mOnCropOverlayReleasedListener.onCropOverlayReleased(getCropRect());
                 }
             }
         });
@@ -755,7 +755,7 @@ public class CropImageView extends FrameLayout {
      * Set the callback t
      */
     public void setOnSetCropOverlayReleasedListener(OnSetCropOverlayReleasedListener listener) {
-        mOnSetCropOverlayReleasedListener = listener;
+        mOnCropOverlayReleasedListener = listener;
     }
 
     /**
@@ -1631,7 +1631,8 @@ public class CropImageView extends FrameLayout {
     /**
      * Interface definition for a callback to be invoked when the crop overlay is released.
      */
-    public interface OnSetCropOverlayReleasedListener{
+    public interface OnSetCropOverlayReleasedListener {
+
         /**
          * Called when the crop overlay changed listener is called and inProgress is false.
          *
