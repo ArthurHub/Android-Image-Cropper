@@ -24,32 +24,37 @@ Include the library
 2. Add `CropImageActivity` into your AndroidManifest.xml
  ```xml
  <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-     android:theme="@style/Base.Theme.AppCompat"/> <!-- optional (needed if default theme has no action bar) -->
+   android:theme="@style/Base.Theme.AppCompat"/> <!-- optional (needed if default theme has no action bar) -->
  ```
 
 3. Start `CropImageActivity` using builder pattern from your activity
  ```java
+ // start picker to get image for cropping and then use the image in cropping activity
  CropImage.activity()
-    .setGuidelines(CropImageView.Guidelines.ON)
-    .start(this);
+   .setGuidelines(CropImageView.Guidelines.ON)
+   .start(this);
+
+ // start cropping activity for pre-acquired image saved on the device
+ CropImage.activity(imageUri)
+  .start(this);
 
  // for fragment (DO NOT use `getActivity()`)
  CropImage.activity()
-     .start(getContext(), this);
+   .start(getContext(), this);
  ```
 
 4. Override `onActivityResult` method in your activity to get crop result
  ```java
  @Override
  public void onActivityResult(int requestCode, int resultCode, Intent data) {
-     if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-         CropImage.ActivityResult result = CropImage.getActivityResult(data);
-         if (resultCode == RESULT_OK) {
-             Uri resultUri = result.getUri();
-         } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-             Exception error = result.getError();
-         }
+   if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+     CropImage.ActivityResult result = CropImage.getActivityResult(data);
+     if (resultCode == RESULT_OK) {
+       Uri resultUri = result.getUri();
+     } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+       Exception error = result.getError();
      }
+   }
  }
  ```
 
@@ -58,11 +63,11 @@ Include the library
  ```xml
  <!-- Image Cropper fill the remaining available height -->
  <com.theartofdev.edmodo.cropper.CropImageView
-    xmlns:custom="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cropImageView"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"/>
+   xmlns:custom="http://schemas.android.com/apk/res-auto"
+   android:id="@+id/cropImageView"
+   android:layout_width="match_parent"
+   android:layout_height="0dp"
+   android:layout_weight="1"/>
  ```
 
 3. Set image to crop
@@ -74,9 +79,10 @@ Include the library
 
 4. Get cropped image
  ```java
- Bitmap cropped = cropImageView.getCroppedImage();
- // or (must subscribe to async event using cropImageView.setOnCropImageCompleteListener(listener))
+ // subscribe to async event using cropImageView.setOnCropImageCompleteListener(listener)
  cropImageView.getCroppedImageAsync();
+ // or
+ Bitmap cropped = cropImageView.getCroppedImage();
  ```
 
 ## Features
