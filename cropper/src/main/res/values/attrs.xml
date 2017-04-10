@@ -42,6 +42,8 @@
         <attr name="cropMinCropResultHeightPX" format="float"/>
         <attr name="cropMaxCropResultWidthPX" format="float"/>
         <attr name="cropMaxCropResultHeightPX" format="float"/>
+        <attr name="cropFlipHorizontally" format="boolean"/>
+        <attr name="cropFlipVertically" format="boolean"/>
     </declare-styleable>
 
 </resources>

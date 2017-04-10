@@ -242,6 +242,8 @@ public class CropImageView extends FrameLayout {
                     options.minCropResultHeight = (int) ta.getFloat(R.styleable.CropImageView_cropMinCropResultHeightPX, options.minCropResultHeight);
                     options.maxCropResultWidth = (int) ta.getFloat(R.styleable.CropImageView_cropMaxCropResultWidthPX, options.maxCropResultWidth);
                     options.maxCropResultHeight = (int) ta.getFloat(R.styleable.CropImageView_cropMaxCropResultHeightPX, options.maxCropResultHeight);
+                    options.flipHorizontally = ta.getBoolean(R.styleable.CropImageView_cropFlipHorizontally, options.flipHorizontally);
+                    options.flipVertically = ta.getBoolean(R.styleable.CropImageView_cropFlipHorizontally, options.flipVertically);
 
                     // if aspect ratio is set then set fixed to true
                     if (ta.hasValue(R.styleable.CropImageView_cropAspectRatioX) &&
@@ -415,6 +417,34 @@ public class CropImageView extends FrameLayout {
      */
     public void setFixedAspectRatio(boolean fixAspectRatio) {
         mCropOverlayView.setFixedAspectRatio(fixAspectRatio);
+    }
+
+    /**
+     * whether the image should be flipped horizontally
+     */
+    public boolean isFlippedHorizontally() {
+        return mCropOverlayView.getIsFlippedHorizontally();
+    }
+
+    /**
+     * Sets whether the image should be flipped horizontally
+     */
+    public void setFlippedHorizontally(boolean flipHorizontally) {
+        mCropOverlayView.setFlipHorizontally(flipHorizontally);
+    }
+
+    /**
+     * whether the image should be flipped vertically
+     */
+    public boolean isFlippedVertically() {
+        return mCropOverlayView.getIsFlippedVertically();
+    }
+
+    /**
+     * Sets whether the image should be flipped vertically
+     */
+    public void setFlippedVertically(boolean flipVertically) {
+        mCropOverlayView.setFlipVertically(flipVertically);
     }
 
     /**
@@ -647,11 +677,12 @@ public class CropImageView extends FrameLayout {
                         BitmapUtils.cropBitmap(getContext(), mLoadedImageUri, getCropPoints(),
                                 mDegreesRotated, orgWidth, orgHeight,
                                 mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                                reqWidth, reqHeight);
+                                reqWidth, reqHeight, mCropOverlayView.getIsFlippedHorizontally(), mCropOverlayView.getIsFlippedVertically());
                 croppedBitmap = bitmapSampled.bitmap;
             } else {
                 croppedBitmap = BitmapUtils.cropBitmapObjectHandleOOM(mBitmap, getCropPoints(), mDegreesRotated,
-                        mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY()).bitmap;
+                        mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
+                        mCropOverlayView.getIsFlippedHorizontally(), mCropOverlayView.getIsFlippedVertically()).bitmap;
             }
 
             croppedBitmap = BitmapUtils.resizeBitmap(croppedBitmap, reqWidth, reqHeight, options);
@@ -936,6 +967,22 @@ public class CropImageView extends FrameLayout {
         }
     }
 
+    /**
+     * Flips the image horizontally.
+     */
+    public void flipImageHorizontally() {
+        mCropOverlayView.setFlipHorizontally(!mCropOverlayView.getIsFlippedHorizontally());
+        applyImageMatrix(getWidth(), getHeight(), true, false);
+    }
+
+    /**
+     * Flips the image vertically.
+     */
+    public void flipImageVertically() {
+        mCropOverlayView.setFlipVertically(!mCropOverlayView.getIsFlippedVertically());
+        applyImageMatrix(getWidth(), getHeight(), true, false);
+    }
+
     //region: Private methods
 
     /**
@@ -1097,12 +1144,12 @@ public class CropImageView extends FrameLayout {
                 mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
                         mDegreesRotated, orgWidth, orgHeight,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                        reqWidth, reqHeight, options,
+                        reqWidth, reqHeight, mCropOverlayView.getIsFlippedHorizontally(), mCropOverlayView.getIsFlippedVertically(), options,
                         saveUri, saveCompressFormat, saveCompressQuality));
             } else {
                 mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), mDegreesRotated,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                        reqWidth, reqHeight, options,
+                        reqWidth, reqHeight, mCropOverlayView.getIsFlippedHorizontally(), mCropOverlayView.getIsFlippedVertically(), options,
                         saveUri, saveCompressFormat, saveCompressQuality));
             }
             mBitmapCroppingWorkerTask.get().execute();
@@ -1143,6 +1190,8 @@ public class CropImageView extends FrameLayout {
         bundle.putString("CROP_SHAPE", mCropOverlayView.getCropShape().name());
         bundle.putBoolean("CROP_AUTO_ZOOM_ENABLED", mAutoZoomEnabled);
         bundle.putInt("CROP_MAX_ZOOM", mMaxZoom);
+        bundle.putBoolean("CROP_FLIP_HORIZONTALLY", mCropOverlayView.getIsFlippedHorizontally());
+        bundle.putBoolean("CROP_FLIP_VERTICALLY", mCropOverlayView.getIsFlippedVertically());
 
         return bundle;
     }
@@ -1197,6 +1246,9 @@ public class CropImageView extends FrameLayout {
 
                 mAutoZoomEnabled = bundle.getBoolean("CROP_AUTO_ZOOM_ENABLED");
                 mMaxZoom = bundle.getInt("CROP_MAX_ZOOM");
+
+                mCropOverlayView.setFlipHorizontally(bundle.getBoolean("CROP_FLIP_HORIZONTALLY"));
+                mCropOverlayView.setFlipVertically(bundle.getBoolean("CROP_FLIP_VERTICALLY"));
             }
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
@@ -1390,7 +1442,9 @@ public class CropImageView extends FrameLayout {
             }
 
             // scale by the current zoom level
-            mImageMatrix.postScale(mZoom, mZoom, BitmapUtils.getRectCenterX(mImagePoints), BitmapUtils.getRectCenterY(mImagePoints));
+            float scaleX = mCropOverlayView.getIsFlippedHorizontally() ? -mZoom : mZoom;
+            float scaleY = mCropOverlayView.getIsFlippedVertically() ? -mZoom : mZoom;
+            mImageMatrix.postScale(scaleX, scaleY, BitmapUtils.getRectCenterX(mImagePoints), BitmapUtils.getRectCenterY(mImagePoints));
             mapImagePointsByImageMatrix();
 
             mImageMatrix.mapRect(cropRect);
@@ -1398,20 +1452,21 @@ public class CropImageView extends FrameLayout {
             if (center) {
                 // set the zoomed area to be as to the center of cropping window as possible
                 mZoomOffsetX = width > BitmapUtils.getRectWidth(mImagePoints) ? 0
-                        : Math.max(Math.min(width / 2 - cropRect.centerX(), -BitmapUtils.getRectLeft(mImagePoints)), getWidth() - BitmapUtils.getRectRight(mImagePoints)) / mZoom;
+                        : Math.max(Math.min(width / 2 - cropRect.centerX(), -BitmapUtils.getRectLeft(mImagePoints)), getWidth() - BitmapUtils.getRectRight(mImagePoints)) / scaleX;
                 mZoomOffsetY = height > BitmapUtils.getRectHeight(mImagePoints) ? 0
-                        : Math.max(Math.min(height / 2 - cropRect.centerY(), -BitmapUtils.getRectTop(mImagePoints)), getHeight() - BitmapUtils.getRectBottom(mImagePoints)) / mZoom;
+                        : Math.max(Math.min(height / 2 - cropRect.centerY(), -BitmapUtils.getRectTop(mImagePoints)), getHeight() - BitmapUtils.getRectBottom(mImagePoints)) / scaleY;
             } else {
                 // adjust the zoomed area so the crop window rectangle will be inside the area in case it was moved outside
-                mZoomOffsetX = Math.min(Math.max(mZoomOffsetX * mZoom, -cropRect.left), -cropRect.right + width) / mZoom;
-                mZoomOffsetY = Math.min(Math.max(mZoomOffsetY * mZoom, -cropRect.top), -cropRect.bottom + height) / mZoom;
+                mZoomOffsetX = Math.min(Math.max(mZoomOffsetX * scaleX, -cropRect.left), -cropRect.right + width) / scaleX;
+                mZoomOffsetY = Math.min(Math.max(mZoomOffsetY * scaleY, -cropRect.top), -cropRect.bottom + height) / scaleY;
             }
 
             // apply to zoom offset translate and update the crop rectangle to offset correctly
-            mImageMatrix.postTranslate(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
-            cropRect.offset(mZoomOffsetX * mZoom, mZoomOffsetY * mZoom);
+            mImageMatrix.postTranslate(mZoomOffsetX * scaleX, mZoomOffsetY * scaleY);
+            cropRect.offset(mZoomOffsetX * scaleX, mZoomOffsetY * scaleY);
             mCropOverlayView.setCropWindowRect(cropRect);
             mapImagePointsByImageMatrix();
+            mCropOverlayView.invalidate();
 
             // set matrix to apply
             if (animate) {

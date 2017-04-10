@@ -76,6 +76,8 @@ public final class MainFragment extends Fragment
         mCropImageView.setShowProgressBar(options.showProgressBar);
         mCropImageView.setAutoZoomEnabled(options.autoZoomEnabled);
         mCropImageView.setMaxZoom(options.maxZoomLevel);
+        mCropImageView.setFlippedHorizontally(options.flipHorizontally);
+        mCropImageView.setFlippedVertically(options.flipVertically);
     }
 
     /**
@@ -103,6 +105,8 @@ public final class MainFragment extends Fragment
         options.showProgressBar = mCropImageView.isShowProgressBar();
         options.autoZoomEnabled = mCropImageView.isAutoZoomEnabled();
         options.maxZoomLevel = mCropImageView.getMaxZoom();
+        options.flipHorizontally = mCropImageView.isFlippedHorizontally();
+        options.flipVertically = mCropImageView.isFlippedVertically();
         ((MainActivity) getActivity()).setCurrentOptions(options);
     }
 
@@ -160,6 +164,12 @@ public final class MainFragment extends Fragment
             return true;
         } else if (item.getItemId() == R.id.main_action_rotate) {
             mCropImageView.rotateImage(90);
+            return true;
+        } else if (item.getItemId() == R.id.main_action_flip_horizontally) {
+            mCropImageView.flipImageHorizontally();
+            return true;
+        } else if (item.getItemId() == R.id.main_action_flip_vertically) {
+            mCropImageView.flipImageVertically();
             return true;
         }
         return super.onOptionsItemSelected(item);

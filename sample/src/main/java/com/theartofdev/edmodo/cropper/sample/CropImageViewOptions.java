@@ -40,4 +40,8 @@ final class CropImageViewOptions {
     public boolean showCropOverlay;
 
     public boolean showProgressBar;
+
+    public boolean flipHorizontally;
+
+    public boolean flipVertically;
 }
