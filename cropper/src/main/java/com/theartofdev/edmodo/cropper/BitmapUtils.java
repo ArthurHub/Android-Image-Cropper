@@ -180,21 +180,10 @@ final class BitmapUtils {
         // get the rectangle in original image that contains the required cropped area (larger for non rectangular crop)
         Rect rect = getRectFromPoints(points, bitmap.getWidth(), bitmap.getHeight(), fixAspectRatio, aspectRatioX, aspectRatioY);
 
-        if (degreesRotated == 90 || degreesRotated == 270) {
-            if (flipHorizontally != flipVertically) {
-                boolean temp = flipHorizontally;
-                flipHorizontally = flipVertically;
-                flipVertically = temp;
-            }
-        }
-
         // crop and rotate the cropped image in one operation
-        float scaleX = flipHorizontally ? -scale : scale;
-        float scaleY = flipVertically ? -scale : scale;
-
         Matrix matrix = new Matrix();
-        matrix.setScale(scaleX, scaleY);
-        matrix.postRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
+        matrix.setRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
+        matrix.postScale(flipHorizontally ? -scale : scale, flipVertically ? -scale : scale);
         Bitmap result = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height(), matrix, true);
 
         if (result == bitmap) {
