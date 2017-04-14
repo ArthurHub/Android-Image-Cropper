@@ -254,6 +254,11 @@ public class CropImageOptions implements Parcelable {
     public boolean allowRotation;
 
     /**
+     * if to allow (all) flipping during cropping (activity)
+     */
+    public boolean allowFlipping;
+
+    /**
      * if to allow counter-clockwise rotation during cropping (activity)
      */
     public boolean allowCounterRotation;
@@ -328,6 +333,7 @@ public class CropImageOptions implements Parcelable {
         initialCropWindowRectangle = null;
         initialRotation = -1;
         allowRotation = true;
+        allowFlipping = true;
         allowCounterRotation = false;
         rotationDegrees = 90;
         flipHorizontally = false;
@@ -379,6 +385,7 @@ public class CropImageOptions implements Parcelable {
         initialCropWindowRectangle = in.readParcelable(Rect.class.getClassLoader());
         initialRotation = in.readInt();
         allowRotation = in.readByte() != 0;
+        allowFlipping = in.readByte() != 0;
         allowCounterRotation = in.readByte() != 0;
         rotationDegrees = in.readInt();
         flipHorizontally = in.readByte() != 0;
@@ -428,6 +435,7 @@ public class CropImageOptions implements Parcelable {
         dest.writeParcelable(initialCropWindowRectangle, flags);
         dest.writeInt(initialRotation);
         dest.writeByte((byte) (allowRotation ? 1 : 0));
+        dest.writeByte((byte) (allowFlipping ? 1 : 0));
         dest.writeByte((byte) (allowCounterRotation ? 1 : 0));
         dest.writeInt(rotationDegrees);
         dest.writeByte((byte) (flipHorizontally ? 1 : 0));

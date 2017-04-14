@@ -807,6 +807,15 @@ public final class CropImage {
         }
 
         /**
+         * if to allow flipping during cropping.<br>
+         * <i>Default: true</i>
+         */
+        public ActivityBuilder setAllowFlipping(boolean allowFlipping) {
+            mOptions.allowFlipping = allowFlipping;
+            return this;
+        }
+
+        /**
          * if to allow counter-clockwise rotation during cropping.<br>
          * Note: if rotation is disabled this option has no effect.<br>
          * <i>Default: false</i>
