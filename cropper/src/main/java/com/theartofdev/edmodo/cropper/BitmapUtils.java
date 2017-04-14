@@ -296,7 +296,7 @@ final class BitmapUtils {
 
     /**
      * Get a rectangle for the given 4 points (x0,y0,x1,y1,x2,y2,x3,y3) by finding the min/max 2 points that
-     * contains the given 4 points and is a stright rectangle.
+     * contains the given 4 points and is a straight rectangle.
      */
     static Rect getRectFromPoints(float[] points, int imageWidth, int imageHeight, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
         int left = Math.round(Math.max(0, getRectLeft(points)));
@@ -404,7 +404,7 @@ final class BitmapUtils {
         if (result != null) {
             try {
                 // rotate the decoded region by the required amount
-                result = rotateBitmapInt(result, degreesRotated);
+                result = rotateAndFlipBitmapInt(result, degreesRotated, flipHorizontally, flipVertically);
 
                 // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
                 if (degreesRotated % 90 != 0) {
@@ -640,10 +640,11 @@ final class BitmapUtils {
      * Rotate the given bitmap by the given degrees.<br>
      * New bitmap is created and the old one is recycled.
      */
-    private static Bitmap rotateBitmapInt(Bitmap bitmap, int degrees) {
-        if (degrees > 0) {
+    private static Bitmap rotateAndFlipBitmapInt(Bitmap bitmap, int degrees, boolean flipHorizontally, boolean flipVertically) {
+        if (degrees > 0 || flipHorizontally || flipVertically) {
             Matrix matrix = new Matrix();
             matrix.setRotate(degrees);
+            matrix.postScale(flipHorizontally ? -1 : 1, flipVertically ? -1 : 1);
             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
             if (newBitmap != bitmap) {
                 bitmap.recycle();
