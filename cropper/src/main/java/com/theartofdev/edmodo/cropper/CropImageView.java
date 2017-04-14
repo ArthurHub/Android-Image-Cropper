@@ -82,6 +82,11 @@ public class CropImageView extends FrameLayout {
     private Bitmap mBitmap;
 
     /**
+     * The image rotation value used during loading of the image so we can reset to it
+     */
+    private int mInitialDegreesRotated;
+
+    /**
      * How much the image is rotated from original clockwise
      */
     private int mDegreesRotated;
@@ -638,7 +643,7 @@ public class CropImageView extends FrameLayout {
         mZoom = 1;
         mZoomOffsetX = 0;
         mZoomOffsetY = 0;
-        mDegreesRotated = 0;
+        mDegreesRotated = mInitialDegreesRotated;
         mFlipHorizontally = false;
         mFlipVertically = false;
         applyImageMatrix(getWidth(), getHeight(), false, false);
@@ -843,6 +848,7 @@ public class CropImageView extends FrameLayout {
             BitmapUtils.RotateBitmapResult result = BitmapUtils.rotateBitmapByExif(bitmap, exif);
             setBitmap = result.bitmap;
             degreesRotated = result.degrees;
+            mInitialDegreesRotated = result.degrees;
         } else {
             setBitmap = bitmap;
         }
@@ -993,6 +999,7 @@ public class CropImageView extends FrameLayout {
         setProgressBarVisibility();
 
         if (result.error == null) {
+            mInitialDegreesRotated = result.degreesRotated;
             setBitmap(result.bitmap, result.uri, result.loadSampleSize, result.degreesRotated);
         }
 
