@@ -116,11 +116,13 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 *2.4.0*
 
 - Super simple crop activity quick start flow that handles URI and permissions (huge thanks to @adwiv)
-- Image vertical and horizontal flipping during cropping (huge thanks to @tibbi).
+- Add image horizontal/vertical flipping during cropping (huge thanks to @tibbi).
 - Handle OOM error for cropping set bitmap object, previously only image set by URI handled OOM.
 - Allows for rotation degrees to be negative, fixes operator-precedence-related bug in flipAxes computation (thx Tim Cooke)
 - Added crop overlay released listener (thx Richard Yee)
 - Added originalUri and originalBitmap to CropResult object.
+- Fix `resetCropRect()` resetting image rotation to 0 instead of the original exif data.
+- Fix ignoring image rotation data in `setImageBitmap(Bitmap, ExifInterface )` method.
 - Removed deprecated listeners.
 
 *2.3.1*
