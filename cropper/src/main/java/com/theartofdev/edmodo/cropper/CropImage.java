@@ -824,6 +824,24 @@ public final class CropImage {
             mOptions.rotationDegrees = rotationDegrees;
             return this;
         }
+
+        /**
+         * whether the image should be flipped horizontally.<br>
+         * <i>Default: false</i>
+         */
+        public ActivityBuilder setFlipHorizontally(boolean flipHorizontally) {
+            mOptions.flipHorizontally = flipHorizontally;
+            return this;
+        }
+
+        /**
+         * whether the image should be flipped vertically.<br>
+         * <i>Default: false</i>
+         */
+        public ActivityBuilder setFlipVertically(boolean flipVertically) {
+            mOptions.flipVertically = flipVertically;
+            return this;
+        }
     }
     //endregion
 
