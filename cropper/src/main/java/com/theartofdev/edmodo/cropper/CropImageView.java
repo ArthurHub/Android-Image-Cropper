@@ -890,6 +890,11 @@ public class CropImageView extends FrameLayout {
             BitmapUtils.RECT.set(mCropOverlayView.getCropWindowRect());
             float halfWidth = (flipAxes ? BitmapUtils.RECT.height() : BitmapUtils.RECT.width()) / 2f;
             float halfHeight = (flipAxes ? BitmapUtils.RECT.width() : BitmapUtils.RECT.height()) / 2f;
+            if (flipAxes) {
+                boolean isFlippedHorizontally = mCropOverlayView.getIsFlippedHorizontally();
+                mCropOverlayView.setFlipHorizontally(mCropOverlayView.getIsFlippedVertically());
+                mCropOverlayView.setFlipVertically(isFlippedHorizontally);
+            }
 
             mImageMatrix.invert(mImageInverseMatrix);
 
