@@ -264,8 +264,9 @@ public class CropImageView extends FrameLayout {
             @Override
             public void onCropWindowChanged(boolean inProgress) {
                 handleCropWindowChanged(inProgress, true);
-                if (!inProgress) {
-                    mOnCropOverlayReleasedListener.onCropOverlayReleased(getCropRect());
+                OnSetCropOverlayReleasedListener listener = mOnCropOverlayReleasedListener;
+                if (listener != null && !inProgress) {
+                    listener.onCropOverlayReleased(getCropRect());
                 }
             }
         });
