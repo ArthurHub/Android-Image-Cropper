@@ -259,7 +259,7 @@ public class CropImageOptions implements Parcelable {
     public boolean allowCounterRotation;
 
     /**
-     * the amount of degreees to rotate clockwise or counter-clockwise
+     * the amount of degrees to rotate clockwise or counter-clockwise
      */
     public int rotationDegrees;
 

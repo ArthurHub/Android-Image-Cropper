@@ -81,7 +81,20 @@ public class CropImageView extends FrameLayout {
 
     private Bitmap mBitmap;
 
+    /**
+     * How much the image is rotated from original clockwise
+     */
     private int mDegreesRotated;
+
+    /**
+     * if the image flipped horizontally
+     */
+    private boolean mFlipHorizontally;
+
+    /**
+     * if the image flipped vertically
+     */
+    private boolean mFlipVertically;
 
     private int mLayoutWidth;
 
@@ -252,6 +265,8 @@ public class CropImageView extends FrameLayout {
         mMaxZoom = options.maxZoom;
         mShowCropOverlay = options.showCropOverlay;
         mShowProgressBar = options.showProgressBar;
+        mFlipHorizontally = options.flipHorizontally;
+        mFlipVertically = options.flipVertically;
 
         LayoutInflater inflater = LayoutInflater.from(context);
         View v = inflater.inflate(R.layout.crop_image_view, this, true);
@@ -412,28 +427,34 @@ public class CropImageView extends FrameLayout {
      * whether the image should be flipped horizontally
      */
     public boolean isFlippedHorizontally() {
-        return mCropOverlayView.getIsFlippedHorizontally();
+        return mFlipHorizontally;
     }
 
     /**
      * Sets whether the image should be flipped horizontally
      */
     public void setFlippedHorizontally(boolean flipHorizontally) {
-        mCropOverlayView.setFlipHorizontally(flipHorizontally);
+        if (mFlipHorizontally != flipHorizontally) {
+            mFlipHorizontally = flipHorizontally;
+            applyImageMatrix(getWidth(), getHeight(), true, false);
+        }
     }
 
     /**
      * whether the image should be flipped vertically
      */
     public boolean isFlippedVertically() {
-        return mCropOverlayView.getIsFlippedVertically();
+        return mFlipVertically;
     }
 
     /**
      * Sets whether the image should be flipped vertically
      */
     public void setFlippedVertically(boolean flipVertically) {
-        mCropOverlayView.setFlipVertically(flipVertically);
+        if (mFlipVertically != flipVertically) {
+            mFlipVertically = flipVertically;
+            applyImageMatrix(getWidth(), getHeight(), true, false);
+        }
     }
 
     /**
@@ -618,6 +639,8 @@ public class CropImageView extends FrameLayout {
         mZoomOffsetX = 0;
         mZoomOffsetY = 0;
         mDegreesRotated = 0;
+        mFlipHorizontally = false;
+        mFlipVertically = false;
         applyImageMatrix(getWidth(), getHeight(), false, false);
         mCropOverlayView.resetCropWindowRect();
     }
@@ -666,12 +689,12 @@ public class CropImageView extends FrameLayout {
                         BitmapUtils.cropBitmap(getContext(), mLoadedImageUri, getCropPoints(),
                                 mDegreesRotated, orgWidth, orgHeight,
                                 mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                                reqWidth, reqHeight, mCropOverlayView.getIsFlippedHorizontally(), mCropOverlayView.getIsFlippedVertically());
+                                reqWidth, reqHeight, mFlipHorizontally, mFlipVertically);
                 croppedBitmap = bitmapSampled.bitmap;
             } else {
                 croppedBitmap = BitmapUtils.cropBitmapObjectHandleOOM(mBitmap, getCropPoints(), mDegreesRotated,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                        mCropOverlayView.getIsFlippedHorizontally(), mCropOverlayView.getIsFlippedVertically()).bitmap;
+                        mFlipHorizontally, mFlipVertically).bitmap;
             }
 
             croppedBitmap = BitmapUtils.resizeBitmap(croppedBitmap, reqWidth, reqHeight, options);
@@ -891,9 +914,9 @@ public class CropImageView extends FrameLayout {
             float halfWidth = (flipAxes ? BitmapUtils.RECT.height() : BitmapUtils.RECT.width()) / 2f;
             float halfHeight = (flipAxes ? BitmapUtils.RECT.width() : BitmapUtils.RECT.height()) / 2f;
             if (flipAxes) {
-                boolean isFlippedHorizontally = mCropOverlayView.getIsFlippedHorizontally();
-                mCropOverlayView.setFlipHorizontally(mCropOverlayView.getIsFlippedVertically());
-                mCropOverlayView.setFlipVertically(isFlippedHorizontally);
+                boolean isFlippedHorizontally = mFlipHorizontally;
+                mFlipHorizontally = mFlipVertically;
+                mFlipVertically = isFlippedHorizontally;
             }
 
             mImageMatrix.invert(mImageInverseMatrix);
@@ -943,7 +966,7 @@ public class CropImageView extends FrameLayout {
      * Flips the image horizontally.
      */
     public void flipImageHorizontally() {
-        mCropOverlayView.setFlipHorizontally(!mCropOverlayView.getIsFlippedHorizontally());
+        mFlipHorizontally = !mFlipHorizontally;
         applyImageMatrix(getWidth(), getHeight(), true, false);
     }
 
@@ -951,7 +974,7 @@ public class CropImageView extends FrameLayout {
      * Flips the image vertically.
      */
     public void flipImageVertically() {
-        mCropOverlayView.setFlipVertically(!mCropOverlayView.getIsFlippedVertically());
+        mFlipVertically = !mFlipVertically;
         applyImageMatrix(getWidth(), getHeight(), true, false);
     }
 
@@ -1105,12 +1128,12 @@ public class CropImageView extends FrameLayout {
                 mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
                         mDegreesRotated, orgWidth, orgHeight,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                        reqWidth, reqHeight, mCropOverlayView.getIsFlippedHorizontally(), mCropOverlayView.getIsFlippedVertically(), options,
+                        reqWidth, reqHeight, mFlipHorizontally, mFlipVertically, options,
                         saveUri, saveCompressFormat, saveCompressQuality));
             } else {
                 mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), mDegreesRotated,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
-                        reqWidth, reqHeight, mCropOverlayView.getIsFlippedHorizontally(), mCropOverlayView.getIsFlippedVertically(), options,
+                        reqWidth, reqHeight, mFlipHorizontally, mFlipVertically, options,
                         saveUri, saveCompressFormat, saveCompressQuality));
             }
             mBitmapCroppingWorkerTask.get().execute();
@@ -1151,8 +1174,8 @@ public class CropImageView extends FrameLayout {
         bundle.putString("CROP_SHAPE", mCropOverlayView.getCropShape().name());
         bundle.putBoolean("CROP_AUTO_ZOOM_ENABLED", mAutoZoomEnabled);
         bundle.putInt("CROP_MAX_ZOOM", mMaxZoom);
-        bundle.putBoolean("CROP_FLIP_HORIZONTALLY", mCropOverlayView.getIsFlippedHorizontally());
-        bundle.putBoolean("CROP_FLIP_VERTICALLY", mCropOverlayView.getIsFlippedVertically());
+        bundle.putBoolean("CROP_FLIP_HORIZONTALLY", mFlipHorizontally);
+        bundle.putBoolean("CROP_FLIP_VERTICALLY", mFlipVertically);
 
         return bundle;
     }
@@ -1208,8 +1231,8 @@ public class CropImageView extends FrameLayout {
                 mAutoZoomEnabled = bundle.getBoolean("CROP_AUTO_ZOOM_ENABLED");
                 mMaxZoom = bundle.getInt("CROP_MAX_ZOOM");
 
-                mCropOverlayView.setFlipHorizontally(bundle.getBoolean("CROP_FLIP_HORIZONTALLY"));
-                mCropOverlayView.setFlipVertically(bundle.getBoolean("CROP_FLIP_VERTICALLY"));
+                mFlipHorizontally = bundle.getBoolean("CROP_FLIP_HORIZONTALLY");
+                mFlipVertically = bundle.getBoolean("CROP_FLIP_VERTICALLY");
             }
 
             super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
@@ -1403,8 +1426,8 @@ public class CropImageView extends FrameLayout {
             }
 
             // scale by the current zoom level
-            float scaleX = mCropOverlayView.getIsFlippedHorizontally() ? -mZoom : mZoom;
-            float scaleY = mCropOverlayView.getIsFlippedVertically() ? -mZoom : mZoom;
+            float scaleX = mFlipHorizontally ? -mZoom : mZoom;
+            float scaleY = mFlipVertically ? -mZoom : mZoom;
             mImageMatrix.postScale(scaleX, scaleY, BitmapUtils.getRectCenterX(mImagePoints), BitmapUtils.getRectCenterY(mImagePoints));
             mapImagePointsByImageMatrix();
 
