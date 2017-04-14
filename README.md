@@ -88,7 +88,7 @@ Include the library
 ## Features
 - Built-in `CropImageActivity`.
 - Set cropping image as Bitmap, Resource or Android URI (Gallery, Camera, Dropbox, etc.).
-- Image rotation during cropping.
+- Image rotation/flipping during cropping.
 - Auto zoom-in/out to relevant cropping area.
 - Auto rotate bitmap by image Exif data.
 - Set result image min/max limits in pixels.
@@ -116,6 +116,7 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 *2.4.0*
 
 - Super simple crop activity quick start flow that handles URI and permissions (huge thanks to @adwiv)
+- Image vertical and horizontal flipping during cropping (huge thanks to @tibbi).
 - Handle OOM error for cropping set bitmap object, previously only image set by URI handled OOM.
 - Allows for rotation degrees to be negative, fixes operator-precedence-related bug in flipAxes computation (thx Tim Cooke)
 - Added crop overlay released listener (thx Richard Yee)
