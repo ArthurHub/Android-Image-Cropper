@@ -92,6 +92,16 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
     private final int mReqHeight;
 
     /**
+     * is the image flipped horizontally
+     */
+    private final boolean mFlipHorizontally;
+
+    /**
+     * is the image flipped vertically
+     */
+    private final boolean mFlipVertically;
+
+    /**
      * The option to handle requested width/height
      */
     private final CropImageView.RequestSizeOptions mReqSizeOptions;
@@ -114,7 +124,7 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
 
     BitmapCroppingWorkerTask(CropImageView cropImageView, Bitmap bitmap, float[] cropPoints,
                              int degreesRotated, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
-                             int reqWidth, int reqHeight, CropImageView.RequestSizeOptions options,
+                             int reqWidth, int reqHeight, boolean flipHorizontally, boolean flipVertically, CropImageView.RequestSizeOptions options,
                              Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
 
         mCropImageViewReference = new WeakReference<>(cropImageView);
@@ -128,6 +138,8 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
         mAspectRatioY = aspectRatioY;
         mReqWidth = reqWidth;
         mReqHeight = reqHeight;
+        mFlipHorizontally = flipHorizontally;
+        mFlipVertically = flipVertically;
         mReqSizeOptions = options;
         mSaveUri = saveUri;
         mSaveCompressFormat = saveCompressFormat;
@@ -138,8 +150,8 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
 
     BitmapCroppingWorkerTask(CropImageView cropImageView, Uri uri, float[] cropPoints,
                              int degreesRotated, int orgWidth, int orgHeight,
-                             boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
-                             int reqWidth, int reqHeight, CropImageView.RequestSizeOptions options,
+                             boolean fixAspectRatio, int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight,
+                             boolean flipHorizontally, boolean flipVertically, CropImageView.RequestSizeOptions options,
                              Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
 
         mCropImageViewReference = new WeakReference<>(cropImageView);
@@ -154,6 +166,8 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
         mOrgHeight = orgHeight;
         mReqWidth = reqWidth;
         mReqHeight = reqHeight;
+        mFlipHorizontally = flipHorizontally;
+        mFlipVertically = flipVertically;
         mReqSizeOptions = options;
         mSaveUri = saveUri;
         mSaveCompressFormat = saveCompressFormat;
@@ -182,9 +196,10 @@ final class BitmapCroppingWorkerTask extends AsyncTask<Void, Void, BitmapCroppin
                 BitmapUtils.BitmapSampled bitmapSampled;
                 if (mUri != null) {
                     bitmapSampled = BitmapUtils.cropBitmap(mContext, mUri, mCropPoints, mDegreesRotated, mOrgWidth, mOrgHeight,
-                            mFixAspectRatio, mAspectRatioX, mAspectRatioY, mReqWidth, mReqHeight);
+                            mFixAspectRatio, mAspectRatioX, mAspectRatioY, mReqWidth, mReqHeight, mFlipHorizontally, mFlipVertically);
                 } else if (mBitmap != null) {
-                    bitmapSampled = BitmapUtils.cropBitmapObjectHandleOOM(mBitmap, mCropPoints, mDegreesRotated, mFixAspectRatio, mAspectRatioX, mAspectRatioY);
+                    bitmapSampled = BitmapUtils.cropBitmapObjectHandleOOM(mBitmap, mCropPoints, mDegreesRotated, mFixAspectRatio,
+                            mAspectRatioX, mAspectRatioY, mFlipHorizontally, mFlipVertically);
                 } else {
                     return new Result((Bitmap) null, 1);
                 }

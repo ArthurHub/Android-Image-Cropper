@@ -149,11 +149,13 @@ final class BitmapUtils {
      * If crop fails due to OOM we scale the cropping image by 0.5 every time it fails until it is small enough.
      */
     static BitmapSampled cropBitmapObjectHandleOOM(Bitmap bitmap, float[] points, int degreesRotated,
-                                                   boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
+                                                   boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
+                                                   boolean flipHorizontally, boolean flipVertically) {
         int scale = 1;
         while (true) {
             try {
-                Bitmap cropBitmap = cropBitmapObjectWithScale(bitmap, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, 1 / (float) scale);
+                Bitmap cropBitmap = cropBitmapObjectWithScale(bitmap, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY,
+                        1 / (float) scale, flipHorizontally, flipVertically);
                 return new BitmapSampled(cropBitmap, scale);
             } catch (OutOfMemoryError e) {
                 scale *= 2;
@@ -172,14 +174,26 @@ final class BitmapUtils {
      * @param scale how much to scale the cropped image part, use 0.5 to lower the image by half (OOM handling)
      */
     private static Bitmap cropBitmapObjectWithScale(Bitmap bitmap, float[] points, int degreesRotated,
-                                                    boolean fixAspectRatio, int aspectRatioX, int aspectRatioY, float scale) {
+                                                    boolean fixAspectRatio, int aspectRatioX, int aspectRatioY, float scale,
+                                                    boolean flipHorizontally, boolean flipVertically) {
 
         // get the rectangle in original image that contains the required cropped area (larger for non rectangular crop)
         Rect rect = getRectFromPoints(points, bitmap.getWidth(), bitmap.getHeight(), fixAspectRatio, aspectRatioX, aspectRatioY);
 
+        if (degreesRotated == 90 || degreesRotated == 270) {
+            if (flipHorizontally != flipVertically) {
+                boolean temp = flipHorizontally;
+                flipHorizontally = flipVertically;
+                flipVertically = temp;
+            }
+        }
+
         // crop and rotate the cropped image in one operation
+        float scaleX = flipHorizontally ? -scale : scale;
+        float scaleY = flipVertically ? -scale : scale;
+
         Matrix matrix = new Matrix();
-        matrix.setScale(scale, scale);
+        matrix.setScale(scaleX, scaleY);
         matrix.postRotate(degreesRotated, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
         Bitmap result = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height(), matrix, true);
 
@@ -204,7 +218,8 @@ final class BitmapUtils {
      */
     static BitmapSampled cropBitmap(Context context, Uri loadedImageUri, float[] points,
                                     int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
-                                    int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight) {
+                                    int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight,
+                                    boolean flipHorizontally, boolean flipVertically) {
         int sampleMulti = 1;
         while (true) {
             try {
@@ -212,7 +227,7 @@ final class BitmapUtils {
                 return cropBitmap(context, loadedImageUri, points,
                         degreesRotated, orgWidth, orgHeight, fixAspectRatio,
                         aspectRatioX, aspectRatioY, reqWidth, reqHeight,
-                        sampleMulti);
+                        flipHorizontally, flipVertically, sampleMulti);
             } catch (OutOfMemoryError e) {
                 // if OOM try to increase the sampling to lower the memory usage
                 sampleMulti *= 2;
@@ -366,9 +381,9 @@ final class BitmapUtils {
      * @param orgHeight used to get rectangle from points (handle edge cases to limit rectangle)
      * @param sampleMulti used to increase the sampling of the image to handle memory issues.
      */
-    private static BitmapSampled cropBitmap(Context context, Uri loadedImageUri, float[] points,
-                                            int degreesRotated, int orgWidth, int orgHeight, boolean fixAspectRatio,
-                                            int aspectRatioX, int aspectRatioY, int reqWidth, int reqHeight, int sampleMulti) {
+    private static BitmapSampled cropBitmap(Context context, Uri loadedImageUri, float[] points, int degreesRotated,
+                                            int orgWidth, int orgHeight, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
+                                            int reqWidth, int reqHeight, boolean flipHorizontally, boolean flipVertically, int sampleMulti) {
 
         // get the rectangle in original image that contains the required cropped area (larger for non rectangular crop)
         Rect rect = getRectFromPoints(points, orgWidth, orgHeight, fixAspectRatio, aspectRatioX, aspectRatioY);
@@ -406,7 +421,8 @@ final class BitmapUtils {
             return new BitmapSampled(result, sampleSize);
         } else {
             // failed to decode region, may be skia issue, try full decode and then crop
-            return cropBitmap(context, loadedImageUri, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, sampleMulti, rect, width, height);
+            return cropBitmap(context, loadedImageUri, points, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, sampleMulti,
+                    rect, width, height, flipHorizontally, flipVertically);
         }
     }
 
@@ -415,7 +431,7 @@ final class BitmapUtils {
      */
     private static BitmapSampled cropBitmap(Context context, Uri loadedImageUri, float[] points,
                                             int degreesRotated, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY,
-                                            int sampleMulti, Rect rect, int width, int height) {
+                                            int sampleMulti, Rect rect, int width, int height, boolean flipHorizontally, boolean flipVertically) {
         Bitmap result = null;
         int sampleSize;
         try {
@@ -432,7 +448,8 @@ final class BitmapUtils {
                         points2[i] = points2[i] / options.inSampleSize;
                     }
 
-                    result = cropBitmapObjectWithScale(fullBitmap, points2, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, 1);
+                    result = cropBitmapObjectWithScale(fullBitmap, points2, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY, 1,
+                            flipHorizontally, flipVertically);
                 } finally {
                     if (result != fullBitmap) {
                         fullBitmap.recycle();

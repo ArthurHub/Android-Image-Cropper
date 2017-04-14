@@ -159,6 +159,16 @@ public class CropOverlayView extends View {
     private float mTargetAspectRatio = ((float) mAspectRatioX) / mAspectRatioY;
 
     /**
+     * Flag indicating if the image should be flipped horizontally
+     */
+    private boolean mFlipHorizontally;
+
+    /**
+     * Flag indicating if the image should be flipped vertically
+     */
+    private boolean mFlipVertically;
+
+    /**
      * Instance variables for customizable attributes
      */
     private CropImageView.Guidelines mGuidelines;
@@ -380,6 +390,34 @@ public class CropOverlayView extends View {
     }
 
     /**
+     * whether the image is flipped horizontally
+     */
+    public boolean getIsFlippedHorizontally() {
+        return mFlipHorizontally;
+    }
+
+    /**
+     * Sets whether the image should be flipped horizontally
+     */
+    public void setFlipHorizontally(boolean flipHorizontally) {
+        mFlipHorizontally = flipHorizontally;
+    }
+
+    /**
+     * whether the image is flipped vertically
+     */
+    public boolean getIsFlippedVertically() {
+        return mFlipVertically;
+    }
+
+    /**
+     * Sets whether the image should be flipped vertically
+     */
+    public void setFlipVertically(boolean flipVertically) {
+        mFlipVertically = flipVertically;
+    }
+
+    /**
      * An edge of the crop window will snap to the corresponding edge of a
      * specified bounding box when the crop window edge is less than or equal to
      * this distance (in pixels) away from the bounding box edge. (default: 3)
@@ -475,6 +513,8 @@ public class CropOverlayView extends View {
         setAspectRatioX(options.aspectRatioX);
 
         setAspectRatioY(options.aspectRatioY);
+
+        setFlipHorizontally(options.flipHorizontally);
 
         setMultiTouchEnabled(options.multiTouchEnabled);
 

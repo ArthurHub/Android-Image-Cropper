@@ -264,6 +264,16 @@ public class CropImageOptions implements Parcelable {
     public int rotationDegrees;
 
     /**
+     * whether the image should be flipped horizontally
+     */
+    public boolean flipHorizontally;
+
+    /**
+     * whether the image should be flipped vertically
+     */
+    public boolean flipVertically;
+
+    /**
      * Init options with defaults.
      */
     public CropImageOptions() {
@@ -320,6 +330,8 @@ public class CropImageOptions implements Parcelable {
         allowRotation = true;
         allowCounterRotation = false;
         rotationDegrees = 90;
+        flipHorizontally = false;
+        flipVertically = false;
     }
 
     /**
@@ -369,6 +381,8 @@ public class CropImageOptions implements Parcelable {
         allowRotation = in.readByte() != 0;
         allowCounterRotation = in.readByte() != 0;
         rotationDegrees = in.readInt();
+        flipHorizontally = in.readByte() != 0;
+        flipVertically = in.readByte() != 0;
     }
 
     @Override
@@ -416,6 +430,8 @@ public class CropImageOptions implements Parcelable {
         dest.writeByte((byte) (allowRotation ? 1 : 0));
         dest.writeByte((byte) (allowCounterRotation ? 1 : 0));
         dest.writeInt(rotationDegrees);
+        dest.writeByte((byte) (flipHorizontally ? 1 : 0));
+        dest.writeByte((byte) (flipVertically ? 1 : 0));
     }
 
     @Override
