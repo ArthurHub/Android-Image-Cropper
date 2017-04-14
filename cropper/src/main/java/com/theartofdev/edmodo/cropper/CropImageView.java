@@ -838,15 +838,16 @@ public class CropImageView extends FrameLayout {
      */
     public void setImageBitmap(Bitmap bitmap, ExifInterface exif) {
         Bitmap setBitmap;
+        int degreesRotated = 0;
         if (bitmap != null && exif != null) {
             BitmapUtils.RotateBitmapResult result = BitmapUtils.rotateBitmapByExif(bitmap, exif);
             setBitmap = result.bitmap;
-            mDegreesRotated = result.degrees;
+            degreesRotated = result.degrees;
         } else {
             setBitmap = bitmap;
         }
         mCropOverlayView.setInitialCropWindowRect(null);
-        setBitmap(setBitmap);
+        setBitmap(setBitmap, 0, null, 1, degreesRotated);
     }
 
     /**
