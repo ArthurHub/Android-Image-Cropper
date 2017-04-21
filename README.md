@@ -116,6 +116,7 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 *2.4.1* (WIP)
 
 - Fix corners of crop overlay offset for oval shape resulting in confusing UI (#256).
+- Add `start` method that accepts `android.app.Fragment`, annotated with `@RequiresApi` 11
 
 *2.4.0*
 

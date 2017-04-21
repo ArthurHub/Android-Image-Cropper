@@ -35,6 +35,7 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 
 import java.io.File;
@@ -467,7 +468,27 @@ public final class CropImage {
          *
          * @param fragment fragment to receive result
          */
+        @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+        public void start(@NonNull Context context, @NonNull android.app.Fragment fragment) {
+            fragment.startActivityForResult(getIntent(context), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param fragment fragment to receive result
+         */
         public void start(@NonNull Context context, @NonNull Fragment fragment, @Nullable Class<?> cls) {
+            fragment.startActivityForResult(getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param fragment fragment to receive result
+         */
+        @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+        public void start(@NonNull Context context, @NonNull android.app.Fragment fragment, @Nullable Class<?> cls) {
             fragment.startActivityForResult(getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
         }
 
