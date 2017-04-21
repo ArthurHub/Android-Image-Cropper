@@ -113,6 +113,10 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.4.1* (WIP)
+
+- Fix corners of crop overlay offset for oval shape resulting in confusing UI (#256).
+
 *2.4.0*
 
 - Super simple crop activity quick start flow that handles URI and permissions (huge thanks to @adwiv)

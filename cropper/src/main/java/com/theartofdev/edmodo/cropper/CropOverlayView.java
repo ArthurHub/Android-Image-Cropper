@@ -784,7 +784,10 @@ public class CropOverlayView extends View {
 
             float lineWidth = mBorderPaint != null ? mBorderPaint.getStrokeWidth() : 0;
             float cornerWidth = mBorderCornerPaint.getStrokeWidth();
-            float w = cornerWidth / 2 + mBorderCornerOffset;
+
+            // for rectangle crop shape we allow the corners to be offset from the borders
+            float w = cornerWidth / 2 + (mCropShape == CropImageView.CropShape.RECTANGLE ? mBorderCornerOffset : 0);
+
             RectF rect = mCropWindowHandler.getRect();
             rect.inset(w, w);
 
