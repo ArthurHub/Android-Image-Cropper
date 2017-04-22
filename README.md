@@ -19,6 +19,13 @@ Include the library
  compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
  ```
 
+Add permissions to manifest
+
+ ```
+ <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+ <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+ ```
+
 ### Using Activity
 
 2. Add `CropImageActivity` into your AndroidManifest.xml
