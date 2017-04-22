@@ -1235,12 +1235,12 @@ public class CropImageView extends FrameLayout {
                 mDegreesRotated = bundle.getInt("DEGREES_ROTATED");
 
                 Rect initialCropRect = bundle.getParcelable("INITIAL_CROP_RECT");
-                if (initialCropRect != null && (initialCropRect.width() < 1 || initialCropRect.height() < 1)) {
+                if (initialCropRect != null && (initialCropRect.width() > 0 || initialCropRect.height() > 0)) {
                     mCropOverlayView.setInitialCropWindowRect(initialCropRect);
                 }
 
                 RectF cropWindowRect = bundle.getParcelable("CROP_WINDOW_RECT");
-                if (cropWindowRect != null && (cropWindowRect.width() < 1 || cropWindowRect.height() < 1)) {
+                if (cropWindowRect != null && (cropWindowRect.width() > 0 || cropWindowRect.height() > 0)) {
                     mRestoreCropWindowRect = cropWindowRect;
                 }
 
