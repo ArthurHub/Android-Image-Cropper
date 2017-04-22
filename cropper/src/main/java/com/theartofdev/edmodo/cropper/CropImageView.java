@@ -1151,6 +1151,10 @@ public class CropImageView extends FrameLayout {
 
     @Override
     public Parcelable onSaveInstanceState() {
+        if (mLoadedImageUri == null && mBitmap == null) {
+            return super.onSaveInstanceState();
+        }
+
         Bundle bundle = new Bundle();
         bundle.putParcelable("instanceState", super.onSaveInstanceState());
         bundle.putParcelable("LOADED_IMAGE_URI", mLoadedImageUri);
@@ -1230,9 +1234,15 @@ public class CropImageView extends FrameLayout {
 
                 mDegreesRotated = bundle.getInt("DEGREES_ROTATED");
 
-                mCropOverlayView.setInitialCropWindowRect((Rect) bundle.getParcelable("INITIAL_CROP_RECT"));
+                Rect initialCropRect = bundle.getParcelable("INITIAL_CROP_RECT");
+                if (initialCropRect != null && (initialCropRect.width() < 1 || initialCropRect.height() < 1)) {
+                    mCropOverlayView.setInitialCropWindowRect(initialCropRect);
+                }
 
-                mRestoreCropWindowRect = bundle.getParcelable("CROP_WINDOW_RECT");
+                RectF cropWindowRect = bundle.getParcelable("CROP_WINDOW_RECT");
+                if (cropWindowRect != null && (cropWindowRect.width() < 1 || cropWindowRect.height() < 1)) {
+                    mRestoreCropWindowRect = cropWindowRect;
+                }
 
                 mCropOverlayView.setCropShape(CropShape.valueOf(bundle.getString("CROP_SHAPE")));
 

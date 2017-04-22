@@ -122,6 +122,7 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 ## Change log
 *2.4.1* (WIP)
 
+- Fix instance state saved before any image loaded resulted in corrupted initial crop rectangle.
 - Fix corners of crop overlay offset for oval shape resulting in confusing UI (#256).
 - Fix support for negative rotation values for CropImageActivity.
 - Add `start` method that accepts `android.app.Fragment`, annotated with `@RequiresApi` 11
