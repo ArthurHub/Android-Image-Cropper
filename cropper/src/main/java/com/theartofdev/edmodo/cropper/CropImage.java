@@ -814,7 +814,7 @@ public final class CropImage {
          * <i>Default: NONE - will read image exif data</i>
          */
         public ActivityBuilder setInitialRotation(int initialRotation) {
-            mOptions.initialRotation = initialRotation;
+            mOptions.initialRotation = (initialRotation + 360) % 360;
             return this;
         }
 
@@ -851,7 +851,7 @@ public final class CropImage {
          * <i>Default: 90</i>
          */
         public ActivityBuilder setRotationDegrees(int rotationDegrees) {
-            mOptions.rotationDegrees = rotationDegrees;
+            mOptions.rotationDegrees = (rotationDegrees + 360) % 360;
             return this;
         }
 
