@@ -1,2 +1,8 @@
 gems:
   - jekyll-seo-tag
+
+title: Android Image Cropper
+description: Image Cropping Library for Android, optimized for Camera / Gallery.
+google_analytics: UA-52577707-4
+show_downloads: true
+theme: jekyll-theme-cayman
