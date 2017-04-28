@@ -125,9 +125,9 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 - Adding option to omit camera intents on getPickImageChooserIntent (thx Hugo Rossi)
 - Portuguese Language localization (thx Hugo Rossi)
 - Removed saving bitmap into parcel in `onSaveInstanceState` to prevent `TransactionTooLargeException`
- - By default nothing will happen and the view will be restored empty (if cropping image loaded using bitmap).
- - Added config `SaveBitmapToInstanceState` to enable saving bitmap to temp file so it can be restored (default is false because of possible performance implications).
- - Always prefer using URI to load image from cropping!
+  - By default nothing will happen and the view will be restored empty (if cropping image loaded using bitmap).
+  - Added config `SaveBitmapToInstanceState` to enable saving bitmap to temp file so it can be restored (default is false because of possible performance implications).
+  - Always prefer using URI to load image from cropping!
 - Fix restore state not restoring rotation.
 - Fix initial crop window may be in invalid position because reading previous image instance state.
 
