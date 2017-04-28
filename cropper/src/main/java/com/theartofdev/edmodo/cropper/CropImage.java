@@ -149,7 +149,7 @@ public final class CropImage {
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      */
     public static Intent getPickImageChooserIntent(@NonNull Context context) {
-        return getPickImageChooserIntent(context, context.getString(R.string.pick_image_intent_chooser_title), false);
+        return getPickImageChooserIntent(context, context.getString(R.string.pick_image_intent_chooser_title), false, true);
     }
 
     /**
@@ -160,14 +160,15 @@ public final class CropImage {
      * @param context used to access Android APIs, like content resolve, it is your activity/fragment/widget.
      * @param title the title to use for the chooser UI
      * @param includeDocuments if to include KitKat documents activity containing all sources
+     * @param includeCamera if to include camera intents
      */
-    public static Intent getPickImageChooserIntent(@NonNull Context context, CharSequence title, boolean includeDocuments) {
+    public static Intent getPickImageChooserIntent(@NonNull Context context, CharSequence title, boolean includeDocuments, boolean includeCamera) {
 
         List<Intent> allIntents = new ArrayList<>();
         PackageManager packageManager = context.getPackageManager();
 
         // collect all camera intents if Camera permission is available
-        if (!isExplicitCameraPermissionRequired(context)) {
+        if (!isExplicitCameraPermissionRequired(context) && includeCamera) {
             allIntents.addAll(getCameraIntents(context, packageManager));
         }
 
