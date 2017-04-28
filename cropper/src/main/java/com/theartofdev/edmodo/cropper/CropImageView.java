@@ -113,6 +113,15 @@ public class CropImageView extends FrameLayout {
     private ScaleType mScaleType;
 
     /**
+     * if to save bitmap on save instance state.<br>
+     * It is best to avoid it by using URI in setting image for cropping.<br>
+     * If false the bitmap is not saved and if restore is required to view will be empty, storing the bitmap
+     * requires saving it to file which can be expensive.
+     * default: false.
+     */
+    private boolean mSaveBitmapToInstanceState = false;
+
+    /**
      * if to show crop overlay UI what contains the crop window UI surrounded by background over the cropping
      * image.<br>
      * default: true, may disable for animation or frame transition.
@@ -260,6 +269,8 @@ public class CropImageView extends FrameLayout {
                     options.maxCropResultHeight = (int) ta.getFloat(R.styleable.CropImageView_cropMaxCropResultHeightPX, options.maxCropResultHeight);
                     options.flipHorizontally = ta.getBoolean(R.styleable.CropImageView_cropFlipHorizontally, options.flipHorizontally);
                     options.flipVertically = ta.getBoolean(R.styleable.CropImageView_cropFlipHorizontally, options.flipVertically);
+
+                    mSaveBitmapToInstanceState = ta.getBoolean(R.styleable.CropImageView_cropSaveBitmapToInstanceState, mSaveBitmapToInstanceState);
 
                     // if aspect ratio is set then set fixed to true
                     if (ta.hasValue(R.styleable.CropImageView_cropAspectRatioX) &&
@@ -564,6 +575,28 @@ public class CropImageView extends FrameLayout {
             mShowCropOverlay = showCropOverlay;
             setCropOverlayVisibility();
         }
+    }
+
+    /**
+     * if to save bitmap on save instance state.<br>
+     * It is best to avoid it by using URI in setting image for cropping.<br>
+     * If false the bitmap is not saved and if restore is required to view will be empty, storing the bitmap
+     * requires saving it to file which can be expensive.
+     * default: false.
+     */
+    public boolean isSaveBitmapToInstanceState() {
+        return mSaveBitmapToInstanceState;
+    }
+
+    /**
+     * if to save bitmap on save instance state.<br>
+     * It is best to avoid it by using URI in setting image for cropping.<br>
+     * If false the bitmap is not saved and if restore is required to view will be empty, storing the bitmap
+     * requires saving it to file which can be expensive.
+     * default: false.
+     */
+    public void setSaveBitmapToInstanceState(boolean saveBitmapToInstanceState) {
+        mSaveBitmapToInstanceState = saveBitmapToInstanceState;
     }
 
     /**
@@ -1149,7 +1182,7 @@ public class CropImageView extends FrameLayout {
 
         Bundle bundle = new Bundle();
         Uri imageUri = mLoadedImageUri;
-        if (imageUri == null && mImageResource < 1) {
+        if (mSaveBitmapToInstanceState && imageUri == null && mImageResource < 1) {
             mSaveInstanceStateBitmapUri = imageUri = BitmapUtils.writeTempStateStoreBitmap(getContext(), mBitmap, mSaveInstanceStateBitmapUri);
         }
         if (imageUri != null && mBitmap != null) {
