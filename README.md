@@ -120,6 +120,10 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.4.3* (WIP)
+
+- Adding option to omit camera intents on getPickImageChooserIntent (thx Hugo Rossi)
+
 *2.4.2*
 
 - Fix instance state saved before any image loaded resulted in corrupted initial crop rectangle.
