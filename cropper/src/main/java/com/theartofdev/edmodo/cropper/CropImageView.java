@@ -182,6 +182,11 @@ public class CropImageView extends FrameLayout {
     private RectF mRestoreCropWindowRect;
 
     /**
+     * Used to restore image rotation after state restore
+     */
+    private int mRestoreDegreesRotated;
+
+    /**
      * Used to detect size change to handle auto-zoom using {@link #handleCropWindowChanged(boolean, boolean)} in
      * {@link #layout(int, int, int, int)}.
      */
@@ -1213,7 +1218,7 @@ public class CropImageView extends FrameLayout {
                     }
                 }
 
-                mDegreesRotated = bundle.getInt("DEGREES_ROTATED");
+                mDegreesRotated = mRestoreDegreesRotated = bundle.getInt("DEGREES_ROTATED");
 
                 Rect initialCropRect = bundle.getParcelable("INITIAL_CROP_RECT");
                 if (initialCropRect != null && (initialCropRect.width() > 0 || initialCropRect.height() > 0)) {
@@ -1315,6 +1320,10 @@ public class CropImageView extends FrameLayout {
 
                 // after state restore we want to restore the window crop, possible only after widget size is known
                 if (mRestoreCropWindowRect != null) {
+                    if (mRestoreDegreesRotated != mInitialDegreesRotated) {
+                        mDegreesRotated = mRestoreDegreesRotated;
+                        applyImageMatrix(r - l, b - t, true, false);
+                    }
                     mImageMatrix.mapRect(mRestoreCropWindowRect);
                     mCropOverlayView.setCropWindowRect(mRestoreCropWindowRect);
                     handleCropWindowChanged(false, false);
