@@ -316,6 +316,32 @@ final class BitmapUtils {
     }
 
     /**
+     * Write given bitmap to a temp file.
+     * If file already exists no-op as we already saved the file in this session.
+     * Uses JPEG 95% compression.
+     *
+     * @param uri the uri to write the bitmap to, if null
+     * @return the uri where the image was saved in, either the given uri or new pointing to temp file.
+     */
+    static Uri writeTempStateStoreBitmap(Context context, Bitmap bitmap, Uri uri) {
+        try {
+            boolean needSave = true;
+            if (uri == null) {
+                uri = Uri.fromFile(File.createTempFile("aic_state_store_temp", ".jpg", context.getCacheDir()));
+            } else if (new File(uri.getPath()).exists()) {
+                needSave = false;
+            }
+            if (needSave) {
+                writeBitmapToUri(context, bitmap, uri, Bitmap.CompressFormat.JPEG, 95);
+            }
+            return uri;
+        } catch (Exception e) {
+            Log.w("AIC", "Failed to write bitmap to temp file for image-cropper save instance state", e);
+            return null;
+        }
+    }
+
+    /**
      * Write the given bitmap to the given uri using the given compression.
      */
     static void writeBitmapToUri(Context context, Bitmap bitmap, Uri uri, Bitmap.CompressFormat compressFormat, int compressQuality) throws FileNotFoundException {

@@ -188,6 +188,11 @@ public class CropImageView extends FrameLayout {
     private boolean mSizeChanged;
 
     /**
+     * Temp URI used to save bitmap image to disk to preserve for instance state in case cropped was set with bitmap
+     */
+    private Uri mSaveInstanceStateBitmapUri;
+
+    /**
      * Task used to load bitmap async from UI thread
      */
     private WeakReference<BitmapLoadingWorkerTask> mBitmapLoadingWorkerTask;
@@ -829,7 +834,7 @@ public class CropImageView extends FrameLayout {
      */
     public void setImageBitmap(Bitmap bitmap) {
         mCropOverlayView.setInitialCropWindowRect(null);
-        setBitmap(bitmap);
+        setBitmap(bitmap, 0, null, 1, 0);
     }
 
     /**
@@ -865,7 +870,7 @@ public class CropImageView extends FrameLayout {
         if (resId != 0) {
             mCropOverlayView.setInitialCropWindowRect(null);
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
-            setBitmap(bitmap, resId);
+            setBitmap(bitmap, resId, null, 1, 0);
         }
     }
 
@@ -1000,7 +1005,7 @@ public class CropImageView extends FrameLayout {
 
         if (result.error == null) {
             mInitialDegreesRotated = result.degreesRotated;
-            setBitmap(result.bitmap, result.uri, result.loadSampleSize, result.degreesRotated);
+            setBitmap(result.bitmap, 0, result.uri, result.loadSampleSize, result.degreesRotated);
         }
 
         OnSetImageUriCompleteListener listener = mOnSetImageUriCompleteListener;
@@ -1025,27 +1030,6 @@ public class CropImageView extends FrameLayout {
                     getCropPoints(), getCropRect(), getRotatedDegrees(), result.sampleSize);
             listener.onCropImageComplete(this, cropResult);
         }
-    }
-
-    /**
-     * {@link #setBitmap(Bitmap, int, Uri, int, int)}}
-     */
-    private void setBitmap(Bitmap bitmap) {
-        setBitmap(bitmap, 0, null, 1, 0);
-    }
-
-    /**
-     * {@link #setBitmap(Bitmap, int, Uri, int, int)}}
-     */
-    private void setBitmap(Bitmap bitmap, int imageResource) {
-        setBitmap(bitmap, imageResource, null, 1, 0);
-    }
-
-    /**
-     * {@link #setBitmap(Bitmap, int, Uri, int, int)}}
-     */
-    private void setBitmap(Bitmap bitmap, Uri imageUri, int loadSampleSize, int degreesRotated) {
-        setBitmap(bitmap, 0, imageUri, loadSampleSize, degreesRotated);
     }
 
     /**
@@ -1098,6 +1082,7 @@ public class CropImageView extends FrameLayout {
         mZoomOffsetX = 0;
         mZoomOffsetY = 0;
         mImageMatrix.reset();
+        mSaveInstanceStateBitmapUri = null;
 
         mImageView.setImageBitmap(null);
 
@@ -1151,18 +1136,16 @@ public class CropImageView extends FrameLayout {
 
     @Override
     public Parcelable onSaveInstanceState() {
-        if (mLoadedImageUri == null && mBitmap == null) {
+        if (mLoadedImageUri == null && mBitmap == null && mImageResource < 1) {
             return super.onSaveInstanceState();
         }
 
         Bundle bundle = new Bundle();
-        bundle.putParcelable("instanceState", super.onSaveInstanceState());
-        bundle.putParcelable("LOADED_IMAGE_URI", mLoadedImageUri);
-        bundle.putInt("LOADED_IMAGE_RESOURCE", mImageResource);
-        if (mLoadedImageUri == null && mImageResource < 1) {
-            bundle.putParcelable("SET_BITMAP", mBitmap);
+        Uri imageUri = mLoadedImageUri;
+        if (imageUri == null && mImageResource < 1) {
+            mSaveInstanceStateBitmapUri = imageUri = BitmapUtils.writeTempStateStoreBitmap(getContext(), mBitmap, mSaveInstanceStateBitmapUri);
         }
-        if (mLoadedImageUri != null && mBitmap != null) {
+        if (imageUri != null && mBitmap != null) {
             String key = UUID.randomUUID().toString();
             BitmapUtils.mStateBitmap = new Pair<>(key, new WeakReference<>(mBitmap));
             bundle.putString("LOADED_IMAGE_STATE_BITMAP_KEY", key);
@@ -1173,6 +1156,9 @@ public class CropImageView extends FrameLayout {
                 bundle.putParcelable("LOADING_IMAGE_URI", task.getUri());
             }
         }
+        bundle.putParcelable("instanceState", super.onSaveInstanceState());
+        bundle.putParcelable("LOADED_IMAGE_URI", imageUri);
+        bundle.putInt("LOADED_IMAGE_RESOURCE", mImageResource);
         bundle.putInt("LOADED_SAMPLE_SIZE", mLoadedSampleSize);
         bundle.putInt("DEGREES_ROTATED", mDegreesRotated);
         bundle.putParcelable("INITIAL_CROP_RECT", mCropOverlayView.getInitialCropWindowRect());
@@ -1207,9 +1193,9 @@ public class CropImageView extends FrameLayout {
                     if (key != null) {
                         Bitmap stateBitmap = BitmapUtils.mStateBitmap != null && BitmapUtils.mStateBitmap.first.equals(key)
                                 ? BitmapUtils.mStateBitmap.second.get() : null;
+                        BitmapUtils.mStateBitmap = null;
                         if (stateBitmap != null && !stateBitmap.isRecycled()) {
-                            BitmapUtils.mStateBitmap = null;
-                            setBitmap(stateBitmap, uri, bundle.getInt("LOADED_SAMPLE_SIZE"), 0);
+                            setBitmap(stateBitmap, 0, uri, bundle.getInt("LOADED_SAMPLE_SIZE"), 0);
                         }
                     }
                     if (mLoadedImageUri == null) {
@@ -1220,14 +1206,9 @@ public class CropImageView extends FrameLayout {
                     if (resId > 0) {
                         setImageResource(resId);
                     } else {
-                        Bitmap bitmap = bundle.getParcelable("SET_BITMAP");
-                        if (bitmap != null) {
-                            setBitmap(bitmap);
-                        } else {
-                            uri = bundle.getParcelable("LOADING_IMAGE_URI");
-                            if (uri != null) {
-                                setImageUriAsync(uri);
-                            }
+                        uri = bundle.getParcelable("LOADING_IMAGE_URI");
+                        if (uri != null) {
+                            setImageUriAsync(uri);
                         }
                     }
                 }
