@@ -123,7 +123,8 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 *2.4.3* (WIP)
 
 - Adding option to omit camera intents on getPickImageChooserIntent (thx Hugo Rossi)
-- Fix restore state not restoring rotation
+- Fix restore state not restoring rotation.
+- Fix initial crop window invalid position because reading previous image instance state.
 
 *2.4.2*
 

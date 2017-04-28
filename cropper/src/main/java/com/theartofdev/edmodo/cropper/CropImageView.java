@@ -896,6 +896,8 @@ public class CropImageView extends FrameLayout {
 
             // either no existing task is working or we canceled it, need to load new URI
             clearImageInt();
+            mRestoreCropWindowRect = null;
+            mRestoreDegreesRotated = 0;
             mCropOverlayView.setInitialCropWindowRect(null);
             mBitmapLoadingWorkerTask = new WeakReference<>(new BitmapLoadingWorkerTask(this, uri));
             mBitmapLoadingWorkerTask.get().execute();
