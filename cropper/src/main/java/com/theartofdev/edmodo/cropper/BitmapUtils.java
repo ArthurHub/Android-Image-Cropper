@@ -27,13 +27,17 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Pair;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.util.UUID;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -80,13 +84,19 @@ final class BitmapUtils {
      * New bitmap is created and the old one is recycled.
      */
     static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, Context context, Uri uri) {
+        File file = null;
         try {
-            File file = getFileFromUri(context, uri);
+            file = getFileFromUri(context, uri);
             if (file.exists()) {
                 ExifInterface ei = new ExifInterface(file.getAbsolutePath());
                 return rotateBitmapByExif(bitmap, ei);
             }
         } catch (Exception ignored) {
+        } finally {
+            boolean tempFile = file != null && file.getParentFile().equals(context.getCacheDir());
+            if (tempFile) {
+                file.delete();
+            }
         }
         return new RotateBitmapResult(bitmap, 0);
     }
@@ -620,7 +630,8 @@ final class BitmapUtils {
 
     /**
      * Get {@link File} object for the given Android URI.<br>
-     * Use content resolver to get real path if direct path doesn't return valid file.
+     * Use content resolver to get real path if direct path doesn't return valid file
+     * or save uri's content to temporary file.
      */
     private static File getFileFromUri(Context context, Uri uri) {
 
@@ -631,6 +642,21 @@ final class BitmapUtils {
         }
 
         // try reading real path from content resolver (gallery images)
+        file = tryGetFileFromContentUri(context, uri);
+        if (file != null) {
+            return file;
+        }
+
+        // uri is nether file:// or gallery content:// . Just save content to temp file
+        return saveUriContentToTempFile(context, uri);
+    }
+
+    /**
+     * Try to get {@link File} corresponding to given Android URI.<br>
+     *
+     * @return a existed file for given URI or {@code null} otherwise.
+     */
+    private static File tryGetFileFromContentUri(Context context, Uri uri) {
         Cursor cursor = null;
         try {
             String[] proj = {MediaStore.Images.Media.DATA};
@@ -639,7 +665,8 @@ final class BitmapUtils {
                 int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
                 cursor.moveToFirst();
                 String realPath = cursor.getString(column_index);
-                file = new File(realPath);
+                File file = new File(realPath);
+                return file.exists() ? file : null;
             }
         } catch (Exception ignored) {
         } finally {
@@ -648,6 +675,29 @@ final class BitmapUtils {
             }
         }
 
+        return null;
+    }
+
+    /**
+     * Save content of Android URI to temp file.<br>
+     */
+    private static File saveUriContentToTempFile(Context context, Uri uri) {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        File file = new File(context.getCacheDir(), UUID.randomUUID().toString() + ".image");
+        try {
+            ContentResolver contentResolver = context.getContentResolver();
+            inputStream = contentResolver.openInputStream(uri);
+            outputStream = new FileOutputStream(file);
+            copy(inputStream, outputStream);
+        } catch (Exception ignored) {
+            if (file.exists()) {
+                file.delete();
+            }
+        } finally {
+            closeSafe(inputStream);
+            closeSafe(outputStream);
+        }
         return file;
     }
 
@@ -732,6 +782,28 @@ final class BitmapUtils {
             } catch (IOException ignored) {
             }
         }
+    }
+
+    /**
+     * Copy bytes from an {@code InputStream} to an {@code OutputStream}.
+     * <p>
+     * This method buffers the input internally, so there is no need to use a {@code BufferedInputStream}. Method doesn't close
+     * streams after copying.
+     * </p>
+     *
+     * @param input  the {@code InputStream} to read from.
+     * @param output the {@code OutputStream} to write to.
+     * @throws IOException if an I/O error occurs or if the input or output is {@code null}
+     */
+    public static void copy(InputStream input, OutputStream output) throws IOException {
+        InputStream bufferedInputStream = new BufferedInputStream(input);
+        OutputStream bufferedOutputStream = new BufferedOutputStream(output);
+        byte[] buffer = new byte[8 * 1024];
+        int readBytes;
+        while ((readBytes = bufferedInputStream.read(buffer)) != -1) {
+            bufferedOutputStream.write(buffer, 0, readBytes);
+        }
+        bufferedOutputStream.flush();
     }
     //endregion
 
