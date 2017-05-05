@@ -14,16 +14,14 @@ package com.theartofdev.edmodo.cropper;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.media.ExifInterface;
 import android.net.Uri;
-import android.provider.MediaStore;
+import android.support.media.ExifInterface;
 import android.util.Log;
 import android.util.Pair;
 
@@ -80,15 +78,18 @@ final class BitmapUtils {
      * New bitmap is created and the old one is recycled.
      */
     static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, Context context, Uri uri) {
+        ExifInterface ei = null;
         try {
-            File file = getFileFromUri(context, uri);
-            if (file.exists()) {
-                ExifInterface ei = new ExifInterface(file.getAbsolutePath());
-                return rotateBitmapByExif(bitmap, ei);
+            InputStream is = context.getContentResolver().openInputStream(uri);
+            if (is != null) {
+                ei = new ExifInterface(is);
+                is.close();
             }
         } catch (Exception ignored) {
         }
-        return new RotateBitmapResult(bitmap, 0);
+        return ei != null
+                ? rotateBitmapByExif(bitmap, ei)
+                : new RotateBitmapResult(bitmap, 0);
     }
 
     /**
@@ -619,39 +620,6 @@ final class BitmapUtils {
     }
 
     /**
-     * Get {@link File} object for the given Android URI.<br>
-     * Use content resolver to get real path if direct path doesn't return valid file.
-     */
-    private static File getFileFromUri(Context context, Uri uri) {
-
-        // first try by direct path
-        File file = new File(uri.getPath());
-        if (file.exists()) {
-            return file;
-        }
-
-        // try reading real path from content resolver (gallery images)
-        Cursor cursor = null;
-        try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = context.getContentResolver().query(uri, proj, null, null, null);
-            if (cursor != null) {
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                cursor.moveToFirst();
-                String realPath = cursor.getString(column_index);
-                file = new File(realPath);
-            }
-        } catch (Exception ignored) {
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-
-        return file;
-    }
-
-    /**
      * Rotate the given bitmap by the given degrees.<br>
      * New bitmap is created and the old one is recycled.
      */
@@ -762,7 +730,7 @@ final class BitmapUtils {
     //region: Inner class: RotateBitmapResult
 
     /**
-     * The result of {@link #rotateBitmapByExif(android.graphics.Bitmap, android.media.ExifInterface)}.
+     * The result of {@link #rotateBitmapByExif(android.graphics.Bitmap, ExifInterface)}.
      */
     static final class RotateBitmapResult {
 
