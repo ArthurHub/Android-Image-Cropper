@@ -38,6 +38,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 
+import com.bluelinelabs.conductor.Controller;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -491,6 +493,25 @@ public final class CropImage {
         @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
         public void start(@NonNull Context context, @NonNull android.app.Fragment fragment, @Nullable Class<?> cls) {
             fragment.startActivityForResult(getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param controller controller to receive result
+         */
+        public void start(@NonNull Context context, @NonNull Controller controller) {
+            controller.startActivityForResult(getIntent(context), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+
+        /**
+         * Start {@link CropImageActivity}.
+         *
+         * @param controller controller to receive result
+         */
+        public void start(@NonNull Context context, @NonNull Controller controller, @Nullable Class<?> cls) {
+            controller.startActivityForResult(getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
         }
 
         /**
