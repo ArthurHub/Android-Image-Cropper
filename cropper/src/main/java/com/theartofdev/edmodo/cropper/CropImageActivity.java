@@ -274,7 +274,7 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
      */
     protected Uri getOutputUri() {
         Uri outputUri = mOptions.outputUri;
-        if (outputUri.equals(Uri.EMPTY)) {
+        if (outputUri == null || outputUri.equals(Uri.EMPTY)) {
             try {
                 String ext = mOptions.outputCompressFormat == Bitmap.CompressFormat.JPEG ? ".jpg" :
                         mOptions.outputCompressFormat == Bitmap.CompressFormat.PNG ? ".png" : ".webp";
