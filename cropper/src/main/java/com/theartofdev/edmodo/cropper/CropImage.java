@@ -276,11 +276,9 @@ public final class CropImage {
      * question</a>.
      */
     public static boolean isExplicitCameraPermissionRequired(@NonNull Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return hasPermissionInManifest(context, "android.permission.CAMERA") &&
-                    context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED;
-        }
-        return false;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                hasPermissionInManifest(context, "android.permission.CAMERA") &&
+                context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED;
     }
 
     /**
@@ -363,7 +361,9 @@ public final class CropImage {
         try {
             ContentResolver resolver = context.getContentResolver();
             InputStream stream = resolver.openInputStream(uri);
-            stream.close();
+            if (stream != null) {
+                stream.close();
+            }
             return false;
         } catch (Exception e) {
             return true;
@@ -371,8 +371,20 @@ public final class CropImage {
     }
 
     /**
+     * Create {@link ActivityBuilder} instance to open image picker for cropping and then start
+     * {@link CropImageActivity} to crop the selected image.<br>
+     * Result will be received in {@link Activity#onActivityResult(int, int, Intent)} and can be retrieved
+     * using {@link #getActivityResult(Intent)}.
+     *
+     * @return builder for Crop Image Activity
+     */
+    public static ActivityBuilder activity() {
+        return new ActivityBuilder(null);
+    }
+
+    /**
      * Create {@link ActivityBuilder} instance to start {@link CropImageActivity} to crop the given image.<br>
-     * Result will be recieved in {@link Activity#onActivityResult(int, int, Intent)} and can be retrieved
+     * Result will be received in {@link Activity#onActivityResult(int, int, Intent)} and can be retrieved
      * using {@link #getActivityResult(Intent)}.
      *
      * @param uri the image Android uri source to crop or null to start a picker

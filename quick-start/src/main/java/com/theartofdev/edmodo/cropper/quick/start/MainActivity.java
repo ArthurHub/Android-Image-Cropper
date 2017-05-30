@@ -13,7 +13,6 @@
 package com.theartofdev.edmodo.cropper.quick.start;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -35,7 +34,10 @@ public class MainActivity extends AppCompatActivity {
      * Start pick image activity with chooser.
      */
     public void onSelectImageClick(View view) {
-        startCropImageActivity(null);
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setMultiTouchEnabled(true)
+                .start(this);
     }
 
     @Override
@@ -51,15 +53,5 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    /**
-     * Start crop image activity for the given image.
-     */
-    private void startCropImageActivity(Uri imageUri) {
-        CropImage.activity(imageUri)
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .setMultiTouchEnabled(true)
-                .start(this);
     }
 }
