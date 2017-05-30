@@ -121,8 +121,9 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
-*2.4.5*
+*2.4.6*
 - Fix undefined drawable in Android Studio 3.0 (thx @adrien-aubel)
+- Added `CropImage.activity()` overload without `uri` parameter (thx @jake32321)
 
 *2.4.4*
 - Fix image exif (rotation) data not always extracted during image loading (thx @danikula).
