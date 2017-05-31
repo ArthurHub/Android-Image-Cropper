@@ -1,4 +1,5 @@
-<manifest
+<manifest xmlns:tools="http://schemas.android.com/tools"
     package="com.theartofdev.edmodo.cropper">
 
+    <uses-sdk tools:overrideLibrary="com.bluelinelabs.conductor" />
 </manifest>
