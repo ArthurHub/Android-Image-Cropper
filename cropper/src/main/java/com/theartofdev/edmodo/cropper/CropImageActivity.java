@@ -91,6 +91,10 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
             actionBar.setTitle(title);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        if (mOptions.activityBackgroundColor != 0) {
+            mCropImageView.setBackgroundColor(mOptions.activityBackgroundColor);
+        }
     }
 
     @Override

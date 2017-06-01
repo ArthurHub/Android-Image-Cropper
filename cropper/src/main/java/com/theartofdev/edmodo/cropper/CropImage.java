@@ -757,6 +757,15 @@ public final class CropImage {
         }
 
         /**
+         * the color to use for activity background
+         * <i>Default: NONE</i>
+         */
+        public ActivityBuilder setActivityBackgroundColor(int activityBackgroundColor) {
+            mOptions.activityBackgroundColor = activityBackgroundColor;
+            return this;
+        }
+
+        /**
          * the Android Uri to save the cropped image to.<br>
          * <i>Default: NONE, will create a temp file</i>
          */
