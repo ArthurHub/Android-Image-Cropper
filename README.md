@@ -38,7 +38,7 @@ Add permissions to manifest
 3. Start `CropImageActivity` using builder pattern from your activity
  ```java
  // start picker to get image for cropping and then use the image in cropping activity
- CropImage.activity()
+ CropImage.activity(imageUri)
    .setGuidelines(CropImageView.Guidelines.ON)
    .start(this);
 
@@ -47,7 +47,7 @@ Add permissions to manifest
   .start(this);
 
  // for fragment (DO NOT use `getActivity()`)
- CropImage.activity()
+ CropImage.activity(imageUri)
    .start(getContext(), this);
  ```
 
