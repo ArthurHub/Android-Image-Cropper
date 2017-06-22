@@ -141,6 +141,17 @@ public final class CropImage {
     }
 
     /**
+     * Same as {@link #startPickImageActivity(Activity) startPickImageActivity} method but instead
+     * of being called and returning to an Activity, this method can be called and return to a Fragment.
+     *
+     * @param context The Fragments context. Use getContext()
+     * @param fragment The calling Fragment to start and return the image to
+     */
+    public static void startPickImageActivity(@NonNull Context context, @NonNull Fragment fragment) {
+        fragment.startActivityForResult(getPickImageChooserIntent(context),PICK_IMAGE_CHOOSER_REQUEST_CODE);
+    }
+
+    /**
      * Create a chooser intent to select the  source to get image from.<br>
      * The source can be camera's  (ACTION_IMAGE_CAPTURE) or gallery's (ACTION_GET_CONTENT).<br>
      * All possible sources are added to the intent chooser.<br>
