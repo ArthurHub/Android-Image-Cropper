@@ -314,6 +314,7 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
                 mCropImageView.getCropPoints(),
                 mCropImageView.getCropRect(),
                 mCropImageView.getRotatedDegrees(),
+                mCropImageView.getWholeImageRect(),
                 sampleSize);
         Intent intent = new Intent();
         intent.putExtra(CropImage.CROP_IMAGE_EXTRA_RESULT, result);

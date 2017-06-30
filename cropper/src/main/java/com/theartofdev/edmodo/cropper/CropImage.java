@@ -908,8 +908,8 @@ public final class CropImage {
         };
 
         public ActivityResult(Uri originalUri, Uri uri, Exception error,
-                              float[] cropPoints, Rect cropRect, int rotation, int sampleSize) {
-            super(null, originalUri, null, uri, error, cropPoints, cropRect, rotation, sampleSize);
+                              float[] cropPoints, Rect cropRect, int rotation, Rect wholeImageRect, int sampleSize) {
+            super(null, originalUri, null, uri, error, cropPoints, cropRect, wholeImageRect, rotation, sampleSize);
         }
 
         protected ActivityResult(Parcel in) {
@@ -919,6 +919,7 @@ public final class CropImage {
                     (Uri) in.readParcelable(Uri.class.getClassLoader()),
                     (Exception) in.readSerializable(),
                     in.createFloatArray(),
+                    (Rect) in.readParcelable(Rect.class.getClassLoader()),
                     (Rect) in.readParcelable(Rect.class.getClassLoader()),
                     in.readInt(),
                     in.readInt());
@@ -931,6 +932,7 @@ public final class CropImage {
             dest.writeSerializable(getError());
             dest.writeFloatArray(getCropPoints());
             dest.writeParcelable(getCropRect(), flags);
+            dest.writeParcelable(getWholeImageRect(), flags);
             dest.writeInt(getRotation());
             dest.writeInt(getSampleSize());
         }
