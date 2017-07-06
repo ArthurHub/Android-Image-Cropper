@@ -614,6 +614,17 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * Gets the source Bitmap's dimensions. This represents the largest possible crop rectangle.
+     *
+     * @return a Rect instance dimensions of the source Bitmap
+     */
+    public Rect getWholeImageRect() {
+        int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
+        int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
+        return new Rect(0, 0, orgWidth, orgHeight);
+    }
+
+    /**
      * Gets the crop window's position relative to the source Bitmap (not the image
      * displayed in the CropImageView) using the original image rotation.
      *
@@ -1067,7 +1078,7 @@ public class CropImageView extends FrameLayout {
         OnCropImageCompleteListener listener = mOnCropImageCompleteListener;
         if (listener != null) {
             CropResult cropResult = new CropResult(mBitmap, mLoadedImageUri, result.bitmap, result.uri, result.error,
-                    getCropPoints(), getCropRect(), getRotatedDegrees(), result.sampleSize);
+                    getCropPoints(), getCropRect(), getWholeImageRect(), getRotatedDegrees(), result.sampleSize);
             listener.onCropImageComplete(this, cropResult);
         }
     }
@@ -1806,6 +1817,11 @@ public class CropImageView extends FrameLayout {
         private final Rect mCropRect;
 
         /**
+         * The rectangle of the source image dimensions
+         */
+        private final Rect mWholeImageRect;
+
+        /**
          * The final rotation of the cropped image relative to source
          */
         private final int mRotation;
@@ -1816,7 +1832,7 @@ public class CropImageView extends FrameLayout {
         private final int mSampleSize;
 
         CropResult(Bitmap originalBitmap, Uri originalUri, Bitmap bitmap, Uri uri, Exception error,
-                   float[] cropPoints, Rect cropRect, int rotation, int sampleSize) {
+                   float[] cropPoints, Rect cropRect, Rect wholeImageRect, int rotation, int sampleSize) {
             mOriginalBitmap = originalBitmap;
             mOriginalUri = originalUri;
             mBitmap = bitmap;
@@ -1824,6 +1840,7 @@ public class CropImageView extends FrameLayout {
             mError = error;
             mCropPoints = cropPoints;
             mCropRect = cropRect;
+            mWholeImageRect = wholeImageRect;
             mRotation = rotation;
             mSampleSize = sampleSize;
         }
@@ -1886,6 +1903,13 @@ public class CropImageView extends FrameLayout {
          */
         public Rect getCropRect() {
             return mCropRect;
+        }
+
+        /**
+         * The rectangle of the source image dimensions
+         */
+        public Rect getWholeImageRect() {
+            return mWholeImageRect;
         }
 
         /**
