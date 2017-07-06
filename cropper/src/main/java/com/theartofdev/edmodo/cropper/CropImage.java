@@ -30,6 +30,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
@@ -453,8 +454,10 @@ public final class CropImage {
 
             Intent intent = new Intent();
             intent.setClass(context, cls);
-            intent.putExtra(CROP_IMAGE_EXTRA_SOURCE, mSource);
-            intent.putExtra(CROP_IMAGE_EXTRA_OPTIONS, mOptions);
+            Bundle b = new Bundle();
+            b.putParcelable(CROP_IMAGE_EXTRA_SOURCE, mSource);
+            b.putParcelable(CROP_IMAGE_EXTRA_OPTIONS, mOptions);
+            intent.putExtra("bundle", b);
             return intent;
         }
 

@@ -62,9 +62,9 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
 
         mCropImageView = (CropImageView) findViewById(R.id.cropImageView);
 
-        Intent intent = getIntent();
-        mCropImageUri = intent.getParcelableExtra(CropImage.CROP_IMAGE_EXTRA_SOURCE);
-        mOptions = intent.getParcelableExtra(CropImage.CROP_IMAGE_EXTRA_OPTIONS);
+        Bundle bundle = getIntent().getBundleExtra("bundle");
+        mCropImageUri = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE);
+        mOptions = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS);
 
         if (savedInstanceState == null) {
             if (mCropImageUri == null || mCropImageUri.equals(Uri.EMPTY)) {
