@@ -227,7 +227,10 @@ public class CropImageView extends FrameLayout {
         CropImageOptions options = null;
         Intent intent = context instanceof Activity ? ((Activity) context).getIntent() : null;
         if (intent != null) {
-            options = intent.getParcelableExtra(CropImage.CROP_IMAGE_EXTRA_OPTIONS);
+            Bundle bundle = intent.getBundleExtra(CropImageOptions.BUNDLE_KEY);
+            if (bundle != null) {
+                options = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS);
+            }
         }
 
         if (options == null) {

@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         CropImage.activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .setActivityTitle("My Crop")
+                .setCropShape(CropImageView.CropShape.OVAL)
+                .setRequestedSize(400, 400)
                 .start(this);
     }
 
