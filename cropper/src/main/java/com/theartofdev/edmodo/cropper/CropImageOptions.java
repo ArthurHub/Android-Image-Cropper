@@ -19,6 +19,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
@@ -87,10 +88,10 @@ public class CropImageOptions implements Parcelable {
      */
     public boolean autoZoomEnabled;
 
-  /**
-   * if multi-touch should be enabled on the crop box
-   * default: false
-   */
+    /**
+     * if multi-touch should be enabled on the crop box
+     * default: false
+     */
     public boolean multiTouchEnabled;
 
     /**
@@ -196,7 +197,7 @@ public class CropImageOptions implements Parcelable {
     /**
      * the title of the {@link CropImageActivity}
      */
-    public String activityTitle;
+    public CharSequence activityTitle;
 
     /**
      * the color to use for action bar items icons
@@ -373,7 +374,7 @@ public class CropImageOptions implements Parcelable {
         minCropResultHeight = in.readInt();
         maxCropResultWidth = in.readInt();
         maxCropResultHeight = in.readInt();
-        activityTitle = in.readString();
+        activityTitle = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
         activityMenuIconColor = in.readInt();
         outputUri = in.readParcelable(Uri.class.getClassLoader());
         outputCompressFormat = Bitmap.CompressFormat.valueOf(in.readString());
@@ -423,7 +424,7 @@ public class CropImageOptions implements Parcelable {
         dest.writeInt(minCropResultHeight);
         dest.writeInt(maxCropResultWidth);
         dest.writeInt(maxCropResultHeight);
-        dest.writeString(activityTitle);
+        TextUtils.writeToParcel(activityTitle, dest, flags);
         dest.writeInt(activityMenuIconColor);
         dest.writeParcelable(outputUri, flags);
         dest.writeString(outputCompressFormat.name());

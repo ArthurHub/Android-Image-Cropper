@@ -123,6 +123,7 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 ## Change log
 *2.4.7*
 - Fix toolbar menu crop icon sometimes appears with random icon (#305)
+- Use CharSequence instead of string for activity title (thx @KentHawkings) (#297)
 - Fix class not found exception on some Samsung devices (Huge thanks to @Vantablack) (#332)
 - Add original image dimensions to CropResult (Thanks @gazialankus) (#327)
 - Making the library JitPack-friendly (Thanks @gazialankus) (#325)

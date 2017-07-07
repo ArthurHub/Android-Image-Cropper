@@ -756,7 +756,7 @@ public final class CropImage {
          * the title of the {@link CropImageActivity}.<br>
          * <i>Default: ""</i>
          */
-        public ActivityBuilder setActivityTitle(String activityTitle) {
+        public ActivityBuilder setActivityTitle(CharSequence activityTitle) {
             mOptions.activityTitle = activityTitle;
             return this;
         }

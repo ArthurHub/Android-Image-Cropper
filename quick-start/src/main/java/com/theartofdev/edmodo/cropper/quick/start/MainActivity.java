@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     public void onSelectImageClick(View view) {
         CropImage.activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
-                .setMultiTouchEnabled(true)
+                .setActivityTitle("My Crop")
                 .start(this);
     }
 

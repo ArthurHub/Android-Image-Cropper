@@ -87,7 +87,7 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            String title = mOptions.activityTitle != null && !mOptions.activityTitle.isEmpty()
+            CharSequence title = mOptions.activityTitle != null && mOptions.activityTitle.length() > 0
                     ? mOptions.activityTitle
                     : getResources().getString(R.string.crop_image_activity_title);
             actionBar.setTitle(title);
