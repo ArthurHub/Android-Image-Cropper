@@ -121,47 +121,19 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.4.7*
+- Fix toolbar menu crop icon sometimes appears with random icon (#305)
+- Fix class not found exception on some Samsung devices (Huge thanks to @Vantablack) (#332)
+- Add original image dimensions to CropResult (Thanks @gazialankus) (#327)
+- Making the library JitPack-friendly (Thanks @gazialankus) (#325)
+- Allow a Fragment to call the startPickImageActivity help method in CropImage (Thanks @cdavietei) (#315)
+
 *2.4.6*
 - Fix undefined drawable in Android Studio 3.0 (thx @adrien-aubel)
 - Added `CropImage.activity()` overload without `uri` parameter (thx @jake32321)
 
 *2.4.4*
 - Fix image exif (rotation) data not always extracted during image loading (thx @danikula).
-
-*2.4.3*
-
-- Adding option to omit camera intents on getPickImageChooserIntent (thx Hugo Rossi)
-- Portuguese Language localization (thx Hugo Rossi)
-- Removed saving bitmap into parcel in `onSaveInstanceState` to prevent `TransactionTooLargeException`
-  - By default nothing will happen and the view will be restored empty (if cropping image loaded using bitmap).
-  - Added config `SaveBitmapToInstanceState` to enable saving bitmap to temp file so it can be restored (default is false because of possible performance implications).
-  - Always prefer using URI to load image from cropping!
-- Fix restore state not restoring rotation.
-- Fix initial crop window may be in invalid position because reading previous image instance state.
-
-*2.4.2*
-
-- Fix instance state saved before any image loaded resulted in corrupted initial crop rectangle.
-- Fix corners of crop overlay offset for oval shape resulting in confusing UI (#256).
-- Fix support for negative rotation values for CropImageActivity.
-- Add `start` method that accepts `android.app.Fragment`, annotated with `@RequiresApi` 11
-
-*2.4.0*
-
-- Super simple crop activity quick start flow that handles URI and permissions (huge thanks to @adwiv)
-- Add image horizontal/vertical flipping during cropping (huge thanks to @tibbi).
-- Handle OOM error for cropping set bitmap object, previously only image set by URI handled OOM.
-- Allows for rotation degrees to be negative, fixes operator-precedence-related bug in flipAxes computation (thx Tim Cooke)
-- Added crop overlay released listener (thx Richard Yee)
-- Added originalUri and originalBitmap to CropResult object.
-- Fix `resetCropRect()` resetting image rotation to 0 instead of the original exif data.
-- Fix ignoring image rotation data in `setImageBitmap(Bitmap, ExifInterface )` method.
-- Removed deprecated listeners.
-
-*2.3.1*
-
-- Fix image picker for xiaomi and huawei phones (thx @nicolabeghin)
-- Fix crop window get corrupted on `CropImageView` resize.
 
 See [full change log](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log).
 

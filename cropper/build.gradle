@@ -9,7 +9,7 @@ group='com.github.ArthurHub'
 ext {
     PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
     PUBLISH_ARTIFACT_ID = 'android-image-cropper'
-    PUBLISH_VERSION = '2.4.6'
+    PUBLISH_VERSION = '2.4.7'
     // gradlew clean build generateRelease
 }
 
