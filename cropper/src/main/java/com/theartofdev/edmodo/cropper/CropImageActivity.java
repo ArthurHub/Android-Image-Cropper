@@ -26,6 +26,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -124,11 +126,14 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
 
         Drawable cropIcon = null;
         try {
-            cropIcon = ContextCompat.getDrawable(this, R.drawable.crop_image_menu_crop);
-            if (cropIcon != null) {
+            TypedValue typedValue = new TypedValue();
+            getResources().getValue(R.drawable.crop_image_menu_crop, typedValue, false);
+            if (typedValue.data != R.drawable.crop_image_menu_crop_stub) {
+                cropIcon = ContextCompat.getDrawable(this, R.drawable.crop_image_menu_crop);
                 menu.findItem(R.id.crop_image_menu_crop).setIcon(cropIcon);
             }
         } catch (Exception e) {
+            Log.w("AIC", "Failed to read menu crop drawable", e);
         }
 
         if (mOptions.activityMenuIconColor != 0) {
@@ -334,6 +339,7 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
                     menuItemIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
                     menuItem.setIcon(menuItemIcon);
                 } catch (Exception e) {
+                    Log.w("AIC", "Failed to update menu item color", e);
                 }
             }
         }
