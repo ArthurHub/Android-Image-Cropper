@@ -622,6 +622,10 @@ public class CropImageView extends FrameLayout {
      * @return a Rect instance dimensions of the source Bitmap
      */
     public Rect getWholeImageRect() {
+        if (mBitmap == null) {
+            return null;
+        }
+        
         int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
         int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
         return new Rect(0, 0, orgWidth, orgHeight);
