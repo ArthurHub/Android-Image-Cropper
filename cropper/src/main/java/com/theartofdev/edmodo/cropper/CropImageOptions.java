@@ -281,6 +281,12 @@ public class CropImageOptions implements Parcelable {
      */
     public boolean flipVertically;
 
+
+    /**
+     * the title of the  CropMenu
+     */
+    public CharSequence cropMenuTitle;
+
     /**
      * Init options with defaults.
      */
@@ -341,6 +347,7 @@ public class CropImageOptions implements Parcelable {
         rotationDegrees = 90;
         flipHorizontally = false;
         flipVertically = false;
+        cropMenuTitle = "Crop";
     }
 
     /**
@@ -393,6 +400,7 @@ public class CropImageOptions implements Parcelable {
         rotationDegrees = in.readInt();
         flipHorizontally = in.readByte() != 0;
         flipVertically = in.readByte() != 0;
+        cropMenuTitle = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
     }
 
     @Override
@@ -443,6 +451,7 @@ public class CropImageOptions implements Parcelable {
         dest.writeInt(rotationDegrees);
         dest.writeByte((byte) (flipHorizontally ? 1 : 0));
         dest.writeByte((byte) (flipVertically ? 1 : 0));
+        TextUtils.writeToParcel(cropMenuTitle, dest, flags);
     }
 
     @Override

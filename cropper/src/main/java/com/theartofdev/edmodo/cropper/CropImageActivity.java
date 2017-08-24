@@ -144,8 +144,23 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
                 updateMenuItemIconColor(menu, R.id.crop_image_menu_crop, mOptions.activityMenuIconColor);
             }
         }
-
+            updateMenuTitle(menu, R.id.crop_image_menu_crop,mOptions.cropMenuTitle);
         return true;
+    }
+
+    private void updateMenuTitle(Menu menu, int itemId,CharSequence menuTitle) {
+        MenuItem menuItem = menu.findItem(itemId);
+        if (menuItem != null) {
+                try {
+                    CharSequence title = menuTitle != null && menuTitle.length() > 0
+                            ? menuTitle
+                            : getResources().getString(R.string.crop_image_menu_crop);
+
+                    menuItem.setTitle(title);
+                } catch (Exception e) {
+                    Log.w("AIC", "Failed to update menu item color", e);
+                }
+        }
     }
 
     @Override
