@@ -288,6 +288,11 @@ public class CropImageOptions implements Parcelable {
     public CharSequence cropMenuTitle;
 
     /**
+     * optional image resource to be used for crop menu crop icon instead of text
+     */
+    public int cropMenuCropIcon;
+
+    /**
      * Init options with defaults.
      */
     public CropImageOptions() {
@@ -348,6 +353,8 @@ public class CropImageOptions implements Parcelable {
         flipHorizontally = false;
         flipVertically = false;
         cropMenuTitle = "Crop";
+
+        cropMenuCropIcon = 0;
     }
 
     /**
@@ -401,6 +408,7 @@ public class CropImageOptions implements Parcelable {
         flipHorizontally = in.readByte() != 0;
         flipVertically = in.readByte() != 0;
         cropMenuTitle = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
+        cropMenuCropIcon = in.readInt();
     }
 
     @Override
@@ -452,6 +460,7 @@ public class CropImageOptions implements Parcelable {
         dest.writeByte((byte) (flipHorizontally ? 1 : 0));
         dest.writeByte((byte) (flipVertically ? 1 : 0));
         TextUtils.writeToParcel(cropMenuTitle, dest, flags);
+        dest.writeInt(cropMenuCropIcon);
     }
 
     @Override

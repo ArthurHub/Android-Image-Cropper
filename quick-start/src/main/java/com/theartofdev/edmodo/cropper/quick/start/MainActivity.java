@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
                 .setCropShape(CropImageView.CropShape.OVAL)
                 .setCropMenuTitle("Done")
                 .setRequestedSize(400, 400)
+                .setCropMenuCropIcon(R.drawable.ic_launcher)
                 .start(this);
     }
 

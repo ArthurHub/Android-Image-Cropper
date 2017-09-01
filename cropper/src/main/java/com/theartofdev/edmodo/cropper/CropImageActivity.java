@@ -27,7 +27,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -126,10 +125,8 @@ public class CropImageActivity extends AppCompatActivity implements CropImageVie
 
         Drawable cropIcon = null;
         try {
-            TypedValue typedValue = new TypedValue();
-            getResources().getValue(R.drawable.crop_image_menu_crop, typedValue, false);
-            if (typedValue.data != R.drawable.crop_image_menu_crop_stub) {
-                cropIcon = ContextCompat.getDrawable(this, R.drawable.crop_image_menu_crop);
+            if (mOptions.cropMenuCropIcon != 0) {
+                cropIcon = ContextCompat.getDrawable(this, mOptions.cropMenuCropIcon);
                 menu.findItem(R.id.crop_image_menu_crop).setIcon(cropIcon);
             }
         } catch (Exception e) {

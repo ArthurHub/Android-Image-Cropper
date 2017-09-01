@@ -34,6 +34,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -909,6 +910,15 @@ public final class CropImage {
             return this;
         }
 
+
+        /**
+         * Image resource id to use for crop icon instead of text.<br>
+         * <i>Default: 0</i>
+         */
+        public ActivityBuilder setCropMenuCropIcon(@DrawableRes int cropMenuCropIcon) {
+            mOptions.cropMenuCropIcon = cropMenuCropIcon;
+            return this;
+        }
     }
     //endregion
 
