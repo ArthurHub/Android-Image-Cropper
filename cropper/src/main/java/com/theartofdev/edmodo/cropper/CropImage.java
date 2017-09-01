@@ -899,6 +899,16 @@ public final class CropImage {
             mOptions.flipVertically = flipVertically;
             return this;
         }
+
+        /**
+         * the title of the  CropMenu.<br>
+         * <i>Default: ""</i>
+         */
+        public ActivityBuilder setCropMenuTitle(CharSequence cropMenuTitle) {
+            mOptions.cropMenuTitle = cropMenuTitle;
+            return this;
+        }
+
     }
     //endregion
 
