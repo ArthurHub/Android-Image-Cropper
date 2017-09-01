@@ -17,7 +17,7 @@ Android Image Cropper
 1. Include the library
 
  ```
- compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
+ compile 'com.theartofdev.edmodo:android-image-cropper:2.5.+'
  ```
 
 Add permissions to manifest

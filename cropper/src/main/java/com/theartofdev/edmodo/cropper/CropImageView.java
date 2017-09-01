@@ -622,12 +622,14 @@ public class CropImageView extends FrameLayout {
      * @return a Rect instance dimensions of the source Bitmap
      */
     public Rect getWholeImageRect() {
-        if (mBitmap == null) {
+        int loadedSampleSize = mLoadedSampleSize;
+        Bitmap bitmap = mBitmap;
+        if (bitmap == null) {
             return null;
         }
-        
-        int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
-        int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
+
+        int orgWidth = bitmap.getWidth() * loadedSampleSize;
+        int orgHeight = bitmap.getHeight() * loadedSampleSize;
         return new Rect(0, 0, orgWidth, orgHeight);
     }
 
@@ -638,20 +640,21 @@ public class CropImageView extends FrameLayout {
      * @return a Rect instance containing cropped area boundaries of the source Bitmap
      */
     public Rect getCropRect() {
-        if (mBitmap != null) {
-
-            // get the points of the crop rectangle adjusted to source bitmap
-            float[] points = getCropPoints();
-
-            int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
-            int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
-
-            // get the rectangle for the points (it may be larger than original if rotation is not stright)
-            return BitmapUtils.getRectFromPoints(points, orgWidth, orgHeight,
-                    mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY());
-        } else {
+        int loadedSampleSize = mLoadedSampleSize;
+        Bitmap bitmap = mBitmap;
+        if (bitmap == null) {
             return null;
         }
+
+        // get the points of the crop rectangle adjusted to source bitmap
+        float[] points = getCropPoints();
+
+        int orgWidth = bitmap.getWidth() * loadedSampleSize;
+        int orgHeight = bitmap.getHeight() * loadedSampleSize;
+
+        // get the rectangle for the points (it may be larger than original if rotation is not stright)
+        return BitmapUtils.getRectFromPoints(points, orgWidth, orgHeight,
+                mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY());
     }
 
     /**
@@ -1161,7 +1164,8 @@ public class CropImageView extends FrameLayout {
      * @param saveCompressQuality if saveUri is given, the given quality will be used for the compression.
      */
     public void startCropWorkerTask(int reqWidth, int reqHeight, RequestSizeOptions options, Uri saveUri, Bitmap.CompressFormat saveCompressFormat, int saveCompressQuality) {
-        if (mBitmap != null) {
+        Bitmap bitmap = mBitmap;
+        if (bitmap != null) {
             mImageView.clearAnimation();
 
             BitmapCroppingWorkerTask currentTask = mBitmapCroppingWorkerTask != null ? mBitmapCroppingWorkerTask.get() : null;
@@ -1173,8 +1177,8 @@ public class CropImageView extends FrameLayout {
             reqWidth = options != RequestSizeOptions.NONE ? reqWidth : 0;
             reqHeight = options != RequestSizeOptions.NONE ? reqHeight : 0;
 
-            int orgWidth = mBitmap.getWidth() * mLoadedSampleSize;
-            int orgHeight = mBitmap.getHeight() * mLoadedSampleSize;
+            int orgWidth = bitmap.getWidth() * mLoadedSampleSize;
+            int orgHeight = bitmap.getHeight() * mLoadedSampleSize;
             if (mLoadedImageUri != null && (mLoadedSampleSize > 1 || options == RequestSizeOptions.SAMPLING)) {
                 mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mLoadedImageUri, getCropPoints(),
                         mDegreesRotated, orgWidth, orgHeight,
@@ -1182,7 +1186,7 @@ public class CropImageView extends FrameLayout {
                         reqWidth, reqHeight, mFlipHorizontally, mFlipVertically, options,
                         saveUri, saveCompressFormat, saveCompressQuality));
             } else {
-                mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, mBitmap, getCropPoints(), mDegreesRotated,
+                mBitmapCroppingWorkerTask = new WeakReference<>(new BitmapCroppingWorkerTask(this, bitmap, getCropPoints(), mDegreesRotated,
                         mCropOverlayView.isFixAspectRatio(), mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY(),
                         reqWidth, reqHeight, mFlipHorizontally, mFlipVertically, options,
                         saveUri, saveCompressFormat, saveCompressQuality));
