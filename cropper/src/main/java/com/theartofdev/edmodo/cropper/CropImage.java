@@ -915,8 +915,8 @@ public final class CropImage {
          * Image resource id to use for crop icon instead of text.<br>
          * <i>Default: 0</i>
          */
-        public ActivityBuilder setCropMenuCropIcon(@DrawableRes int cropMenuCropIcon) {
-            mOptions.cropMenuCropButtonIcon = cropMenuCropIcon;
+        public ActivityBuilder setCropMenuCropButtonIcon(@DrawableRes int drawableResource) {
+            mOptions.cropMenuCropButtonIcon = drawableResource;
             return this;
         }
     }

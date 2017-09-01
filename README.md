@@ -121,6 +121,15 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.5.0*
+- Update to sdk v26
+- Update gradle plugin to 2.0
+- Update min sdk version to 14
+- Fix NPE in `getWholeImageRect`
+- Remove `crop_image_menu_crop` drawable support, replace with `setCropMenuCropButtonIcon` builder api.
+- Support setting crop button title via builder api.
+- Add string resource for "no permissions" toast.
+
 *2.4.7*
 - Fix toolbar menu crop icon sometimes appears with random icon (#305)
 - Use CharSequence instead of string for activity title (thx @KentHawkings) (#297)
@@ -128,13 +137,6 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 - Add original image dimensions to CropResult (Thanks @gazialankus) (#327)
 - Making the library JitPack-friendly (Thanks @gazialankus) (#325)
 - Allow a Fragment to call the startPickImageActivity help method in CropImage (Thanks @cdavietei) (#315)
-
-*2.4.6*
-- Fix undefined drawable in Android Studio 3.0 (thx @adrien-aubel)
-- Added `CropImage.activity()` overload without `uri` parameter (thx @jake32321)
-
-*2.4.4*
-- Fix image exif (rotation) data not always extracted during image loading (thx @danikula).
 
 See [full change log](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log).
 
