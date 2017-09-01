@@ -902,11 +902,11 @@ public final class CropImage {
         }
 
         /**
-         * the title of the  CropMenu.<br>
-         * <i>Default: ""</i>
+         * optional, set crop menu crop button title.<br>
+         * <i>Default: null, will use resource string: crop_image_menu_crop</i>
          */
-        public ActivityBuilder setCropMenuTitle(CharSequence cropMenuTitle) {
-            mOptions.cropMenuTitle = cropMenuTitle;
+        public ActivityBuilder setCropMenuCropButtonTitle(CharSequence title) {
+            mOptions.cropMenuCropButtonTitle = title;
             return this;
         }
 
@@ -916,7 +916,7 @@ public final class CropImage {
          * <i>Default: 0</i>
          */
         public ActivityBuilder setCropMenuCropIcon(@DrawableRes int cropMenuCropIcon) {
-            mOptions.cropMenuCropIcon = cropMenuCropIcon;
+            mOptions.cropMenuCropButtonIcon = cropMenuCropIcon;
             return this;
         }
     }
