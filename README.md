@@ -103,7 +103,7 @@ Add permissions to manifest
 - Set initial crop window size/location.
 - Request cropped image resize to specific size.
 - Bitmap memory optimization, OOM handling (should never occur)!
-- API Level 10.
+- API Level 14.
 - More..
  
 ## Customizations
