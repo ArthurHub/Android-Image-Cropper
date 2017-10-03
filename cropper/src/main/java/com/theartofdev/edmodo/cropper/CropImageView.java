@@ -151,6 +151,16 @@ public class CropImageView extends FrameLayout {
     private OnSetCropOverlayReleasedListener mOnCropOverlayReleasedListener;
 
     /**
+     * callback to be invoked when crop overlay is moved.
+     */
+    private OnSetCropOverlayMovedListener mOnSetCropOverlayMovedListener;
+
+    /**
+     * callback to be invoked when crop windows is changed.
+     */
+    private OnSetCropWindowChangeListener mOnSetCropWindowChangeListener;
+
+    /**
      * callback to be invoked when image async loading is complete.
      */
     private OnSetImageUriCompleteListener mOnSetImageUriCompleteListener;
@@ -311,6 +321,10 @@ public class CropImageView extends FrameLayout {
                 OnSetCropOverlayReleasedListener listener = mOnCropOverlayReleasedListener;
                 if (listener != null && !inProgress) {
                     listener.onCropOverlayReleased(getCropRect());
+                }
+                OnSetCropOverlayMovedListener movedListener = mOnSetCropOverlayMovedListener;
+                if (movedListener != null && inProgress) {
+                    movedListener.onCropOverlayMoved(getCropRect());
                 }
             }
         });
@@ -658,6 +672,18 @@ public class CropImageView extends FrameLayout {
     }
 
     /**
+     * Gets the crop window's position relative to the parent's view at screen.
+     *
+     * @return a Rect instance containing cropped area boundaries of the source Bitmap
+     */
+    public RectF getCropWindowRect() {
+        if (mCropOverlayView == null) {
+            return null;
+        }
+        return mCropOverlayView.getCropWindowRect();
+    }
+
+    /**
      * Gets the 4 points of crop window's position relative to the source Bitmap (not the image
      * displayed in the CropImageView) using the original image rotation.<br>
      * Note: the 4 points may not be a rectangle if the image was rotates to NOT stright angle (!= 90/180/270).
@@ -868,6 +894,20 @@ public class CropImageView extends FrameLayout {
      */
     public void setOnSetCropOverlayReleasedListener(OnSetCropOverlayReleasedListener listener) {
         mOnCropOverlayReleasedListener = listener;
+    }
+
+    /**
+     * Set the callback when the cropping is moved
+     */
+    public void setOnSetCropOverlayMovedListener(OnSetCropOverlayMovedListener listener) {
+        mOnSetCropOverlayMovedListener = listener;
+    }
+
+    /**
+     * Set the callback when the crop window is changed
+     */
+    public void setOnCropWindowChangedListener(OnSetCropWindowChangeListener listener) {
+        mOnSetCropWindowChangeListener = listener;
     }
 
     /**
@@ -1455,6 +1495,9 @@ public class CropImageView extends FrameLayout {
                     applyImageMatrix(width, height, true, animate);
                 }
             }
+            if (mOnSetCropWindowChangeListener != null && !inProgress){
+                mOnSetCropWindowChangeListener.onCropWindowChanged();
+            }
         }
     }
 
@@ -1743,6 +1786,31 @@ public class CropImageView extends FrameLayout {
          * @param rect The rect coordinates of the cropped overlay
          */
         void onCropOverlayReleased(Rect rect);
+    }
+
+
+    /**
+     * Interface definition for a callback to be invoked when the crop overlay is released.
+     */
+    public interface OnSetCropOverlayMovedListener {
+
+        /**
+         * Called when the crop overlay is moved
+         *
+         * @param rect The rect coordinates of the cropped overlay
+         */
+        void onCropOverlayMoved(Rect rect);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when the crop overlay is released.
+     */
+    public interface OnSetCropWindowChangeListener {
+
+        /**
+         * Called when the crop window is changed
+         */
+        void onCropWindowChanged();
     }
 
     /**
