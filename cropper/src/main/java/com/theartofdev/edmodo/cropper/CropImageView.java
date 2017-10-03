@@ -156,7 +156,7 @@ public class CropImageView extends FrameLayout {
     private OnSetCropOverlayMovedListener mOnSetCropOverlayMovedListener;
 
     /**
-     * callback to be invoked when crop windows is changed.
+     * callback to be invoked when crop window is changed.
      */
     private OnSetCropWindowChangeListener mOnSetCropWindowChangeListener;
 
