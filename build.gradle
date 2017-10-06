@@ -4,17 +4,25 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
     }
 }
 
 allprojects {
     repositories {
         jcenter()
-        mavenLocal()
-        mavenCentral()
         maven {
             url "https://maven.google.com"
         }
     }
+}
+
+ext {
+    compileSdkVersion = 26
+    buildToolsVersion = '26.0.2'
+    supportLibraryVersion = '26.+'
+
+    PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
+    PUBLISH_ARTIFACT_ID = 'android-image-cropper'
+    PUBLISH_VERSION = '2.5.1'
+    // gradlew clean build generateRelease
 }

@@ -3,19 +3,10 @@ apply plugin: 'com.android.library'
 // http://www.flexlabs.org/2013/06/using-local-aar-android-library-packages-in-gradle-builds
 apply plugin: 'maven-publish'
 
-group = 'com.github.ArthurHub'
-
-ext {
-    PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
-    PUBLISH_ARTIFACT_ID = 'android-image-cropper'
-    PUBLISH_VERSION = '2.5.0'
-    // gradlew clean build generateRelease
-}
-
 android {
 
-    compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
@@ -51,7 +42,9 @@ publishing {
 apply from: 'https://raw.githubusercontent.com/ArthurHub/release-android-library/master/android-release-aar.gradle'
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:26.0.2'
-    compile "com.android.support:exifinterface:26.0.2"
+    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
+    compile("com.android.support:exifinterface:$supportLibraryVersion") {
+        transitive = false
+    }
 }
 

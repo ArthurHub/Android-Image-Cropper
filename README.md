@@ -121,6 +121,9 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
+*2.5.1* (in-dev)
+- Try solve manifest merger issue by adding `transitive` flag #405 (thx @j-garin)
+
 *2.5.0*
 - Update to sdk v26
 - Update gradle plugin to 2.0
