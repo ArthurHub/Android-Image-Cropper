@@ -22,6 +22,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.media.ExifInterface;
@@ -1020,7 +1021,7 @@ public class CropImageView extends FrameLayout {
       mRestoreDegreesRotated = 0;
       mCropOverlayView.setInitialCropWindowRect(null);
       mBitmapLoadingWorkerTask = new WeakReference<>(new BitmapLoadingWorkerTask(this, uri));
-      mBitmapLoadingWorkerTask.get().execute();
+      mBitmapLoadingWorkerTask.get().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
       setProgressBarVisibility();
     }
   }
@@ -1318,7 +1319,7 @@ public class CropImageView extends FrameLayout {
                     saveCompressFormat,
                     saveCompressQuality));
       }
-      mBitmapCroppingWorkerTask.get().execute();
+      mBitmapCroppingWorkerTask.get().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
       setProgressBarVisibility();
     }
   }
