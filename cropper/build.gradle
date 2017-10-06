@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 // http://www.flexlabs.org/2013/06/using-local-aar-android-library-packages-in-gradle-builds
 apply plugin: 'maven-publish'
 
-group='com.github.ArthurHub'
+group = 'com.github.ArthurHub'
 
 ext {
     PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
