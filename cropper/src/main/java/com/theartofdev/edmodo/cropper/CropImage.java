@@ -66,6 +66,9 @@ public final class CropImage {
   /** The key used to pass crop image options to {@link CropImageActivity}. */
   public static final String CROP_IMAGE_EXTRA_OPTIONS = "CROP_IMAGE_EXTRA_OPTIONS";
 
+  /** The key used to pass crop image bundle data to {@link CropImageActivity}. */
+  public static final String CROP_IMAGE_EXTRA_BUNDLE = "CROP_IMAGE_EXTRA_BUNDLE";
+
   /** The key used to pass crop image result data back from {@link CropImageActivity}. */
   public static final String CROP_IMAGE_EXTRA_RESULT = "CROP_IMAGE_EXTRA_RESULT";
 
@@ -469,7 +472,7 @@ public final class CropImage {
       Bundle bundle = new Bundle();
       bundle.putParcelable(CROP_IMAGE_EXTRA_SOURCE, mSource);
       bundle.putParcelable(CROP_IMAGE_EXTRA_OPTIONS, mOptions);
-      intent.putExtra(CropImageOptions.BUNDLE_KEY, bundle);
+      intent.putExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE, bundle);
       return intent;
     }
 

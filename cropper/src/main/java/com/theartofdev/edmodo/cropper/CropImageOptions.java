@@ -29,8 +29,6 @@ import android.util.TypedValue;
  */
 public class CropImageOptions implements Parcelable {
 
-  static final String BUNDLE_KEY = "bundle";
-
   public static final Creator<CropImageOptions> CREATOR =
       new Creator<CropImageOptions>() {
         @Override

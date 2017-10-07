@@ -125,6 +125,7 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 - Try solve manifest merger issue by adding `transitive` flag #405 (thx @j-garin)
 - Use thread pool executors for async image loading and cropping operations to prevent app hang if default executor is busy (thx @ruifcardoso)
 - Fix image rotation breaking min/max crop result restrictions #401
+- Propagate all extra data set on start crop activity intent back in crop result intent #352
 
 *2.5.0*
 - Update to sdk v26

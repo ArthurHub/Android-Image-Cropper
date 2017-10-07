@@ -59,7 +59,7 @@ public class CropImageActivity extends AppCompatActivity
 
     mCropImageView = findViewById(R.id.cropImageView);
 
-    Bundle bundle = getIntent().getBundleExtra(CropImageOptions.BUNDLE_KEY);
+    Bundle bundle = getIntent().getBundleExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE);
     mCropImageUri = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE);
     mOptions = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS);
 
@@ -325,6 +325,7 @@ public class CropImageActivity extends AppCompatActivity
             mCropImageView.getWholeImageRect(),
             sampleSize);
     Intent intent = new Intent();
+    intent.putExtras(getIntent());
     intent.putExtra(CropImage.CROP_IMAGE_EXTRA_RESULT, result);
     return intent;
   }
