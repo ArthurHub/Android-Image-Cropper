@@ -308,7 +308,7 @@ final class BitmapUtils {
     return getRectRight(points) - getRectLeft(points);
   }
 
-  /** Get heightof the bounding rectangle of the given points. */
+  /** Get height of the bounding rectangle of the given points. */
   static float getRectHeight(float[] points) {
     return getRectBottom(points) - getRectTop(points);
   }
@@ -318,7 +318,7 @@ final class BitmapUtils {
     return (getRectRight(points) + getRectLeft(points)) / 2f;
   }
 
-  /** Get verical center value of the bounding rectangle of the given points. */
+  /** Get vertical center value of the bounding rectangle of the given points. */
   static float getRectCenterY(float[] points) {
     return (getRectBottom(points) + getRectTop(points)) / 2f;
   }

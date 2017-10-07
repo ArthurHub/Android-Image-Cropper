@@ -132,7 +132,7 @@ public final class MainFragment extends Fragment
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    mCropImageView = (CropImageView) view.findViewById(R.id.cropImageView);
+    mCropImageView = view.findViewById(R.id.cropImageView);
     mCropImageView.setOnSetImageUriCompleteListener(this);
     mCropImageView.setOnCropImageCompleteListener(this);
 

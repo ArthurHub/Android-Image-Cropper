@@ -58,8 +58,11 @@ public class CropImageView extends FrameLayout {
   /** Progress bar widget to show progress bar on async image loading and cropping. */
   private final ProgressBar mProgressBar;
 
-  /** Rectengale used in image matrix transformation calculation (reusing rect instance) */
+  /** Rectangle used in image matrix transformation calculation (reusing rect instance) */
   private final float[] mImagePoints = new float[8];
+
+  /** Rectangle used in image matrix transformation for scale calculation (reusing rect instance) */
+  private final float[] mScaleImagePoints = new float[8];
 
   /** Animation class to smooth animate zoom-in/out */
   private CropImageAnimation mAnimation;
@@ -323,10 +326,10 @@ public class CropImageView extends FrameLayout {
     LayoutInflater inflater = LayoutInflater.from(context);
     View v = inflater.inflate(R.layout.crop_image_view, this, true);
 
-    mImageView = (ImageView) v.findViewById(R.id.ImageView_image);
+    mImageView = v.findViewById(R.id.ImageView_image);
     mImageView.setScaleType(ImageView.ScaleType.MATRIX);
 
-    mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
+    mCropOverlayView = v.findViewById(R.id.CropOverlayView);
     mCropOverlayView.setCropWindowChangeListener(
         new CropOverlayView.CropWindowChangeListener() {
           @Override
@@ -344,7 +347,7 @@ public class CropImageView extends FrameLayout {
         });
     mCropOverlayView.setInitialAttributeValues(options);
 
-    mProgressBar = (ProgressBar) v.findViewById(R.id.CropProgressBar);
+    mProgressBar = v.findViewById(R.id.CropProgressBar);
     setProgressBarVisibility();
   }
 
@@ -1727,7 +1730,7 @@ public class CropImageView extends FrameLayout {
   /**
    * Adjust the given image rectangle by image transformation matrix to know the final rectangle of
    * the image.<br>
-   * To get the proper rectangle it must be first reset to orginal image rectangle.
+   * To get the proper rectangle it must be first reset to original image rectangle.
    */
   private void mapImagePointsByImageMatrix() {
     mImagePoints[0] = 0;
@@ -1739,6 +1742,15 @@ public class CropImageView extends FrameLayout {
     mImagePoints[6] = 0;
     mImagePoints[7] = mBitmap.getHeight();
     mImageMatrix.mapPoints(mImagePoints);
+    mScaleImagePoints[0] = 0;
+    mScaleImagePoints[1] = 0;
+    mScaleImagePoints[2] = 100;
+    mScaleImagePoints[3] = 0;
+    mScaleImagePoints[4] = 100;
+    mScaleImagePoints[5] = 100;
+    mScaleImagePoints[6] = 0;
+    mScaleImagePoints[7] = 100;
+    mImageMatrix.mapPoints(mScaleImagePoints);
   }
 
   /**
@@ -1795,9 +1807,9 @@ public class CropImageView extends FrameLayout {
       // Get the scale factor between the actual Bitmap dimensions and the displayed dimensions for
       // width/height.
       float scaleFactorWidth =
-          mBitmap.getWidth() * mLoadedSampleSize / BitmapUtils.getRectWidth(mImagePoints);
+          100f * mLoadedSampleSize / BitmapUtils.getRectWidth(mScaleImagePoints);
       float scaleFactorHeight =
-          mBitmap.getHeight() * mLoadedSampleSize / BitmapUtils.getRectHeight(mImagePoints);
+          100f * mLoadedSampleSize / BitmapUtils.getRectHeight(mScaleImagePoints);
       mCropOverlayView.setCropWindowLimits(
           getWidth(), getHeight(), scaleFactorWidth, scaleFactorHeight);
     }
