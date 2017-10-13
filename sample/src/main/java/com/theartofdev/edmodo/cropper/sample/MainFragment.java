@@ -96,6 +96,7 @@ public final class MainFragment extends Fragment
     options.maxZoomLevel = mCropImageView.getMaxZoom();
     options.flipHorizontally = mCropImageView.isFlippedHorizontally();
     options.flipVertically = mCropImageView.isFlippedVertically();
+    options.imageRatio = mCropImageView.getImageAspectRatio();
     ((MainActivity) getActivity()).setCurrentOptions(options);
   }
 
