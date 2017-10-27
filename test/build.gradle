@@ -16,7 +16,7 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:appcompat-v7:6.0.2"
+    compile "com.android.support:appcompat-v7:26.0.2"
     compile 'com.theartofdev.edmodo:android-image-cropper:2.5.+'
 
 }
