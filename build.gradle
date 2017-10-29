@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0'
     }
 }
 
@@ -17,9 +17,9 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 26
-    buildToolsVersion = '26.0.2'
-    supportLibraryVersion = '26.+'
+    compileSdkVersion = 27
+    buildToolsVersion = '27.0.0'
+    supportLibraryVersion = '27.+'
 
     PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
     PUBLISH_ARTIFACT_ID = 'android-image-cropper'
