@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Pivoter à gauche</string>
+    <string name="crop_image_menu_rotate_right">Pivoter à droite</string>
+    <string name="crop_image_menu_crop">Redimensionner</string>
+    <string name="crop_image_menu_flip">Retourner</string>
+    <string name="crop_image_menu_flip_horizontally">Retourner horizontalement</string>
+    <string name="crop_image_menu_flip_vertically">Retourner verticalement</string>
+    <string name="pick_image_intent_chooser_title">Sélectionner la source</string>
+    <string name="crop_image_activity_no_permissions">Annulation, il manque des permissions requises</string>
+</resources>
