@@ -18,6 +18,7 @@ Android Image Cropper
 
  ```
  compile 'com.theartofdev.edmodo:android-image-cropper:2.5.+'
+
  ```
 
 Add permissions to manifest
@@ -100,6 +101,7 @@ Add permissions to manifest
 - Auto zoom-in/out to relevant cropping area.
 - Auto rotate bitmap by image Exif data.
 - Set result image min/max limits in pixels.
+- Do add aspect ratio.
 - Set initial crop window size/location.
 - Request cropped image resize to specific size.
 - Bitmap memory optimization, OOM handling (should never occur)!
@@ -126,6 +128,8 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 - Use thread pool executors for async image loading and cropping operations to prevent app hang if default executor is busy (thx @ruifcardoso)
 - Fix image rotation breaking min/max crop result restrictions #401
 - Propagate all extra data set on start crop activity intent back in crop result intent #352
+- Your android studio may not compile this if you add this dependency while being connected to your college wifi if they have blocked it.
+ You will not see any error but it just won't compile like ever. So make sure to be connected to an independent internet connection.
 
 *2.5.0*
 - Update to sdk v26
@@ -135,6 +139,8 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 - Remove `crop_image_menu_crop` drawable support, replace with `setCropMenuCropButtonIcon` builder api.
 - Support setting crop button title via builder api.
 - Add string resource for "no permissions" toast.
+- your android studio may not compile this if you add this dependency while being connected to your college wifi if they have blocked it.
+ You will not see any error but it just won't compile like ever. So make sure to be connected to an independent internet connection.
 
 *2.4.7*
 - Fix toolbar menu crop icon sometimes appears with random icon (#305)
@@ -143,6 +149,8 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
 - Add original image dimensions to CropResult (Thanks @gazialankus) (#327)
 - Making the library JitPack-friendly (Thanks @gazialankus) (#325)
 - Allow a Fragment to call the startPickImageActivity help method in CropImage (Thanks @cdavietei) (#315)
+- Your android studio may not compile this if you add this dependency while being connected to your college wifi if they have blocked it.
+ You will not see any error but it just won't compile like ever. So make sure to be connected to an independent internet connection.
 
 See [full change log](https://github.com/ArthurHub/Android-Image-Cropper/wiki/Change-Log).
 
