@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion rootProject.compileSdkVersion
         versionCode 1
         versionName '1.0'
     }
@@ -16,6 +16,6 @@ android {
 }
 
 dependencies {
-    compile project(':cropper')
-    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
+    api project(':cropper')
+    api "com.android.support:appcompat-v7:$supportLibraryVersion"
 }

@@ -9,7 +9,7 @@ android {
     buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion rootProject.compileSdkVersion
         versionCode 1
         versionName PUBLISH_VERSION
     }
@@ -39,12 +39,10 @@ publishing {
     }
 }
 
-apply from: 'https://raw.githubusercontent.com/ArthurHub/release-android-library/master/android-release-aar.gradle'
+apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
 
 dependencies {
-    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
-    compile("com.android.support:exifinterface:$supportLibraryVersion") {
-        transitive = false
-    }
+    api "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.android.support:exifinterface:$supportLibraryVersion"
 }
 

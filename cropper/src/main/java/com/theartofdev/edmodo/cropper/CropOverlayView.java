@@ -204,7 +204,7 @@ public class CropOverlayView extends View {
   public void setCropShape(CropImageView.CropShape cropShape) {
     if (mCropShape != cropShape) {
       mCropShape = cropShape;
-      if (Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 17) {
+        if (Build.VERSION.SDK_INT <= 17) {
         if (mCropShape == CropImageView.CropShape.OVAL) {
           mOriginalLayerType = getLayerType();
           if (mOriginalLayerType != View.LAYER_TYPE_SOFTWARE) {
@@ -320,8 +320,7 @@ public class CropOverlayView extends View {
 
   /** Set multi touch functionality to enabled/disabled. */
   public boolean setMultiTouchEnabled(boolean multiTouchEnabled) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
-        && mMultiTouchEnabled != multiTouchEnabled) {
+      if (mMultiTouchEnabled != multiTouchEnabled) {
       mMultiTouchEnabled = multiTouchEnabled;
       if (mMultiTouchEnabled && mScaleDetector == null) {
         mScaleDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
@@ -626,9 +625,7 @@ public class CropOverlayView extends View {
       }
     } else {
       mPath.reset();
-      if (Build.VERSION.SDK_INT >= 11
-          && Build.VERSION.SDK_INT <= 17
-          && mCropShape == CropImageView.CropShape.OVAL) {
+        if (Build.VERSION.SDK_INT <= 17 && mCropShape == CropImageView.CropShape.OVAL) {
         mDrawRect.set(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2);
       } else {
         mDrawRect.set(rect.left, rect.top, rect.right, rect.bottom);

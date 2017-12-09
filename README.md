@@ -17,7 +17,7 @@ Android Image Cropper
 1. Include the library
 
  ```
- compile 'com.theartofdev.edmodo:android-image-cropper:2.5.+'
+ compile 'com.theartofdev.edmodo:android-image-cropper:2.6.+'
  ```
 
 Add permissions to manifest
@@ -121,7 +121,11 @@ For more information, see the [GitHub Wiki](https://github.com/ArthurHub/Android
  - [Adding auto-zoom feature to Android-Image-Cropper](https://theartofdev.com/2016/04/25/adding-auto-zoom-feature-to-android-image-cropper/)
 
 ## Change log
-*2.5.1* (in-dev)
+*2.6.0*
+- Update to sdk v27
+- Update to gradle v3
+
+*2.5.1*
 - Try solve manifest merger issue by adding `transitive` flag #405 (thx @j-garin)
 - Use thread pool executors for async image loading and cropping operations to prevent app hang if default executor is busy (thx @ruifcardoso)
 - Fix image rotation breaking min/max crop result restrictions #401
