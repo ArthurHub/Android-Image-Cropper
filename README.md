@@ -26,7 +26,11 @@ Add permissions to manifest
  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
  ```
+Add this line to your Proguard config file
 
+```
+-keep class android.support.v7.widget.** { *; }
+```
 ### Using Activity
 
 2. Add `CropImageActivity` into your AndroidManifest.xml
