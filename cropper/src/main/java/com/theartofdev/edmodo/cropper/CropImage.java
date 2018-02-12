@@ -611,6 +611,16 @@ public final class CropImage {
             @NonNull Fragment fragment, Intent intent,  int requestCode) {
       fragment.startActivityForResult(intent, requestCode);
     }
+
+    /**
+     * Start {@link CropImageActivity}.
+     *
+     * @param fragment fragment to receive result
+     */
+    public void start(
+            @NonNull Activity activity, Fragment fragment, int requestCode) {
+      fragment.startActivityForResult(getIntent(activity), requestCode);
+    }
     //endregion
 
     /**
