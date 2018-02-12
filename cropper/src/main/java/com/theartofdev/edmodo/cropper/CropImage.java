@@ -458,6 +458,7 @@ public final class CropImage {
       mOptions = new CropImageOptions();
     }
 
+    //region Intent factory methods
     /** Get {@link CropImageActivity} intent to start the activity. */
     public Intent getIntent(@NonNull Context context) {
       return getIntent(context, CropImageActivity.class);
@@ -475,15 +476,25 @@ public final class CropImage {
       intent.putExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE, bundle);
       return intent;
     }
+    //endregion
 
+    //region Launch CropImageActivity from another Activity
     /**
      * Start {@link CropImageActivity}.
      *
      * @param activity activity to receive result
      */
     public void start(@NonNull Activity activity) {
-      mOptions.validate();
-      activity.startActivityForResult(getIntent(activity), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+      start(activity, getIntent(activity), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    /**
+     * Start {@link CropImageActivity}.
+     *
+     * @param activity fragment to receive result
+     */
+    public void start(@NonNull Activity activity, int requestCode) {
+      start(activity, getIntent(activity), requestCode);
     }
 
     /**
@@ -492,27 +503,93 @@ public final class CropImage {
      * @param activity activity to receive result
      */
     public void start(@NonNull Activity activity, @Nullable Class<?> cls) {
-      mOptions.validate();
-      activity.startActivityForResult(getIntent(activity, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+      start(activity, getIntent(activity, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
     }
 
+    /**
+     * Start {@link CropImageActivity}.
+     *
+     * @param activity activity to receive result
+     */
+    public void start(@NonNull Activity activity, @Nullable Class<?> cls, int requestCode) {
+      start(activity, getIntent(activity, cls), requestCode);
+    }
+
+    /**
+     * Start {@link CropImageActivity}.
+     *
+     * @param activity activity to receive result
+     */
+    private void start(@NonNull Activity activity, @NonNull Intent intent, int requestCode) {
+      mOptions.validate();
+      activity.startActivityForResult(intent, requestCode);
+    }
+    //endregion
+
+    //region Launch CropImageActivity from another android.app.Fragment
+    /**
+     * Start {@link CropImageActivity}.
+     *
+     * @param fragment fragment to receive result
+     */
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+    public void start(
+            @NonNull Context context, @NonNull android.app.Fragment fragment) {
+      start(fragment, getIntent(context), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    /**
+     * Start {@link CropImageActivity}.
+     *
+     * @param fragment fragment to receive result
+     */
+    public void start(
+            @NonNull Context context, @NonNull android.app.Fragment fragment, int requestCode) {
+      start(fragment, getIntent(context), requestCode);
+    }
+
+    /**
+     * Start {@link CropImageActivity}.
+     *
+     * @param fragment fragment to receive result
+     */
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+    public void start(
+            @NonNull Context context, @NonNull android.app.Fragment fragment, @Nullable Class<?> cls) {
+      start(fragment, getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    /**
+     * Start {@link CropImageActivity}.
+     *
+     * @param fragment fragment to receive result
+     */
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+    public void start(
+            @NonNull Context context, @NonNull android.app.Fragment fragment, @Nullable Class<?> cls, int requestCode) {
+      start(fragment, getIntent(context, cls), requestCode);
+    }
+
+    /**
+     * Start {@link CropImageActivity}.
+     *
+     * @param fragment fragment to receive result
+     */
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+    private void start(
+            @NonNull android.app.Fragment fragment, @NonNull Intent intent, int requestCode) {
+      fragment.startActivityForResult(intent, requestCode);
+    }
+    //endregion
+
+    //region Launch CropImageActivity from another Fragment (support v4)
     /**
      * Start {@link CropImageActivity}.
      *
      * @param fragment fragment to receive result
      */
     public void start(@NonNull Context context, @NonNull Fragment fragment) {
-      fragment.startActivityForResult(getIntent(context), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
-    }
-
-    /**
-     * Start {@link CropImageActivity}.
-     *
-     * @param fragment fragment to receive result
-     */
-    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
-    public void start(@NonNull Context context, @NonNull android.app.Fragment fragment) {
-      fragment.startActivityForResult(getIntent(context), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+      start(fragment, getIntent(context), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
     }
 
     /**
@@ -521,8 +598,8 @@ public final class CropImage {
      * @param fragment fragment to receive result
      */
     public void start(
-        @NonNull Context context, @NonNull Fragment fragment, @Nullable Class<?> cls) {
-      fragment.startActivityForResult(getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+            @NonNull Context context, @NonNull Fragment fragment, @Nullable Class<?> cls) {
+      start(fragment, getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
     }
 
     /**
@@ -530,11 +607,11 @@ public final class CropImage {
      *
      * @param fragment fragment to receive result
      */
-    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     public void start(
-        @NonNull Context context, @NonNull android.app.Fragment fragment, @Nullable Class<?> cls) {
-      fragment.startActivityForResult(getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+            @NonNull Fragment fragment, Intent intent,  int requestCode) {
+      fragment.startActivityForResult(intent, requestCode);
     }
+    //endregion
 
     /**
      * The shape of the cropping window.<br>
