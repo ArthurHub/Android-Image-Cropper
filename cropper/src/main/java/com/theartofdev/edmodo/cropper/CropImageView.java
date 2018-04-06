@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import java.lang.ref.WeakReference;
+import java.math.BigInteger;
 import java.util.UUID;
 
 /** Custom view that provides cropping capabilities to an image. */
@@ -510,6 +511,22 @@ public class CropImageView extends FrameLayout {
   /** both the X and Y values of the aspectRatio. */
   public Pair<Integer, Integer> getAspectRatio() {
     return new Pair<>(mCropOverlayView.getAspectRatioX(), mCropOverlayView.getAspectRatioY());
+  }
+
+  /** both the X and Y values of the aspectRatio of the image to be cropped. */
+  public Pair<Integer, Integer> getImageAspectRatio() {
+    if (mBitmap != null) {
+      BigInteger b1 = BigInteger.valueOf(mBitmap.getWidth());
+      BigInteger b2 = BigInteger.valueOf(mBitmap.getHeight());
+      int gcd = b1.gcd(b2).intValue();
+      int width = b1.intValue();
+      int height = b2.intValue();
+      if (gcd != 0)
+      {
+        return new Pair<>(width / gcd, height / gcd);
+      }
+    }
+    return new Pair<>(1, 1);
   }
 
   /**
