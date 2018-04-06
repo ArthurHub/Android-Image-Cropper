@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">أدر عكس اتجاه عقارب الساعة</string>
+    <string name="crop_image_menu_rotate_right">أدر</string>
+    <string name="crop_image_menu_crop">قُصّ</string>
+    <string name="crop_image_menu_flip">اقلب</string>
+    <string name="crop_image_menu_flip_horizontally">اقلب أفقيًا</string>
+    <string name="crop_image_menu_flip_vertically">اقلب رأسيًا</string>
+
+    <string name="pick_image_intent_chooser_title">اختر مصدرًا</string>
+
+    <string name="crop_image_activity_no_permissions">إلغاء؛ الأذونات المطلوبة غير ممنوحة</string>
+
+</resources>
