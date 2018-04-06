@@ -86,7 +86,7 @@ public class CropImageActivity extends AppCompatActivity
 
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
-      CharSequence title =
+      CharSequence title = mOptions != null &&
           mOptions.activityTitle != null && mOptions.activityTitle.length() > 0
               ? mOptions.activityTitle
               : getResources().getString(R.string.crop_image_activity_title);
