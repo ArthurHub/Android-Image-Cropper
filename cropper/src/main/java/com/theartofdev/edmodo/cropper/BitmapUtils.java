@@ -113,6 +113,9 @@ final class BitmapUtils {
       // First decode with inJustDecodeBounds=true to check dimensions
       BitmapFactory.Options options = decodeImageForOption(resolver, uri);
 
+      if(options.outWidth  == -1 && options.outHeight == -1)
+        throw new RuntimeException("File is not a picture");
+
       // Calculate inSampleSize
       options.inSampleSize =
           Math.max(
