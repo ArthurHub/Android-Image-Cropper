@@ -18,6 +18,7 @@
         </attr>
         <attr name="cropAutoZoomEnabled" format="boolean"/>
         <attr name="cropMaxZoom" format="integer"/>
+        <attr name="cropMultiTouchEnabled" format="boolean"/>
         <attr name="cropFixAspectRatio" format="boolean"/>
         <attr name="cropAspectRatioX" format="integer"/>
         <attr name="cropAspectRatioY" format="integer"/>
@@ -33,6 +34,7 @@
         <attr name="cropBackgroundColor" format="color"/>
         <attr name="cropSnapRadius" format="dimension"/>
         <attr name="cropTouchRadius" format="dimension"/>
+        <attr name="cropSaveBitmapToInstanceState" format="boolean"/>
         <attr name="cropShowCropOverlay" format="boolean"/>
         <attr name="cropShowProgressBar" format="boolean"/>
         <attr name="cropMinCropWindowWidth" format="dimension"/>
@@ -41,6 +43,8 @@
         <attr name="cropMinCropResultHeightPX" format="float"/>
         <attr name="cropMaxCropResultWidthPX" format="float"/>
         <attr name="cropMaxCropResultHeightPX" format="float"/>
+        <attr name="cropFlipHorizontally" format="boolean"/>
+        <attr name="cropFlipVertically" format="boolean"/>
     </declare-styleable>
 
 </resources>
