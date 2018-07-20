@@ -15,7 +15,7 @@ Android Image Cropper
 1. Include the library
 
  ```
- compile 'com.theartofdev.edmodo:android-image-cropper:2.0.+'
+ implementation 'com.theartofdev.edmodo:android-image-cropper:2.0.+'
  ```
 
 2. Add `CropImageView` into your activity
