@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">סובב נגד כיוון השעון</string>
+    <string name="crop_image_menu_rotate_right">סובב</string>
+    <string name="crop_image_menu_crop">חתוך</string>
+    <string name="crop_image_menu_flip">הפוך</string>
+    <string name="crop_image_menu_flip_horizontally">הפוך אופקית</string>
+    <string name="crop_image_menu_flip_vertically">הפוך אנכית</string>
+
+    <string name="pick_image_intent_chooser_title">בחר מקור</string>
+
+    <string name="crop_image_activity_no_permissions">ההרשאות הנדרשות חסרות, מבטל</string>
+
+</resources>
