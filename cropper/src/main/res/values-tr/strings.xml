@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Sola Döndür</string>
+    <string name="crop_image_menu_rotate_right">Sağa Döndür</string>
+    <string name="crop_image_menu_crop">Kes</string>
+    <string name="crop_image_menu_flip">Çevir</string>
+    <string name="crop_image_menu_flip_horizontally">Yatay yönde çevir</string>
+    <string name="crop_image_menu_flip_vertically">Dikey yönde çevir</string>
+
+    <string name="pick_image_intent_chooser_title">Resim Seçin</string>
+
+    <string name="crop_image_activity_no_permissions">İptal ediliyor, gerekli izinler verilmedi</string>
+
+</resources>
