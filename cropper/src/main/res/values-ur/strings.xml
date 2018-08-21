@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crop_image_menu_rotate_left">گھڑی وار گھڑی گھومیں</string>
+    <string name="crop_image_menu_rotate_right">گھمائیں</string>
+    <string name="crop_image_menu_crop">فصل</string>
+    <string name="crop_image_menu_flip">پلٹائیں</string>
+    <string name="crop_image_menu_flip_horizontally">افقی پلٹائیں</string>
+    <string name="crop_image_menu_flip_vertically">عمودی طور پر پلٹائیں</string>
+    <string name="pick_image_intent_chooser_title">ذریعہ منتخب کریں</string>
+    <string name="crop_image_activity_no_permissions">منسوخ کرنا، ضروری اجازت نہیں دی جاتی ہیں</string>
+
+</resources>
