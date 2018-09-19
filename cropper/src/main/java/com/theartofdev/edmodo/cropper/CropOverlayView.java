@@ -632,7 +632,17 @@ public class CropOverlayView extends View {
       }
       mPath.addOval(mDrawRect, Path.Direction.CW);
       canvas.save();
-      canvas.clipPath(mPath, Region.Op.XOR);
+      // Ops other then Region.Op.INTERSECT and Region.Op.DIFFERENCE are deprecated since API 26
+      // as they have the ability to expand the clip. A new method Canvas.clipOutPath(Path) has been introduce
+      // to solve this issue. Since Android P using any ops other than Region.Op.INTERSECT and Region.Op.DIFFERENCE
+      // in Canvas.clipPath(Path, Region.Op) leads to IllegalArgumentException.
+      // More info can be found here:
+      // https://developer.android.com/reference/android/graphics/Canvas#clipPath(android.graphics.Path,%20android.graphics.Region.Op)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        canvas.clipOutPath(mPath);
+      } else {
+        canvas.clipPath(mPath, Region.Op.XOR);
+      }
       canvas.drawRect(left, top, right, bottom, mBackgroundPaint);
       canvas.restore();
     }
