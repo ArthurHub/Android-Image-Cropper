@@ -1,6 +1,6 @@
 Android Image Cropper
 =======
-[https://github.com/ArthurHub/Android-Image-Cropper](The original repository seems dead.) this fork was made to continue updating this wonderful library
+[The original repository seems dead](https://github.com/ArthurHub/Android-Image-Cropper) this fork was made to continue updating this wonderful library
 
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android--Image--Cropper-green.svg?style=true)](https://android-arsenal.com/details/1/3487)
