@@ -1,5 +1,8 @@
 Android Image Cropper
 =======
+[https://github.com/ArthurHub/Android-Image-Cropper](The original repository seems dead.) this fork was made to continue updating this wonderful library
+
+
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android--Image--Cropper-green.svg?style=true)](https://android-arsenal.com/details/1/3487)
 [![Build Status](https://travis-ci.org/ArthurHub/Android-Image-Cropper.svg?branch=master)](https://travis-ci.org/ArthurHub/Android-Image-Cropper)
 [ ![Download](https://api.bintray.com/packages/arthurhub/maven/Android-Image-Cropper/images/download.svg) ](https://bintray.com/arthurhub/maven/Android-Image-Cropper/_latestVersion)
