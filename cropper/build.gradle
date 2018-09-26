@@ -6,7 +6,7 @@ apply plugin: 'maven-publish'
 android {
 
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
+    buildToolsVersion '28.0.2'
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion rootProject.compileSdkVersion
@@ -42,7 +42,7 @@ publishing {
 apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
 
 dependencies {
-    api "com.android.support:appcompat-v7:$supportLibraryVersion"
-    implementation "com.android.support:exifinterface:$supportLibraryVersion"
+    api 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.exifinterface:exifinterface:1.0.0'
 }
 

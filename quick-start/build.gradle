@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
+    buildToolsVersion '28.0.2'
 
     defaultConfig {
         minSdkVersion 14
@@ -17,5 +17,5 @@ android {
 
 dependencies {
     api project(':cropper')
-    api "com.android.support:appcompat-v7:$supportLibraryVersion"
+    api 'androidx.appcompat:appcompat:1.0.0'
 }

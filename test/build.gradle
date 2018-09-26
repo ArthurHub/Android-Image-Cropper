@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
+    buildToolsVersion '28.0.2'
 
     defaultConfig {
         minSdkVersion 14
@@ -16,7 +16,7 @@ android {
 }
 
 dependencies {
-    api "com.android.support:appcompat-v7:27.1.1"
+    api "androidx.appcompat:appcompat:1.0.0"
     api 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
 
 }
