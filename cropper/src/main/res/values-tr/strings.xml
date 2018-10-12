@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_crop">Kırp</string>
+    <string name="crop_image_menu_rotate_right">Döndür</string>
+    <string name="crop_image_menu_rotate_left">Saat yönünün tersine döndür</string>
+    <string name="crop_image_menu_flip">Çevir</string>
+    <string name="crop_image_menu_flip_horizontally">Yatay çevir</string>
+    <string name="crop_image_menu_flip_vertically">Dikey çevir</string>
+    <string name="pick_image_intent_chooser_title">Kaynak seçin</string>
+    <string name="crop_image_activity_no_permissions">Gereken izin verilmediği için iptal edildi.</string>
+</resources>
