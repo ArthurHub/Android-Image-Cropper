@@ -10,5 +10,8 @@ android:
     - android-28
     - extra-android-m2repository
 
+before_install:
+- yes | sdkmanager "platforms;android-28"
+
 script:
  - ./gradlew clean build
