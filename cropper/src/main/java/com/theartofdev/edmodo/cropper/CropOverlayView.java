@@ -639,7 +639,7 @@ public class CropOverlayView extends View {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         canvas.clipOutPath(mPath);
       } else {
-        canvas.clipPath(mPath, Region.Op.INTERSECT);
+        canvas.clipPath(mPath, Region.Op.XOR);
       }
       canvas.drawRect(left, top, right, bottom, mBackgroundPaint);
       canvas.restore();
