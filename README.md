@@ -35,13 +35,7 @@ Add this line to your Proguard config file
 ```
 ### Using Activity
 
-2. Add `CropImageActivity` into your AndroidManifest.xml
- ```xml
- <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-   android:theme="@style/Base.Theme.AppCompat"/> <!-- optional (needed if default theme has no action bar) -->
- ```
-
-3. Start `CropImageActivity` using builder pattern from your activity
+2. Start `CropImageActivity` using builder pattern from your activity
  ```java
  // start picker to get image for cropping and then use the image in cropping activity
  CropImage.activity()
@@ -57,7 +51,7 @@ Add this line to your Proguard config file
    .start(getContext(), this);
  ```
 
-4. Override `onActivityResult` method in your activity to get crop result
+3. Override `onActivityResult` method in your activity to get crop result
  ```java
  @Override
  public void onActivityResult(int requestCode, int resultCode, Intent data) {
