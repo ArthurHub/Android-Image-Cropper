@@ -31,7 +31,7 @@ Add permissions to manifest
 Add this line to your Proguard config file
 
 ```
--keep class android.support.v7.widget.** { *; }
+-keep class androidx.appcompat.widget.** { *; }
 ```
 ### Using Activity
 
