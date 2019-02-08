@@ -60,8 +60,13 @@ public class CropImageActivity extends AppCompatActivity
     mCropImageView = findViewById(R.id.cropImageView);
 
     Bundle bundle = getIntent().getBundleExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE);
-    mCropImageUri = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE);
-    mOptions = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS);
+    if (bundle != null) {
+      mCropImageUri = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE);
+      mOptions = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS);
+    } else {
+      Log.w(getClass().getSimpleName(), "No crop image extra bundle provided!");
+      finish();
+    }
 
     if (savedInstanceState == null) {
       if (mCropImageUri == null || mCropImageUri.equals(Uri.EMPTY)) {
