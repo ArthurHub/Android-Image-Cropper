@@ -22,9 +22,6 @@
         </activity>
         <activity android:name="com.theartofdev.edmodo.cropper.sample.CropResultActivity">
         </activity>
-        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity">
-        </activity>
-
     </application>
 
 </manifest>
