@@ -17,6 +17,6 @@ android {
 
 dependencies {
     api "androidx.appcompat:appcompat:$androidXLibraryVersion"
-    api 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
+    implementation project(":cropper")
 
 }
