@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Повернути проти годинникової стрілки</string>
+    <string name="crop_image_menu_rotate_right">Повернути за годинниковою стрілкою</string>
+    <string name="crop_image_menu_crop">Обрізати</string>
+    <string name="crop_image_menu_flip">Відобразити</string>
+    <string name="crop_image_menu_flip_horizontally">Відобразити за горизонталлю</string>
+    <string name="crop_image_menu_flip_vertically">Відобразити за вертикаллю</string>
+
+    <string name="pick_image_intent_chooser_title">Виберіть джерело</string>
+
+    <string name="crop_image_activity_no_permissions">Скасовано, необхідні дозволи не були надані</string>
+</resources>
