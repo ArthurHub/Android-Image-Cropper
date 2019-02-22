@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="crop_image_menu_rotate_left">Повернуть налево</string>
-    <string name="crop_image_menu_rotate_right">Повернуть направо</string>
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Повернуть против часовой стрелки</string>
+    <string name="crop_image_menu_rotate_right">Повернуть по часовой стрелке</string>
     <string name="crop_image_menu_crop">Обрезать</string>
     <string name="crop_image_menu_flip">Отразить</string>
     <string name="crop_image_menu_flip_horizontally">Отразить по горизонтали</string>
     <string name="crop_image_menu_flip_vertically">Отразить по вертикали</string>
+
     <string name="pick_image_intent_chooser_title">Выбрать источник</string>
+
+    <string name="crop_image_activity_no_permissions">Отмена, необходимые разрешения не предоставлены</string>
 </resources>
