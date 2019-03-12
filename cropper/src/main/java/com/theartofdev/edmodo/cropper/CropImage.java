@@ -800,7 +800,7 @@ public final class CropImage {
     }
 
     /**
-     * the compression format to use when writting the image.<br>
+     * the compression format to use when writing the image.<br>
      * <i>Default: JPEG</i>
      */
     public ActivityBuilder setOutputCompressFormat(Bitmap.CompressFormat outputCompressFormat) {
@@ -809,7 +809,7 @@ public final class CropImage {
     }
 
     /**
-     * the quility (if applicable) to use when writting the image (0 - 100).<br>
+     * the quality (if applicable) to use when writing the image (0 - 100).<br>
      * <i>Default: 90</i>
      */
     public ActivityBuilder setOutputCompressQuality(int outputCompressQuality) {
