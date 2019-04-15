@@ -394,11 +394,28 @@ public class CropImageView extends FrameLayout {
     }
   }
 
+  /** Adjust zoom with given value */
+  public void adjustZoom(float value) {
+      if (mZoom * value < /* 1f stands for original size */ 1f ||
+              mZoom * value > mMaxZoom) return;
+
+      mZoom *= value;
+      applyImageMatrix(getWidth(), getHeight(), true, false);
+      mCropOverlayView.fixCurrentCropWindowRect();
+  }
+
   /** Set multi touch functionality to enabled/disabled. */
   public void setMultiTouchEnabled(boolean multiTouchEnabled) {
     if (mCropOverlayView.setMultiTouchEnabled(multiTouchEnabled)) {
       handleCropWindowChanged(false, false);
       mCropOverlayView.invalidate();
+
+      mCropOverlayView.setScaleGestureListener(new CropOverlayView.OnScaleGestureListener() {
+          @Override
+          public void onScaleGesturePerformed(float scale) {
+              adjustZoom(scale);
+          }
+      });
     }
   }
 
@@ -1577,7 +1594,7 @@ public class CropImageView extends FrameLayout {
       } else if (mAutoZoomEnabled || mZoom > 1) {
         float newZoom = 0;
         // keep the cropping window covered area to 50%-65% of zoomed sub-area
-        if (mZoom < mMaxZoom
+                if (mZoom < mMaxZoom
             && cropRect.width() < width * 0.5f
             && cropRect.height() < height * 0.5f) {
           newZoom =
