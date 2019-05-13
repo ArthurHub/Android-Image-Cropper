@@ -169,6 +169,11 @@ public class MainActivity extends AppCompatActivity {
         }
         mDrawerLayout.closeDrawers();
         break;
+      case R.id.drawer_option_load_multiple:
+        Intent intent = new Intent(MainActivity.this, AddMultiplePhotos.class);
+        startActivity(intent);
+        mDrawerLayout.closeDrawers();
+        break;
       case R.id.drawer_option_oval:
         setMainFragmentByPreset(CropDemoPreset.CIRCULAR);
         mDrawerLayout.closeDrawers();

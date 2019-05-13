@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/image_menu_crop"
+        android:title="@string/crop_image_menu_crop"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/image_menu_done"
+        android:title="@string/crop_image_menu_done"
+        app:showAsAction="always"/>
+</menu>

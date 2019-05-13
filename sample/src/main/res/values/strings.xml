@@ -6,6 +6,7 @@
     <string name="result_image_desc">crop result</string>
 
     <string name="main_drawer_load">Load Image for cropping</string>
+    <string name="main_drawer_load_multiple">Load Multiple Images</string>
     <string name="main_drawer_open">Open navigation drawer</string>
     <string name="main_drawer_close">Close navigation drawer</string>
 
