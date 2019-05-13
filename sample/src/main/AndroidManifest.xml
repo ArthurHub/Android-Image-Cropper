@@ -25,6 +25,11 @@
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity">
         </activity>
 
+        <activity android:name="com.theartofdev.edmodo.cropper.sample.AddMultiplePhotos">
+        </activity>
+
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImagesActivity">
+        </activity>
     </application>
 
 </manifest>
