@@ -44,6 +44,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 /**
@@ -343,7 +344,8 @@ public final class CropImage {
     Uri outputFileUri = null;
     File getImage = context.getExternalCacheDir();
     if (getImage != null) {
-      outputFileUri = Uri.fromFile(new File(getImage.getPath(), "pickImageResult.jpeg"));
+      File pickImageFile = new File(getImage.getPath(), "pickImageResult.jpeg");
+      outputFileUri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", pickImageFile);
     }
     return outputFileUri;
   }
