@@ -227,8 +227,8 @@ public class CropOverlayView extends View {
      * ImageView. This is necessary to call in order to draw the crop window.
      *
      * @param boundsPoints the image's bounding points
-     * @param viewWidth The bounding image view width.
-     * @param viewHeight The bounding image view height.
+     * @param viewWidth    The bounding image view width.
+     * @param viewHeight   The bounding image view height.
      */
     public void setBounds(float[] boundsPoints, int viewWidth, int viewHeight) {
         if (boundsPoints == null || !Arrays.equals(mBoundsPoints, boundsPoints)) {
@@ -363,7 +363,7 @@ public class CropOverlayView extends View {
      * Sets the Y value of the aspect ratio; is defaulted to 1.
      *
      * @param aspectRatioY int that specifies the new Y value of the aspect
-     * ratio
+     *                     ratio
      */
     public void setAspectRatioY(int aspectRatioY) {
         if (aspectRatioY <= 0) {
@@ -690,7 +690,11 @@ public class CropOverlayView extends View {
                 mPath.close();
 
                 canvas.save();
-                canvas.clipPath(mPath, Region.Op.INTERSECT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    canvas.clipOutPath(mPath);
+                } else {
+                    canvas.clipPath(mPath, Region.Op.INTERSECT);
+                }
                 canvas.clipRect(rect, Region.Op.XOR);
                 canvas.drawRect(left, top, right, bottom, mBackgroundPaint);
                 canvas.restore();
@@ -704,7 +708,11 @@ public class CropOverlayView extends View {
             }
             mPath.addOval(mDrawRect, Path.Direction.CW);
             canvas.save();
-            canvas.clipPath(mPath, Region.Op.XOR);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                canvas.clipOutPath(mPath);
+            } else {
+                canvas.clipPath(mPath, Region.Op.INTERSECT);
+            }
             canvas.drawRect(left, top, right, bottom, mBackgroundPaint);
             canvas.restore();
         }
