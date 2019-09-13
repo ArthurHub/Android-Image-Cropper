@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crop_image_menu_rotate_left">Saat yönünde döndür</string>
+    <string name="crop_image_menu_rotate_right">döndürmek</string>
+    <string name="crop_image_menu_crop">ekin</string>
+    <string name="crop_image_menu_flip">fiske</string>
+    <string name="crop_image_menu_flip_horizontally">Yatay olarak çevir</string>
+    <string name="crop_image_menu_flip_vertically">Dikey olarak çevir</string>
+    <string name="pick_image_intent_chooser_title">Kaynağı seçin</string>
+    <string name="crop_image_activity_no_permissions">İptal ediliyor, gerekli izinler verilmiyor</string>
+
+</resources>

@@ -1,0 +1,22 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 28
+        versionCode 1
+        versionName '1.0'
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    api "androidx.appcompat:appcompat:$androidXLibraryVersion"
+    implementation project(":cropper")
+
+}

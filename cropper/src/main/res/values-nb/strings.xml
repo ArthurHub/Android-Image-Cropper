@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Roter teller med urviseren</string>
+    <string name="crop_image_menu_rotate_right">Roter</string>
+    <string name="crop_image_menu_crop">Beskjær</string>
+    <string name="crop_image_menu_flip">Vend</string>
+    <string name="crop_image_menu_flip_horizontally">Vend vannrett</string>
+    <string name="crop_image_menu_flip_vertically">Vend loddrett</string>
+
+    <string name="pick_image_intent_chooser_title">Velg kilde</string>
+
+    <string name="crop_image_activity_no_permissions">Avbryter, nødvendige tillatelser er ikke gitt</string>
+
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Xoay theo chiều kim đồng hồ</string>
+    <string name="crop_image_menu_rotate_right">Xoay</string>
+    <string name="crop_image_menu_crop">Cắt</string>
+    <string name="crop_image_menu_flip">Lật</string>
+    <string name="crop_image_menu_flip_horizontally">Lật theo chiều ngang</string>
+    <string name="crop_image_menu_flip_vertically">Lật theo chiều dọc</string>
+
+    <string name="pick_image_intent_chooser_title">Chọn nguồn</string>
+
+    <string name="crop_image_activity_no_permissions">Đang hủy, các quyền đã yêu cầu không được cấp</string>
+
+</resources>

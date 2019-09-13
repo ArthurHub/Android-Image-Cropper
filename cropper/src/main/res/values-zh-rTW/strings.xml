@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">逆時針旋轉</string>
+    <string name="crop_image_menu_rotate_right">旋轉</string>
+    <string name="crop_image_menu_crop">裁切</string>
+    <string name="crop_image_menu_flip">翻轉</string>
+    <string name="crop_image_menu_flip_horizontally">水平翻轉</string>
+    <string name="crop_image_menu_flip_vertically">垂直翻轉</string>
+
+    <string name="pick_image_intent_chooser_title">選擇來源</string>
+
+    <string name="crop_image_activity_no_permissions">取消中，未授予所需權限</string>
+
+</resources>

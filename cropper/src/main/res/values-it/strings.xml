@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Ruota in senso antiorario</string>
+    <string name="crop_image_menu_rotate_right">Ruota</string>
+    <string name="crop_image_menu_crop">Ritaglia</string>
+    <string name="crop_image_menu_flip">Capovolgi</string>
+    <string name="crop_image_menu_flip_horizontally">Capovolgi orizzontalmente</string>
+    <string name="crop_image_menu_flip_vertically">Capovolgi verticalmente</string>
+
+    <string name="pick_image_intent_chooser_title">Seleziona origine</string>
+
+    <string name="crop_image_activity_no_permissions">Annullamento in corso, autorizzazione richieste non concesse</string>
+
+</resources>

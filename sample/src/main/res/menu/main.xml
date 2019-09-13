@@ -1,11 +1,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/main_action_rotate"
         android:icon="@android:drawable/ic_menu_rotate"
         android:title="@string/main_action_rotate"
         app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/main_action_flip"
+        android:icon="@drawable/crop_image_menu_flip"
+        android:title="@string/main_action_flip"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/main_action_flip_horizontally"
+                android:title="@string/main_action_flip_horizontally"/>
+            <item
+                android:id="@+id/main_action_flip_vertically"
+                android:title="@string/main_action_flip_vertically"/>
+        </menu>
+    </item>
+
     <item
         android:id="@+id/main_action_crop"
         android:title="@string/main_action_crop"

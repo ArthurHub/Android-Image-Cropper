@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crop_image_menu_rotate_left">Putar berlawanan arah jarum jam</string>
+    <string name="crop_image_menu_rotate_right">Putar</string>
+    <string name="crop_image_menu_crop">Potong</string>
+    <string name="crop_image_menu_flip">Balik</string>
+    <string name="crop_image_menu_flip_horizontally">Balik secara horizontal</string>
+    <string name="crop_image_menu_flip_vertically">Balik secara vertikal</string>
+    <string name="pick_image_intent_chooser_title">Pilih sumber</string>
+    <string name="crop_image_activity_no_permissions">Membatalkan, tidak mendapatkan izin yang diperlukan</string>
+
+</resources>

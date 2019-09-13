@@ -14,6 +14,20 @@
         android:title="@string/crop_image_menu_rotate_right"
         app:showAsAction="ifRoom"/>
     <item
+        android:id="@+id/crop_image_menu_flip"
+        android:icon="@drawable/crop_image_menu_flip"
+        android:title="@string/crop_image_menu_flip"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/crop_image_menu_flip_horizontally"
+                android:title="@string/crop_image_menu_flip_horizontally"/>
+            <item
+                android:id="@+id/crop_image_menu_flip_vertically"
+                android:title="@string/crop_image_menu_flip_vertically"/>
+        </menu>
+    </item>
+    <item
         android:id="@+id/crop_image_menu_crop"
         android:title="@string/crop_image_menu_crop"
         app:showAsAction="always"/>

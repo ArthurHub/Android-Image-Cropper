@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Obróć w lewo</string>
+    <string name="crop_image_menu_rotate_right">Obróć</string>
+    <string name="crop_image_menu_crop">Przytnij</string>
+    <string name="crop_image_menu_flip">Odbij</string>
+    <string name="crop_image_menu_flip_horizontally">Odbij poziomo</string>
+    <string name="crop_image_menu_flip_vertically">Odbij pionowo</string>
+
+    <string name="pick_image_intent_chooser_title">Wybierz źródło</string>
+
+    <string name="crop_image_activity_no_permissions">Przerywaniem, potrzebne uprawnienia nie zostały nadane</string>
+
+</resources>

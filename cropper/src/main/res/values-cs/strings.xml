@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Otočit proti směru hodinových ručiček</string>
+    <string name="crop_image_menu_rotate_right">Otočit</string>
+    <string name="crop_image_menu_crop">Oříznout</string>
+    <string name="crop_image_menu_flip">Překlopit</string>
+    <string name="crop_image_menu_flip_horizontally">Překlopit vodorovně</string>
+    <string name="crop_image_menu_flip_vertically">Překlopit svisle</string>
+
+    <string name="pick_image_intent_chooser_title">Vybrat zdroj</string>
+
+    <string name="crop_image_activity_no_permissions">Probíhá storno, požadovaná povolení nejsou udělena</string>
+
+</resources>

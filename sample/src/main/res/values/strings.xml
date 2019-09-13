@@ -11,6 +11,9 @@
 
     <string name="main_action_crop">CROP</string>
     <string name="main_action_rotate">Rotate 90 degrees clockwise</string>
+    <string name="main_action_flip">Flip</string>
+    <string name="main_action_flip_horizontally">Flip horizontally</string>
+    <string name="main_action_flip_vertically">Flip vertically</string>
     <string name="drawer_option_title">Crop View Presets</string>
     <string name="drawer_option_oval">Circular</string>
     <string name="drawer_option_rect">Rectangular</string>
