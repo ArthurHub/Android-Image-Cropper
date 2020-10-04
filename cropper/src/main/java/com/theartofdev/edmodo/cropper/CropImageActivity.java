@@ -189,6 +189,7 @@ public class CropImageActivity extends AppCompatActivity
   @Override
   @SuppressLint("NewApi")
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
 
     // handle result of pick image chooser
     if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE) {

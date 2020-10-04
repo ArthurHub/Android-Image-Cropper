@@ -5,7 +5,7 @@ android {
     buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion rootProject.compileSdkVersion
         versionCode 1
         versionName '1.0'
@@ -17,5 +17,5 @@ android {
 
 dependencies {
     api project(':cropper')
-    api "androidx.appcompat:appcompat:$androidXLibraryVersion"
+    api "androidx.appcompat:appcompat:$androidXAppCompatVersion"
 }
