@@ -55,6 +55,11 @@ Add this line to your Proguard config file
  // for fragment (DO NOT use `getActivity()`)
  CropImage.activity()
    .start(getContext(), this);
+   
+ // start cropping with aspect Ration for fit in imageview .
+    CropImage.activity(imageuri)
+                    .setAspectRatio(1,1) //square Size for fit in imageview.    
+                    .start(this);
  ```
 
 4. Override `onActivityResult` method in your activity to get crop result
