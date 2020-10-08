@@ -4,18 +4,18 @@
 
     <item
         android:id="@+id/crop_image_menu_rotate_left"
-        android:icon="@drawable/crop_image_menu_rotate_left"
+        android:icon="@drawable/crop_menu_rotate_left"
         android:title="@string/crop_image_menu_rotate_left"
         android:visible="false"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/crop_image_menu_rotate_right"
-        android:icon="@drawable/crop_image_menu_rotate_right"
+        android:icon="@drawable/crop_menu_rotate_right"
         android:title="@string/crop_image_menu_rotate_right"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/crop_image_menu_flip"
-        android:icon="@drawable/crop_image_menu_flip"
+        android:icon="@drawable/crop_menu_flip"
         android:title="@string/crop_image_menu_flip"
         app:showAsAction="ifRoom">
         <menu>
