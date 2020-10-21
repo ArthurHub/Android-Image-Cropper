@@ -4,7 +4,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:4.0.1'
     }
 }
 
@@ -18,7 +18,7 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 28
+    compileSdkVersion = 30
     buildToolsVersion = '28.0.3'
     androidXLibraryVersion = '1.0.0'
 
