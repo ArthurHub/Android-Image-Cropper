@@ -1,10 +1,12 @@
 buildscript {
+    ext.kotlin_version = '1.4.21'
     repositories {
         jcenter()
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -18,9 +20,9 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 28
-    buildToolsVersion = '28.0.3'
-    androidXLibraryVersion = '1.0.0'
+    compileSdkVersion = 30
+    buildToolsVersion = '30.0.3'
+    androidXLibraryVersion = '1.2.0'
 
     PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
     PUBLISH_ARTIFACT_ID = 'android-image-cropper'
