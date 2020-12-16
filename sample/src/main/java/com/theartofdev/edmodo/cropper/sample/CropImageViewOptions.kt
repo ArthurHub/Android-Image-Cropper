@@ -9,37 +9,25 @@
 //
 // - Sun Tsu,
 // "The Art of War"
+package com.theartofdev.edmodo.cropper.sample
 
-package com.theartofdev.edmodo.cropper.sample;
+import android.util.Pair
+import com.theartofdev.edmodo.cropper.CropImageView
+import com.theartofdev.edmodo.cropper.CropImageView.CropShape
+import com.theartofdev.edmodo.cropper.CropImageView.Guidelines
 
-import android.util.Pair;
-
-import com.theartofdev.edmodo.cropper.CropImageView;
-
-/** The crop image view options that can be changed live. */
-final class CropImageViewOptions {
-
-  public CropImageView.ScaleType scaleType = CropImageView.ScaleType.CENTER_INSIDE;
-
-  public CropImageView.CropShape cropShape = CropImageView.CropShape.RECTANGLE;
-
-  public CropImageView.Guidelines guidelines = CropImageView.Guidelines.ON_TOUCH;
-
-  public Pair<Integer, Integer> aspectRatio = new Pair<>(1, 1);
-
-  public boolean autoZoomEnabled;
-
-  public int maxZoomLevel;
-
-  public boolean fixAspectRatio;
-
-  public boolean multitouch;
-
-  public boolean showCropOverlay;
-
-  public boolean showProgressBar;
-
-  public boolean flipHorizontally;
-
-  public boolean flipVertically;
+/** The crop image view options that can be changed live.  */
+class CropImageViewOptions {
+    var scaleType = CropImageView.ScaleType.CENTER_INSIDE
+    var cropShape = CropShape.RECTANGLE
+    var guidelines = Guidelines.ON_TOUCH
+    var aspectRatio = Pair(1, 1)
+    var autoZoomEnabled = false
+    var maxZoomLevel = 0
+    var fixAspectRatio = false
+    var multitouch = false
+    var showCropOverlay = false
+    var showProgressBar = false
+    var flipHorizontally = false
+    var flipVertically = false
 }

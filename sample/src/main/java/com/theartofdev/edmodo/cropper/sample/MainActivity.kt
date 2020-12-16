@@ -9,333 +9,271 @@
 //
 // - Sun Tsu,
 // "The Art of War"
+package com.theartofdev.edmodo.cropper.sample
 
-package com.theartofdev.edmodo.cropper.sample;
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Bundle
+import android.util.Pair
+import android.view.*
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
+import com.example.croppersample.R
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImage.getPickImageResultUri
+import com.theartofdev.edmodo.cropper.CropImage.isExplicitCameraPermissionRequired
+import com.theartofdev.edmodo.cropper.CropImage.isReadExternalStoragePermissionsRequired
+import com.theartofdev.edmodo.cropper.CropImage.startPickImageActivity
+import com.theartofdev.edmodo.cropper.CropImageView
+import com.theartofdev.edmodo.cropper.CropImageView.CropShape
+import com.theartofdev.edmodo.cropper.CropImageView.Guidelines
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Bundle;
-import androidx.fragment.app.FragmentManager;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import android.util.Pair;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+class MainActivity : AppCompatActivity() {
+    // region: Fields and Consts
+    var mDrawerLayout: DrawerLayout? = null
+    private var mDrawerToggle: ActionBarDrawerToggle? = null
+    private var mCurrentFragment: MainFragment? = null
+    private var mCropImageUri: Uri? = null
+    private var mCropImageViewOptions = CropImageViewOptions()
 
-import com.example.croppersample.R;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
-
-public class MainActivity extends AppCompatActivity {
-
-  // region: Fields and Consts
-
-  DrawerLayout mDrawerLayout;
-
-  private ActionBarDrawerToggle mDrawerToggle;
-
-  private MainFragment mCurrentFragment;
-
-  private Uri mCropImageUri;
-
-  private CropImageViewOptions mCropImageViewOptions = new CropImageViewOptions();
-  // endregion
-
-  public void setCurrentFragment(MainFragment fragment) {
-    mCurrentFragment = fragment;
-  }
-
-  public void setCurrentOptions(CropImageViewOptions options) {
-    mCropImageViewOptions = options;
-    updateDrawerTogglesByOptions(options);
-  }
-
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    getSupportActionBar().setHomeButtonEnabled(true);
-
-    mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-    mDrawerToggle =
-        new ActionBarDrawerToggle(
-            this, mDrawerLayout, R.string.main_drawer_open, R.string.main_drawer_close);
-    mDrawerToggle.setDrawerIndicatorEnabled(true);
-    mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-    if (savedInstanceState == null) {
-      setMainFragmentByPreset(CropDemoPreset.RECT);
+    // endregion
+    fun setCurrentFragment(fragment: MainFragment?) {
+        mCurrentFragment = fragment
     }
-  }
 
-  @Override
-  protected void onPostCreate(Bundle savedInstanceState) {
-    super.onPostCreate(savedInstanceState);
-    mDrawerToggle.syncState();
-    mCurrentFragment.updateCurrentCropViewOptions();
-  }
-
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    MenuInflater inflater = getMenuInflater();
-    inflater.inflate(R.menu.main, menu);
-    return true;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    if (mDrawerToggle.onOptionsItemSelected(item)) {
-      return true;
+    fun setCurrentOptions(options: CropImageViewOptions) {
+        mCropImageViewOptions = options
+        updateDrawerTogglesByOptions(options)
     }
-    if (mCurrentFragment != null && mCurrentFragment.onOptionsItemSelected(item)) {
-      return true;
-    }
-    return super.onOptionsItemSelected(item);
-  }
 
-  @Override
-  @SuppressLint("NewApi")
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-
-    if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE
-        && resultCode == AppCompatActivity.RESULT_OK) {
-      Uri imageUri = CropImage.getPickImageResultUri(this, data);
-
-      // For API >= 23 we need to check specifically that we have permissions to read external
-      // storage,
-      // but we don't know if we need to for the URI so the simplest is to try open the stream and
-      // see if we get error.
-      boolean requirePermissions = false;
-      if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {
-
-        // request permissions and handle the result in onRequestPermissionsResult()
-        requirePermissions = true;
-        mCropImageUri = imageUri;
-        requestPermissions(
-            new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
-            CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
-      } else {
-
-        mCurrentFragment.setImageUri(imageUri);
-      }
-    }
-  }
-
-  @Override
-  public void onRequestPermissionsResult(
-      int requestCode, String permissions[], int[] grantResults) {
-    if (requestCode == CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE) {
-      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        CropImage.startPickImageActivity(this);
-      } else {
-        Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG)
-            .show();
-      }
-    }
-    if (requestCode == CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
-      if (mCropImageUri != null
-          && grantResults.length > 0
-          && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        mCurrentFragment.setImageUri(mCropImageUri);
-      } else {
-        Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG)
-            .show();
-      }
-    }
-  }
-
-  @SuppressLint("NewApi")
-  public void onDrawerOptionClicked(View view) {
-    switch (view.getId()) {
-      case R.id.drawer_option_load:
-        if (CropImage.isExplicitCameraPermissionRequired(this)) {
-          requestPermissions(
-              new String[] {Manifest.permission.CAMERA},
-              CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE);
-        } else {
-          CropImage.startPickImageActivity(this);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar!!.setHomeButtonEnabled(true)
+        mDrawerLayout = findViewById<View>(R.id.drawer_layout) as DrawerLayout
+        mDrawerToggle = ActionBarDrawerToggle(
+                this, mDrawerLayout, R.string.main_drawer_open, R.string.main_drawer_close)
+        mDrawerToggle!!.isDrawerIndicatorEnabled = true
+        mDrawerLayout!!.setDrawerListener(mDrawerToggle)
+        if (savedInstanceState == null) {
+            setMainFragmentByPreset(CropDemoPreset.RECT)
         }
-        mDrawerLayout.closeDrawers();
-        break;
-      case R.id.drawer_option_oval:
-        setMainFragmentByPreset(CropDemoPreset.CIRCULAR);
-        mDrawerLayout.closeDrawers();
-        break;
-      case R.id.drawer_option_rect:
-        setMainFragmentByPreset(CropDemoPreset.RECT);
-        mDrawerLayout.closeDrawers();
-        break;
-      case R.id.drawer_option_customized_overlay:
-        setMainFragmentByPreset(CropDemoPreset.CUSTOMIZED_OVERLAY);
-        mDrawerLayout.closeDrawers();
-        break;
-      case R.id.drawer_option_min_max_override:
-        setMainFragmentByPreset(CropDemoPreset.MIN_MAX_OVERRIDE);
-        mDrawerLayout.closeDrawers();
-        break;
-      case R.id.drawer_option_scale_center:
-        setMainFragmentByPreset(CropDemoPreset.SCALE_CENTER_INSIDE);
-        mDrawerLayout.closeDrawers();
-        break;
-      case R.id.drawer_option_toggle_scale:
-        mCropImageViewOptions.scaleType =
-            mCropImageViewOptions.scaleType == CropImageView.ScaleType.FIT_CENTER
-                ? CropImageView.ScaleType.CENTER_INSIDE
-                : mCropImageViewOptions.scaleType == CropImageView.ScaleType.CENTER_INSIDE
-                    ? CropImageView.ScaleType.CENTER
-                    : mCropImageViewOptions.scaleType == CropImageView.ScaleType.CENTER
-                        ? CropImageView.ScaleType.CENTER_CROP
-                        : CropImageView.ScaleType.FIT_CENTER;
-        mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
-        updateDrawerTogglesByOptions(mCropImageViewOptions);
-        break;
-      case R.id.drawer_option_toggle_shape:
-        mCropImageViewOptions.cropShape =
-            mCropImageViewOptions.cropShape == CropImageView.CropShape.RECTANGLE
-                ? CropImageView.CropShape.OVAL
-                : CropImageView.CropShape.RECTANGLE;
-        mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
-        updateDrawerTogglesByOptions(mCropImageViewOptions);
-        break;
-      case R.id.drawer_option_toggle_guidelines:
-        mCropImageViewOptions.guidelines =
-            mCropImageViewOptions.guidelines == CropImageView.Guidelines.OFF
-                ? CropImageView.Guidelines.ON
-                : mCropImageViewOptions.guidelines == CropImageView.Guidelines.ON
-                    ? CropImageView.Guidelines.ON_TOUCH
-                    : CropImageView.Guidelines.OFF;
-        mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
-        updateDrawerTogglesByOptions(mCropImageViewOptions);
-        break;
-      case R.id.drawer_option_toggle_aspect_ratio:
-        if (!mCropImageViewOptions.fixAspectRatio) {
-          mCropImageViewOptions.fixAspectRatio = true;
-          mCropImageViewOptions.aspectRatio = new Pair<>(1, 1);
-        } else {
-          if (mCropImageViewOptions.aspectRatio.first == 1
-              && mCropImageViewOptions.aspectRatio.second == 1) {
-            mCropImageViewOptions.aspectRatio = new Pair<>(4, 3);
-          } else if (mCropImageViewOptions.aspectRatio.first == 4
-              && mCropImageViewOptions.aspectRatio.second == 3) {
-            mCropImageViewOptions.aspectRatio = new Pair<>(16, 9);
-          } else if (mCropImageViewOptions.aspectRatio.first == 16
-              && mCropImageViewOptions.aspectRatio.second == 9) {
-            mCropImageViewOptions.aspectRatio = new Pair<>(9, 16);
-          } else {
-            mCropImageViewOptions.fixAspectRatio = false;
-          }
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        mDrawerToggle!!.syncState()
+        mCurrentFragment!!.updateCurrentCropViewOptions()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (mDrawerToggle!!.onOptionsItemSelected(item)) {
+            return true
         }
-        mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
-        updateDrawerTogglesByOptions(mCropImageViewOptions);
-        break;
-      case R.id.drawer_option_toggle_auto_zoom:
-        mCropImageViewOptions.autoZoomEnabled = !mCropImageViewOptions.autoZoomEnabled;
-        mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
-        updateDrawerTogglesByOptions(mCropImageViewOptions);
-        break;
-      case R.id.drawer_option_toggle_max_zoom:
-        mCropImageViewOptions.maxZoomLevel =
-            mCropImageViewOptions.maxZoomLevel == 4
-                ? 8
-                : mCropImageViewOptions.maxZoomLevel == 8 ? 2 : 4;
-        mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
-        updateDrawerTogglesByOptions(mCropImageViewOptions);
-        break;
-      case R.id.drawer_option_set_initial_crop_rect:
-        mCurrentFragment.setInitialCropRect();
-        mDrawerLayout.closeDrawers();
-        break;
-      case R.id.drawer_option_reset_crop_rect:
-        mCurrentFragment.resetCropRect();
-        mDrawerLayout.closeDrawers();
-        break;
-      case R.id.drawer_option_toggle_multitouch:
-        mCropImageViewOptions.multitouch = !mCropImageViewOptions.multitouch;
-        mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
-        updateDrawerTogglesByOptions(mCropImageViewOptions);
-        break;
-      case R.id.drawer_option_toggle_show_overlay:
-        mCropImageViewOptions.showCropOverlay = !mCropImageViewOptions.showCropOverlay;
-        mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
-        updateDrawerTogglesByOptions(mCropImageViewOptions);
-        break;
-      case R.id.drawer_option_toggle_show_progress_bar:
-        mCropImageViewOptions.showProgressBar = !mCropImageViewOptions.showProgressBar;
-        mCurrentFragment.setCropImageViewOptions(mCropImageViewOptions);
-        updateDrawerTogglesByOptions(mCropImageViewOptions);
-        break;
-      default:
-        Toast.makeText(this, "Unknown drawer option clicked", Toast.LENGTH_LONG).show();
+        return if (mCurrentFragment != null && mCurrentFragment!!.onOptionsItemSelected(item)) {
+            true
+        } else super.onOptionsItemSelected(item)
     }
-  }
 
-  private void setMainFragmentByPreset(CropDemoPreset demoPreset) {
-    FragmentManager fragmentManager = getSupportFragmentManager();
-    fragmentManager
-        .beginTransaction()
-        .replace(R.id.container, MainFragment.newInstance(demoPreset))
-        .commit();
-  }
+    @SuppressLint("NewApi")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE
+                && resultCode == RESULT_OK) {
+            val imageUri = getPickImageResultUri(this, data)
 
-  private void updateDrawerTogglesByOptions(CropImageViewOptions options) {
-    ((TextView) findViewById(R.id.drawer_option_toggle_scale))
-        .setText(
-            getResources()
-                .getString(R.string.drawer_option_toggle_scale, options.scaleType.name()));
-    ((TextView) findViewById(R.id.drawer_option_toggle_shape))
-        .setText(
-            getResources()
-                .getString(R.string.drawer_option_toggle_shape, options.cropShape.name()));
-    ((TextView) findViewById(R.id.drawer_option_toggle_guidelines))
-        .setText(
-            getResources()
-                .getString(R.string.drawer_option_toggle_guidelines, options.guidelines.name()));
-    ((TextView) findViewById(R.id.drawer_option_toggle_multitouch))
-        .setText(
-            getResources()
-                .getString(
-                    R.string.drawer_option_toggle_multitouch,
-                    Boolean.toString(options.multitouch)));
-    ((TextView) findViewById(R.id.drawer_option_toggle_show_overlay))
-        .setText(
-            getResources()
-                .getString(
-                    R.string.drawer_option_toggle_show_overlay,
-                    Boolean.toString(options.showCropOverlay)));
-    ((TextView) findViewById(R.id.drawer_option_toggle_show_progress_bar))
-        .setText(
-            getResources()
-                .getString(
-                    R.string.drawer_option_toggle_show_progress_bar,
-                    Boolean.toString(options.showProgressBar)));
+            // For API >= 23 we need to check specifically that we have permissions to read external
+            // storage,
+            // but we don't know if we need to for the URI so the simplest is to try open the stream and
+            // see if we get error.
+            var requirePermissions = false
+            if (isReadExternalStoragePermissionsRequired(this, imageUri!!)) {
 
-    String aspectRatio = "FREE";
-    if (options.fixAspectRatio) {
-      aspectRatio = options.aspectRatio.first + ":" + options.aspectRatio.second;
+                // request permissions and handle the result in onRequestPermissionsResult()
+                requirePermissions = true
+                mCropImageUri = imageUri
+                requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                        CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE)
+            } else {
+                mCurrentFragment!!.setImageUri(imageUri)
+            }
+        }
     }
-    ((TextView) findViewById(R.id.drawer_option_toggle_aspect_ratio))
-        .setText(getResources().getString(R.string.drawer_option_toggle_aspect_ratio, aspectRatio));
 
-    ((TextView) findViewById(R.id.drawer_option_toggle_auto_zoom))
-        .setText(
-            getResources()
+    override fun onRequestPermissionsResult(
+            requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        if (requestCode == CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startPickImageActivity(this)
+            } else {
+                Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG)
+                        .show()
+            }
+        }
+        if (requestCode == CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
+            if (mCropImageUri != null && grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mCurrentFragment!!.setImageUri(mCropImageUri)
+            } else {
+                Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG)
+                        .show()
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    fun onDrawerOptionClicked(view: View) {
+        when (view.id) {
+            R.id.drawer_option_load -> {
+                if (isExplicitCameraPermissionRequired(this)) {
+                    requestPermissions(arrayOf(Manifest.permission.CAMERA),
+                            CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE)
+                } else {
+                    startPickImageActivity(this)
+                }
+                mDrawerLayout!!.closeDrawers()
+            }
+            R.id.drawer_option_oval -> {
+                setMainFragmentByPreset(CropDemoPreset.CIRCULAR)
+                mDrawerLayout!!.closeDrawers()
+            }
+            R.id.drawer_option_rect -> {
+                setMainFragmentByPreset(CropDemoPreset.RECT)
+                mDrawerLayout!!.closeDrawers()
+            }
+            R.id.drawer_option_customized_overlay -> {
+                setMainFragmentByPreset(CropDemoPreset.CUSTOMIZED_OVERLAY)
+                mDrawerLayout!!.closeDrawers()
+            }
+            R.id.drawer_option_min_max_override -> {
+                setMainFragmentByPreset(CropDemoPreset.MIN_MAX_OVERRIDE)
+                mDrawerLayout!!.closeDrawers()
+            }
+            R.id.drawer_option_scale_center -> {
+                setMainFragmentByPreset(CropDemoPreset.SCALE_CENTER_INSIDE)
+                mDrawerLayout!!.closeDrawers()
+            }
+            R.id.drawer_option_toggle_scale -> {
+                mCropImageViewOptions.scaleType = if (mCropImageViewOptions.scaleType === CropImageView.ScaleType.FIT_CENTER) CropImageView.ScaleType.CENTER_INSIDE else if (mCropImageViewOptions.scaleType === CropImageView.ScaleType.CENTER_INSIDE) CropImageView.ScaleType.CENTER else if (mCropImageViewOptions.scaleType === CropImageView.ScaleType.CENTER) CropImageView.ScaleType.CENTER_CROP else CropImageView.ScaleType.FIT_CENTER
+                mCurrentFragment!!.setCropImageViewOptions(mCropImageViewOptions)
+                updateDrawerTogglesByOptions(mCropImageViewOptions)
+            }
+            R.id.drawer_option_toggle_shape -> {
+                mCropImageViewOptions.cropShape = if (mCropImageViewOptions.cropShape === CropShape.RECTANGLE) CropShape.OVAL else CropShape.RECTANGLE
+                mCurrentFragment!!.setCropImageViewOptions(mCropImageViewOptions)
+                updateDrawerTogglesByOptions(mCropImageViewOptions)
+            }
+            R.id.drawer_option_toggle_guidelines -> {
+                mCropImageViewOptions.guidelines = if (mCropImageViewOptions.guidelines === Guidelines.OFF) Guidelines.ON else if (mCropImageViewOptions.guidelines === Guidelines.ON) Guidelines.ON_TOUCH else Guidelines.OFF
+                mCurrentFragment!!.setCropImageViewOptions(mCropImageViewOptions)
+                updateDrawerTogglesByOptions(mCropImageViewOptions)
+            }
+            R.id.drawer_option_toggle_aspect_ratio -> {
+                if (!mCropImageViewOptions.fixAspectRatio) {
+                    mCropImageViewOptions.fixAspectRatio = true
+                    mCropImageViewOptions.aspectRatio = Pair(1, 1)
+                } else {
+                    if (mCropImageViewOptions.aspectRatio.first == 1
+                            && mCropImageViewOptions.aspectRatio.second == 1) {
+                        mCropImageViewOptions.aspectRatio = Pair(4, 3)
+                    } else if (mCropImageViewOptions.aspectRatio.first == 4
+                            && mCropImageViewOptions.aspectRatio.second == 3) {
+                        mCropImageViewOptions.aspectRatio = Pair(16, 9)
+                    } else if (mCropImageViewOptions.aspectRatio.first == 16
+                            && mCropImageViewOptions.aspectRatio.second == 9) {
+                        mCropImageViewOptions.aspectRatio = Pair(9, 16)
+                    } else {
+                        mCropImageViewOptions.fixAspectRatio = false
+                    }
+                }
+                mCurrentFragment!!.setCropImageViewOptions(mCropImageViewOptions)
+                updateDrawerTogglesByOptions(mCropImageViewOptions)
+            }
+            R.id.drawer_option_toggle_auto_zoom -> {
+                mCropImageViewOptions.autoZoomEnabled = !mCropImageViewOptions.autoZoomEnabled
+                mCurrentFragment!!.setCropImageViewOptions(mCropImageViewOptions)
+                updateDrawerTogglesByOptions(mCropImageViewOptions)
+            }
+            R.id.drawer_option_toggle_max_zoom -> {
+                mCropImageViewOptions.maxZoomLevel = if (mCropImageViewOptions.maxZoomLevel == 4) 8 else if (mCropImageViewOptions.maxZoomLevel == 8) 2 else 4
+                mCurrentFragment!!.setCropImageViewOptions(mCropImageViewOptions)
+                updateDrawerTogglesByOptions(mCropImageViewOptions)
+            }
+            R.id.drawer_option_set_initial_crop_rect -> {
+                mCurrentFragment!!.setInitialCropRect()
+                mDrawerLayout!!.closeDrawers()
+            }
+            R.id.drawer_option_reset_crop_rect -> {
+                mCurrentFragment!!.resetCropRect()
+                mDrawerLayout!!.closeDrawers()
+            }
+            R.id.drawer_option_toggle_multitouch -> {
+                mCropImageViewOptions.multitouch = !mCropImageViewOptions.multitouch
+                mCurrentFragment!!.setCropImageViewOptions(mCropImageViewOptions)
+                updateDrawerTogglesByOptions(mCropImageViewOptions)
+            }
+            R.id.drawer_option_toggle_show_overlay -> {
+                mCropImageViewOptions.showCropOverlay = !mCropImageViewOptions.showCropOverlay
+                mCurrentFragment!!.setCropImageViewOptions(mCropImageViewOptions)
+                updateDrawerTogglesByOptions(mCropImageViewOptions)
+            }
+            R.id.drawer_option_toggle_show_progress_bar -> {
+                mCropImageViewOptions.showProgressBar = !mCropImageViewOptions.showProgressBar
+                mCurrentFragment!!.setCropImageViewOptions(mCropImageViewOptions)
+                updateDrawerTogglesByOptions(mCropImageViewOptions)
+            }
+            else -> Toast.makeText(this, "Unknown drawer option clicked", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun setMainFragmentByPreset(demoPreset: CropDemoPreset) {
+        val fragmentManager = supportFragmentManager
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.container, MainFragment.newInstance(demoPreset))
+                .commit()
+    }
+
+    private fun updateDrawerTogglesByOptions(options: CropImageViewOptions) {
+        (findViewById<View>(R.id.drawer_option_toggle_scale) as TextView).text = resources
+                .getString(R.string.drawer_option_toggle_scale, options.scaleType.name)
+        (findViewById<View>(R.id.drawer_option_toggle_shape) as TextView).text = resources
+                .getString(R.string.drawer_option_toggle_shape, options.cropShape.name)
+        (findViewById<View>(R.id.drawer_option_toggle_guidelines) as TextView).text = resources
+                .getString(R.string.drawer_option_toggle_guidelines, options.guidelines.name)
+        (findViewById<View>(R.id.drawer_option_toggle_multitouch) as TextView).text = resources
                 .getString(
-                    R.string.drawer_option_toggle_auto_zoom,
-                    options.autoZoomEnabled ? "Enabled" : "Disabled"));
-    ((TextView) findViewById(R.id.drawer_option_toggle_max_zoom))
-        .setText(
-            getResources().getString(R.string.drawer_option_toggle_max_zoom, options.maxZoomLevel));
-  }
+                        R.string.drawer_option_toggle_multitouch,
+                        java.lang.Boolean.toString(options.multitouch))
+        (findViewById<View>(R.id.drawer_option_toggle_show_overlay) as TextView).text = resources
+                .getString(
+                        R.string.drawer_option_toggle_show_overlay,
+                        java.lang.Boolean.toString(options.showCropOverlay))
+        (findViewById<View>(R.id.drawer_option_toggle_show_progress_bar) as TextView).text = resources
+                .getString(
+                        R.string.drawer_option_toggle_show_progress_bar,
+                        java.lang.Boolean.toString(options.showProgressBar))
+        var aspectRatio = "FREE"
+        if (options.fixAspectRatio) {
+            aspectRatio = options.aspectRatio.first.toString() + ":" + options.aspectRatio.second
+        }
+        (findViewById<View>(R.id.drawer_option_toggle_aspect_ratio) as TextView).text = resources.getString(R.string.drawer_option_toggle_aspect_ratio, aspectRatio)
+        (findViewById<View>(R.id.drawer_option_toggle_auto_zoom) as TextView).text = resources
+                .getString(
+                        R.string.drawer_option_toggle_auto_zoom,
+                        if (options.autoZoomEnabled) "Enabled" else "Disabled")
+        (findViewById<View>(R.id.drawer_option_toggle_max_zoom) as TextView).text = resources.getString(R.string.drawer_option_toggle_max_zoom, options.maxZoomLevel)
+    }
 }

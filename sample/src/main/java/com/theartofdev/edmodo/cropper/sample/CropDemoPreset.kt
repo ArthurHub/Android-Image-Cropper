@@ -9,14 +9,8 @@
 //
 // - Sun Tsu,
 // "The Art of War"
+package com.theartofdev.edmodo.cropper.sample
 
-package com.theartofdev.edmodo.cropper.sample;
-
-enum CropDemoPreset {
-  RECT,
-  CIRCULAR,
-  CUSTOMIZED_OVERLAY,
-  MIN_MAX_OVERRIDE,
-  SCALE_CENTER_INSIDE,
-  CUSTOM
+enum class CropDemoPreset {
+    RECT, CIRCULAR, CUSTOMIZED_OVERLAY, MIN_MAX_OVERRIDE, SCALE_CENTER_INSIDE, CUSTOM
 }
