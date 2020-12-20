@@ -55,7 +55,7 @@ public class CropImageActivity extends AppCompatActivity
   @SuppressLint("NewApi")
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.crop_image_activity);
+    setContentView(R.layout.com_theartofdev_edmodo_cropper__crop_image_activity);
 
     mCropImageView = findViewById(R.id.cropImageView);
 
