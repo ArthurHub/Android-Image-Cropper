@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">Pööra vastupäeva</string>
+    <string name="crop_image_menu_rotate_right">Pööra</string>
+    <string name="crop_image_menu_crop">Lõika</string>
+    <string name="crop_image_menu_flip">Pööra ümber</string>
+    <string name="crop_image_menu_flip_horizontally">Peegelda horisontaalselt</string>
+    <string name="crop_image_menu_flip_vertically">Peegelda vertikaalselt</string>
+
+    <string name="pick_image_intent_chooser_title">Valige allikas</string>
+
+    <string name="crop_image_activity_no_permissions">Tühistamine, nõutavaid õiguseid ei antud</string>
+
+</resources>
