@@ -149,7 +149,7 @@ public final class MainFragment extends Fragment
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    if (item.getItemId() == R.id.main_action_crop) {
+    if (item.getItemId() == R.id.main_action_save) {
       mCropImageView.getCroppedImageAsync();
       return true;
     } else if (item.getItemId() == R.id.main_action_rotate) {

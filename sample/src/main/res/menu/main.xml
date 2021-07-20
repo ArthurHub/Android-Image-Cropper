@@ -21,8 +21,8 @@
     </item>
 
     <item
-        android:id="@+id/main_action_crop"
-        android:title="@string/main_action_crop"
+        android:id="@+id/main_action_save"
+        android:title="@string/main_action_save"
         app:showAsAction="always"/>
 
 </menu>
