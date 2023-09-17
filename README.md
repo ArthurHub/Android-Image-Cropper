@@ -1,9 +1,19 @@
 Android Image Cropper
 =======
+
+# :triangular_flag_on_post: The Project is NOT currently maintained :triangular_flag_on_post:
+
+## Please use **[CanHub's fork](https://github.com/CanHub/Android-Image-Cropper)!**
+
+### Thank everybody for using the library. It was very fun to create and a privilage to help you build awesome apps.
+### The same way I took an unmaintained initial implementation from [edmodo](https://github.com/edmodo/cropper), I'm happy to see [CanHub](https://github.com/CanHub/Android-Image-Cropper) taking it now.
+### Good luck and happy coding :octocat:
+
+
+----
+----
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android--Image--Cropper-green.svg?style=true)](https://android-arsenal.com/details/1/3487)
 [![Build Status](https://travis-ci.org/ArthurHub/Android-Image-Cropper.svg?branch=master)](https://travis-ci.org/ArthurHub/Android-Image-Cropper)
-[ ![Download](https://api.bintray.com/packages/arthurhub/maven/Android-Image-Cropper/images/download.svg) ](https://bintray.com/arthurhub/maven/Android-Image-Cropper/_latestVersion)
-
 
 **Powerful** (Zoom, Rotation, Multi-Source), **customizable** (Shape, Limits, Style), **optimized** (Async, Sampling, Matrix) and **simple** image cropping library for Android.
 
