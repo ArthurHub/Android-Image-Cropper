@@ -39,7 +39,7 @@ publishing {
     }
 }
 
-apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
+apply from: 'https://gist.githubusercontent.com/pranavvij/5aeb200e5f3977549f2fe6e38bb5362c/raw/87c348483297c75ac78f29c6c741a373975659c4/gradle-maven-push.gradle'
 
 dependencies {
     api "androidx.appcompat:appcompat:$androidXLibraryVersion"
