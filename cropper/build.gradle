@@ -42,7 +42,7 @@ publishing {
 apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
 
 dependencies {
-    api "androidx.appcompat:appcompat:$androidXLibraryVersion"
+    api "androidx.appcompat:appcompat:$androidXAppCompatVersion"
     implementation "androidx.exifinterface:exifinterface:$androidXLibraryVersion"
 }
 

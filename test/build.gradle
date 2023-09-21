@@ -16,7 +16,7 @@ android {
 }
 
 dependencies {
-    api "androidx.appcompat:appcompat:$androidXLibraryVersion"
+    api "androidx.appcompat:appcompat:$androidXAppCompatVersion"
     implementation project(":cropper")
 
 }
