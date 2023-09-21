@@ -8,7 +8,7 @@
     <string name="crop_image_menu_flip">Flip</string>
     <string name="crop_image_menu_flip_horizontally">Flip horizontally</string>
     <string name="crop_image_menu_flip_vertically">Flip vertically</string>
-
+    <string name="crop_image_menu_done" translatable="false">Done</string>
     <string name="pick_image_intent_chooser_title">Select source</string>
 
     <string name="crop_image_activity_no_permissions">Cancelling, required permissions are not granted</string>

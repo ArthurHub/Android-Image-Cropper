@@ -43,6 +43,7 @@ apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/
 
 dependencies {
     api "androidx.appcompat:appcompat:$androidXLibraryVersion"
+    api "com.android.support:design:$buildToolsVersion"
     implementation "androidx.exifinterface:exifinterface:$androidXLibraryVersion"
 }
 

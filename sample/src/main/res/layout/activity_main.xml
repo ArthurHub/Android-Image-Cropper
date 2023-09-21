@@ -36,6 +36,12 @@
                 android:onClick="onDrawerOptionClicked"
                 android:text="@string/main_drawer_load"/>
 
+            <TextView
+                android:id="@+id/drawer_option_load_multiple"
+                style="@style/Cropper.Widget.Drawer.Option.TextView"
+                android:onClick="onDrawerOptionClicked"
+                android:text="@string/main_drawer_load_multiple"/>
+
             <View style="@style/Cropper.Widget.Drawer.Seperator"/>
 
             <TextView
